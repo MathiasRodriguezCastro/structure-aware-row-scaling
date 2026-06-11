@@ -1,5 +1,7 @@
 # Generator-Aware Positive Row Scaling for Block-Structured Engineering MIPs
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20648950.svg)](https://doi.org/10.5281/zenodo.20648950)
+
 Reproducibility repository for the paper *“Generator-Aware Positive Row Scaling for
 Block-Structured Engineering Mixed-Integer Programs”* (International Journal for Numerical
 Methods in Engineering, free-format submission).
@@ -120,17 +122,12 @@ Code: MIT (`LICENSE`). Data and aggregate results: CC BY 4.0 (`DATA_LICENSE.md`)
 Please cite the paper (`CITATION.cff`).
 
 ## Archiving and DOI (Zenodo)
-A long-term archive with a citable DOI can be created from the tagged GitHub release
-`v1.0.0`. The repository already ships `.zenodo.json` with the archive metadata
-(title, author, license, keywords), so the deposit only needs the one account-gated step:
-
-1. Sign in at <https://zenodo.org> with the GitHub account and, under
-   *Settings → GitHub*, toggle this repository **on**.
-2. Publish (or re-publish) the GitHub release `v1.0.0`. Zenodo then archives the
-   release tarball and mints a DOI (a version DOI plus a concept DOI for "all versions").
-3. Replace the `PENDING` DOI in `CITATION.cff` (`doi:` field) and in
-   `artifacts/README.md` with the minted DOI, and commit.
+This repository is archived on Zenodo through the GitHub–Zenodo integration, using the
+metadata in `.zenodo.json`. Cite the **concept DOI**
+[`10.5281/zenodo.20648950`](https://doi.org/10.5281/zenodo.20648950), which always
+resolves to the latest archived version; each release also receives its own version DOI.
 
 The heavy per-instance logs/CSVs (release assets, ~180 MB) are not part of the
 auto-archived source tarball; attach them to the Zenodo record manually if a single
-self-contained archive is desired.
+self-contained archive is desired. The journal-article DOI in `CITATION.cff`
+(`preferred-citation`) remains `PENDING` until the paper is published.

@@ -33,7 +33,10 @@ curl -LO $BASE/validacion-preproc-simple_logs.tar.zst
 curl -LO $BASE/validacion-preproc-simple_resultados.tar.zst
 ```
 
-A Zenodo deposit (DOI) is planned; this section will be updated once the DOI is minted.
+The repository is also archived on Zenodo (concept DOI
+[`10.5281/zenodo.20648950`](https://doi.org/10.5281/zenodo.20648950)). The Zenodo
+record archives the source tarball; these heavy archives stay on the GitHub release
+unless attached to the Zenodo record manually.
 
 ## Integrity
 
