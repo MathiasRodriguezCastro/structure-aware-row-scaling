@@ -18,9 +18,22 @@ Total compressed size: ~180 MB.
 
 ## Where to download
 
-> **Download location: _pending_.** The archives will be attached to a tagged
-> **GitHub Release** of this repository and/or deposited on **Zenodo** (DOI pending).
-> Update this section with the final URLs/DOI before publication.
+The archives are attached to the **GitHub Release `v1.0.0`** of this repository:
+
+- Release page:
+  <https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/tag/v1.0.0>
+- Direct download pattern:
+  `https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/download/v1.0.0/<archive-name>`
+
+For example:
+
+```bash
+BASE=https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/download/v1.0.0
+curl -LO $BASE/validacion-preproc-simple_logs.tar.zst
+curl -LO $BASE/validacion-preproc-simple_resultados.tar.zst
+```
+
+A Zenodo deposit (DOI) is planned; this section will be updated once the DOI is minted.
 
 ## Integrity
 
