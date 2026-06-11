@@ -18,8 +18,21 @@ separately under the MIT `LICENSE`.
 
 ## Terms
 
-Unless a more specific notice is added, the data files in `data/` and `results/` are
-released for academic reproducibility of the accompanying paper. If you reuse them,
-please cite the paper (see `CITATION.cff`) and the dispatch-model references listed in
-the paper. The aggregate results were produced by the original ClusterUY runs; the
-cleaned `code/` reproduces the same monolithic MIP + preprocessing path.
+Unless otherwise stated, the data files in `data/` and the aggregate result files
+`results/*/resumen.csv` are released under the Creative Commons Attribution 4.0
+International License (CC BY 4.0) for academic and research use. Please cite the
+paper using `CITATION.cff`.
+
+In summary:
+
+- **Code** is licensed separately under MIT (`LICENSE`).
+- **Real dispatch instances** used in the paper are included for reproducibility.
+- **Synthetic instances** are fully generated and are included as well.
+- **Aggregate results** (`results/*/resumen.csv`) stay in the repository tree.
+- **Full per-instance logs and dispatch CSVs** are distributed as external archives
+  **only because of their size** — to keep the repository light and clonable — not
+  because of any access restriction. The same CC BY 4.0 terms apply to them.
+
+The aggregate results were produced by the original ClusterUY runs; the cleaned
+`code/` reproduces the same monolithic MIP + preprocessing path. When reusing the
+data, please also cite the dispatch-model references listed in the paper.

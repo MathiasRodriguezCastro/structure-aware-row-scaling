@@ -15,9 +15,12 @@ paper:
 analysis-n0:
 	bash scripts/run_analysis_n0.sh
 
+# Always builds a license-free binary (Cbc only) into its own build dir
+# (code/build-cbc/), so this target never depends on — nor overwrites — a
+# preexisting Gurobi/CPLEX build under code/build/.
 synthetic-mini:
-	@test -x code/build/SistemaElectrico || $(MAKE) -C code USE_GUROBI=0 USE_CPLEX=0 USE_CBC=1 USE_HEXALY=0
-	cd code && ./build/SistemaElectrico < ../data/synthetic/validacion_mini_cbc.txt
+	$(MAKE) -C code BUILD_DIR=build-cbc USE_GUROBI=0 USE_CPLEX=0 USE_CBC=1 USE_HEXALY=0
+	cd code && ./build-cbc/SistemaElectrico < ../data/synthetic/validacion_mini_cbc.txt
 	@echo "Synthetic-mini metrics under code/synthetic/resultados/valid/"
 
 sanity-check:
@@ -25,5 +28,6 @@ sanity-check:
 
 clean:
 	-$(MAKE) -C code clean
+	-$(MAKE) -C code BUILD_DIR=build-cbc clean
 	-$(MAKE) -C paper clean
 	rm -rf results-analysis code/synthetic/resultados
