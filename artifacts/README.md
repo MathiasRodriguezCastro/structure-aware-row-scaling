@@ -18,17 +18,17 @@ Total compressed size: ~180 MB.
 
 ## Where to download
 
-The archives are attached to the **GitHub Release `v1.0.0`** of this repository:
+The archives are attached to the **GitHub Release `v1.0.1`** of this repository:
 
 - Release page:
-  <https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/tag/v1.0.0>
+  <https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/tag/v1.0.1>
 - Direct download pattern:
-  `https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/download/v1.0.0/<archive-name>`
+  `https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/download/v1.0.1/<archive-name>`
 
 For example:
 
 ```bash
-BASE=https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/download/v1.0.0
+BASE=https://github.com/MathiasRodriguezCastro/generator-aware-row-scaling/releases/download/v1.0.1
 curl -LO $BASE/validacion-preproc-simple_logs.tar.zst
 curl -LO $BASE/validacion-preproc-simple_resultados.tar.zst
 ```
