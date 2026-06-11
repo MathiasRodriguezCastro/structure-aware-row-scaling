@@ -2,7 +2,7 @@
 
 ## Compiler / language
 - C++17.
-- g++ 11.4.0 (Ubuntu 22.04) was used for the reference build. CPLEX 22.1.2 compiles
+- g++ 11.4.0 (Ubuntu 22.04) was used for the reference build. CPLEX 22.1.2.0 compiles
   cleanly with g++ <= 12; with g++ 13 the IBM Concert headers are pathologically slow,
   so prefer g++ <= 12 when CPLEX is enabled.
 
