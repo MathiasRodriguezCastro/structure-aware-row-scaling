@@ -1,0 +1,2040 @@
+% !TEX program = pdflatex
+%
+% Working manuscript for International Journal for Numerical Methods in Engineering.
+% IJNME offers Free Format submission. Wiley recommends the New Journal Design
+% (NJD) LaTeX template for authors requiring a journal template. This source
+% keeps an elsarticle-compatible review layout so that it compiles without
+% proprietary journal files; adapt to the Wiley NJD class if requested after review.
+%
+% Suggested compile sequence:
+%   pdflatex main
+%   bibtex main
+%   pdflatex main
+%   pdflatex main
+
+\documentclass[5p,times,authoryear]{elsarticle}
+
+% -------------------------------------------------------------------------
+% Packages
+% -------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% The elsarticle [times] option loads journal-like Times fonts for this layout.
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{threeparttable}
+\usepackage{makecell}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{stfloats}
+\usepackage{balance}
+\captionsetup{font=small,labelfont=bf}
+\captionsetup[figure]{skip=3pt,justification=centering,singlelinecheck=false}
+\captionsetup[subfigure]{font=footnotesize,labelfont=bf,justification=centering,singlelinecheck=false}
+\captionsetup[table]{skip=4pt}
+% Float tuning for the two-column review layout. The aim is to avoid isolated
+% figure-only pages after inserting the final plots, while still allowing the
+% figures to remain close to the results they illustrate.
+\setcounter{topnumber}{5}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{8}
+\setcounter{dbltopnumber}{4}
+\renewcommand{\topfraction}{0.98}
+\renewcommand{\bottomfraction}{0.92}
+\renewcommand{\textfraction}{0.02}
+\renewcommand{\floatpagefraction}{0.72}
+\renewcommand{\dbltopfraction}{0.98}
+\renewcommand{\dblfloatpagefraction}{0.72}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+% Place floats at the top of float-only pages instead of vertically centering them.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{8pt plus 1fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+\setlength{\tabcolsep}{4.5pt}
+\renewcommand{\arraystretch}{1.08}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\graphicspath{{figs/}}
+% Figure label convention for external plots: use English axis labels,
+% legends, and class/variant names. Recommended labels:
+% classes = {Simple, Full, SG-Ter-Mer}; variants = {SA-Aug, SA-Mat, Ruiz, Ruiz+Cols};
+% axes = {total-time speedup, solver speedup, coefficient-range ratio, fraction solved}.
+% Captions in this source are already in English. The figures are allowed to float
+% so that the preprint layout does not create pages with excessive blank space.
+
+\sisetup{
+  detect-weight=true,
+  detect-family=true,
+  group-separator={,},
+  group-minimum-digits=4,
+  round-mode=places,
+  round-precision=3
+}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+% Typography safeguards for the compact two-column layout.
+\raggedbottom
+\emergencystretch=2em
+\allowdisplaybreaks[2]
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+% -------------------------------------------------------------------------
+% Macros
+% -------------------------------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\nnz}{\operatorname{nnz}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\cond}{\operatorname{cond}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\pending}[1]{\textcolor{red}{[#1]}}
+\newcommand{\methodBase}{Base}
+\newcommand{\methodAug}{SA-Aug}
+\newcommand{\methodMat}{SA-Mat}
+\newcommand{\methodRuiz}{Ruiz}
+\newcommand{\methodRuizCols}{Ruiz+Cols}
+\newcommand{\sgm}{\ensuremath{\operatorname{sgm}}}
+\newcommand{\PARten}{\ensuremath{\operatorname{PAR10}}}
+\newcommand{\PI}{\ensuremath{\operatorname{PI}}}
+\newcommand{\Work}{\texttt{Work}}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}[proposition]{Lemma}
+\newtheorem{theorem}[proposition]{Theorem}
+
+% Safe figure insertion: if external plot files are unavailable, the manuscript
+% still compiles without large "Missing figure" boxes. Set \showmissingfigurestrue
+% while drafting if you want visible placeholders for absent plot files.
+\newif\ifshowmissingfigures
+\showmissingfiguresfalse
+\newcommand{\safefigure}[2]{%
+  \IfFileExists{#1}{%
+    \includegraphics[width=#2,keepaspectratio]{#1}%
+  }{%
+    \ifshowmissingfigures
+      {\color{gray}\footnotesize Draft placeholder: \texttt{\detokenize{#1}}}%
+    \fi
+  }%
+}
+
+% Full-width plot float that disappears cleanly if the external plot file is absent.
+% This avoids caption-only figures in local compilations before the final figure files
+% have been copied into figs/, figures/, results/, or img/.
+
+% Full-width plot float. A maximum height is imposed so that final plots do not
+% turn into isolated figure-only pages in the two-column layout. If a plot is
+% generated with large white margins, use \plotfiguretrim below for that file.
+\newcommand{\plotfigure}[4]{%
+  \IfFileExists{#1}{%
+    \begin{figure*}[!tbp]
+    \centering
+    \includegraphics[width=#2,height=.45\textheight,keepaspectratio]{#1}
+    \vspace{-0.35em}
+    \caption{#3}
+    \label{#4}
+    \end{figure*}%
+  }{%
+    \ifshowmissingfigures
+      \begin{figure*}[!tbp]
+      \centering
+      {\color{gray}\footnotesize Draft placeholder: \texttt{\detokenize{#1}}}
+      \caption{#3}
+      \label{#4}
+      \end{figure*}%
+    \fi
+  }%
+}
+
+% Variant for PDF figures exported with excessive surrounding white margins.
+% The optional first argument follows graphicx trim order: left bottom right top.
+\newcommand{\plotfiguretrim}[5][0pt 0pt 0pt 0pt]{%
+  \IfFileExists{#2}{%
+    \begin{figure*}[!tbp]
+    \centering
+    \includegraphics[width=#3,height=.45\textheight,trim=#1,clip,keepaspectratio]{#2}
+    \vspace{-0.35em}
+    \caption{#4}
+    \label{#5}
+    \end{figure*}%
+  }{%
+    \ifshowmissingfigures
+      \begin{figure*}[!tbp]
+      \centering
+      {\color{gray}\footnotesize Draft placeholder: \texttt{\detokenize{#2}}}
+      \caption{#4}
+      \label{#5}
+      \end{figure*}%
+    \fi
+  }%
+}
+
+% Pair two related plots under one full-width float. This is useful for evidence
+% that should be compared directly, such as static coefficient ranges versus
+% solver-level conditioning diagnostics. It also prevents long runs of isolated
+% plot-only pages after inserting final figures.
+\newcommand{\twoplotfigure}[8]{%
+  \IfFileExists{#1}{%
+    \IfFileExists{#4}{%
+      \begin{figure*}[!tbp]
+      \centering
+      \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=.35\textheight,keepaspectratio]{#1}
+        \caption{#2}
+        \label{#3}
+      \end{subfigure}\hfill
+      \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth,height=.35\textheight,keepaspectratio]{#4}
+        \caption{#5}
+        \label{#6}
+      \end{subfigure}
+      \vspace{-0.35em}
+      \caption{#7}
+      \label{#8}
+      \end{figure*}%
+    }{}%
+  }{}%
+}
+
+\journal{International Journal for Numerical Methods in Engineering}
+% Two-column review layout used as a journal-page proxy for free-format submission.
+\begin{document}
+
+
+\begin{frontmatter}
+
+\title{Generator-Aware Positive Row Scaling for Block-Structured Engineering Mixed-Integer Programs}
+
+\author[inst1]{Mathias Rodr\'iguez Castro\corref{cor1}}
+\ead{mathiasr@fing.edu.uy}
+\cortext[cor1]{Corresponding author.}
+
+\affiliation[inst1]{
+  organization={Facultad de Ingenier\'ia, Universidad de la Rep\'ublica},
+  city={Montevideo},
+  country={Uruguay}
+}
+
+\begin{abstract}
+Model generators know more than the coefficient matrix that they eventually export. Before export, a generator knows which constraints belong to physical or operational components, which variables those components create, and which rows couple components through system-wide balances. After export, the solver mainly sees a flat matrix. This paper asks whether this pre-export structural information can be used to choose positive row-scaling factors that improve the solver-facing representation without changing the mixed-integer program.
+
+We propose a generator-aware positive row-scaling framework for block-structured engineering mixed-integer programs (MIPs). The method multiplies complete constraints, including right-hand sides, by strictly positive factors. It therefore preserves the feasible set, objective function, and integer restrictions. The contribution is not positive row scaling by itself, but the use of pre-export generator metadata as numerical information: row roles, component ownership, and coupling incidence. The generator chooses the factors in three stages: it first scales local component rows, then computes representative block scales, and finally scales global coupling rows using the scales of the blocks they connect. Idealized conditioning results for block-diagonal and block-coupled matrices explain why this local--block--coupling order separates local scale imbalance from coupling imbalance.
+
+We test the method on a short-term hydrothermal dispatch platform that generates modular MIPs with heterogeneous physical and economic units. Two generator-aware variants are compared with the unscaled formulation and Ruiz-type baselines across three instance classes, two commercial solvers, and two optimality tolerances. A controlled synthetic benchmark of generated block-structured MIPs is also used as a mechanism check: it injects local and coupling row imbalance by construction, then verifies conditioning recovery and original-scale equivalence. The evidence supports three claims. First, the algebraic claim is exact: positive row scaling preserves the MIP. Second, the numerical claim is robust in this testbed: generator-aware scaling improves solver-facing conditioning diagnostics. Third, the performance claim is conditional: under Gurobi, the improved representation often reduces robust runtime or deterministic effort; under CPLEX 22.1.2.0, it does not yield a robust runtime gain. The method therefore improves numerical representation, but whether that improvement becomes acceleration depends on the solver pipeline.
+\end{abstract}
+
+\begin{keyword}
+Numerical scaling \sep mixed-integer programming \sep generated formulations \sep
+block-structured optimization \sep engineering optimization \sep numerical preprocessing
+\sep hydrothermal dispatch
+\end{keyword}
+
+\end{frontmatter}
+
+
+% -------------------------------------------------------------------------
+% Optional IJNME Practitioner Points (not printed in this compact version).
+% Uncomment if the journal or editor requests them.
+%
+% \section*{Practitioner Points}
+% \begin{itemize}[leftmargin=*,itemsep=2pt,topsep=2pt]
+%   \item Generated engineering optimization models may retain useful numerical
+%   information at model-generation time, before the solver sees only a flat matrix.
+%   \item Positive generator-aware row scalings preserve the original mixed-integer
+%   model while changing the numerical representation processed by the solver.
+%   \item Coefficient-range and conditioning improvements should be evaluated together
+%   with solver-level behavior, because they do not automatically imply faster branch-and-bound.
+% \end{itemize}
+
+
+% -------------------------------------------------------------------------
+\section{Introduction}
+\label{sec:introduction}
+% -------------------------------------------------------------------------
+
+A model generator and a solver see different representations of the same optimization problem. The generator builds the model from components: hydro plants, thermal units, market rules, resource limits, demand balances, and discrete operating decisions. While doing so, it knows which rows are local to one component, which variables that component owns, and which constraints link several components. The solver receives the exported version: rows, columns, coefficients, bounds, and tolerances. In that exported matrix, much of the generator's structural knowledge has disappeared.
+
+This loss matters because numerical representation affects computation. Two formulations
+can describe the same feasible set and objective, yet lead a solver through different
+presolve reductions, relaxation bases, cuts, incumbent searches, branching decisions, and
+feasibility checks. Generic scaling routines can inspect coefficient magnitudes after
+export. They usually cannot tell whether a row is a local turbine restriction, a thermal
+limit, or a system-wide balance. The generator can make that distinction before export.
+
+The resulting question is simple: can generator-level block information guide positive row scalings that improve the solver-facing representation without changing the MIP? The question is not whether positive row scaling is valid. Multiplying a complete constraint by a strictly positive scalar preserves the feasible set. The question is whether the scaling factors should depend on information that the generator still has: local rows, component blocks, and coupling rows. In this sense, the paper treats pre-export metadata as numerical information rather than only as modeling bookkeeping.
+
+We answer this question with a generator-aware row-scaling framework. The method scales
+only whole constraints, including their right-hand sides. Hence it preserves the original
+mixed-integer optimization problem. Its novelty lies in the order and source of the
+scales, not in claiming that row scaling is new. The generator first scales local component rows. It then summarizes the scale of
+each locally scaled block. Finally, it scales global coupling rows with the scales of the
+blocks they connect. Throughout the paper, this local--block--coupling order is the main
+object of study.
+
+The numerical rationale is also local--block--coupling. In an ideal block-diagonal matrix,
+scalar block scaling can reduce scale separation between blocks, but it cannot repair the
+intrinsic conditioning of a block. Once coupling rows are added, their relevant magnitude
+is not just their raw coefficient size; it is their size relative to the scaled local blocks.
+Idealized conditioning results make this distinction precise. They justify the
+architecture of the preprocessing rule, but they do not claim to predict mixed-integer
+runtime.
+
+We test the method on short-term hydrothermal dispatch. The methodological contribution is not a new hydrothermal formulation; rather, the dispatch platform is a demanding testbed for the preprocessing idea. It naturally creates local hydro, thermal, market, shortage, and demand modules, then links them through global balance equations. The coefficients mix water volumes, turbine flows, power outputs, generation costs, shortage penalties, and demand balances. The testbed therefore combines engineering structure with numerical scale heterogeneity.
+
+The hydrothermal formulation used in the experiments descends from models for the
+R\'io Negro hydroelectric complex, extensions to Salto Grande, and enriched hydrothermal
+variants developed by Risso and coauthors, together with a modular C++ implementation used
+as the experimental platform
+\citep{risso2025rioNegro,risso2025uruguayRiver,risso2026enriched,rodriguez2025thesis}.
+We take the formulation as given and insert the proposed preprocessing layer after model
+generation and before solver invocation.
+
+The paper makes three claims of different strength. The algebraic claim is exact: positive row scaling preserves the MIP. The numerical claim is empirical: in the tested hydrothermal instances, generator-aware scaling improves solver-facing conditioning measures. The performance claim is conditional: under Gurobi, the improved representation often reduces robust runtime or deterministic effort; under CPLEX 22.1.2.0, the same external transformations do not produce a robust runtime gain. Thus the method improves representation, while acceleration depends on how the solver uses that representation.
+
+The rest of the paper follows this chain of evidence. \Cref{sec:related-work} identifies
+the research niche. \Cref{sec:model} defines the generated model structure and testbed.
+\Cref{sec:scaling} gives the scaling method. \Cref{sec:experimental-design} explains how
+the experiments test the claims. \Cref{sec:results} reports numerical and runtime
+evidence. \Cref{sec:discussion} interprets that evidence and answers likely objections.
+\Cref{sec:validity} states the main limitations and reproducibility implications, and
+\cref{sec:conclusion} summarizes the contribution.
+
+\section{Related work}
+\label{sec:related-work}
+% -------------------------------------------------------------------------
+
+The literature establishes the setting for the paper but leaves a specific niche. The hydrothermal-dispatch literature supplies realistic generated engineering models. Numerical-scaling literature supplies flat-matrix preprocessing tools. Work on generated formulations explains why model-generation information may remain available before export. The missing argument is not that scaling can be useful in general; that is already well known. The missing argument is narrower: when the generator knows the block and coupling role of each row, that information can guide algebraically equivalent row scalings, and the value of those scalings must be judged through both numerical evidence and solver behavior.
+
+\subsection{Hydrothermal dispatch and MIP formulations}
+
+Hydrothermal dispatch has been studied with dynamic programming, stochastic dual
+dynamic programming, nonlinear programming, and mathematical programming. Classical
+references emphasize the trade-off between thermal generation costs, hydro opportunity
+costs, demand satisfaction, and intertemporal reservoir management
+\citep{wood2013power,conejo2010decision}. In short-term settings, MIP formulations are
+attractive because they incorporate discrete decisions, piecewise-linear approximations,
+local operating constraints, and system-wide balance equations in a single model
+\citep{vielma2015formulation}.
+
+This literature motivates the testbed but does not define the paper's methodological contribution. The objective here is not to redesign the hydrothermal model itself. Instead, the dispatch model acts as a representative generated engineering MIP with local physical modules and global coupling equations.
+
+\subsection{Dispatch models used in this study}
+
+The computational experiments use a reference formulation from a research line on
+MIP-based dispatch models for the Uruguayan power system. Risso et al. introduced a
+mixed combinatorial optimization model for the R\'io Negro hydroelectric complex
+\citep{risso2025rioNegro}, extended the modeling line to the hydrothermal dispatch of
+the Uruguay River hydroelectric plant \citep{risso2025uruguayRiver}, and developed an
+enriched formulation for the R\'io Negro complex with additional operational components
+\citep{risso2026enriched}. The implementation used here builds on a modular C++ version
+of the R\'io Negro dispatch model \citep{rodriguez2025thesis}.
+
+This provenance fixes the scope of the experiments. The dispatch formulation, data
+pipeline, and physical components are not redesigned. The proposed method acts after the
+model has been generated and before the solver is called.
+
+\subsection{Numerical scaling in mathematical programming}
+
+Scaling is a standard preprocessing operation in linear and mixed-integer optimization.
+Multiplying a constraint by a positive factor preserves the feasible region but changes
+the numerical magnitudes passed to the solver. These magnitudes can affect feasibility
+tolerances, relaxation stability, presolve transformations, and the numerical behavior of
+LP relaxations. Practical guidelines for difficult LP and MIP models warn that large
+coefficient ranges and poor scaling can harm solver performance even when the
+mathematical formulation is correct \citep{klotz2013lp,klotz2013mip}.
+
+Generic equilibration procedures balance rows and columns according to matrix norms.
+Ruiz-type scaling is a representative method: it iteratively equilibrates row and column
+norms through diagonal transformations \citep{ruiz2001scaling}. Such methods are useful
+because they are model-agnostic. That strength is also their limitation here. They balance
+the exported matrix but do not necessarily know whether a row represents a local device
+restriction or a global coupling equation.
+
+\subsection{Generated formulations and the remaining niche}
+
+A modular model generator provides information that is not explicit in the coefficient
+matrix alone. Each module contributes local rows and variables, while global rows couple
+several modules. Treating all rows identically can ignore this modeling structure.
+Generator-aware preprocessing exploits this distinction while leaving the feasible region
+unchanged.
+
+The present work occupies the niche between generic scaling and structural decomposition.
+Like decomposition, it uses block structure; unlike Dantzig--Wolfe, Benders, or
+Lagrangian methods, it does not decompose the optimization problem. The solver still
+receives one monolithic MIP. The only change is an algebraically equivalent row scaling
+chosen from generator-level information. For benchmarking, we use performance profiles,
+a standard tool for comparing optimization algorithms over heterogeneous instance sets
+\citep{dolan2002performance}.
+
+The resulting contribution is deliberately narrow: it tests whether local rows, block scales, and coupling rows should be treated as different numerical objects before a generated engineering MIP is exported to a commercial solver.
+
+\section{Materials and methods: generated modular formulation and testbed}
+\label{sec:model}
+% -------------------------------------------------------------------------
+
+We now define the objects that the scaling rule changes and the objects it must leave
+unchanged. The generator supplies the block structure; the preprocessing layer changes the
+row magnitudes; the solver then receives an algebraically equivalent MIP. The dispatch
+model itself is not new. What matters here is the structure that the generator exposes and
+the original scale in which all feasibility and objective checks are evaluated after the
+solve. We consider generated modular MIP instances formulated as
+\begin{equation}
+\begin{aligned}
+  \min_{x} \quad & c^\top x \\
+  \text{s.t.} \quad & Ax \le b, \\
+  & x_j \in \Z, \qquad j \in \mathcal{I}, \\
+  & x_j \in \R, \qquad j \notin \mathcal{I}.
+\end{aligned}
+\label{eq:generic-mip}
+\end{equation}
+In the general generated setting, the vector $x$ collects all variables created by the
+modules, while $A$ and $b$ contain both local component constraints and global linking
+constraints. In the hydrothermal testbed used here, $x$ includes generation, reservoir,
+flow, spillage, shortage, and operating variables. Equalities are represented either
+explicitly or by pairs of inequalities, depending on the solver interface.
+
+\subsection{Hydrothermal dispatch testbed and scope}
+
+The computational testbed uses the reference model generated by the modular dispatch
+platform developed around R\'io Negro and Salto Grande hydrothermal dispatch models
+\citep{risso2025rioNegro,risso2025uruguayRiver,risso2026enriched,rodriguez2025thesis}.
+The application is useful because it exhibits the target structure: local modules
+with heterogeneous physical units and global rows that couple those modules through
+system-wide balances. The hydraulic, thermal, and market-cost constraints are those of
+the reference model and its implementation.
+
+The paper therefore separates the preprocessing idea from the application that tests it. The proposed method acts on the generated algebraic model; it does not modify the physical dispatch formulation. All preprocessing transformations must preserve the feasible set and must allow objective values, constraint violations, and operational variables to be interpreted in the original scale after solution.
+
+\subsection{Block structure}
+
+The method targets models generated by components or agents. Each component
+$i\in\mathcal{B}$ creates local variables $x_i$, contributes local constraints
+$A_i x_i\le b_i$, and appears in a smaller number of global constraints. In the
+hydrothermal testbed, these components include hydro, thermal, market, and demand
+modules. If $u_{\mathrm{loc}}$ stacks all local variables and $g$ denotes an aggregate
+coupling variable, the row structure can be written schematically as
+\begin{equation}
+\begin{bmatrix}
+D & 0 \\
+0 & I_T \\
+L & -I_T
+\end{bmatrix}
+\begin{bmatrix}
+u_{\mathrm{loc}} \\
+g
+\end{bmatrix}
+\sim
+\begin{bmatrix}
+b \\
+d \\
+0
+\end{bmatrix},
+\qquad
+D=\diag(A_1,\ldots,A_B).
+\label{eq:compact-dispatch-structure}
+\end{equation}
+The first block contains local component restrictions. The second block represents an
+aggregate system restriction. The third block contains coupling equations that link local
+component decisions with the aggregate system variable. In the dispatch application,
+these rows correspond to demand and balance relationships. Equivalently, after row and
+column permutations, the coefficient matrix has the block form
+\begin{equation}
+A =
+\begin{bmatrix}
+A_1 & 0   & \cdots & 0 \\
+0   & A_2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0   & 0   & \cdots & A_B \\
+L_1 & L_2 & \cdots & L_B
+\end{bmatrix},
+\qquad
+b =
+\begin{bmatrix}
+b_1\\ b_2\\ \vdots\\ b_B\\ h
+\end{bmatrix}.
+\label{eq:block-matrix}
+\end{equation}
+The matrices $A_i$ encode local restrictions. The matrices $L_i$ encode each block's contribution to the global coupling rows, such as demand balance in the hydrothermal
+testbed.
+
+This structure suggests three scaling decisions: scale local rows inside each block; compute representative block scales after local row scaling; and scale global coupling rows with those block scales. The goal is to reduce harmful scale heterogeneity without erasing the modular meaning of the formulation.
+
+\subsection{Algebraic equivalence and spectral diagnostics}
+\label{subsec:equivalence-diagnostics}
+
+We restrict the preprocessing layer to positive row scalings. This restriction makes the
+transformation auditable: variables keep their original units, and the generated MIP remains
+the same optimization problem. Let $D_r=\diag(d_1,\ldots,d_m)$, with $d_r>0$ for every
+row. We replace $(A,b)$ by
+\begin{equation}
+\widetilde A = D_r A,
+\qquad
+\widetilde b = D_r b .
+\label{eq:row-scaling}
+\end{equation}
+For every vector $x$,
+\begin{equation}
+Ax\le b
+\quad\Longleftrightarrow\quad
+D_rAx\le D_rb,
+\label{eq:row-scaling-equivalence}
+\end{equation}
+because each component of the inequality is multiplied by a strictly positive scalar.
+Thus positive row scaling preserves the feasible set, the integer restrictions, and the
+objective function. Any difference observed after preprocessing must therefore come from
+the numerical representation seen by the solver, not from a different mathematical MIP.
+
+The theoretical arguments below use the spectral condition number as a diagnostic of linear-algebraic sensitivity. For a real matrix $M$, define
+\begin{equation}
+\kappa_2(M)=
+\frac{\sigma_{\max}(M)}{\sigma_{\min}^{+}(M)},
+\label{eq:spectral-condition}
+\end{equation}
+where $\sigma_{\max}(M)$ is the largest singular value and $\sigma_{\min}^{+}(M)$ is the
+smallest positive singular value. For rectangular matrices, this ratio is used only as a
+diagnostic over the nonzero singular spectrum; in square nonsingular benchmarks, rank
+deficiency is interpreted as infinite condition number. This diagnostic does not characterize the full difficulty of a MIP. A MIP solver also depends on presolve, cuts, branching, primal heuristics, incumbent discovery, feasibility tolerances, and integrality. The role of $\kappa_2$ is narrower: it provides an idealized matrix argument explaining why local rows and coupling rows should not be scaled in exactly the same way.
+
+\subsection{Ideal block scaling}
+\label{subsec:ideal-block-scaling}
+
+The block structure is not only a modeling convenience. It identifies what scalar scaling
+can and cannot repair. In a purely block-diagonal matrix $D=\diag(A_1,\ldots,A_B)$, a
+single scalar per block can remove differences of scale between blocks, but it cannot
+improve the intrinsic conditioning of an individual block. The following benchmark makes
+this statement precise in the ideal square nonsingular case.
+
+\begin{proposition}[Ideal scalar scaling of block-diagonal matrices]
+\label{prop:ideal-block-scaling}
+Let $D=\diag(A_1,\ldots,A_B)$, where every $A_i$ is square and nonsingular. Let
+$M_i=\sigma_{\max}(A_i)$ and $m_i=\sigma_{\min}(A_i)>0$. Then
+\begin{equation}
+\min_{\alpha_i>0}
+\kappa_2\!\left(\diag(\alpha_1 I,\ldots,\alpha_B I)D\right)
+=
+\max_i \kappa_2(A_i).
+\label{eq:ideal-block-minimax}
+\end{equation}
+One minimizer is
+\begin{equation}
+\alpha_i=\frac{1}{\sqrt{M_i m_i}}
+=
+\frac{1}{\sqrt{\sigma_{\max}(A_i)\sigma_{\min}(A_i)}} .
+\label{eq:ideal-block-factor}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
+\begin{equation*}
+\diag(\alpha_1 I,\ldots,\alpha_B I)D
+=
+\diag(\alpha_1 A_1,\ldots,\alpha_B A_B).
+\end{equation*}
+The singular values of a block-diagonal matrix are the union of the singular values of
+its blocks. Therefore, for every $i$,
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\kappa_2(\alpha_i A_i)
+=
+\kappa_2(A_i).
+\end{equation*}
+Taking the maximum over $i$ gives the lower bound
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\max_i \kappa_2(A_i)
+\end{equation*}
+for every admissible block scaling.
+
+Now choose $\alpha_i=(M_i m_i)^{-1/2}$. Then the largest and smallest singular values of
+$\alpha_i A_i$ are
+\begin{align*}
+\sigma_{\max}(\alpha_i A_i)
+&=\sqrt{\frac{M_i}{m_i}}=\sqrt{\kappa_2(A_i)},\\
+\sigma_{\min}(\alpha_i A_i)
+&=\sqrt{\frac{m_i}{M_i}}=\frac{1}{\sqrt{\kappa_2(A_i)}}.
+\end{align*}
+Because the singular values of the complete block-diagonal matrix are obtained by
+pooling the singular values of its blocks,
+\begin{equation*}
+\sigma_{\max}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\sqrt{\max_i \kappa_2(A_i)},
+\end{equation*}
+and
+\begin{equation*}
+\sigma_{\min}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\frac{1}{\sqrt{\max_i \kappa_2(A_i)}}.
+\end{equation*}
+The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
+\end{proof}
+
+This proposition is not used as an algorithmic recipe. The generated MIPs considered in
+this paper contain rectangular local matrices, inequalities, bounds, redundant rows, and
+integer variables; computing singular-value-based block scalings would not be a practical
+external preprocessing rule for the exported MIP. The proposition instead justifies the
+architecture of the method. First, poor scale separation between blocks should be treated
+differently from poor conditioning inside a block. Second, after local row scaling, each
+block should contribute a representative scale before global coupling rows are processed.
+The implemented rules therefore replace the ideal singular-value quantities
+$(M_i,m_i)$ with coefficient-based proxies that are cheap to compute from the generated
+model. These propositions are design principles, not performance theorems. They should not be read as predictive guarantees for the implemented
+MIP preprocessing rule; they motivate the distinction between local rows, block scales,
+and coupling rows.
+
+\subsection{Effect of global coupling rows}
+\label{subsec:global-coupling-theory}
+
+Local block scaling does not exhaust the numerical issue because the generated model is
+not purely block diagonal. In the hydrothermal dispatch testbed, global rows couple local
+agent decisions through demand and balance equations. The relevant schematic block is
+\begin{equation}
+A_B=
+\begin{bmatrix}
+D & 0\\
+L & -I_T
+\end{bmatrix},
+\label{eq:balance-block-matrix}
+\end{equation}
+where $D=\diag(A_1,\ldots,A_B)$ represents the local blocks and $L$ collects the
+coefficients by which local decisions enter the global balance. If $D$ is nonsingular, then
+\begin{equation}
+A_B=
+\begin{bmatrix}
+I & 0\\
+LD^{-1} & -I_T
+\end{bmatrix}
+\begin{bmatrix}
+D & 0\\
+0 & I_T
+\end{bmatrix}.
+\label{eq:balance-factorization}
+\end{equation}
+This factorization separates local scale from coupling scale. The matrix $L$ by itself is
+not the relevant object: the coupling felt by the balance row after the local block scales
+are taken into account is $LD^{-1}$. Thus a row with moderate entries in $L$ can still be
+numerically influential if some local block contains weak directions.
+
+The next result makes the dependence on the effective coupling norm explicit.
+
+\begin{proposition}[Conditioning of a triangular coupling factor]
+\label{prop:triangular-coupling}
+Let $R\in\R^{m\times n}$ and define
+\begin{equation}
+T_R=
+\begin{bmatrix}
+I_n & 0\\
+R & I_m
+\end{bmatrix}.
+\end{equation}
+If $\rho=\norm{R}_2$, then
+\begin{equation}
+\kappa_2(T_R)=
+\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
+\label{eq:link-condition}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Let $R=U\Sigma V^\top$ be a singular value decomposition of $R$, with $U$ and $V$
+orthogonal. Orthogonal multiplication does not change singular values, and hence
+$T_R$ has the same singular values as
+\begin{equation*}
+\begin{bmatrix}
+V^\top & 0\\
+0 & U^\top
+\end{bmatrix}
+\begin{bmatrix}
+I_n & 0\\
+R & I_m
+\end{bmatrix}
+\begin{bmatrix}
+V & 0\\
+0 & U
+\end{bmatrix}
+=
+\begin{bmatrix}
+I_n & 0\\
+\Sigma & I_m
+\end{bmatrix}.
+\end{equation*}
+For each singular value $\sigma$ of $R$, the nontrivial part reduces to the two-dimensional
+block
+\begin{equation*}
+B_\sigma=
+\begin{bmatrix}
+1 & 0\\
+\sigma & 1
+\end{bmatrix}.
+\end{equation*}
+The squared singular values of $B_\sigma$ are the eigenvalues of
+\begin{equation*}
+B_\sigma^\top B_\sigma=
+\begin{bmatrix}
+1+\sigma^2 & \sigma\\
+\sigma & 1
+\end{bmatrix},
+\end{equation*}
+namely
+\begin{equation*}
+\lambda_{\pm}(\sigma)=
+\frac{\sigma^2+2\pm \sigma\sqrt{\sigma^2+4}}{2}.
+\end{equation*}
+Their product is one, and $\lambda_+(\sigma)$ is increasing for $\sigma\ge0$. Additional
+directions associated with zero singular values of $R$ contribute singular values equal to
+one. Therefore the largest squared singular value of $T_R$ is $\lambda_+(\rho)$ and the
+smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
+\begin{align*}
+\kappa_2(T_R)
+&=\lambda_+(\rho)\\
+&=\frac{\rho^2+2+\rho\sqrt{\rho^2+4}}{2}\\
+&=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
+\end{align*}
+\end{proof}
+
+Applied to \eqref{eq:balance-factorization}, the proposition shows that the balance row
+should not be treated as an ordinary local row. Its numerical effect depends on the
+effective coupling proxy $\norm{LD^{-1}}_2$, not only on the raw magnitude of the
+entries in $L$. Moreover, if a common positive factor $\gamma$ is applied to the coupling
+row, the scaled block satisfies
+\begin{equation}
+\begin{bmatrix}
+D & 0\\
+\gamma L & -\gamma I_T
+\end{bmatrix}
+=
+\begin{bmatrix}
+I & 0\\
+\gamma LD^{-1} & -I_T
+\end{bmatrix}
+\begin{bmatrix}
+D & 0\\
+0 & \gamma I_T
+\end{bmatrix}.
+\label{eq:scaled-balance-factorization}
+\end{equation}
+Thus $\gamma$ changes both the effective coupling term and the relative scale of the
+aggregate variable in the balance equation. This is the trade-off behind the proposed
+coupling-row factor: global rows should be scaled after local rows, using block-level
+representative scales, rather than by an isolated row norm. In the implemented variants,
+$D^{-1}$ and singular values are replaced by coefficient-based block proxies, yielding a
+cheap operational approximation to the ideal coupling measure.
+
+
+% -------------------------------------------------------------------------
+\section{Numerical scaling method}
+\label{sec:scaling}
+% -------------------------------------------------------------------------
+
+The scaling method keeps the same structural roles visible throughout: local rows, blocks, and coupling rows. Local rows receive row factors first. Blocks then inherit representative scales from their scaled local rows. Coupling rows receive their factors last, using the blocks they connect. This order is the algorithmic expression of the numerical argument in \cref{subsec:ideal-block-scaling,subsec:global-coupling-theory}.
+
+This section defines the numerical transformations tested in the results. The base variant is the unscaled model generated by the platform. The two proposed variants use the same local--block--coupling architecture but differ in whether the right-hand side participates in the scale diagnosis. Ruiz-type variants provide generic flat-matrix baselines. This organization makes two contrasts explicit. The comparison between \methodAug{} and \methodMat{} isolates the role of right-hand-side information within the same architecture; the comparison with Ruiz-type baselines tests whether generator-level row roles add information beyond generic flat-matrix equilibration.
+
+\subsection{Base formulation}
+
+The \methodBase{} variant is passed to the solver without external scaling. Internal
+solver presolve and internal scaling remain enabled unless stated otherwise. All
+speedups, objective deviations, and equivalence checks are computed relative to this
+variant on the same instance, solver, and gap setting.
+
+\subsection{Augmented generator-aware scaling}
+\label{subsec:strategy-1}
+
+The first proposed variant, denoted \methodAug{}, computes row factors from both
+coefficient magnitudes and right-hand sides. The motivation is that a generated row may
+have moderate coefficients but a right-hand side in a very different physical or economic
+scale. Such a row can still lead to a poorly balanced numerical representation.
+
+For each local row $r$, define
+\begin{equation}
+\mathcal{S}_r^{A,b}
+=
+\left\{
+\abs{a_{rj}}: a_{rj}\neq 0
+\right\}
+\cup
+\left\{
+\abs{b_r}: b_r\neq 0
+\right\}.
+\label{eq:augmented-set}
+\end{equation}
+If $\mathcal{S}_r^{A,b}\neq\emptyset$, let
+\begin{equation}
+M_r^{A,b}=\max \mathcal{S}_r^{A,b},
+\qquad
+m_r^{A,b}=\min \mathcal{S}_r^{A,b}.
+\label{eq:augmented-extremes}
+\end{equation}
+The local row factor is
+\begin{equation}
+\alpha_r^{A,b}=\frac{1}{\sqrt{M_r^{A,b}m_r^{A,b}}}.
+\label{eq:alpha-augmented}
+\end{equation}
+The scaled row is
+\begin{equation}
+\alpha_r^{A,b}a_r^\top x\le \alpha_r^{A,b}b_r.
+\end{equation}
+
+The augmented rule is not only a row-by-row normalization. It is a three-stage
+generator-aware procedure that first rescales local rows, then summarizes the resulting
+local block scales, and finally uses those block scales to treat coupling rows separately.
+After local scaling, let $\widetilde a_{rj}=\alpha_r^{A,b}a_{rj}$ for local rows. For each
+local block $i$, define
+\begin{equation}
+M_i^{A,b}
+=
+\max_{r\in A_i,\,j:\,\widetilde a_{rj}\neq 0}
+\abs{\widetilde a_{rj}},
+\qquad
+m_i^{A,b}
+=
+\min_{r\in A_i,\,j:\,\widetilde a_{rj}\neq 0}
+\abs{\widetilde a_{rj}}.
+\label{eq:augmented-block-extremes}
+\end{equation}
+The representative scale of block $i$ is
+\begin{equation}
+s_i^{A,b}=\sqrt{M_i^{A,b}m_i^{A,b}}.
+\label{eq:augmented-block-scale}
+\end{equation}
+For a coupling row $r$, let $b(j)$ denote the local block associated with column $j$.
+The effective coupling proxy used by \methodAug{} is
+\begin{equation}
+\widehat\rho_r^{A,b}
+=
+\sqrt{
+\sum_j
+\left(
+\frac{\abs{a_{rj}}}{s_{b(j)}^{A,b}}
+\right)^2
+}.
+\label{eq:augmented-coupling-rho}
+\end{equation}
+If $\widehat\rho_r^{A,b}>0$, the coupling-row factor is
+\begin{equation}
+\gamma_r^{A,b}=\frac{1}{\widehat\rho_r^{A,b}}.
+\label{eq:augmented-coupling-factor}
+\end{equation}
+All factors are then clipped by the safeguards described below. This sequence is the
+main structural feature of the proposed method: local physical scales are used first,
+block scales are estimated after local normalization, and global coupling rows are scaled
+only after the blocks they connect have been put on comparable numerical footing.
+
+\subsection{Matrix-only generator-aware scaling}
+\label{subsec:strategy-2}
+
+The second proposed variant, denoted \methodMat{}, uses the same row--block--coupling
+architecture but excludes $b$ from the diagnosis. The right-hand side is still multiplied
+by the selected row factor to preserve equivalence, but it does not influence factor
+selection.
+
+For each local row $r$, define the nonzero coefficient extremes
+\begin{equation}
+M_r^{A}=\max_{j:\,a_{rj}\neq 0}\abs{a_{rj}},
+\qquad
+m_r^{A}=\min_{j:\,a_{rj}\neq 0}\abs{a_{rj}}.
+\label{eq:matrix-row-extremes}
+\end{equation}
+If the row has at least one nonzero coefficient, the row factor is
+\begin{equation}
+\alpha_r^{A}=\frac{1}{\sqrt{M_r^{A}m_r^{A}}}.
+\label{eq:matrix-row-factor}
+\end{equation}
+The scaled row is
+\begin{equation}
+\alpha_r^{A}a_r^\top x\le \alpha_r^{A}b_r.
+\end{equation}
+This factor centers the smallest and largest nonzero coefficient magnitudes of the row
+around a common scale. Unlike Euclidean-norm scaling, it does not directly depend on
+the number of nonzeros in the row.
+
+Let $\widetilde a_{rj}=\alpha_r^A a_{rj}$ after local row scaling. For each local block
+$i$, define
+\begin{equation}
+M_i^{A}
+=
+\max_{r\in A_i,\,j:\,\widetilde a_{rj}\neq 0}
+\abs{\widetilde a_{rj}},
+\qquad
+m_i^{A}
+=
+\min_{r\in A_i,\,j:\,\widetilde a_{rj}\neq 0}
+\abs{\widetilde a_{rj}}.
+\label{eq:matrix-block-extremes}
+\end{equation}
+The representative block scale is
+\begin{equation}
+s_i^A=\sqrt{M_i^A m_i^A}.
+\label{eq:matrix-block-scale}
+\end{equation}
+No additional multiplier is applied to all rows or columns of block $i$ at this stage.
+The quantity $s_i^A$ is an auxiliary representative scale: it is used only to
+normalize the contribution of block $i$ when the coupling-row proxy is computed.
+
+For a coupling row $r$, let $b(j)$ denote the block associated with column $j$. Define
+\begin{equation}
+\widehat{\rho}_r^{A}
+=
+\sqrt{
+\sum_j
+\left(
+\frac{\abs{a_{rj}}}{s_{b(j)}^{A}}
+\right)^2
+}.
+\label{eq:matrix-coupling-rho}
+\end{equation}
+If $\widehat{\rho}_r^{A}>0$, the coupling-row factor is
+\begin{equation}
+\gamma_r^{A}=\frac{1}{\widehat{\rho}_r^{A}}.
+\label{eq:matrix-coupling-factor}
+\end{equation}
+
+The comparison between \methodAug{} and \methodMat{} isolates the empirical value of
+including the right-hand side in the scaling diagnosis. Both variants preserve the same
+structural architecture; they differ only in whether $b$ participates in factor selection.
+
+\subsection{Safeguards}
+
+All applied scaling factors---the local row factors and the coupling-row factors in the
+augmented or matrix-only variants---are subject to two per-factor safeguards, applied
+independently to each factor. The representative block scales $s_i$ are auxiliary
+quantities used to compute coupling-row proxies; they are not applied as independent
+row or column scalings.
+
+\paragraph{Near-identity threshold}
+A factor is applied only if it departs from one by at least a factor of $u=2$; factors
+falling in the band $[\,1/u,\;u\,]=[0.5,\,2]$ are treated as negligible and skipped:
+\begin{equation}
+\theta \text{ is applied}
+\iff
+\left(\theta \le \frac{1}{u}\right)\ \text{or}\ \left(\theta \ge u\right),
+\qquad u=2 .
+\label{eq:near-identity}
+\end{equation}
+This prevents re-scaling rows or coupling rows that are already at a reasonable scale.
+
+\paragraph{Admissible coefficient range}
+A factor is applied only if it keeps every affected coefficient within the window
+$[\varepsilon_{\min},\varepsilon_{\max}] = [10^{-9},\,10^{9}]$. Writing
+$c_{\min}$ and $c_{\max}$ for the smallest and largest magnitudes of the affected
+coefficients, the factor $\theta$ is admitted only if
+\begin{equation}
+\begin{aligned}
+\varepsilon_{\min} &\le c_{\min}\,\theta,
+& c_{\max}\,\theta &\le \varepsilon_{\max},\\
+[\varepsilon_{\min},\varepsilon_{\max}]&=[10^{-9},\,10^{9}].
+\end{aligned}
+\label{eq:coef-window}
+\end{equation}
+Otherwise, the factor is not applied and the corresponding row or coupling row is left at its base scale. The coupling factor is additionally hard-clipped to
+$\gamma \in [10^{-8},\,10^{8}]$ prior to this check.
+
+Because each admitted factor is a strictly positive multiplier applied to a complete
+constraint---both its coefficients and its right-hand side---the feasible set and the
+objective value are preserved exactly. The safeguards therefore restrict only the
+numerical aggressiveness of the transformation, never its equivalence to the base model.
+
+
+\subsection{Ruiz-type baselines}
+
+We compare the proposed variants with two generic baselines. The first,
+\methodRuiz{}, applies iterative row equilibration based on the maximum norm. The
+second, \methodRuizCols{}, combines Ruiz-type row equilibration with continuous-column
+scaling and physical normalization. These baselines separate the effect of generic
+coefficient compression from the effect of exploiting model structure.
+
+The final implementation uses
+\begin{equation}
+K=4
+\end{equation}
+Ruiz iterations. Binary and integer variables are not rescaled unless explicitly stated,
+so that bounds, objective interpretation, and integrality remain unchanged.
+
+\subsection{Algorithmic summary}
+
+\begin{algorithm}[H]
+\caption{Augmented generator-aware row scaling}
+\label{alg:augmented-scaling}
+\begin{algorithmic}[1]
+\Require Matrix $A$, right-hand side $b$, block partition $\mathcal{B}$
+\Ensure Scaled matrix $\widetilde A$, scaled right-hand side $\widetilde b$
+\State Initialize row factors $d_r\gets 1$
+\For{each local block $i\in\mathcal{B}$}
+  \For{each local row $r\in A_i$}
+    \State Build $\mathcal{S}_r^{A,b}$ from nonzero coefficients and nonzero right-hand side
+    \If{$\mathcal{S}_r^{A,b}\neq\emptyset$}
+      \State Compute $M_r^{A,b}$ and $m_r^{A,b}$ using \cref{eq:augmented-extremes}
+      \State Set $\alpha_r^{A,b}\gets 1/\sqrt{M_r^{A,b}m_r^{A,b}}$
+      \State Apply safeguards and update $d_r\gets d_r\alpha_r^{A,b}$
+    \EndIf
+  \EndFor
+\EndFor
+\State Compute the locally scaled coefficients $\widetilde a_{rj}=d_r a_{rj}$
+\State Compute block scales $s_i^{A,b}=\sqrt{M_i^{A,b}m_i^{A,b}}$ using \cref{eq:augmented-block-scale}
+\For{each coupling row $r$}
+  \State Compute $\widehat\rho_r^{A,b}$ using \cref{eq:augmented-coupling-rho}
+  \If{$\widehat\rho_r^{A,b}>0$}
+    \State Set $\gamma_r^{A,b}\gets 1/\widehat\rho_r^{A,b}$
+    \State Apply safeguards and update $d_r\gets d_r\gamma_r^{A,b}$
+  \EndIf
+\EndFor
+\State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
+\end{algorithmic}
+\end{algorithm}
+
+The matrix-only algorithm is obtained from \cref{alg:augmented-scaling} by replacing
+$\mathcal{S}_r^{A,b}$ with the coefficient-only set
+$\{\abs{a_{rj}}:a_{rj}\neq 0\}$ and by using the representative block scales and coupling
+proxies in \cref{eq:matrix-block-scale,eq:matrix-coupling-rho}. In the present
+manuscript, \methodMat{} is interpreted as an ablation of the right-hand-side
+information: it preserves the same local-row and coupling-row architecture, but the
+right-hand side does not enter the factor-selection rule.
+
+% -------------------------------------------------------------------------
+\section{Experimental design}
+\label{sec:experimental-design}
+% -------------------------------------------------------------------------
+
+\subsection{Instance classes and scenarios}
+
+The experiments are organized around four reader questions. Does scaling preserve the original optimization problem? Does it improve the numerical representation? Does that improvement change solver behavior? Does the effect survive changes in instance class, solver, and tolerance? To answer these questions, the computational study uses three instance classes generated by the same modular hydrothermal dispatch platform. The pools are built from operational
+instances for which the required real input data are available. Consequently, the number
+of valid runs may differ across
+class--scenario--variant combinations: some instances may be absent because the
+corresponding real data, generated model, or solver log is unavailable. Descriptive
+aggregate metrics use all valid runs for the reported row. Speedups, statistical tests,
+and all claims involving direct comparison with the base model use matched
+base--variant pairs for the same instance, solver, and gap tolerance.
+
+\begin{table*}[t]
+\centering
+\caption{The experimental design turns the main claim into reader questions, evidence, and possible objections.}
+\label{tab:argument-design}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}p{0.23\textwidth}p{0.33\textwidth}p{0.34\textwidth}@{}}
+\toprule
+Reader question & Evidence reported in the paper & Objection addressed by the design \\
+\midrule
+Does scaling change the optimization problem? & Algebraic equivalence of positive row scaling, descaling checks, and original-scale feasibility/integrality tests. & A faster run would be irrelevant if it solved a different MIP or hid violations created by rescaling. \\
+Does generator awareness improve numerical representation? & Coefficient-range summaries, estimated conditioning ratios, and solver-level conditioning diagnostics when available. & Static matrix compression alone may not measure the numerical state actually used by the solver. \\
+Does numerical improvement become algorithmic improvement? & Matched base--variant speedups, deterministic effort, performance profiles, and primal--dual progress. & Better conditioning diagnostics do not necessarily imply shorter branch-and-bound search. \\
+Is the effect a property of the method or of one solver pipeline? & Separate Gurobi and CPLEX scenarios at two MIPGap tolerances. & A positive result under one solver may be absorbed, reversed, or made irrelevant by another solver's internal preprocessing and search strategy. \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item The table is used as a guide to the results. It separates claims from the
+evidence that can support them and keeps the strongest performance claim conditional on
+solver behavior.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+\noindent \Cref{tab:argument-design} states the logic of the computational study. The
+experiments are designed not only to report faster or slower runs, but also to show which
+part of the argument each measurement can support.
+
+\begin{table*}[t]
+\centering
+\caption{Three instance classes test the method on progressively different generated hydrothermal models.}
+\label{tab:instance-stats}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}p{0.16\textwidth}p{0.42\textwidth}p{0.28\textwidth}r@{}}
+\toprule
+Class & Configuration & Main role & Instances \\
+\midrule
+Simple & R\'io Negro + fixed demand + fixed dispatch & Basic numerical behavior & 204 \\
+Full & R\'io Negro nonlinear + Salto Grande + thermal units + market & Largest integrated model & 34 \\
+SG-Ter-Mer & Salto Grande + thermal units + market & Coupled hydrothermal subset & 68 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item The counts report the maximum operational instance pools with available real input
+      data. Scenario tables may show different $n$ values because each aggregate row uses
+      the valid runs available for that solver--gap--variant combination. Pairwise
+      speedups and tests use matched base--variant pairs only.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+\noindent Table~\ref{tab:instance-stats} separates the three experimental pools before solver results are compared. Simple gives the largest sample for distributional evidence, Full is the smallest and most integrated model, and SG-Ter-Mer isolates a coupled hydrothermal subset. This distinction matters because the descriptive averages and paired tests do not come from a single homogeneous instance population.
+
+
+We evaluate four solver--gap scenarios. The time limit is one hour per solve in every
+case. Internal solver presolve and internal scaling are left enabled, because the goal is
+to test whether external preprocessing helps in a realistic solver pipeline. All main
+experiments were run on ClusterUY, a collaborative high-performance computing
+platform for scientific computing in Uruguay \citep{nesmachnow2019clusteruy}.
+
+\begin{table*}[t]
+\centering
+\caption{Four solver--tolerance scenarios separate solver dependence from gap-tolerance effects.}
+\label{tab:solver-scenarios}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}clc@{}}
+\toprule
+Scenario & Solver & Relative MIPGap \\
+\midrule
+1 & Gurobi & $10^{-2}$ \\
+2 & Gurobi & $10^{-3}$ \\
+3 & CPLEX  & $10^{-2}$ \\
+4 & CPLEX  & $10^{-3}$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Deterministic time is reported when available: \Work{} units for Gurobi and ticks
+for CPLEX.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+\noindent The four scenarios vary two dimensions separately: the stopping tolerance and the solver pipeline. Scenarios 1--2 test Gurobi at two MIPGap values; scenarios 3--4 repeat the comparison under CPLEX and serve as a solver contrast, not as another route to a universal acceleration claim.
+
+
+\begin{table*}[t]
+\centering
+\caption{The computational environment fixes solver versions, time limits, and default presolve settings for all comparisons.}
+\label{tab:computational-environment}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Item & Configuration \\
+\midrule
+Cluster & ClusterUY, partition \texttt{ute} \\
+Processor & Intel Xeon Gold 6138 \\
+Threads & 16 \\
+Memory limit & 12 GB \\
+Time limit & 1 hour per solve \\
+Gurobi version & 13.0.1 \\
+CPLEX version & 22.1.2.0 \\
+Presolve & solver default, enabled \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Solver-internal scaling and presolve were left at their default enabled settings
+unless otherwise stated. CPLEX 22.1.2.0 is the version available in the ClusterUY
+environment used for the long runs; conclusions involving CPLEX should therefore be
+interpreted as solver-version and environment specific.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+\noindent This configuration matters because the proposed preprocessing is tested on top of each solver's default numerical pipeline. The CPLEX conclusions below are therefore statements about this version and ClusterUY environment, not claims about all CPLEX releases or parameter choices.
+
+
+
+\subsection{Controlled synthetic block-structured benchmark}
+\label{subsec:synthetic-benchmark}
+
+The hydrothermal testbed evaluates the proposed preprocessing rule on realistic
+operational generated MIPs. To complement this real-data setting, we define a controlled
+synthetic benchmark whose purpose is diagnostic rather than physical. The synthetic
+instances are not intended to model a power system. They isolate the numerical mechanism
+targeted by the method by allowing local-row scale imbalance and coupling-row scale
+imbalance to be varied independently.
+
+Each synthetic instance consists of $B$ local blocks. Block $i$ contains continuous
+activity variables $y_i\in\R^{n_y}_+$ and binary activation variables
+$z_i\in\{0,1\}^{n_z}$. A nonnegative slack vector $s$ is added to the global coupling
+constraints to guarantee feasibility. The generic synthetic MIP is
+\begin{equation}
+\begin{aligned}
+\min_{y,z,s}\quad
+& \sum_{i=1}^{B} c_i^\top y_i
+  + \sum_{i=1}^{B} q_i^\top z_i
+  + P\mathbf{1}^\top s \\
+\text{s.t.}\quad
+& R_i y_i + G_i z_i \le r_i,
+  \qquad i=1,\ldots,B,\\
+& 0 \le y_{ik} \le U_{ik}z_{ik},
+  \qquad i=1,\ldots,B,\quad k=1,\ldots,n_y,\\
+& \sum_{i=1}^{B} L_i y_i
+  + \sum_{i=1}^{B} H_i z_i
+  + s \ge d,\\
+& s\ge 0,\qquad z_i\in\{0,1\}^{n_z}.
+\end{aligned}
+\label{eq:synthetic-mip}
+\end{equation}
+The first group of constraints defines local block restrictions, the second group links
+continuous activity variables to binary activation variables, and the third group creates
+global coupling rows. The penalty $P$ is chosen large enough that the slack variable is
+used only when the activated block capacity cannot satisfy the synthetic demand.
+
+The unscaled coefficients are generated from bounded random distributions with controlled
+sparsity. Local matrices $R_i$ and $G_i$ define block-internal resource constraints.
+Coupling matrices $L_i$ and $H_i$ define the contribution of each block to the global rows.
+The generator records row metadata
+\begin{equation}
+\texttt{row\_type}\in\{\texttt{local},\texttt{coupling}\},
+\qquad
+\texttt{block\_id}\in\{1,\ldots,B\},
+\label{eq:synthetic-row-metadata}
+\end{equation}
+and column metadata identifying the block associated with each variable. This metadata is
+the same information required by the generator-aware scaling rules.
+
+Scale imbalance is introduced after the clean synthetic MIP has been generated. For each
+eligible row $r$, a positive row multiplier
+\begin{equation}
+\theta_r = 10^{\xi_r},
+\qquad
+\xi_r\sim\mathrm{Unif}[-S,S],
+\label{eq:synthetic-row-factor}
+\end{equation}
+is drawn and applied to the entire row, including its right-hand side. Therefore, the
+scaled representation is algebraically equivalent to the clean synthetic MIP. The severity
+parameter $S$ controls the possible scale range. We use
+\begin{equation}
+S\in\{0,3,6\},
+\label{eq:synthetic-severity}
+\end{equation}
+corresponding to no artificial imbalance, moderate imbalance, and strong imbalance.
+
+Four scale patterns are considered:
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
+  \item \textbf{None:} no artificial row scaling is applied.
+  \item \textbf{Local:} only local block rows are multiplied by factors
+  \eqref{eq:synthetic-row-factor}.
+  \item \textbf{Coupling:} only global coupling rows are multiplied by factors
+  \eqref{eq:synthetic-row-factor}.
+  \item \textbf{Mixed:} both local block rows and global coupling rows are multiplied.
+\end{enumerate}
+The ``none'' pattern is a negative control: a useful preprocessing rule should not create
+large artificial changes when the representation is already reasonably scaled. The
+``local'' and ``coupling'' patterns isolate the two numerical objects distinguished by the
+proposed method. The ``mixed'' pattern approximates the combined heterogeneity observed in
+generated engineering models. These controlled patterns are mechanism checks; they do not replace an operational local-only versus coupling-only ablation on the real hydrothermal instances.
+
+
+\begin{table*}[t]
+\centering
+\caption{Controlled synthetic benchmark factors isolate the numerical mechanisms targeted by the scaling rule.}
+\label{tab:synthetic-design}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}p{0.18\textwidth}p{0.20\textwidth}p{0.26\textwidth}p{0.27\textwidth}@{}}
+\toprule
+Factor & Levels used & Controlled object & Purpose \\
+\midrule
+Scale pattern & none, local, coupling, mixed
+& Row class affected by artificial scaling
+& Separate local imbalance from coupling imbalance \\
+Severity $S$ & $0,3,6$
+& Range of row multipliers $10^{-S}$--$10^S$
+& Test mild and severe numerical heterogeneity \\
+Blocks and size & $B=10$, $n_y=n_z=8$
+& Number and size of generated local components
+& Keep a fixed block structure while varying row-scale imbalance \\
+Rows and seeds & $8$ local rows per block, $3$ coupling rows, $20$ seeds
+& Random coefficients and sparsity patterns
+& Estimate distributional behavior rather than one instance \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item The synthetic instances are not physical power-system models. They are controlled
+block-structured MIPs designed to test whether the preprocessing rule responds to the type
+of scale imbalance it is designed to exploit. The reported synthetic grid uses the middle
+size $B=10$, the four patterns, the three severity levels, and twenty random seeds per
+pattern--severity cell.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+The reported synthetic runs use the five scaling variants in \cref{subsec:variants}, the
+same original-scale feasibility and objective checks, Gurobi with relative MIPGap
+$10^{-3}$, and a $600$ second time limit. They are intentionally small: the benchmark is a
+controlled mechanism check for numerical conditioning and algebraic equivalence, not a
+performance experiment. Runtime claims are reserved for the operational hydrothermal
+instances.
+
+\subsection{Scaling variants}
+\label{subsec:variants}
+
+The compared variants are: \methodBase{}, the original formulation; \methodAug{},
+the augmented generator-aware scaling rule; \methodMat{}, the matrix-only
+generator-aware rule with safeguards; \methodRuiz{}, generic Ruiz-type row
+equilibration with $K=4$ iterations; and \methodRuizCols{}, Ruiz-type row scaling plus
+continuous-column scaling and physical normalization. Binary and integer variables are
+not rescaled.
+
+\subsection{Metrics and reporting conventions}
+\label{subsec:metrics}
+
+The analysis reports three families of metrics. First, feasibility preservation is checked
+after descaling the solver solution and evaluating it on the original MIP. The primary
+post-solve check is the maximum violation of the original constraints, together with the
+maximum integrality violation. A run is labeled feasible in original scale if the maximum
+row violation is at most $10^{-4}$ and the maximum integer violation is at most
+$10^{-5}$. Recomputing the objective in original units is retained as an auxiliary
+consistency diagnostic, but it is not the primary feasibility criterion. Objective agreement
+with the base is measured by
+\begin{equation}
+\Delta z_{\mathrm{rel}}=
+\frac{|z_v-z_{\mathrm{base}}|}{\max\{1,|z_{\mathrm{base}}|\}}.
+\label{eq:relative-objective-deviation}
+\end{equation}
+
+Second, numerical behavior is a primary outcome, not only an explanatory variable for
+speed. We distinguish three quantities. The first is the spectral condition number used in
+\cref{subsec:equivalence-diagnostics} to motivate the rule in an idealized linear-algebraic
+setting. The second is the exported coefficient-range ratio
+\begin{equation}
+\rho_\kappa(v)=
+\frac{(\max |a|/\min |a|)_v}{(\max |a|/\min |a|)_{\mathrm{base}}},
+\label{eq:static-kappa-ratio}
+\end{equation}
+where the extrema are computed over nonzero coefficients in the generated matrix. This
+is a static proxy and should not be interpreted as the condition number of the MIP. The
+third is the solver-level ratio
+\begin{equation}
+\rho^{\mathrm{solver}}_\kappa(v)=
+\frac{\kappa_{\mathrm{solver}}(v)}{\kappa_{\mathrm{solver}}(\mathrm{base})},
+\label{eq:solver-kappa-ratio}
+\end{equation}
+where $\kappa_{\mathrm{solver}}$ is obtained from the fixed-integer LP after the main MIP
+solve when available. For CPLEX we also record tree-level KappaStats: maximum sampled
+basis condition number, fractions of unstable and ill-conditioned bases, and a numerical
+attention score. Solver numerical warnings parsed from logs are retained as a descriptive
+alert, not as a ranking criterion. Values below one indicate improvement relative to the
+base. The paper therefore separates the numerical effect of the preprocessing from the
+question of whether that numerical effect is converted into faster MIP search.
+
+Third, efficiency is measured by wall-clock time, solver time, total time including
+preprocessing, deterministic time, node counts, iterations, final gap, and the
+primal--dual integral. For any time measure $T_q$, the paired speedup is
+\begin{equation}
+\mathrm{speedup}_{q}(v)=
+\frac{T_{q,\mathrm{base}}}{T_{q,v}},
+\qquad
+q\in\{\mathrm{solver},\mathrm{total},\det\}.
+\label{eq:speedup}
+\end{equation}
+Values above one indicate that variant $v$ is faster than the base. Because solution
+times are highly skewed, we report shifted geometric means
+\begin{equation}
+\sgm_s(\{x_i\})=
+\exp\!\left(\frac{1}{n}\sum_i \log(x_i+s)\right)-s,
+\label{eq:shifted-geometric-mean}
+\end{equation}
+using $s=1$ s for times and $s=10$ for node counts. Timeouts are summarized by
+\PARten{}, where a timeout counts as ten times the time limit. The primal--dual integral
+is
+\begin{equation}
+\PI=\frac{1}{T}\int_0^T \gamma(t)\,dt,
+\label{eq:primal-dual-integral}
+\end{equation}
+where $\gamma(t)$ is the reported optimality gap during the run.
+
+\subsection{Statistical analysis}
+
+The statistical analysis is paired by construction: every variant is compared with the
+base formulation on the same instance, solver, and MIPGap tolerance. Since MIP solution
+times are strongly skewed and include censored observations, solver-time comparisons
+use the Wilcoxon signed-rank test on matched, non-double-timeout pairs. Pairs in which
+both the base and the variant reach the time limit are treated as censored for this
+paired test; their global effect is still reflected in \PARten{} and in the Dolan--Mor\'e
+performance profiles. Alongside the test statistic $W$, we report the raw $p$-value, the
+Benjamini--Hochberg adjusted value $q_{\mathrm{BH}}$, and Cliff's $\delta$ as an effect
+size. With the convention used here, negative values of $\delta$ indicate that the
+variant tends to be faster than the base, whereas positive values indicate deterioration.
+
+To evaluate the connection between numerical and algorithmic effects, we first report
+conditioning ratios directly by class and variant, and then compute Spearman correlations
+between solver speedup and two conditioning ratios: the exported coefficient-range ratio
+$\rho_\kappa$ and the solver-level conditioning ratio $\rho_\kappa^{\mathrm{solver}}$.
+The central comparison is not merely whether either correlation is significant, but whether
+the solver-level diagnostic is more informative than the static coefficient-range proxy on
+the same matched observations. We therefore
+compare the two overlapping dependent correlations using the Williams--Steiger test,
+which also uses the correlation between $\rho_\kappa$ and
+$\rho_\kappa^{\mathrm{solver}}$. Where relevant, the numerical audit also checks partial
+rank correlations controlling for instance size, to ensure that the association is not only
+a proxy for larger or harder instances.
+
+\section{Computational results}
+\label{sec:results}
+
+The results follow the hierarchy of claims. We first check whether the solver-facing representation improves. We then ask whether Gurobi converts that improvement into lower runtime or deterministic effort. Finally, we use CPLEX as a contrast to test whether the performance effect is solver-independent.
+
+This order is important because numerical improvement and algorithmic acceleration are related, but not identical, outcomes. The main pattern is clear but bounded. Under Gurobi, the generator-aware variants improve solver-facing conditioning and usually reduce time or deterministic effort. Under CPLEX 22.1.2.0, the same external scalings do not produce a robust runtime gain. The section therefore moves from the positive Gurobi evidence to the CPLEX contrast, with each table adding one layer of evidence: efficiency, conditioning, paired tests, and solver dependence.
+
+A conditioning table alone would imply too much, because a better-scaled matrix does not
+guarantee easier branch-and-bound search. A timing table alone would imply too little,
+because it would hide the numerical mechanism. The numerical and algorithmic evidence
+must therefore be read together.
+
+\subsection{Scenario 1: Gurobi with 1\% MIPGap}
+
+At the looser Gurobi tolerance, the evidence favors the generator-aware family.
+\methodMat{} gives the lowest shifted geometric solver time in Simple and SG-Ter-Mer,
+and it improves deterministic effort in all three classes. \methodAug{} remains the
+strongest descriptive rule in Full. The Ruiz-type baselines do not tell the same story:
+they may change coefficient ranges, but their runtime behavior is irregular.
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{At $1\%$ MIPGap, Gurobi converts generator-aware scaling into lower robust-efficiency metrics in the Simple and SG-Ter-Mer classes.}
+\label{tab:robust-gurobi-1pct-mipgap}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}
+\toprule
+Class & Variant & $n$ & $\sgm T$ & med. sp.$^{\det}$ & \PARten{} & \PI{} \\
+\midrule
+Simple & \methodBase & 197 & 4.05 & 1.00 & 11.6 & 0.246 \\
+ & \methodAug & 197 & 2.20 & 1.07 & 2.6 & 0.242 \\
+ & \methodMat & 198 & \textbf{2.03} & 1.06 & \textbf{2.4} & 0.241 \\
+ & \methodRuiz & 198 & 8.27 & 0.88 & 26.7 & 0.300 \\
+ & \methodRuizCols & 199 & 7.52 & 1.02 & 27.6 & \textbf{0.233} \\
+Full & \methodBase & 34 & 82.93 & 1.00 & 3384.8 & 0.120 \\
+ & \methodAug & 34 & \textbf{70.56} & \textbf{1.37} & 3307.8 & 0.075 \\
+ & \methodMat & 34 & 77.82 & 1.15 & \textbf{2487.2} & \textbf{0.055} \\
+ & \methodRuiz & 33 & 126.94 & 1.13 & 4566.5 & 0.263 \\
+ & \methodRuizCols & 33 & 75.89 & 1.32 & 4696.3 & 0.239 \\
+SG-Ter-Mer & \methodBase & 67 & 14.14 & 1.00 & 572.7 & 0.664 \\
+ & \methodAug & 67 & 8.39 & 1.32 & 562.2 & 0.566 \\
+ & \methodMat & 67 & \textbf{6.75} & \textbf{1.40} & \textbf{21.0} & \textbf{0.531} \\
+ & \methodRuiz & 68 & 14.40 & 1.00 & 567.3 & 0.639 \\
+ & \methodRuizCols & 68 & 18.35 & 0.78 & 585.1 & 0.662 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\emph{Notes.} $\sgm T$: shifted geometric mean of solver time in seconds. med.
+sp.$^{\det}$: median deterministic speedup with respect to the base model. \PI{}:
+primal--dual integral. Lower is better for $\sgm T$, \PARten{}, and \PI{};
+higher is better for med. sp.$^{\det}$. Bold values mark the best descriptive value within
+each class and metric.
+\end{flushleft}
+\end{table*}
+
+\noindent \Cref{tab:robust-gurobi-1pct-mipgap} shows that the Gurobi gains are not confined to one summary statistic. \methodMat{} gives the best shifted geometric time and \PARten{} in Simple and SG-Ter-Mer, while \methodAug{} is strongest in Full by shifted geometric time and deterministic speedup. The Ruiz-type baselines do not show the same class-consistent pattern.
+
+
+% Result figures are allowed to float across adjacent subsections to avoid large
+% blank pages. Strategic barriers separate the Gurobi and CPLEX result blocks.
+\plotfigure{figs/esc1_gurobi_1pct_boxplot.pdf}{\textwidth}{At $1\%$ MIPGap, the Gurobi speedup distributions place the generator-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. Values above the parity line indicate acceleration relative to the unscaled model.}{fig:boxplot-speedup-total-gap1}
+
+\twoplotfigure{figs/esc1_gurobi_1pct_scatter_rho.pdf}{Static coefficient-range ratio.}{fig:scatter-kappa-speedup-gap1}{figs/esc1_gurobi_1pct_scatter_rhosolver.pdf}{Solver-level conditioning ratio.}{fig:scatter-kappa-solver-speedup-gap1}{At $1\%$ MIPGap, static coefficient-range compression and solver-level conditioning tell different stories. The contrast between panels shows why exported matrix compression alone should not be treated as evidence of easier branch-and-bound search.}{fig:diagnostic-scatter-gap1}
+
+\plotfigure{figs/esc1_gurobi_1pct_perfil.pdf}{\textwidth}{At $1\%$ MIPGap, the Dolan--Mor\'e profiles show whether the average Gurobi improvements persist across the instance pool. Curves farther toward the upper-left indicate variants that more often solve close to the best observed time.}{fig:profile-gurobi-gap001}
+
+\subsection{Scenario 2: Gurobi with 0.1\% MIPGap}
+
+The stricter Gurobi tolerance tests whether the first pattern survives a harder stopping criterion. The pattern largely persists. The generator-aware variants remain the most favorable options, whereas Ruiz-type variants remain unstable. \methodMat{} again gives the best shifted geometric solver time in Simple and SG-Ter-Mer, while \methodAug{} is stronger in Full. This result suggests that, in this testbed, much of the useful structural scale information is already present in the coefficient matrix.
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{At $0.1\%$ MIPGap, the Gurobi efficiency pattern persists: generator-aware variants remain the strongest structured preprocessing rules.}
+\label{tab:robust-gurobi-01pct-mipgap}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}
+\toprule
+Class & Variant & $n$ & $\sgm T$ & med. sp.$^{\det}$ & \PARten{} & \PI{} \\
+\midrule
+Simple & \methodBase & 195 & 8.28 & 1.00 & 28.5 & \textbf{0.176} \\
+ & \methodAug & 195 & 5.65 & \textbf{1.11} & 28.7 & 0.181 \\
+ & \methodMat & 198 & \textbf{5.44} & 1.10 & \textbf{21.1} & 0.182 \\
+ & \methodRuiz & 199 & 14.12 & 0.88 & 41.5 & 0.261 \\
+ & \methodRuizCols & 195 & 12.55 & 1.02 & 48.9 & 0.199 \\
+Full & \methodBase & 31 & 305.30 & 1.00 & 5023.8 & 0.027 \\
+ & \methodAug & 30 & \textbf{226.90} & 1.26 & \textbf{3890.2} & 0.028 \\
+ & \methodMat & 31 & 306.39 & 1.12 & 5059.3 & 0.026 \\
+ & \methodRuiz & 30 & 341.56 & 0.87 & 5137.5 & 0.027 \\
+ & \methodRuizCols & 31 & 267.10 & \textbf{1.62} & 6140.1 & \textbf{0.022} \\
+SG-Ter-Mer & \methodBase & 62 & 14.49 & 1.00 & 613.0 & 0.642 \\
+ & \methodAug & 63 & 8.99 & 1.32 & 593.7 & 0.473 \\
+ & \methodMat & 65 & \textbf{7.97} & \textbf{1.35} & \textbf{22.7} & \textbf{0.440} \\
+ & \methodRuiz & 65 & 14.27 & 1.05 & 586.8 & 0.634 \\
+ & \methodRuizCols & 62 & 19.16 & 0.78 & 629.1 & 0.625 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Bold values mark the best descriptive value within each class and metric;
+lower is better for $\sgm T$, \PARten{}, and \PI{}, whereas higher is better
+for med. sp.$^{\det}$.
+\end{flushleft}
+\end{table*}
+
+\noindent At the stricter tolerance, \cref{tab:robust-gurobi-01pct-mipgap} preserves the same qualitative picture. \methodMat{} remains the most attractive descriptive rule in Simple and SG-Ter-Mer, whereas \methodAug{} is the strongest generator-aware rule in Full. The Gurobi evidence therefore does not hinge on the looser $1\%$ stopping criterion.
+
+
+\begin{table*}[t]
+\centering
+\caption{Generator-aware scaling improves solver-facing conditioning diagnostics under Gurobi, whereas static coefficient compression alone is insufficient.}
+\label{tab:gurobi-gap0001-relative-conditioning}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llrccc@{}}
+\toprule
+Class & Variant & $n$ & median $\rho_\kappa$ (IQR) & median $\rho_\kappa^{\mathrm{solver}}$ (IQR) & warnings \\
+\midrule
+Simple & \methodAug & 195 & $0.00$ ($0.00$) & $0.04$ ($0.08$) & 1.0 \\
+ & \methodMat & 195 & $0.00$ ($0.00$) & $0.08$ ($0.08$) & 1.0 \\
+ & \methodRuiz & 192 & $0.01$ ($0.01$) & $0.75$ ($3.94$) & 2.0 \\
+ & \methodRuizCols & 190 & $1.5\times10^{-5}$ ($6.7\times10^{-5}$) & $1.19$ ($12.70$) & 1.0 \\
+Full & \methodAug & 30 & $5.6\times10^{-4}$ ($3.7\times10^{-4}$) & $0.02$ ($0.04$) & 1.0 \\
+ & \methodMat & 31 & $5.6\times10^{-4}$ ($3.7\times10^{-4}$) & $0.07$ ($0.08$) & 1.0 \\
+ & \methodRuiz & 29 & $5.6\times10^{-4}$ ($3.7\times10^{-4}$) & $0.47$ ($2.55$) & 2.0 \\
+ & \methodRuizCols & 30 & $6.0\times10^{-4}$ ($8.0\times10^{-4}$) & $1.60$ ($24.82$) & 0.0 \\
+SG-Ter-Mer & \methodAug & 62 & $6.7\times10^{-4}$ ($1.8\times10^{-4}$) & $0.01$ ($0.01$) & 1.0 \\
+ & \methodMat & 61 & $6.7\times10^{-4}$ ($1.8\times10^{-4}$) & $0.08$ ($0.02$) & 1.0 \\
+ & \methodRuiz & 61 & $6.7\times10^{-4}$ ($1.8\times10^{-4}$) & $0.06$ ($0.06$) & 1.0 \\
+ & \methodRuizCols & 59 & $1.0\times10^{-4}$ ($8.9\times10^{-5}$) & $0.07$ ($0.11$) & 0.0 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Values below one indicate improvement relative to the base on the same
+scenario. $\rho_\kappa$ is the exported coefficient-range proxy, whereas
+$\rho_\kappa^{\mathrm{solver}}$ is computed from the solver-level conditioning diagnostic
+on the fixed-integer LP. Entries shown as $0.00$ are positive ratios below the displayed
+precision. The warnings column summarizes solver numerical warning flags parsed from
+logs and is used only as a descriptive diagnostic.
+\end{flushleft}
+\end{table*}
+
+\noindent \Cref{tab:gurobi-gap0001-relative-conditioning} separates two numerical notions that are easy to conflate. The generator-aware variants reduce both the exported coefficient-range proxy and the solver-level ratio. \methodRuizCols{}, by contrast, may compress the exported matrix while worsening the solver-level diagnostic in Full.
+
+The same table also clarifies why the structured variants are not just generic
+equilibration in another form. Both \methodAug{} and \methodMat{} reduce the
+solver-level conditioning ratio well below one. The matrix-only rule compresses
+$\rho_\kappa$ essentially like the augmented rule and brings $\rho_\kappa^{\mathrm{solver}}$
+to $0.07$--$0.08$ in Full and SG-Ter-Mer, whereas \methodRuizCols{} may improve the static range without improving the solver-facing diagnostic.
+
+\plotfigure{figs/esc2_gurobi_01pct_boxplot.pdf}{\textwidth}{At $0.1\%$ MIPGap, the Gurobi speedup distributions preserve the same qualitative pattern observed at the looser tolerance. Values above one indicate faster runs than the unscaled formulation.}{fig:boxplot-speedup-total-gap01}
+
+\twoplotfigure{figs/esc2_gurobi_01pct_scatter_rho.pdf}{Static coefficient-range ratio.}{fig:scatter-kappa-speedup-gap01}{figs/esc2_gurobi_01pct_scatter_rhosolver.pdf}{Solver-level conditioning ratio.}{fig:scatter-kappa-solver-speedup-gap01}{At $0.1\%$ MIPGap, the stricter Gurobi runs again separate static coefficient compression from solver-facing numerical behavior. The solver-level diagnostic remains more informative than the exported coefficient-range ratio.}{fig:diagnostic-scatter-gap01}
+
+\plotfigure{figs/esc2_gurobi_01pct_perfil.pdf}{\textwidth}{At $0.1\%$ MIPGap, the Dolan--Mor\'e profiles test whether the Gurobi speedups persist across the heterogeneous instance pool rather than only in averages.}{fig:profile-gurobi-gap0001}
+
+\begin{table*}[t]
+\centering
+\caption{Paired Gurobi tests show a distributional runtime shift in favor of the generator-aware variants, especially in Simple and SG-Ter-Mer.}
+\label{tab:wilcoxon-structured-gurobi}
+\small
+\begin{tabular}{@{}lllrrrr@{}}
+\toprule
+Scenario & Class & Variant & $W$ & $p$ & $q_{\mathrm{BH}}$ & Cliff's $\delta$ \\
+\midrule
+1\% MIPGap & Simple & \methodAug & 7535.0 & 0.0057 & 0.0097 & $-0.090$ \\
+1\% MIPGap & Simple & \methodMat & 3011.0 & $<10^{-4}$ & $<10^{-4}$ & $-0.210$ \\
+1\% MIPGap & Full & \methodAug & 175.0 & 0.0984 & 0.1476 & $-0.082$ \\
+1\% MIPGap & Full & \methodMat & 172.0 & 0.1406 & 0.1875 & $-0.073$ \\
+1\% MIPGap & SG-Ter-Mer & \methodAug & 501.0 & 0.0001 & 0.0005 & $-0.138$ \\
+1\% MIPGap & SG-Ter-Mer & \methodMat & 115.0 & $<10^{-4}$ & $<10^{-4}$ & $-0.239$ \\
+0.1\% MIPGap & Simple & \methodAug & 6963.0 & 0.0010 & 0.0024 & $-0.077$ \\
+0.1\% MIPGap & Simple & \methodMat & 7069.0 & 0.0016 & 0.0028 & $-0.080$ \\
+0.1\% MIPGap & Full & \methodAug & 97.0 & 0.0262 & 0.0393 & $-0.144$ \\
+0.1\% MIPGap & Full & \methodMat & 173.0 & 0.7140 & 0.7140 & $-0.023$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodAug & 456.0 & 0.0004 & 0.0018 & $-0.145$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodMat & 341.0 & $<10^{-4}$ & 0.0002 & $-0.158$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Tests are paired against the base formulation on matched instances. Negative
+Cliff's $\delta$ means that the variant tends to be faster. Double-timeout pairs are
+excluded from the Wilcoxon test and retained through \PARten{} and the performance
+profiles.
+\end{flushleft}
+\end{table*}
+
+\noindent The paired tests in \cref{tab:wilcoxon-structured-gurobi} support the descriptive Gurobi pattern. The signs are favorable for both generator-aware variants, with the strongest support in Simple and SG-Ter-Mer for \methodMat{} and in the stricter Full case for \methodAug{}. The effect sizes are moderate rather than dramatic; the evidence is a distributional shift, not a guarantee that every instance accelerates.
+
+
+\begin{table*}[t]
+\centering
+\caption{Solver-level conditioning is more informative about Gurobi speedup than the exported coefficient-range proxy.}
+\label{tab:gurobi-conditioning-correlations}
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Scenario & $\rho_S(\rho_\kappa,s)$ & $p$ & $\rho_S(\rho_\kappa^{\mathrm{solver}},s)$ & $p$ & $Z$ & $p_Z$ \\
+\midrule
+1\% MIPGap & $+0.003$ & 0.926 & $-0.256$ & $3.7\times 10^{-19}$ & 6.11 & $<10^{-4}$ \\
+0.1\% MIPGap & $+0.006$ & 0.837 & $-0.267$ & $5.6\times 10^{-20}$ & 6.60 & $<10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} $s$ denotes solver speedup. The Williams--Steiger statistic $Z$ compares the
+two overlapping correlations measured on the same matched observations. The negative
+solver-level correlations have the expected sign: lower solver-level conditioning ratios
+are associated with larger speedups.
+\end{flushleft}
+\end{table*}
+
+\noindent \Cref{tab:gurobi-conditioning-correlations} adds the aggregate correlation check. The exported coefficient-range ratio is essentially uninformative about speedup, while the solver-level conditioning ratio has the expected negative association. This is the empirical basis for treating solver-facing diagnostics as more informative than exported-matrix summaries.
+
+
+Together with \cref{tab:gurobi-gap0001-relative-conditioning,tab:gurobi-conditioning-correlations},
+these results support a two-step interpretation: generator-aware scaling changes the
+numerical representation seen by Gurobi, and the solver-level conditioning ratio is much
+more informative about speedup than the raw coefficient-range ratio.
+
+\FloatBarrier
+
+\subsection{Scenario 3: CPLEX with 1\% MIPGap}
+
+The CPLEX scenarios provide a negative solver contrast to the Gurobi results. The structured variants remain close to parity and do not reproduce the systematic deterministic gains observed under Gurobi. Some descriptive wall-time improvements appear, especially in Full for \methodMat{}, but the paired tests do not support robust generator-aware acceleration. In fact, some CPLEX signs are unfavorable for the structured variants. The correct interpretation is therefore not that CPLEX improves less than Gurobi, but that the present external scaling layer does not reliably improve CPLEX runtime in this environment. Ruiz is sometimes competitive in Full, but its performance is not stable across classes.
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{At $1\%$ MIPGap, CPLEX does not reproduce the Gurobi generator-aware acceleration pattern.}
+\label{tab:robust-cplex-1pct-mipgap}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}
+\toprule
+Class & Variant & $n$ & $\sgm T$ & med. sp.$^{\det}$ & \PARten{} & \PI{} \\
+\midrule
+Simple & \methodBase & 204 & 2.23 & 1.00 & 6.2 & 0 \\
+ & \methodAug & 204 & \textbf{1.46} & \textbf{1.04} & 3.1 & 0 \\
+ & \methodMat & 204 & 1.68 & 1.03 & 3.4 & 0 \\
+ & \methodRuiz & 204 & 1.49 & 0.99 & 3.6 & 0 \\
+ & \methodRuizCols & 204 & 1.51 & 0.96 & \textbf{2.6} & 0 \\
+Full & \methodBase & 33 & 158.38 & 1.00 & 5621.7 & $3.1\times10^{-8}$ \\
+ & \methodAug & 34 & 165.43 & 0.98 & 5546.0 & $3.2\times10^{-8}$ \\
+ & \methodMat & 34 & \textbf{115.60} & 1.00 & 6497.8 & $2.3\times10^{-8}$ \\
+ & \methodRuiz & 34 & 115.96 & \textbf{1.14} & \textbf{3506.3} & \textbf{$2.1\times10^{-8}$} \\
+ & \methodRuizCols & 34 & 225.94 & 0.70 & 4681.1 & $5.5\times10^{-8}$ \\
+SG-Ter-Mer & \methodBase & 68 & \textbf{2.21} & 1.00 & \textbf{3.5} & $1.0\times10^{-10}$ \\
+ & \methodAug & 68 & 2.37 & \textbf{1.02} & 9.9 & $1.0\times10^{-10}$ \\
+ & \methodMat & 68 & 2.41 & 1.00 & 5.5 & $1.1\times10^{-10}$ \\
+ & \methodRuiz & 68 & 2.33 & 1.01 & 10.3 & \textbf{$9.7\times10^{-11}$} \\
+ & \methodRuizCols & 68 & 3.18 & 0.88 & 15.2 & $1.0\times10^{-10}$ \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Bold values mark the best descriptive value within each class and metric.
+Since the CPLEX statistical tests do not support a robust positive external-scaling effect,
+these bold entries are descriptive only.
+\end{flushleft}
+\end{table*}
+
+\noindent For CPLEX, \cref{tab:robust-cplex-1pct-mipgap} has to be interpreted differently from the Gurobi tables. Some descriptive summaries improve, especially for \methodMat{} or \methodRuiz{} in Full, but the class-consistent generator-aware pattern is absent. In SG-Ter-Mer, the base scale already gives the best shifted geometric time and \PARten{}.
+
+
+\twoplotfigure{figs/esc3_cplex_1pct_boxplot.pdf}{Total-time speedup distribution.}{fig:boxplot-speedup-total-cplex1}{figs/esc3_cplex_1pct_perfil.pdf}{Performance profile.}{fig:profile-cplex-gap001}{At $1\%$ MIPGap, the CPLEX distributional and performance-profile views break the Gurobi pattern. The plots therefore serve as a solver contrast, not as evidence of universal acceleration.}{fig:cplex-gap1-visual-summary}
+
+\subsection{Scenario 4: CPLEX with 0.1\% MIPGap}
+
+The stricter CPLEX setting confirms the same solver dependence and makes the negative runtime conclusion clearer. The structured variants remain at or near parity, the matrix-only rule essentially reproduces the base in deterministic effort, and the clearest descriptive improvement in shifted geometric solver time comes from Ruiz rather than from the proposed generator-aware rules. This is a useful negative result: external scaling may improve some numerical diagnostics without becoming a runtime accelerator for CPLEX in this environment.
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{At $0.1\%$ MIPGap, CPLEX remains close to parity for the generator-aware variants, confirming solver dependence.}
+\label{tab:robust-cplex-01pct-mipgap}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrr}
+\toprule
+Class & Variant & $n$ & $\sgm T$ & med. sp.$^{\det}$ & \PARten{} & \PI{} \\
+\midrule
+Simple & \methodBase & 204 & 5.14 & 1.00 & 213.6 & $1.2\times10^{-12}$ \\
+ & \methodAug & 204 & 4.20 & 1.02 & \textbf{188.4} & $6.5\times10^{-13}$ \\
+ & \methodMat & 204 & 5.11 & 1.00 & 213.5 & $1.2\times10^{-12}$ \\
+ & \methodRuiz & 204 & \textbf{4.13} & 1.00 & 192.0 & \textbf{$1.0\times10^{-15}$} \\
+ & \methodRuizCols & 204 & 5.28 & 0.94 & 546.6 & $7.7\times10^{-13}$ \\
+Full & \methodBase & 33 & 421.59 & 1.00 & 9162.0 & $2.7\times10^{-8}$ \\
+ & \methodAug & 34 & 422.62 & 1.07 & 8930.4 & $2.7\times10^{-8}$ \\
+ & \methodMat & 33 & 421.02 & 1.00 & 9161.6 & $2.7\times10^{-8}$ \\
+ & \methodRuiz & 34 & \textbf{285.10} & \textbf{1.28} & \textbf{5857.3} & \textbf{$1.9\times10^{-8}$} \\
+ & \methodRuizCols & 33 & 377.41 & 0.96 & $1.1\times10^{4}$ & $5.2\times10^{-8}$ \\
+SG-Ter-Mer & \methodBase & 68 & 2.82 & 1.00 & 18.8 & $1.1\times10^{-10}$ \\
+ & \methodAug & 68 & 2.84 & 1.01 & 20.6 & \textbf{$1.0\times10^{-10}$} \\
+ & \methodMat & 68 & 2.80 & 1.00 & 18.4 & $1.1\times10^{-10}$ \\
+ & \methodRuiz & 68 & \textbf{2.61} & \textbf{1.02} & \textbf{7.5} & $1.1\times10^{-10}$ \\
+ & \methodRuizCols & 68 & 4.02 & 0.85 & 539.5 & $1.3\times10^{-10}$ \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Bold values mark the best descriptive value within each class and metric.
+Under CPLEX, these descriptive minima do not imply a robust positive external-scaling
+effect.
+\end{flushleft}
+\end{table*}
+
+\noindent The stricter CPLEX runs in \cref{tab:robust-cplex-01pct-mipgap} point in the same direction. \methodRuiz{} is descriptively best in several cells, while the two generator-aware variants remain close to the base. The result is solver dependence, not a weaker version of the Gurobi acceleration claim.
+
+
+\twoplotfigure{figs/esc4_cplex_01pct_boxplot.pdf}{Total-time speedup distribution.}{fig:boxplot-speedup-total-cplex01}{figs/esc4_cplex_01pct_perfil.pdf}{Performance profile.}{fig:profile-cplex-gap0001}{At $0.1\%$ MIPGap, the CPLEX visual evidence remains mixed under the stricter tolerance, supporting a solver-dependent interpretation rather than a robust CPLEX speedup claim.}{fig:cplex-gap01-visual-summary}
+
+\begin{table*}[t]
+\centering
+\caption{Paired CPLEX tests do not support a robust positive runtime effect for the generator-aware variants.}
+\label{tab:wilcoxon-structured-cplex}
+\small
+\begin{tabular}{@{}lllrrrr@{}}
+\toprule
+Scenario & Class & Variant & $W$ & $p$ & $q_{\mathrm{BH}}$ & Cliff's $\delta$ \\
+\midrule
+1\% MIPGap & Simple & \methodAug & 9377.0 & 0.2016 & 0.3456 & $-0.058$ \\
+1\% MIPGap & Simple & \methodMat & 7460.0 & 0.0004 & 0.0023 & $+0.125$ \\
+1\% MIPGap & Full & \methodAug & 172.0 & 0.3357 & 0.4284 & $+0.032$ \\
+1\% MIPGap & Full & \methodMat & 131.0 & 0.1042 & 0.2083 & $-0.153$ \\
+1\% MIPGap & SG-Ter-Mer & \methodAug & 1068.0 & 0.5211 & 0.5211 & $-0.003$ \\
+1\% MIPGap & SG-Ter-Mer & \methodMat & 740.0 & 0.0082 & 0.0326 & $+0.055$ \\
+0.1\% MIPGap & Simple & \methodAug & 8765.0 & 0.0453 & 0.1213 & $-0.024$ \\
+0.1\% MIPGap & Simple & \methodMat & 9515.0 & 0.3173 & 0.4760 & $-0.005$ \\
+0.1\% MIPGap & Full & \methodAug & 173.0 & 0.7140 & 0.7789 & $-0.001$ \\
+0.1\% MIPGap & Full & \methodMat & 159.0 & 0.9368 & 0.9368 & $-0.014$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodAug & 1085.0 & 0.5908 & 0.7089 & $-0.021$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodMat & 944.0 & 0.1617 & 0.3235 & $-0.012$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Tests are paired against the base formulation on matched instances. Under
+CPLEX, the effect signs are small, inconsistent, or unfavorable. They do not support a
+robust positive generator-aware runtime effect.
+\end{flushleft}
+\end{table*}
+
+\noindent The paired CPLEX tests in \cref{tab:wilcoxon-structured-cplex} keep the descriptive tables in perspective. Unlike the Gurobi evidence, the signs are small, mixed, and sometimes unfavorable; after multiplicity adjustment they do not support a robust positive runtime effect for the generator-aware variants.
+
+
+\begin{table*}[t]
+\centering
+\caption{The best descriptive variant depends on the solver pipeline, not only on the external scaling rule.}
+\label{tab:descriptive-best-by-scenario}
+\small
+\begin{tabular}{@{}llllp{0.33\textwidth}@{}}
+\toprule
+Scenario & Simple & Full & SG-Ter-Mer & Interpretation \\
+\midrule
+Gurobi, 1\% & \methodMat{} & \methodAug{} & \methodMat{} & The two generator-aware rules dominate descriptively; \methodMat{} is strongest in Simple and SG-Ter-Mer, while \methodAug{} is strongest in Full. \\
+Gurobi, 0.1\% & \methodMat{} & \methodAug{} & \methodMat{} & The stricter gap preserves the same pattern and strengthens the evidence that a matrix-only structural rule can be competitive under Gurobi. \\
+CPLEX, 1\% & \methodAug{} & \methodMat{} & \methodBase{} & Descriptive winners vary by class; paired tests do not support a robust positive generator-aware effect and some signs are unfavorable. \\
+CPLEX, 0.1\% & \methodRuiz{} & \methodRuiz{} & \methodRuiz{} & Ruiz is descriptively strong in shifted geometric time, especially in Full, but this is a CPLEX-pipeline-specific pattern rather than evidence for universal Ruiz dominance. \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} The table summarizes the lowest shifted geometric solver time within each
+class. It is descriptive only; the statistical evidence is reported separately in
+\cref{tab:wilcoxon-structured-gurobi,tab:wilcoxon-structured-cplex}.
+\end{flushleft}
+\end{table*}
+
+\noindent The summary table is mainly a roadmap. It makes the solver contrast visible at a glance: generator-aware variants dominate the Gurobi rows, whereas the CPLEX rows are heterogeneous and have to be interpreted together with the paired Wilcoxon tests.
+
+
+
+\subsection{Controlled synthetic mechanism check}
+\label{subsec:synthetic-results}
+
+The operational experiments above test the full solver--model interaction. The synthetic
+benchmark has a different role: it checks the numerical mechanism under controlled row-scale
+imbalance. The grid uses \(B=10\) blocks, each with \(8\) continuous and \(8\) binary
+variables, \(8\) local constraints plus binary-activation rows, and \(3\) global coupling
+rows with feasibility slacks. Row imbalance is injected through the pattern
+\(\{
+\textit{none},\textit{local},\textit{coupling},\textit{mixed}\}\) and
+\(S\in\{0,3,6\}\). For each selected row \(r\), all coefficients and the right-hand side
+are multiplied by \(\theta_r=10^{\xi_r}\), with \(\xi_r\sim\mathcal{U}[-S,S]\). The grid
+contains \(20\) seeds per pattern--severity cell, for \(240\) instances and \(1200\)
+variant runs.
+
+\begin{table*}[t]
+\centering
+\scriptsize
+\caption{Controlled synthetic benchmark: median condition numbers before scaling and after each variant, with worst original-scale violations across the selected cells.}
+\label{tab:synthetic_compact}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrr}
+\toprule
+Pattern & $S$ & $\kappa^{\mathrm{pre}}$ (Base) & $\kappa^{\mathrm{post}}$ (\methodAug) & $\kappa^{\mathrm{post}}$ (\methodMat) & $\kappa^{\mathrm{post}}$ (\methodRuiz) & $\kappa^{\mathrm{post}}$ (\methodRuizCols) & $v_{\mathrm{row}}$ & $v_{\mathrm{int}}$ \\
+\midrule
+none & 0 & $1.34\times10^{3}$ & $1.09\times10^{3}$ & $2.49\times10^{3}$ & $1.88\times10^{3}$ & $1.88\times10^{3}$ & $4.55\times10^{-13}$ & $0$ \\
+local & 3 & $1.84\times10^{8}$ & $1.07\times10^{3}$ & $4.68\times10^{3}$ & $3.15\times10^{3}$ & $3.15\times10^{3}$ & $2.91\times10^{-11}$ & $0$ \\
+local & 6 & $1.49\times10^{14}$ & $1.07\times10^{3}$ & $4.02\times10^{3}$ & $3.67\times10^{3}$ & $3.67\times10^{3}$ & $1.49\times10^{-8}$ & $0$ \\
+coupling & 3 & $6.86\times10^{5}$ & $1.22\times10^{3}$ & $2.49\times10^{3}$ & $2.11\times10^{3}$ & $2.11\times10^{3}$ & $1.75\times10^{-10}$ & $0$ \\
+coupling & 6 & $4.87\times10^{8}$ & $1.22\times10^{3}$ & $2.49\times10^{3}$ & $2.67\times10^{3}$ & $2.67\times10^{3}$ & $1.12\times10^{-7}$ & $2.03\times10^{-6}$ \\
+mixed & 3 & $2.06\times10^{8}$ & $1.18\times10^{3}$ & $4.68\times10^{3}$ & $3.24\times10^{3}$ & $3.24\times10^{3}$ & $1.16\times10^{-10}$ & $0$ \\
+mixed & 6 & $1.52\times10^{14}$ & $1.22\times10^{3}$ & $4.02\times10^{3}$ & $4.58\times10^{3}$ & $4.58\times10^{3}$ & $1.31\times10^{-6}$ & $1.28\times10^{-7}$ \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Values are medians by pattern, severity, and variant, except for the two
+violation columns, which report worst original-scale violations in the corresponding
+pattern--severity cell. The grid contains 20 seeds per cell. The synthetic benchmark is a
+conditioning and equivalence check, not a runtime benchmark.
+\end{flushleft}
+\end{table*}
+
+The design behaves as intended. For the negative-control pattern \textit{none}, the median
+pre-scaling condition number is essentially invariant in \(S\), around
+\(1.3\times10^{3}\). When imbalance is injected, \(\kappa^{\mathrm{pre}}\) grows with
+severity only in the affected row classes: at \(S=6\), it reaches about
+\(1.5\times10^{14}\) for \textit{local} and \textit{mixed}, and about
+\(4.9\times10^{8}\) for \textit{coupling}. This confirms that the synthetic generator
+separates local-row and coupling-row imbalance by construction.
+
+\twoplotfigure{synthetic/resultados/grilla_inicial_gurobi/paper_exports/fig3_kappa_antes_vs_S.pdf}{Pre-scaling condition number by pattern and severity.}{fig:synthetic-kappa-pre}{synthetic/resultados/grilla_inicial_gurobi/paper_exports/fig2_bars_log10_reduction.pdf}{Median reduction in $\log_{10}\kappa$.}{fig:synthetic-log-reduction}{Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows the median conditioning recovery obtained by the scaling variants.}{fig:synthetic-mechanism-summary}
+
+All scaling variants recover the conditioning despite the injected severity. In the severe
+local and mixed cases, \(\kappa^{\mathrm{pre}}\) is of order \(10^{14}\), whereas the
+post-scaling medians fall between roughly \(1.1\times10^{3}\) and
+\(4.6\times10^{3}\) (\cref{tab:synthetic_compact}). The paired median reduction in
+\(\log_{10}\kappa\) relative to the unscaled baseline reaches about eleven orders of
+magnitude for \textit{local} and \textit{mixed} at \(S=6\), and about 5.6 orders for
+\textit{coupling} at \(S=6\). A paired Wilcoxon signed-rank analysis with
+Benjamini--Hochberg correction gives \(p_{\mathrm{BH}}\approx1.9\times10^{-6}\) across
+the condition-number comparisons. Conversely, on \textit{none}, scaling provides no
+mechanistic advantage and can slightly worsen the metric, which is the desired negative
+control.
+
+The equivalence checks remain clean. Across all 240 synthetic instances, the maximum
+relative spread of the objective value across variants is \(4.3\times10^{-4}\), below the
+solver MIPGap \(10^{-3}\), and no instance exceeds that threshold. In original scale, the
+maximum row violation is \(1.3\times10^{-6}\) and the maximum integrality violation is
+\(2.0\times10^{-6}\), with no infeasible run. The synthetic benchmark therefore supports
+the numerical mechanism--controlled imbalance, conditioning recovery, and preservation of
+feasibility and objective values--while making no claim about runtime speedup.
+
+Taken together, the four operational scenarios and the controlled synthetic check support a limited but useful interpretation. Under Gurobi, the structured preprocessing rules improve the numerical representation and often reduce solver time or deterministic effort. Under CPLEX, the same external transformations do not produce a robust runtime benefit and can be indistinguishable from, or worse than, the base in paired runtime evidence, even when some numerical diagnostics improve. The empirical message is therefore not that one scaling rule always wins. It is that generator-level structure can matter for MIP performance, but its value has to be measured through the full solver--model interaction.
+
+
+\FloatBarrier
+
+\section{Discussion}
+\label{sec:discussion}
+% -------------------------------------------------------------------------
+
+The experiments support a bounded claim. Generator-aware positive row scaling changes the
+solver-facing representation in the intended direction. Under Gurobi, that change often
+reduces robust runtime or deterministic effort. Under CPLEX 22.1.2.0, the same external
+scaling does not produce a robust runtime gain. The evidence therefore separates three
+issues that are easy to conflate: algebraic equivalence, numerical representation, and
+mixed-integer search performance.
+
+\begin{table*}[t]
+\centering
+\caption{Claim, evidence, and limitation are distinct parts of the argument.}
+\label{tab:claim-summary}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}p{0.19\textwidth}p{0.40\textwidth}p{0.32\textwidth}@{}}
+\toprule
+Claim & Evidence in this study & Limitation \\
+\midrule
+Algebraic equivalence & Positive factors multiply complete constraints; post-solve checks evaluate feasibility, integrality, and objectives in the original scale. & This claim concerns the mathematical MIP, not the path followed by branch-and-bound. \\
+Numerical representation & Generator-aware variants reduce solver-facing conditioning diagnostics in the harder classes. & Conditioning diagnostics describe representation; they do not prove faster MIP search. \\
+Gurobi performance & \methodAug{} and \methodMat{} improve robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The strongest variant depends on the instance class, and the claim is conditional on the tested pipeline. \\
+Solver dependence & CPLEX remains near parity or deteriorates in paired runtime evidence, even when some numerical diagnostics improve. & The result is tied to CPLEX 22.1.2.0, default settings, and the ClusterUY environment. \\
+Generalization & Generator-level block information can guide numerical preprocessing before export; the synthetic benchmark injects local and coupling imbalance by construction and confirms the intended conditioning response. & Runtime evidence still comes from one hydrothermal dispatch platform; the synthetic benchmark is a mechanism check, not a performance benchmark. \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item The table keeps the main characters of the argument visible: the algebraic
+transformation, the numerical representation, the solver pipeline, and the scope of the
+evidence.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+\Cref{tab:claim-summary} prevents the main claim from becoming too strong. The method does
+not promise universal acceleration. It gives a reproducible way to use block and coupling
+information before export, and it tests whether each solver pipeline benefits from that
+representation.
+
+A first objection is that any benefit may come from generic coefficient compression rather
+than from generator information. The results only partly support that objection. Ruiz-type
+baselines sometimes compress coefficients and can be descriptively competitive in isolated
+summaries, but their matched behavior is irregular. The generator-aware rules add a
+modeling distinction that flat-matrix equilibration does not use: they treat local rows
+before coupling rows, and they scale coupling rows relative to the blocks they connect.
+The evidence therefore points to structure, not only coefficient range, as a source of
+useful numerical information.
+
+A second objection is that the right-hand side may be unnecessary. The evidence supports
+this objection more strongly. \methodAug{} uses coefficients and right-hand sides and
+remains strongest in the Full class. Yet \methodMat{} recovers much of the benefit using
+the coefficient matrix alone and is often best in Simple and SG-Ter-Mer. In this testbed,
+the local--coupling distinction appears more important than including the right-hand side in
+every scale proxy. Other generated models may behave differently, but the present evidence
+does not need the right-hand side to explain the main Gurobi gains.
+
+A third objection comes from CPLEX. Several transformations improve static or solver-level
+numerical diagnostics, yet paired runtime evidence remains neutral, mixed, or unfavorable.
+This contrast does not weaken the numerical claim; it limits the performance claim. A
+commercial MIP run is not a linear algebra experiment. Presolve, internal scaling,
+relaxation bases, cuts, incumbents, branching, heuristics, tolerances, and deterministic
+scheduling all stand between the exported matrix and the final runtime. External scaling
+may improve one part of that pipeline while the binding bottleneck lies elsewhere.
+
+The main methodological lesson is therefore about evidence. Numerical preprocessing for
+MIPs should not be evaluated with one coefficient-range statistic or one runtime table.
+Algebraic equivalence shows that the transformed model is legitimate. Numerical
+diagnostics show that the representation changed in the intended direction. Matched
+runtime evidence shows whether the solver converted that representation into speed. Solver
+contrasts show whether the effect survives a different internal pipeline. The study contributes by reporting all four layers and by keeping their claims separate.
+
+The controlled synthetic benchmark closes one part of this gap. It shows that when the
+source of scale imbalance is known by construction, the scaling variants respond in the
+intended direction and preserve original-scale feasibility and objective values. It does
+not close the performance gap: the synthetic instances are small and solve in milliseconds,
+so runtime claims must still come from operational instances. A further operational ablation remains useful. The present real-data comparison separates right-hand-side information and generic equilibration, but it does not run local-only, coupling-only, and local-plus-coupling versions on the hydrothermal instance classes. Such an ablation would identify how much of the Gurobi effect comes from local row normalization and how much comes from the coupling-row treatment. Additional operational
+domains, such as logistics, production planning, and network design, would test whether the
+same mechanism persists when the generator structure itself changes. Until then, the
+supported conclusion is scoped: generator-aware positive row scaling is a numerical
+preprocessing layer for generated block-structured engineering MIPs, not a
+solver-independent acceleration theorem.
+
+\section{Strengths, limitations, and reproducibility}
+\label{sec:validity}
+% -------------------------------------------------------------------------
+
+The study is strongest where the evidence is matched. Runtime comparisons use the same
+instance, solver, and tolerance for the base and scaled variants. Numerical diagnostics are
+reported separately from speed. Feasibility and integrality are checked on the original
+scale. These choices make the argument auditable: a reader can see which evidence supports
+algebraic equivalence, which evidence supports numerical improvement, and which evidence
+supports solver-dependent acceleration.
+
+The main limitation is domain coverage. The method applies to generated modular MIPs with
+identifiable local blocks and coupling rows, but the evidence comes from one hydrothermal
+dispatch platform. That platform supplies a realistic and numerically heterogeneous
+testbed. It does not prove that the same behavior will appear in other generated
+optimization domains.
+
+A second limitation is component-level attribution within the operational testbed. The synthetic benchmark isolates local and coupling imbalance by construction, but the hydrothermal experiments compare the full generator-aware architecture against right-hand-side and generic-scaling alternatives. They do not yet include operational local-only, coupling-only, and local-plus-coupling variants. This omission limits the ability to attribute the observed Gurobi gains to one stage of the architecture.
+
+Solver dependence is another threat. The experiments leave internal presolve and
+scaling enabled, so the measured effect is the effect of an external preprocessing layer
+inside realistic commercial solver pipelines. That design makes the experiments relevant
+to practice, but it also makes the results conditional on solver version, settings, and
+environment. The negative CPLEX evidence should therefore be read as a finding about the
+tested pipeline, not as a universal statement about CPLEX.
+
+The numerical diagnostics have limited reach. Exported coefficient ranges are static
+matrix summaries. Solver-level conditioning diagnostics depend on the state exposed by the
+solver and on auxiliary fixed-integer LP computations. Neither quantity measures full MIP
+difficulty. For that reason, the paper reports original-scale feasibility, integrality
+after descaling, objective consistency checks, performance profiles, deterministic effort,
+paired tests, and primal--dual progress as complementary evidence.
+
+Finally, the experiments use operational data. Some raw inputs may not be redistributable. The reproducibility package should therefore include public code, aggregate results, paired-instance identifiers, processed logs, and scripts that rebuild the tables and figures. The controlled synthetic benchmark in \cref{subsec:synthetic-benchmark,subsec:synthetic-results} provides an auditable complement when raw operational data cannot be released: it can reproduce the numerical mechanism without claiming operational speedup.
+
+% Float barrier removed to improve two-column layout.
+
+\section{Conclusion}
+\label{sec:conclusion}
+% -------------------------------------------------------------------------
+
+Generated engineering MIPs contain useful structure before export. The generator knows the
+local rows, the component blocks, and the coupling rows. A solver usually receives only the
+flat matrix. This paper uses that pre-export information to choose positive row scalings
+that preserve the optimization problem but change its numerical representation.
+
+The answer to the research question is qualified but affirmative. Generator-aware positive
+row scaling improves solver-facing numerical diagnostics for the tested block-structured
+hydrothermal MIPs. Under Gurobi, that improvement often coincides with lower robust runtime
+or deterministic effort. Under CPLEX 22.1.2.0, the same external transformations do not
+produce a robust runtime gain. The method improves representation; acceleration remains
+solver-dependent.
+
+The main contribution is the local--block--coupling architecture. The method scales local
+rows first, summarizes local blocks second, and scales coupling rows last with the scales
+of the blocks they connect. This order uses information that the model generator knows but
+a generic flat-matrix routine may not. Because each factor multiplies a complete
+constraint by a strictly positive scalar, feasible points, objective values, and integer
+restrictions remain unchanged.
+
+The broader lesson is evidential. A claim about numerical preprocessing for generated MIPs
+needs more than coefficient ranges. It needs algebraic equivalence, original-scale
+feasibility checks, solver-facing numerical diagnostics, matched runtime comparisons, and
+solver-contrast evidence. On that chain of evidence, the study supports a scoped claim:
+generator-aware positive row scaling is useful for the tested class of generated
+engineering MIPs, but it is not a universal acceleration mechanism.
+
+Future work should test the mechanism beyond hydrothermal dispatch and should add an operational ablation of the architecture itself. The controlled synthetic benchmark introduced here already isolates local and coupling imbalance in a reproducible setting; larger synthetic suites and local-only, coupling-only, and local-plus-coupling runs on real generated models would clarify which stage of the architecture drives the observed solver effects. Additional generated MIP applications in logistics, production planning, and network design can test whether the same mechanism persists when the engineering structure changes. The reproducibility package should separate implementation-specific effects, operational-data restrictions, and the numerical mechanism studied here.
+
+% Float barrier removed to improve two-column layout.
+
+\section*{CRediT authorship contribution statement}
+
+Mathias Rodr\'iguez Castro: Conceptualization, Methodology, Software,
+Investigation, Formal analysis, Data curation, Visualization, Writing -- original draft,
+Writing -- review and editing.
+
+\section*{Funding statement}
+
+This research received no specific grant from any funding agency in the public,
+commercial, or not-for-profit sectors.
+
+\section*{Conflict of interest statement}
+
+The author declares that there are no known competing financial interests or personal
+relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Ethics approval statement}
+
+This study consists of computational experiments and does not involve human
+participants, animal subjects, patient data, or clinical-trial data.
+
+\section*{Data and code availability statement}
+
+A public reproducibility package will accompany the public version of the manuscript; the repository URL will be inserted before final publication, subject to institutional and operational restrictions on raw dispatch data. The repository will include the experimental source code, preprocessing scripts, processed solver logs or aggregate result tables, paired-instance identifiers, and the scripts used to rebuild every table and figure reported in the manuscript. The package will document the exact solver versions, scenario definitions, command-line options, time limits, MIPGap settings, preprocessing flags, and log-parsing rules used to construct the matched comparisons. If raw operational inputs cannot be redistributed, the release will provide enough processed artifacts for readers to evaluate the numerical transformation, reproduce the reported aggregates, and audit the statistical analyses. The synthetic benchmark generator, grid script, aggregate metrics, and analysis script can be released independently of the operational dispatch data.
+
+\section*{Supporting information statement}
+
+Additional processed solver logs, extended tables, diagnostic plots, and scripts for
+rebuilding the numerical evidence may be supplied as Supporting Information. Raw
+operational dispatch inputs may be subject to institutional restrictions.
+
+% Float barrier removed to improve two-column layout.
+
+\section*{Acknowledgments}
+
+The author acknowledges Universidad de la Rep\'ublica and the computational
+resources used for the experimental evaluation. The experiments presented in this paper
+were carried out using ClusterUY (\url{https://cluster.uy})
+\citep{nesmachnow2019clusteruy}. The author thanks Claudio Risso and Ignacio
+Ram\'irez for supervision, methodological discussions, and feedback during the
+development of this work. The MIP formulation used in this study belongs to a broader
+line of work on hydroelectric and hydrothermal dispatch models developed by Claudio
+Risso and collaborators.
+
+\balance
+\bibliographystyle{elsarticle-harv}
+\bibliography{references}
+
+\end{document}

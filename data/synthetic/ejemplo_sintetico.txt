@@ -1,0 +1,28 @@
+# =============================================================================
+# Smoke test del benchmark sintético MIP bloque-estructurado.
+#
+# Genera 1 instancia (3 bloques, escalas heterogéneas por bloque) y corre las
+# 5 variantes de preprocesamiento (Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols),
+# emitiendo el CSV de métricas + manifest.json + row/column_metadata.csv.
+#
+# Uso (desde Implementacion_Cpp/Codigo_Cpp):
+#     cat synthetic/ejemplo_sintetico.txt | ./build/SistemaElectrico
+#
+# Salidas:
+#     synthetic/resultados/smoke_metrics.csv
+#     synthetic/resultados/smoke/inst001_seed12345_manifest.json
+#     synthetic/resultados/smoke/inst001_seed12345_row_metadata.csv
+#     synthetic/resultados/smoke/inst001_seed12345_column_metadata.csv
+# =============================================================================
+benchmarkSintetico --out synthetic/resultados/smoke --coef-family block_heterogeneous
+Gurobi
+12345
+1
+3
+4 2
+3 5
+mixed
+3
+Base,SA-Aug,SA-Mat,Ruiz,Ruiz+Cols
+synthetic/resultados/smoke_metrics.csv
+salir

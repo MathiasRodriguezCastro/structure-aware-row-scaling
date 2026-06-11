@@ -1,0 +1,35 @@
+# =============================================================================
+# Grilla inicial (Gurobi). Diseño:
+#   B=10, nc=8, nb=8, restrLocales=8, restrAcoplamiento=3
+#   patterns = none, local, coupling, mixed   (4)
+#   S        = 0, 3, 6                         (3)
+#   seeds    = 1..20                           (20)   -> base=1, numInstancias=20
+#   coef_family = uniform (default)
+#   variantes = Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols
+#   solver = Gurobi, mipgap=0.001, timeout=600
+#
+# Total: 4 × 3 × 20 = 240 instancias ; × 5 variantes = 1200 corridas.
+#
+# Salidas (en synthetic/resultados/grilla_inicial_gurobi/):
+#   metrics.csv                                  (una fila por instancia × variante)
+#   <pattern>_S<S>_seed<n>_manifest.json         (manifest por instancia)
+#   <pattern>_S<S>_seed<n>_row_metadata.csv      (metadata de filas por instancia)
+#   <pattern>_S<S>_seed<n>_column_metadata.csv   (metadata de columnas por instancia)
+#   summary_by_pattern_severity_variant.csv      (resumen agregado)
+#
+# Uso (desde Implementacion_Cpp/Codigo_Cpp):
+#   cat synthetic/grilla_inicial_gurobi.txt | ./build/SistemaElectrico \
+#       > synthetic/resultados/grilla_inicial_gurobi/run.log 2>&1
+# =============================================================================
+benchmarkSintetico --out synthetic/resultados/grilla_inicial_gurobi --summary synthetic/resultados/grilla_inicial_gurobi/summary_by_pattern_severity_variant.csv --timeout 600 --mipgap 0.001
+Gurobi
+1
+20
+10
+8 8
+8 3
+none,local,coupling,mixed
+0,3,6
+Base,SA-Aug,SA-Mat,Ruiz,Ruiz+Cols
+synthetic/resultados/grilla_inicial_gurobi/metrics.csv
+salir
