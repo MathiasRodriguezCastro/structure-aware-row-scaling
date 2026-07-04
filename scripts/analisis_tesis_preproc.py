@@ -1064,7 +1064,13 @@ def figura_boxplot(rows: list[dict], out: Path) -> bool:
 
 def figura_scatter(rows: list[dict], out: Path,
                    xcol: str = "matrix_kappa_ratio_vs_base",
-                   xlabel: str = r"$\rho_\kappa$ (dispersión variante/base)") -> bool:
+                   xlabel: str = r"$\rho_\kappa$ (dispersión variante/base)",
+                   estilos: dict | None = None,
+                   ref_x: bool = True,
+                   xlim: tuple | None = None) -> bool:
+    """estilos: kwargs extra de ax.scatter por variante (p.ej. color/marker fijos, para
+    redundancia no cromática); ref_x=False quita la línea de referencia x=1; xlim recorta
+    el eje x a los datos. Defaults = comportamiento histórico."""
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -1087,14 +1093,18 @@ def figura_scatter(rows: list[dict], out: Path,
         if not xs:
             continue
         hay_datos = True
-        ax.scatter(xs, ys, s=18, alpha=0.5, label=VARIANTE_LABEL.get(v, v))
+        kw = dict((estilos or {}).get(v, {}))
+        ax.scatter(xs, ys, s=18, alpha=0.5, label=VARIANTE_LABEL.get(v, v), **kw)
     if not hay_datos:
         plt.close(fig)
         return False
     ax.axhline(1.0, ls="--", color="gray", lw=1)
-    ax.axvline(1.0, ls=":", color="gray", lw=1)
+    if ref_x:
+        ax.axvline(1.0, ls=":", color="gray", lw=1)
     ax.set_xscale("log")
     ax.set_yscale("log")
+    if xlim is not None:
+        ax.set_xlim(*xlim)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(r"speedup$_\mathrm{solver}$")
     ax.legend()
@@ -1105,10 +1115,13 @@ def figura_scatter(rows: list[dict], out: Path,
     return True
 
 
-def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float) -> bool:
+def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float,
+                            estilos: dict | None = None) -> bool:
     """Perfil de desempeño (Dolan–Moré) sobre T_solver: para cada variante, fracción de
     instancias resueltas dentro de un factor τ del mejor tiempo entre las variantes de esa
-    instancia. Una curva por variante (incluida base); maneja timeouts como 'nunca dentro de τ'."""
+    instancia. Una curva por variante (incluida base); maneja timeouts como 'nunca dentro de τ'.
+    estilos: kwargs extra de ax.plot por variante (color/linestyle fijos, para redundancia
+    no cromática); default = comportamiento histórico (ciclo de colores, todo sólido)."""
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -1151,7 +1164,8 @@ def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float) -> bool
             algo = True
             n = len(rs)
             ys = [sum(1 for x in rs if x <= tau) / n for tau in taus]
-            ax.plot(taus, ys, label=VARIANTE_LABEL.get(v, v), lw=1.6)
+            kw = dict((estilos or {}).get(v, {}))
+            ax.plot(taus, ys, label=VARIANTE_LABEL.get(v, v), lw=1.6, **kw)
         ax.set_xscale("log")
         ax.set_xlabel(r"$\tau$ (factor of best time)")
         ax.set_ylabel(r"fraction solved $\leq \tau$")

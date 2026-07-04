@@ -20,7 +20,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # ---- unified publication style -------------------------------------------------
-# Okabe-Ito colorblind-safe palette (base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols).
+# Okabe-Ito colorblind-safe palette (default cycle; per-variant colors are pinned
+# explicitly in SCATTER_STYLE / PERFIL_STYLE below so every figure agrees).
 PALETTE = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#000000"]
 plt.rcParams.update({
     "font.family": "serif",
@@ -61,10 +62,28 @@ import analisis_tesis_preproc as A  # noqa: E402  (style must be set before impo
 # English labels to match the manuscript terminology (figures are for an English paper).
 A.GRUPO_ORDEN = ["Simple", "Full", "SG-Ter-Mer"]
 A.VARIANTE_LABEL = {
+    "base": "Base",   # capitalized to match text/tables
     "estructurado": "SA-Aug",
     "estructurado_matricial": "SA-Mat",
     "ruiz": "Ruiz",
     "ruiz_columnas": "Ruiz+Cols",
+}
+
+# Fixed per-variant styles: same Okabe-Ito color per variant in EVERY figure, plus
+# non-chromatic redundancy (distinct markers in scatters, distinct dash patterns in
+# performance profiles). Colors anchored to the scatter assignment already in use.
+SCATTER_STYLE = {
+    "estructurado": dict(color="#0072B2", marker="o"),
+    "estructurado_matricial": dict(color="#D55E00", marker="s"),
+    "ruiz": dict(color="#009E73", marker="^"),
+    "ruiz_columnas": dict(color="#CC79A7", marker="D"),
+}
+PERFIL_STYLE = {
+    "base": dict(color="#000000", linestyle="-"),
+    "estructurado": dict(color="#0072B2", linestyle="-"),
+    "estructurado_matricial": dict(color="#D55E00", linestyle="--"),
+    "ruiz": dict(color="#009E73", linestyle="-."),
+    "ruiz_columnas": dict(color="#CC79A7", linestyle=":"),
 }
 
 FIGS = ROOT / "paper" / "figs"
@@ -105,14 +124,19 @@ def main():
             print("  (sin datos, salto)")
             continue
         A.figura_boxplot(rows, FIGS / f"{tag}_boxplot.pdf")
-        A.figura_perfil_desempeno(rows, FIGS / f"{tag}_perfil.pdf", TIMEOUT)
+        A.figura_perfil_desempeno(rows, FIGS / f"{tag}_perfil.pdf", TIMEOUT,
+                                  estilos=PERFIL_STYLE)
         if is_gurobi:  # the manuscript only uses the conditioning scatters for Gurobi
+            # rho_kappa data live entirely below 1 (max ~2.4e-2): crop the x axis to the
+            # data and drop the rho=1 reference line (it only stretched ~2 empty decades).
             A.figura_scatter(rows, FIGS / f"{tag}_scatter_rho.pdf",
                              xcol="matrix_kappa_ratio_vs_base",
-                             xlabel=r"$\rho_\kappa$ (exported coef.-range ratio)")
+                             xlabel=r"$\rho_\kappa$ (exported coef.-range ratio)",
+                             estilos=SCATTER_STYLE, ref_x=False, xlim=(1e-7, 1e-1))
             A.figura_scatter(rows, FIGS / f"{tag}_scatter_rhosolver.pdf",
                              xcol="kappa_solver_ratio_vs_base",
-                             xlabel=r"$\rho_\kappa^{\mathrm{solver}}$ (solver-level cond. ratio)")
+                             xlabel=r"$\rho_\kappa^{\mathrm{solver}}$ (solver-level cond. ratio)",
+                             estilos=SCATTER_STYLE)
     print("Done -> paper/figs/")
 
 
