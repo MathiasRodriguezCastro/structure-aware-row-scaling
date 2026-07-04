@@ -1,0 +1,233 @@
+% Point-by-point response to the editorial decision on
+% "Structure-Aware Row Scaling for Block-Structured Mixed-Integer Programs"
+% (submitted as "Generator-Aware Positive Row Scaling for Block-Structured
+% Engineering Mixed-Integer Programs"), IJNME.
+%
+% Build: pdflatex response-letter
+% NOTE: the \reviewerquote{} blocks paraphrase each comment; before submission,
+% replace them with the verbatim text from the decision letter.
+
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.6cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+\usepackage{enumitem}
+
+\definecolor{quotegray}{gray}{0.35}
+\newenvironment{reviewerquote}%
+  {\medskip\noindent\color{quotegray}\itshape\begin{quotation}\noindent}%
+  {\end{quotation}\medskip}
+\newcommand{\resp}{\noindent\textbf{Response.}\ }
+\newcommand{\changes}{\par\smallskip\noindent\textbf{Changes in the manuscript.}\ }
+\newcommand{\secref}[1]{Section~#1}
+
+\setlength{\parskip}{0.35em}
+
+\begin{document}
+
+\begin{flushleft}
+{\large\bfseries Response to the reviewers}\\[0.4em]
+Manuscript: \emph{Structure-Aware Row Scaling for Block-Structured Mixed-Integer Programs}\\
+(submitted under the title \emph{Generator-Aware Positive Row Scaling for Block-Structured
+Engineering Mixed-Integer Programs})\\
+Author: Mathias Rodr\'iguez Castro\\
+Manuscript ID: \texttt{[TO FILL]}
+\end{flushleft}
+
+\noindent Dear Editor and Reviewers,
+
+Thank you for the careful and constructive evaluation. We have revised the manuscript
+following every required (R) and suggested (S) point. The revision adds three new
+experimental controls run on the same cluster and instance pools as the original study
+(a solver-internal-scaling baseline, a hyperparameter sensitivity sweep, and an
+operational stage ablation, now covering all three instance classes), plus a fourth
+control that the ablation itself motivated (a role-blind ``flat'' scaling control), a
+full original-scale equivalence audit of the four operational campaigns, and tempered
+claims wherever the new evidence demanded it. All new code paths are additive and opt-in:
+without the new flags the binaries are byte-identical to the version that produced the
+published results (golden-file regression 23/23), so the original tables remain valid.
+A marked manuscript (\texttt{latexdiff}) against the submitted version accompanies this
+letter. The manuscript was retitled to \emph{Structure-Aware Row Scaling for
+Block-Structured Mixed-Integer Programs}; the reproducibility repository was renamed
+accordingly (\url{https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling},
+the old URL redirects) and its citation metadata updated.
+
+\bigskip
+\hrule
+\section*{Required revisions}
+
+\subsection*{R1 --- Solver-internal-scaling baseline}
+\begin{reviewerquote}
+Is the reported gain just a generic scaling effect that the solver could have produced
+itself with its own scaling controls? [replace with verbatim comment]
+\end{reviewerquote}
+\resp We agree this is the decisive control and have run it in full: the unscaled model
+under every admissible internal-scaling setting of each solver (Gurobi
+\texttt{ScaleFlag} $0$--$3$; CPLEX \texttt{Read::Scale} $-1/0/1$), on the same instances,
+for all three classes and both tolerances, compared against the structure-aware variants
+under default internal scaling. Three findings. (i) Internal scaling is not a straw man:
+disabling it is catastrophic (e.g.\ Simple Gurobi $\mathrm{sgm}$ $3.9\to42$\,s). (ii) On
+the classes where the external rule is effective, no tuned internal setting reproduces
+its runtime: the best internal Gurobi flag returns to the default level while the
+structure-aware rule is $1.8\times$ faster (Simple), and no internal mode comes close on
+SG-Ter-Mer. (iii) We also report honestly where this control does \emph{not} favor the
+method: on the Full class at the strictest tolerance the retuned internal modes overtake
+the external rule, and on Full under CPLEX the ``no scaling'' setting appears
+dramatically faster but produces claimed-optimal objectives that disagree with the
+default pipeline beyond the stopping tolerance on a third of the instances---we flag it
+as numerically unreliable, which itself illustrates the paper's point that scaling
+choices can invalidate certificates.
+\changes New design paragraph in \secref{5.4} (additional controls); results in
+\secref{6.7} with the extended Table~17 (three classes at $1\%$; the $0.1\%$ sweep
+summarized in text); Discussion updated to scope the claim accordingly. Canonical CSVs
+under \texttt{results-revision/r1-internal-scaling/} in the repository.
+
+\subsection*{R2 --- Conditioning vs.\ runtime inconsistency}
+\begin{reviewerquote}
+SA-Aug is better conditioned but SA-Mat is often faster; conditioning does not line up
+with runtime. [replace with verbatim comment]
+\end{reviewerquote}
+\resp We now state the variant-level inversion explicitly and re-frame conditioning as at
+most a \emph{partial mediator} of the runtime effect throughout (abstract, results
+lead-in, Discussion). The revision strengthens this further with two additions: the
+correlation table now reports the per-variant decomposition---the pooled negative
+conditioning--speedup association is carried by the Ruiz baselines
+($\rho_S\approx-0.33/-0.36$), whereas for the structure-aware variants it is essentially
+null---and the stage ablation (R5) shows that the stage that most improves the coupling
+diagnostics is not the stage that drives the runtime. Precedent for both observations is
+now cited (Elble \& Sahinidis 2012; Miltenberger, Ralphs \& Steffy 2018).
+\changes \secref{5.6} (statistical analysis), Table~9 notes and surrounding text;
+Discussion paragraph ``A mechanistic caveat\ldots''; new references.
+
+\subsection*{R3 --- Hyperparameter sensitivity}
+\begin{reviewerquote}
+The constants $u=2$, $K=4$ and the coefficient window were fixed without justification.
+[replace with verbatim comment]
+\end{reviewerquote}
+\resp The constants are now exposed as flags and swept on the Simple class under Gurobi:
+$u\in\{1.5,2,4\}$, window $\in\{[10^{-6},10^{6}],[10^{-9},10^{9}],[10^{-12},10^{12}]\}$,
+$K\in\{2,4,8\}$. The structure-aware rule is insensitive ($\mathrm{sgm}\in[2.01,2.12]$\,s
+across the whole grid against a base of $3.73$\,s). We note transparently that $K$ is a
+parameter of the Ruiz baselines only; varying it leaves the structure-aware rule
+unchanged, as expected.
+\changes \secref{5.4} (design) and \secref{6.9} with Table~19; canonical CSVs under
+\texttt{results-revision/r3-hyperparam/}.
+
+\subsection*{R4 --- Generality and the row-only premise}
+\begin{reviewerquote}
+The generality claims should be rescoped; the row-only choice is a premise, not a
+finding. [replace with verbatim comment]
+\end{reviewerquote}
+\resp The abstract now states that all runtime evidence is single-platform and the method
+is demonstrated on one hydrothermal testbed; a third limitation makes the row-only
+premise explicit and identifies structured \emph{column} scaling as an untested companion
+lever; the generalization to other domains is qualified by the shared structural premise
+(sparse global coupling over local blocks). The title was kept accurate to the method,
+with the scope made explicit in the text.
+\changes Abstract; \secref{8} (limitations), third limitation; Conclusion.
+
+\subsection*{R5 --- Operational stage ablation}
+\begin{reviewerquote}
+Local-only and coupling-only variants were never run on the real hydrothermal classes.
+[replace with verbatim comment]
+\end{reviewerquote}
+\resp Both single-stage ablations now run on the real classes---including the Full
+class---at both tolerances under Gurobi. The attribution is unambiguous and consistent:
+the local stage alone recovers essentially the entire runtime benefit (Simple
+$3.73\to2.01$\,s vs.\ $2.02$ for the full rule; Full $82.6\to70.9$ vs.\ $71.4$;
+SG-Ter-Mer $14.4\to8.6$ vs.\ $8.6$), while the coupling stage alone is inert. We report
+this even though it qualifies our own architecture, and we drew the natural consequence:
+since the local kernel is computable from the flat matrix, we added a further
+\emph{role-blind flat control} (the same per-row kernel and safeguards applied to every
+row with no metadata at all) to isolate whether the row-role metadata is the active
+ingredient of the runtime effect. \texttt{[TO FILL when the campaign completes: flat
+control outcome and the corresponding scoping of the performance claim.]}
+\changes \secref{5.4} (design), \secref{6.8} with Table~18 (three classes); Conclusion
+updated (the previously listed ``future work'' ablation is now in the paper); flat
+control code and campaign in the repository (\texttt{--plano}).
+
+\subsection*{R6 --- Related-work positioning}
+\begin{reviewerquote}
+The related work should engage the classical equilibration literature and state precisely
+what is new. [replace with verbatim comment]
+\end{reviewerquote}
+\resp The related work now engages geometric-/arithmetic-mean scaling (Tomlin),
+Curtis--Reid, Sinkhorn--Knopp, Ruiz, and solver presolve (Achterberg et al.), and states
+precisely what is new: not the kernel (the local factor is a geometric mean of per-row
+extremes) but the metadata-driven \emph{source} of the scales and the staged
+local--block--coupling \emph{ordering}. The revision adds Elble \& Sahinidis (2012) as
+the empirical precedent that generic scaling payoffs are irregular, Miltenberger et al.\
+(2018) on conditioning along the branch-and-cut tree, and Bergner et al.\ (2015) for
+automatic structure detection as the fallback when the generator is not owned; the
+absolute claim about modeling languages exporting flat matrices is now qualified
+(block-structured extensions exist, but they feed decomposition algorithms rather than
+numerical preprocessing---exactly the gap addressed).
+\changes \secref{2.3}--\secref{2.4}; \secref{7} (deployability); references.
+
+\section*{Suggested revisions}
+
+\subsection*{S1 --- Deployability}
+\resp New Discussion subsection \emph{Deployability and downstream effects}: metadata
+availability in Pyomo/JuMP/GAMS/AMPL, instrumentation cost for owned generators, the
+detection fallback (now cited), and a deliberately narrow value proposition.
+
+\subsection*{S2 --- Dual variables}
+\resp The same subsection now states that positive row scaling rescales constraint duals
+by the inverse row factors, that the factors are stored, and that operators must descale
+shadow prices (marginal costs, water values) before use.
+
+\subsection*{S3 --- Proposition--proxy bridge}
+\resp The propositions are explicitly downgraded to motivation, not guarantees; the
+synthetic suite is identified as the empirical bridge, and the revision adds the
+per-block audit trail via the controlled synthetic mechanism check.
+
+\subsection*{S4 --- Abstract effect-size language}
+\resp The abstract describes the Gurobi benefit as concentrated timeout reduction rather
+than a broad per-instance speedup; the single-instance PAR10 caveat of SG-Ter-Mer is now
+stated in the notes of \emph{both} tolerance tables.
+
+\subsection*{S5 --- Partial correlations and missingness}
+\resp The statistical section reports the size-controlled partial Spearman
+($\rho\approx-0.25$, $n=1185$, essentially equal to the raw value), the balanced pools,
+the $1$--$3\%$ per-run error rate, and the matched-pairs policy; the revision adds the
+per-variant decomposition of the pooled correlation (see R2).
+
+\section*{Editor's comments}
+
+\subsection*{Length (W4)}
+\begin{reviewerquote}
+The manuscript should be shortened by roughly 15--20\%. [replace with verbatim comment]
+\end{reviewerquote}
+\resp \texttt{[TO FILL after the P2 editing pass: current status is that the required
+controls added substantiating material; the dedicated trim pass consolidates the
+local--block--coupling framing and the three-claims statements to single occurrences,
+merges the two claim-summary tables, compresses the post-table narration paragraphs, and
+moves the redundant 0.1\% Gurobi figures to Supporting Information.]}
+
+\section*{New material added on our own initiative}
+\begin{itemize}[leftmargin=1.4em]
+  \item \emph{Original-scale equivalence audit} (\secref{6.1}, Table~6): the descaling
+  verification promised by the design is now reported for all four operational campaigns,
+  with verified explanations of every exceedance; notably, the audit shows the strict
+  checker fails the \emph{unscaled base} at the same rate as the scaled variants where
+  exceedances occur, and it catches wrong-optimal certificates in both directions.
+  \item CPLEX tree-level \texttt{KappaStats}, so the numerical claim is now tabulated
+  under both solvers.
+  \item A run-to-run performance-variability paragraph in the limitations, using the
+  repeated base campaigns as an empirical noise bound.
+\end{itemize}
+
+\bigskip
+\noindent We believe the revision addresses every point and, where the new controls
+qualified our own claims, we have reported those qualifications explicitly. We thank the
+panel again for a review that materially improved the paper.
+
+\bigskip
+\noindent Sincerely,\\[0.3em]
+Mathias Rodr\'iguez Castro\\
+Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Uruguay
+
+\end{document}
