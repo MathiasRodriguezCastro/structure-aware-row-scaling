@@ -1,9 +1,11 @@
-# Revision notes — response to the peer-review panel
+# Revision notes — internal pre-submission review
 
 Manuscript: *Structure-Aware Row Scaling for Block-Structured Mixed-Integer Programs*
 (retitled from *Generator-Aware Positive Row Scaling for Block-Structured Engineering MIPs*;
-the method name is unified as "structure-aware" throughout).
-This file maps each required (R) and suggested (S) revision from the editorial decision to
+the method name is unified as "structure-aware" throughout). The paper has NOT been
+submitted yet: the required (R) and suggested (S) points below come from the internal
+pre-submission review package (advisor feedback + adversarial self-review), not from a
+journal decision. This file maps each point to
 the concrete change made in the **code**, the **paper**, and the **cluster experiments**.
 The released code is frozen at the version that produced the published 12-scenario results;
 all new capabilities are **additive** (the original variants are byte-identical without the
@@ -95,10 +97,10 @@ Legend: ✅ done · 🔄 campaign running on ClusterUY.
   CITATION.cff/.zenodo.json/README aligned to the new title, manuscript excluded from the
   MIT/CC BY blanket licenses, N3 instructions fixed (XeLaTeX + WileyNJDv5).
 
-## Pending before resubmission
+## Pending before (first) submission
 - 🔄 plano-control campaign + R5 Full 0.1% rerun (jobs 5580448–53) → integrate into
   §stage-attribution and finalize the flat-control sentence in the conclusion.
-- EIC length trim (~15–20%): planned as the next editing pass (P2), after the new content
-  settles.
-- Formal point-by-point response letter + latexdiff vs `ef6b96e` (draft in progress).
-- Tag v1.1.0 + Zenodo refresh once the campaign data and letter are final.
+- Length trim (~15–20%, W4 of the internal review): next editing pass.
+- Author's own full rewrite/review pass over the manuscript.
+- Cover letter for the initial submission (Research Exchange, free-format allowed).
+- Tag v1.1.0 + Zenodo refresh once the campaign data land and the text is final.
