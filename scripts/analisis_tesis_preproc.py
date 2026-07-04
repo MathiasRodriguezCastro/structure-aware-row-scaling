@@ -1153,8 +1153,8 @@ def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float) -> bool
             ys = [sum(1 for x in rs if x <= tau) / n for tau in taus]
             ax.plot(taus, ys, label=VARIANTE_LABEL.get(v, v), lw=1.6)
         ax.set_xscale("log")
-        ax.set_xlabel(r"$\tau$ (factor del mejor tiempo)")
-        ax.set_ylabel(r"fracción resuelta $\leq \tau$")
+        ax.set_xlabel(r"$\tau$ (factor of best time)")
+        ax.set_ylabel(r"fraction solved $\leq \tau$")
         ax.set_title(grupo)
         ax.set_ylim(0, 1.02)
         ax.legend(fontsize=8)
