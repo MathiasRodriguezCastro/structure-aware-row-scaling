@@ -186,6 +186,13 @@ void ProblemaGurobi::resolverMonolitico() {
         }
         modelo->set(GRB_DoubleParam_MIPGap, config.mipGap);
 
+        // Baseline de escalado interno del solver (R1): permite contrastar el escalado
+        // generator-aware externo contra las opciones nativas de Gurobi. Solo se toca si el
+        // usuario pasó --scaleflag; en caso contrario Gurobi usa su default (-1, automático).
+        if (config.scaleFlagGurobi != SolverConfig::SOLVER_PARAM_AUTO) {
+            modelo->set(GRB_IntParam_ScaleFlag, config.scaleFlagGurobi);
+        }
+
         // Reproducibilidad: semilla fija y, si el entorno la define (SLURM OMP_NUM_THREADS),
         // número de hilos fijo. Con semilla + hilos fijos Gurobi es determinista.
         modelo->set(GRB_IntParam_Seed, 1);

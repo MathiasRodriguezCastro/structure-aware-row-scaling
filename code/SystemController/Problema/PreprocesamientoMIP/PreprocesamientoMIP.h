@@ -23,6 +23,13 @@ struct PreprocesamientoConfig {
                                                ///<  (norma L2 de fila y escalas de bloque por
                                                ///<  normas de fila); el RHS se escala pero no
                                                ///<  participa del diagnóstico de escala.
+    bool   escalamientoPlano         = false;  ///< Control experimental (flat/no-metadata): el MISMO
+                                               ///<  kernel por fila (alpha_r = 1/sqrt(M_r*m_r)) sobre
+                                               ///<  TODAS las filas SIN metadata de roles ni bloques:
+                                               ///<  un único bloque con todas las filas, sin
+                                               ///<  clasificación global/acoplamiento, sin beta de
+                                               ///<  bloque y sin etapa de acoplamiento. Mismas
+                                               ///<  salvaguardas por fila.
     bool   usarEquilibradoRuiz       = false;  ///< Equilibrado iterativo interno por bloque
     bool   escalarColumnasContinuas  = false;  ///< Transformar columnas continuas y recuperar solución
     bool   normalizacionFisica       = false;  ///< Normalizar filas globales por unidades físicas/proxy
@@ -33,7 +40,9 @@ struct PreprocesamientoConfig {
     double umbralKappa               = 1e6;    ///< Umbral para reportar bloque mal condicionado
     double umbralRangoCoef           = 1e6;    ///< Umbral para reportar rango de coeficientes
     double umbralRhoEscalamientoGlobal = 10.0; ///< Solo escalar acoplamiento si rho supera este valor
-    double umbralFactorEscalamiento  = 2.0;    ///< No aplicar factores dentro de [1/u, u]
+    double umbralFactorEscalamiento  = 2.0;    ///< No aplicar factores dentro de [1/u, u]  (hiperparámetro u)
+    double epsMinCoef                = 1e-9;   ///< Ventana de coeficiente admisible: cota inferior ε_min
+    double epsMaxCoef                = 1e9;    ///< Ventana de coeficiente admisible: cota superior ε_max
 };
 
 /**

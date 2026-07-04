@@ -32,6 +32,7 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -717,9 +718,51 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                             }
                             config.mipGap = val;
 
+                        } else if (args[i] == "--scaleflag" || args[i] == "-scaleflag") {
+                            // Baseline R1: escalado interno de Gurobi (GRB ScaleFlag: -1,0,1,2,3).
+                            if (i + 1 >= args.size()) {
+                                std::cerr << "\033[31m[error] --scaleflag requiere un valor entero en {-1,0,1,2,3}\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            int val;
+                            try { val = std::stoi(args[++i]); } catch (...) { val = 99; }
+                            if (val < -1 || val > 3) {
+                                std::cerr << "\033[31m[error] --scaleflag debe estar en {-1,0,1,2,3}\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            config.scaleFlagGurobi = val;
+
+                        } else if (args[i] == "--cplexscale" || args[i] == "-cplexscale") {
+                            // Baseline R1: escalado interno de CPLEX (Read::Scale: -1,0,1).
+                            if (i + 1 >= args.size()) {
+                                std::cerr << "\033[31m[error] --cplexscale requiere un valor entero en {-1,0,1}\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            int val;
+                            try { val = std::stoi(args[++i]); } catch (...) { val = 99; }
+                            if (val < -1 || val > 1) {
+                                std::cerr << "\033[31m[error] --cplexscale debe estar en {-1,0,1}\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            config.scaleIndCplex = val;
+
+                        } else if (args[i] == "--cplexpresolve" || args[i] == "-cplexpresolve") {
+                            // Sondeo R1: presolve de CPLEX (0 off, 1 on). ¿Absorbe el escalado externo?
+                            if (i + 1 >= args.size()) {
+                                std::cerr << "\033[31m[error] --cplexpresolve requiere un valor en {0,1}\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            int val;
+                            try { val = std::stoi(args[++i]); } catch (...) { val = 99; }
+                            if (val < 0 || val > 1) {
+                                std::cerr << "\033[31m[error] --cplexpresolve debe estar en {0,1}\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            config.presolveIndCplex = val;
+
                         } else {
                             std::cerr << "\033[31m[error] Flag desconocida: " << args[i] << "\033[0m" << std::endl;
-                            std::cout << "\033[34m[info] Uso: configurarSolver --<solver> [--timeout <seg>] [--mipgap <val>]\033[0m" << std::endl;
+                            std::cout << "\033[34m[info] Uso: configurarSolver --<solver> [--timeout <seg>] [--mipgap <val>] [--scaleflag <-1..3>] [--cplexscale <-1..1>] [--cplexpresolve <0|1>]\033[0m" << std::endl;
                             errorFlag = true; break;
                         }
                     }
@@ -730,8 +773,14 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
 
                             std::cout << "\033[32m[success] Solver '" << tipoSolver << "' configurado"
                                       << " | timeout=" << config.timeoutSegundos << "s"
-                                      << " | mipgap=" << config.mipGap
-                                      << "\033[0m" << std::endl;
+                                      << " | mipgap=" << config.mipGap;
+                            if (config.scaleFlagGurobi != SolverConfig::SOLVER_PARAM_AUTO)
+                                std::cout << " | scaleflag=" << config.scaleFlagGurobi;
+                            if (config.scaleIndCplex != SolverConfig::SOLVER_PARAM_AUTO)
+                                std::cout << " | cplexscale=" << config.scaleIndCplex;
+                            if (config.presolveIndCplex != SolverConfig::SOLVER_PARAM_AUTO)
+                                std::cout << " | cplexpresolve=" << config.presolveIndCplex;
+                            std::cout << "\033[0m" << std::endl;
 
                         } catch (const std::exception& e) {
                             std::cerr << "\033[31m[error] No se pudo configurar el solver:\033[0m "
@@ -880,6 +929,32 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     cfg.normalizarBloqueTrasFilas = true;
                 } else if (args[i] == "--ruiz-iters" && i + 1 < args.size()) {
                     cfg.iteracionesRuiz = std::max(1, std::stoi(args[++i]));
+                } else if (args[i] == "--banda-identidad" && i + 1 < args.size()) {
+                    // R3: hiperparámetro u de la banda de cuasi-identidad [1/u, u].
+                    double _u;
+                    if (!parseDoubleStrict(args[++i], _u, "--banda-identidad")) return;
+                    cfg.umbralFactorEscalamiento = std::max(1.0, _u);
+                } else if (args[i] == "--ventana-coef" && i + 2 < args.size()) {
+                    // R3: ventana de coeficiente admisible [ε_min, ε_max].
+                    double _emin, _emax;
+                    if (!parseDoubleStrict(args[++i], _emin, "--ventana-coef ε_min")) return;
+                    if (!parseDoubleStrict(args[++i], _emax, "--ventana-coef ε_max")) return;
+                    cfg.epsMinCoef = _emin;
+                    cfg.epsMaxCoef = _emax;
+                } else if (args[i] == "--solo-local") {
+                    // R5 (ablación): solo etapa local (fila/bloque), sin escalado de acoplamiento.
+                    cfg.aplicarEscalamientoLocal  = true;
+                    cfg.aplicarEscalamientoGlobal = false;
+                } else if (args[i] == "--solo-acoplamiento") {
+                    // R5 (ablación): solo escalado de filas de acoplamiento, sin etapa local.
+                    cfg.aplicarEscalamientoLocal  = false;
+                    cfg.aplicarEscalamientoGlobal = true;
+                } else if (args[i] == "--plano") {
+                    // Control experimental (flat/no-metadata): mismo kernel por fila (geomean
+                    // de extremos) sobre TODAS las filas, SIN metadata de roles ni bloques.
+                    // Los ajustes de config se imponen tras el parseo (ver bloque
+                    // escalamientoPlano abajo), para que --plano gane sin importar el orden.
+                    cfg.escalamientoPlano = true;
                 } else if (args[i] == "--columnas-continuas") {
                     cfg.escalarColumnasContinuas = true;
                     cfg.usarEquilibradoRuiz = true;
@@ -901,9 +976,21 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                         if (!tok.empty()) prefijosAcoplamiento.push_back(tok);
                 } else {
                     std::cerr << "\033[31m[error] Flag desconocida: " << args[i] << "\033[0m" << std::endl;
-                    std::cout << "\033[34m[info] Uso: preprocesar [--solodiagnostico] [--verificar-original] [--global prefijo1,prefijo2,...] [--acoplamiento prefijo1,prefijo2,...] [--local-estructurado|--local-matricial|--local-filas|--local-bloque|--local-ruiz] [--ruiz-iters N] [--columnas-continuas] [--normalizacion-fisica]\033[0m" << std::endl;
+                    std::cout << "\033[34m[info] Uso: preprocesar [--solodiagnostico] [--verificar-original] [--global prefijo1,prefijo2,...] [--acoplamiento prefijo1,prefijo2,...] [--local-estructurado|--local-matricial|--local-filas|--local-bloque|--local-ruiz] [--ruiz-iters N] [--banda-identidad u] [--ventana-coef epsMin epsMax] [--solo-local|--solo-acoplamiento|--plano] [--columnas-continuas] [--normalizacion-fisica]\033[0m" << std::endl;
                     return;
                 }
+            }
+
+            // Modo plano: impone su semántica DESPUÉS del parseo para sobreescribir lo que
+            // hayan seteado --local-estructurado/--local-matricial (p.ej. normalizarBloqueTrasFilas)
+            // sin importar el orden. Plano = kernel por fila puro: sin beta de bloque, sin etapa
+            // de acoplamiento, sin Ruiz; modoMatricial (estrategia 1 vs 2 del kernel) se respeta.
+            if (cfg.escalamientoPlano) {
+                cfg.aplicarEscalamientoLocal   = true;
+                cfg.aplicarEscalamientoGlobal  = false;
+                cfg.escalamientoLocalPorFila   = true;
+                cfg.normalizarBloqueTrasFilas  = false;
+                cfg.usarEquilibradoRuiz        = false;
             }
 
             try {
@@ -928,7 +1015,12 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     std::chrono::high_resolution_clock::now() - _t0_preproc).count();
                 // Derivar slug estable a partir de la config aplicada
                 std::string _slug_preproc;
-                if (cfg.usarEquilibradoRuiz) {
+                if (cfg.escalamientoPlano) {
+                    // Control plano: alineado con las variantes del driver de validación
+                    // (el sufijo _solo_local NO aplica: plano no es una etapa de la
+                    // arquitectura, es el kernel sin metadata).
+                    _slug_preproc = cfg.modoMatricial ? "matricial_plano" : "estructurado_plano";
+                } else if (cfg.usarEquilibradoRuiz) {
                     _slug_preproc = cfg.escalarColumnasContinuas ? "ruiz_columnas" : "ruiz";
                 } else if (cfg.modoMatricial) {
                     _slug_preproc = "estructurado_matricial";
@@ -937,8 +1029,25 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                 } else {
                     _slug_preproc = "bloque";
                 }
-                std::cout << "[PREPROC TIME] variante=" << _slug_preproc
-                          << " tiempo_s=" << _t_preproc_s << std::endl;
+                // R5 (ablación): sufijo cuando solo se aplica una etapa de la arquitectura.
+                if (!cfg.escalamientoPlano) {
+                    if (cfg.aplicarEscalamientoLocal && !cfg.aplicarEscalamientoGlobal)
+                        _slug_preproc += "_solo_local";
+                    else if (!cfg.aplicarEscalamientoLocal && cfg.aplicarEscalamientoGlobal)
+                        _slug_preproc += "_solo_acoplamiento";
+                }
+                // Emitir vía ostringstream con formato propio: el estado de std::cout puede
+                // quedar pegado en std::fixed/baja precisión por prints previos del modelo, lo
+                // que distorsionaría el eco de u/ε (los valores en cfg son correctos).
+                std::ostringstream _pt;
+                _pt << std::defaultfloat << std::setprecision(10)
+                    << "[PREPROC TIME] variante=" << _slug_preproc
+                    << " tiempo_s=" << _t_preproc_s
+                    << " u=" << cfg.umbralFactorEscalamiento
+                    << " K=" << cfg.iteracionesRuiz
+                    << " epsMin=" << cfg.epsMinCoef
+                    << " epsMax=" << cfg.epsMaxCoef;
+                std::cout << _pt.str() << std::endl;
                 std::cout << "\033[32m[success] Preprocesamiento aplicado.\033[0m" << std::endl;
             }
 

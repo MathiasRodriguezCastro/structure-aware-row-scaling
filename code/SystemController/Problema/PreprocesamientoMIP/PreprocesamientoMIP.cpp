@@ -92,6 +92,20 @@ void PreprocesamientoMIP::ejecutar() {
     calcularDiagnosticoPorBloque();
     calcularDiagnosticoGlobal();
 
+    // Modo plano (control experimental): verificar que NINGUNA fila quede fuera del
+    // bloque único (cobertura total) y dejar evidencia en el log.
+    if (cfg.escalamientoPlano) {
+        size_t filasEnBloques = 0;
+        for (const auto& b : bloques) filasEnBloques += b.indicesRestricciones.size();
+        const size_t filasModelo = prob.getRestricciones().size();
+        if (filasEnBloques != filasModelo)
+            throw runtime_error(
+                "PreprocesamientoMIP: modo plano no cubre todas las filas (" +
+                to_string(filasEnBloques) + " de " + to_string(filasModelo) + ")");
+        cout << "[PREPROC] modo plano: " << filasModelo
+             << " filas tratadas como un unico bloque sin roles (kernel geomean por fila)" << endl;
+    }
+
     // Estado pre-escalamiento, usado por el reporte comparativo (imprimirReporteComparativo).
     vector<DiagnosticoBloque> bloquesAntes = bloques;
     DiagnosticoGlobal globalAntes = global;
@@ -138,6 +152,22 @@ void PreprocesamientoMIP::ejecutar() {
 // ============================================================
 
 void PreprocesamientoMIP::autodetectarBloques() {
+    // Modo plano (control experimental): un método plano no conoce nombres de agentes
+    // ni roles de fila, así que NO agrupa por prefijos: UN ÚNICO bloque con TODAS las filas
+    // del modelo. El kernel por fila (y sus salvaguardas) se aplica igual que en la etapa
+    // local normal; la clasificación global/acoplamiento queda vacía (ver esRestriccionGlobal
+    // / esRestriccionAcoplamiento) y ninguna fila queda fuera.
+    if (cfg.escalamientoPlano) {
+        auto& restriccionesPlano = prob.getRestricciones();
+        DiagnosticoBloque bloque;
+        bloque.nombre = "plano";
+        bloque.indicesRestricciones.reserve(restriccionesPlano.size());
+        for (int i = 0; i < (int)restriccionesPlano.size(); ++i)
+            bloque.indicesRestricciones.push_back(i);
+        bloques.push_back(move(bloque));
+        return;
+    }
+
     // Agrupar restricciones locales por variables internas de agente:
     // a1_, a2_, ...  Las variables gN(t) se usan para reconocer agentes que
     // solo aparecen como columnas de despacho (por ejemplo una termica simple),
@@ -223,6 +253,9 @@ void PreprocesamientoMIP::clasificarRestricciones() {
 }
 
 bool PreprocesamientoMIP::esRestriccionGlobal(int idx) const {
+    // Modo plano: sin metadata de roles, ninguna fila es "global".
+    if (cfg.escalamientoPlano) return false;
+
     auto& restricciones = prob.getRestricciones();
     if (idx < 0 || idx >= (int)restricciones.size()) return false;
 
@@ -245,6 +278,9 @@ bool PreprocesamientoMIP::esRestriccionGlobal(int idx) const {
 }
 
 bool PreprocesamientoMIP::esRestriccionAcoplamiento(int idx) const {
+    // Modo plano: sin metadata de roles, ninguna fila es "acoplamiento".
+    if (cfg.escalamientoPlano) return false;
+
     auto& restricciones = prob.getRestricciones();
     if (idx < 0 || idx >= (int)restricciones.size()) return false;
 
@@ -705,8 +741,8 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
                     if (cmax <= 0.0 || cmin >= 1e300) continue;
                     alpha = 1.0 / sqrt(cmax * cmin);
                     // Salvaguarda de ventana: no escalar si el factor sacaría algún coeficiente de la
-                    // fila fuera de [1e-9, 1e9].
-                    if (cmin * alpha < 1e-9 || cmax * alpha > 1e9)
+                    // fila fuera de [ε_min, ε_max].
+                    if (cmin * alpha < cfg.epsMinCoef || cmax * alpha > cfg.epsMaxCoef)
                         continue;
                 } else {
                     // Estrategia 1: α_r = 1/√(M_r·m_r) con M_r,m_r sobre |coef| y |RHS|.
@@ -795,7 +831,7 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
                                 double ac = std::abs(coef);
                                 if (ac > 0.0) { cmn = std::min(cmn, ac); cmx = std::max(cmx, ac); }
                             }
-                        if (cmn < 1e300 && (cmn * beta < 1e-9 || cmx * beta > 1e9))
+                        if (cmn < 1e300 && (cmn * beta < cfg.epsMinCoef || cmx * beta > cfg.epsMaxCoef))
                             seguro = false;
                     }
                     if (seguro && !(beta > 0.5 && beta < 2.0)) {
@@ -909,13 +945,13 @@ void PreprocesamientoMIP::aplicarEscalamientoGlobal() {
             // Salvaguarda de rango máximo permitido (evita sobreescalar).
             gamma = std::min(1e8, std::max(1e-8, gamma));
             // Salvaguarda de ventana: no aplicar γ si llevaría algún coeficiente de la fila de
-            // acoplamiento fuera de [1e-9, 1e9] (mismo criterio que fila/bloque).
+            // acoplamiento fuera de [ε_min, ε_max] (mismo criterio que fila/bloque).
             double cmin = 1e300, cmax = 0.0;
             for (const auto& [coef, _] : restricciones[idx]->getTerminos()) {
                 double ac = std::abs(coef);
                 if (ac > 0.0) { cmin = std::min(cmin, ac); cmax = std::max(cmax, ac); }
             }
-            if (cmin < 1e300 && (cmin * gamma < 1e-9 || cmax * gamma > 1e9))
+            if (cmin < 1e300 && (cmin * gamma < cfg.epsMinCoef || cmax * gamma > cfg.epsMaxCoef))
                 continue;
             if (factorSignificativo(gamma, cfg.umbralFactorEscalamiento)) {
                 escalarFila(idx, gamma);   // aplica solo si se aparta de la identidad

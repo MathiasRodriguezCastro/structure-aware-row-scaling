@@ -39,6 +39,20 @@ VARIANT_FLAGS = {
     "bloque": "preprocesar --local-bloque",
     "ruiz": "preprocesar --local-ruiz --ruiz-iters 4",
     "ruiz_columnas": "preprocesar --local-ruiz --ruiz-iters 4 --columnas-continuas --normalizacion-fisica",
+    # --- R5: ablación de etapas de la arquitectura local--bloque--acoplamiento ----------
+    # solo_local      : etapa local (fila + normalización de bloque), SIN escalar acoplamiento.
+    # solo_acoplamiento: SOLO escalar las filas de acoplamiento, sin etapa local.
+    # full == 'estructurado'/'estructurado_matricial' ya existentes (las dos etapas).
+    "estructurado_solo_local":          "preprocesar --local-estructurado --solo-local",
+    "estructurado_solo_acoplamiento":   "preprocesar --local-estructurado --solo-acoplamiento",
+    "matricial_solo_local":             "preprocesar --local-matricial --solo-local",
+    "matricial_solo_acoplamiento":      "preprocesar --local-matricial --solo-acoplamiento",
+    # --- Flat control (no-metadata): the SAME per-row kernel (geomean of extremes,
+    # alpha_r = 1/sqrt(M_r*m_r)) applied to ALL rows WITHOUT role/block metadata
+    # (single block; no per-block beta, no coupling stage). Isolates how much of the
+    # improvement comes from the structural metadata vs the scaling kernel itself.
+    "estructurado_plano":               "preprocesar --local-estructurado --plano",
+    "matricial_plano":                  "preprocesar --local-matricial --plano",
 }
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
@@ -235,9 +249,15 @@ def variant_slug(name: str) -> str:
 
 
 def build_script(instance: Path, solver: str, timeout: float, mipgap: float,
-                 variant: str, csv_path: Path, verificar_original: bool = False) -> str:
+                 variant: str, csv_path: Path, verificar_original: bool = False,
+                 extra_prep: str = "", scaleflag: int | None = None,
+                 cplexscale: int | None = None, cplexpresolve: int | None = None) -> str:
     base = clean_instance_text(instance)
     prep = VARIANT_FLAGS[variant]
+    # R3: flags extra de hiperparámetros (--banda-identidad, --ventana-coef, --ruiz-iters ...)
+    # se anexan SOLO a las variantes que efectivamente preprocesan.
+    if extra_prep and prep:
+        prep = f"{prep} {extra_prep}"
     if verificar_original:
         if prep:
             prep = f"{prep} --verificar-original"
@@ -245,10 +265,18 @@ def build_script(instance: Path, solver: str, timeout: float, mipgap: float,
             # Variante 'base': snapshotear y verificar SIN escalar el modelo, para que su
             # solución postprocesada también se contraste con la formulación original.
             prep = "preprocesar --solodiagnostico --verificar-original"
+    # R1: baseline de escalado interno del solver (Gurobi ScaleFlag / CPLEX Read::Scale).
+    solver_line = f"configurarSolver --{solver} --timeout {timeout:g} --mipgap {mipgap:g}"
+    if scaleflag is not None:
+        solver_line += f" --scaleflag {scaleflag}"
+    if cplexscale is not None:
+        solver_line += f" --cplexscale {cplexscale}"
+    if cplexpresolve is not None:
+        solver_line += f" --cplexpresolve {cplexpresolve}"
     lines = [
         base,
         "",
-        f"configurarSolver --{solver} --timeout {timeout:g} --mipgap {mipgap:g}",
+        solver_line,
     ]
     if prep:
         lines.append(prep)
@@ -259,12 +287,15 @@ def build_script(instance: Path, solver: str, timeout: float, mipgap: float,
 
 def run_case(exe: Path, instance: Path, solver: str, timeout: float, mipgap: float,
              variant: str, csv_path: Path, log_path: Path, force: bool,
-             verificar_original: bool = False) -> int:
+             verificar_original: bool = False, extra_prep: str = "",
+             scaleflag: int | None = None, cplexscale: int | None = None,
+             cplexpresolve: int | None = None) -> int:
     if not force and csv_path.exists() and post_csv_path(csv_path).exists() and log_path.exists():
         return 0
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    script = build_script(instance, solver, timeout, mipgap, variant, csv_path, verificar_original)
+    script = build_script(instance, solver, timeout, mipgap, variant, csv_path,
+                          verificar_original, extra_prep, scaleflag, cplexscale, cplexpresolve)
     # Margen sobre el timeout del solver para el trabajo posterior del binario
     # (postprocesamiento, verificación y medición de κ del solver). Generoso para no
     # cortar antes de que el binario escriba su CSV en instancias grandes.
@@ -1016,6 +1047,18 @@ def main() -> int:
                         help="No anteponer 'base' automáticamente: corre EXACTAMENTE las variantes "
                              "pedidas. Útil para re-correr solo una variante (p.ej. estructurado_matricial) "
                              "cuando el 'base' de referencia ya se calculó aparte y se compara al combinar.")
+    # R1: baseline de escalado interno del solver.
+    parser.add_argument("--scaleflag", type=int, default=None,
+                        help="Gurobi GRB_IntParam_ScaleFlag (-1,0,1,2,3). Se anexa a configurarSolver. "
+                             "Baseline 'is it just generic scaling?' (R1).")
+    parser.add_argument("--cplexscale", type=int, default=None,
+                        help="CPLEX Read::Scale (-1,0,1). Se anexa a configurarSolver. Baseline R1.")
+    parser.add_argument("--cplexpresolve", type=int, default=None,
+                        help="CPLEX Preprocessing::Presolve (0 off, 1 on). Sondeo R1: ¿el presolve absorbe el escalado?")
+    # R3: sweep de hiperparámetros (se anexa a la línea preprocesar de toda variante que escale).
+    parser.add_argument("--extra-prep", default="",
+                        help="Flags extra para 'preprocesar' (p.ej. '--banda-identidad 1.5' o "
+                             "'--ventana-coef 1e-6 1e6' o '--ruiz-iters 8'). Sweep de hiperparámetros (R3).")
     args = parser.parse_args()
 
     exe = args.exe.resolve()
@@ -1046,7 +1089,9 @@ def main() -> int:
             log_path = log_dir / f"{stem}.log"
             print(f"[run] {instance.name} / {variant}")
             rc = run_case(exe, instance, args.solver, args.timeout, args.mipgap,
-                          variant, csv_path, log_path, args.force, args.verificar_original)
+                          variant, csv_path, log_path, args.force, args.verificar_original,
+                          extra_prep=args.extra_prep, scaleflag=args.scaleflag,
+                          cplexscale=args.cplexscale, cplexpresolve=args.cplexpresolve)
             summary = summarize(
                 instance,
                 variant,

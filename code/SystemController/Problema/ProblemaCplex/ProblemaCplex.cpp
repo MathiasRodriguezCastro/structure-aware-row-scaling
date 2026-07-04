@@ -140,6 +140,18 @@ void ProblemaCplex::resolverMonolitico() {
         if (config.timeoutSegundos > 0.0)
             solver.setParam(IloCplex::Param::TimeLimit, config.timeoutSegundos);
         solver.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, config.mipGap);
+        // Baseline de escalado interno del solver (R1): contrasta el escalado externo
+        // generator-aware contra el escalado nativo de CPLEX. Solo se toca si el usuario
+        // pasó --cplexscale; en caso contrario CPLEX usa su default (0, equilibrado estándar).
+        if (config.scaleIndCplex != SolverConfig::SOLVER_PARAM_AUTO) {
+            solver.setParam(IloCplex::Param::Read::Scale, config.scaleIndCplex);
+        }
+        // Sondeo R1: desactivar el presolve de CPLEX para ver si absorbe el efecto del
+        // escalado externo. Solo se toca si el usuario pasó --cplexpresolve.
+        if (config.presolveIndCplex != SolverConfig::SOLVER_PARAM_AUTO) {
+            solver.setParam(IloCplex::Param::Preprocessing::Presolve,
+                            config.presolveIndCplex != 0);
+        }
         // Reproducibilidad: semilla fija y, si el entorno lo define, número de hilos fijo.
         solver.setParam(IloCplex::Param::RandomSeed, 1);
         if (const char* h = std::getenv("OMP_NUM_THREADS")) {
