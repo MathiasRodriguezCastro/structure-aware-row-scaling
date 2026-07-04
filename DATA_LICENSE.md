@@ -26,6 +26,9 @@ paper using `CITATION.cff`.
 In summary:
 
 - **Code** is licensed separately under MIT (`LICENSE`).
+- **The manuscript** under `paper/` is covered by neither license: all rights reserved
+  pending journal publication (shared as a submitted-version preprint under the
+  publisher's self-archiving policy).
 - **Real dispatch instances** used in the paper are included for reproducibility.
 - **Synthetic instances** are fully generated and are included as well.
 - **Aggregate results** (`results/*/resumen.csv`) stay in the repository tree.

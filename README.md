@@ -1,15 +1,15 @@
-# Generator-Aware Positive Row Scaling for Block-Structured Engineering MIPs
+# Structure-Aware Row Scaling for Block-Structured Mixed-Integer Programs
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20648950.svg)](https://doi.org/10.5281/zenodo.20648950)
 
-Reproducibility repository for the paper *“Generator-Aware Positive Row Scaling for
-Block-Structured Engineering Mixed-Integer Programs”* (International Journal for Numerical
-Methods in Engineering, free-format submission).
+Reproducibility repository for the paper *“Structure-Aware Row Scaling for
+Block-Structured Mixed-Integer Programs”* (International Journal for Numerical
+Methods in Engineering).
 
-The paper studies **generator-aware positive row scaling**: a model generator uses its
+The paper studies **structure-aware positive row scaling**: a model generator uses its
 pre-export block/coupling structure to choose strictly positive row factors that improve
 the solver-facing numerical representation **without changing the mixed-integer program**.
-Two generator-aware variants (`SA-Aug`, `SA-Mat`) are compared with the unscaled model and
+Two structure-aware variants (`SA-Aug`, `SA-Mat`) are compared with the unscaled model and
 Ruiz-type baselines, on a hydrothermal-dispatch testbed (three instance classes, two
 commercial solvers, two MIP gaps) and on a controlled synthetic block-structured benchmark.
 
@@ -102,8 +102,10 @@ download the external logs archive (see `artifacts/README.md`) and run
 
 ### N3 — build the paper PDF
 ```bash
-make paper                # paper/main.pdf (needs TeX Live + elsarticle)
+make paper                # paper/main.pdf (needs XeLaTeX on TeX Live 2022 + Wiley NJD v5 class files)
 ```
+The manuscript uses the Wiley New Journal Design v5 class (`WileyNJDv5.cls`, AMA style);
+see `paper/README.md` for the class-file and font prerequisites.
 
 ## Build and environment
 
@@ -119,7 +121,9 @@ make sanity-check         # scans for leaked paths/secrets and residual LSTM/DW 
 
 ## License and citation
 Code: MIT (`LICENSE`). Data and aggregate results: CC BY 4.0 (`DATA_LICENSE.md`).
-Please cite the paper (`CITATION.cff`).
+The manuscript under `paper/` is **not** covered by those licenses: all rights reserved
+pending journal publication (shared as a submitted-version preprint under the publisher's
+self-archiving policy). Please cite the paper (`CITATION.cff`).
 
 ## Archiving and DOI (Zenodo)
 This repository is archived on Zenodo through the GitHub–Zenodo integration, using the
