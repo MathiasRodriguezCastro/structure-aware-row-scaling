@@ -315,6 +315,7 @@ def fig_bars_reduction(df, outdir):
     LaTeX caption provides the title.
     """
     from matplotlib.patches import Patch
+    from matplotlib.colors import to_rgba
 
     patterns = ["local", "coupling", "mixed"]
     variants = ["SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols"]
@@ -322,7 +323,19 @@ def fig_bars_reduction(df, outdir):
     # (palette order: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols).
     vcolors = {"SA-Aug": "#D55E00", "SA-Mat": "#009E73",
                "Ruiz": "#CC79A7", "Ruiz+Cols": "#E69F00"}
+    # Non-color redundancy so the four variants are separable WITHOUT color
+    # (colorblind readers / grayscale print): a distinct hatch per variant,
+    # drawn with a dark edge so it reads as black lines on the fill.
+    vhatch = {"SA-Aug": "", "SA-Mat": "//", "Ruiz": "xx", "Ruiz+Cols": ".."}
     severities = [3, 6]
+    # Severity is encoded THREE ways so it survives grayscale: fill opacity
+    # (light vs solid, as before) PLUS border thickness (thin vs thick).
+    sev_alpha = {3: 0.45, 6: 1.0}
+    sev_lw = {3: 0.5, 6: 1.6}
+    edge = "black"
+
+    prev_hatch_lw = plt.rcParams["hatch.linewidth"]
+    plt.rcParams["hatch.linewidth"] = 0.7  # crisper hatch lines in the PDF
 
     fig, ax = plt.subplots(figsize=(7, 4.5))
     xs = np.arange(len(patterns))
@@ -335,18 +348,26 @@ def fig_bars_reduction(df, outdir):
                                      & (df.variante == var)]["log10_reduction"])
                     for pat in patterns]
             off = center + (si - 0.5) * bar_w
+            # Alpha baked into the FACE only, so the black edge and hatch stay
+            # crisp at both severities (a whole-bar alpha would fade them too).
             ax.bar(xs + off, meds, width=bar_w,
-                   color=vcolors[var], alpha=0.45 if S == 3 else 1.0,
-                   edgecolor="none")
+                   facecolor=to_rgba(vcolors[var], sev_alpha[S]),
+                   hatch=vhatch[var],
+                   edgecolor=edge, linewidth=sev_lw[S])
     ax.axhline(0, color="k", lw=0.6)
     ax.set_xticks(xs)
     ax.set_xticklabels(patterns)
     ax.set_xlabel("imbalance pattern")
     ax.set_ylabel("median $\\Delta\\log_{10}\\kappa$ (pre $-$ post)")
     ax.grid(False, axis="x")
-    handles = [Patch(facecolor=vcolors[v], label=v) for v in variants]
-    handles += [Patch(facecolor="0.45", alpha=0.45, label="$S = 3$"),
-                Patch(facecolor="0.45", label="$S = 6$")]
+    # Variant handles carry BOTH the color and the hatch; severity handles show
+    # the opacity + border-thickness mapping (neutral gray, no hatch).
+    handles = [Patch(facecolor=vcolors[v], hatch=vhatch[v], edgecolor=edge,
+                     linewidth=0.8, label=v) for v in variants]
+    handles += [Patch(facecolor=to_rgba("0.45", sev_alpha[3]), edgecolor=edge,
+                      linewidth=sev_lw[3], label="$S = 3$ (thin edge)"),
+                Patch(facecolor=to_rgba("0.45", sev_alpha[6]), edgecolor=edge,
+                      linewidth=sev_lw[6], label="$S = 6$ (thick edge)")]
     # Legend in a single row ABOVE the axes: the tall 'local'/'mixed' bars
     # reach the top of the plotting area, so an inside legend would collide.
     ax.legend(handles=handles, ncol=6, loc="lower left", mode="expand",
@@ -354,6 +375,7 @@ def fig_bars_reduction(df, outdir):
               handlelength=1.4, columnspacing=1.0)
     fig.tight_layout()
     _save(fig, outdir / "fig2_bars_log10_reduction")
+    plt.rcParams["hatch.linewidth"] = prev_hatch_lw
 
 
 def fig_kappa_antes_vs_S(df, outdir):
