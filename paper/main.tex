@@ -121,7 +121,7 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) are usually exported to solvers as flat coefficient matrices, yet the generator that builds them knows which constraints are local to physical components, which variables those components own, and which rows couple components through system-wide balances. We ask whether this pre-export metadata can drive positive row scaling without changing the program. We propose a structure-aware row-scaling framework for block-structured MIPs: complete constraints, including right-hand sides, are multiplied by strictly positive factors, so the feasible set, objective, and integer restrictions are preserved exactly. The contribution is not row scaling itself, but using generator metadata to order it---local rows first, then representative block scales, then coupling rows relative to the blocks they connect---which an idealized conditioning analysis shows separates local from coupling imbalance. We evaluate the method on a hydrothermal dispatch platform emitting modular MIPs, treated as a generated block-structured testbed rather than a hydro-specific application; the only metadata required are row roles, block ownership, and coupling incidence. Across three instance classes, two solvers, and two optimality tolerances, the evidence supports three scoped claims: positive row scaling is algebraically exact; structure-aware scaling robustly improves solver-facing numerical diagnostics; and runtime gains are solver dependent, concentrated under Gurobi in fewer otherwise-timing-out instances, with no robust CPLEX gain. It is best read as a structure-aware numerical preprocessing layer, not a solver-independent acceleration theorem.
+Generated mixed-integer programs (MIPs) are usually exported to solvers as flat coefficient matrices, yet the generator that builds them knows which constraints are local to physical components, which variables those components own, and which rows couple components through system-wide balances. We ask whether this pre-export metadata can drive positive row scaling without changing the program. We propose a structure-aware row-scaling framework for block-structured MIPs: complete constraints, including right-hand sides, are multiplied by strictly positive factors, so the feasible set, objective, and integer restrictions are preserved exactly. The contribution is not row scaling itself, but using generator metadata to order it---local rows first, then representative block scales, then coupling rows relative to the blocks they connect---which an idealized conditioning analysis shows separates local from coupling imbalance. We evaluate the method on a hydrothermal dispatch platform emitting modular MIPs, treated as a generated block-structured testbed rather than a hydro-specific application; the only metadata required are row roles, block ownership, and coupling incidence. Across three instance classes, two solvers, and two optimality tolerances, the evidence supports three scoped claims: positive row scaling is algebraically exact; structure-aware scaling robustly improves solver-facing numerical diagnostics; and it lowers runtime under Gurobi, with no robust CPLEX gain. A role-blind control locates that runtime effect in per-row local scaling rather than in the row-role metadata: applying the same per-row kernel to every row matches the structure-aware rule on the simpler class and outperforms it on the coupled one. The metadata's demonstrated value is thus in the numerical representation, while the runtime accelerator is a cheap normalization it is not needed to build---a clean dissociation between the rule that best conditions the matrix and the rule that solves fastest. It is best read as a structure-aware numerical preprocessing layer, not a solver-independent acceleration theorem.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -2293,12 +2293,64 @@ against $2.02$ for the full rule; Full $82.55\!\to\!70.94$ against $71.41$; SG-T
 $14.42\!\to\!8.58$ against $8.55$), whereas the
 coupling-only variant is statistically inert ($3.74$, $83.69$, and $14.45$, all at base
 level). The matrix-only family behaves identically. In this testbed, therefore, the operational Gurobi
-effect comes from local row normalization, not from the coupling-row treatment. This does
-not contradict the architecture---the coupling rule is what makes the rule
-\emph{structure-aware} and remains the conceptual contribution---but it locates the runtime
-lever, and it is consistent with the reading in \cref{sec:discussion} that conditioning is
-at most a partial mediator: the stage that most improves the solver-level coupling
-diagnostics is not the stage that drives the runtime.
+effect comes from local row normalization, not from the coupling-row treatment.
+
+Because the local stage is, in isolation, a per-row geometric mean of the coefficient
+extremes---a kernel computable from the flat matrix without any row-role information---the
+natural sharpening of this control is to apply that same kernel to \emph{every} row, coupling
+rows included, with no roles and no coupling stage. \Cref{tab:flat-control} reports this
+role-blind variant. In Simple it is indistinguishable from the local-only rule and from the
+full architecture ($\sgm$ $2.02$ at $1\%$, matching $2.01$ and $2.02$; the same at $0.1\%$),
+so the row-role metadata adds nothing to runtime there. In SG-Ter-Mer it is markedly
+\emph{faster} than either: $\sgm$ $5.25$ against $8.38$ for both the full rule and local-only
+at $1\%$ (paired speedup $1.85\times$ versus $1.22\times$, Cliff's $\delta=-0.64$), and
+$5.81$ against $9.23$ at $0.1\%$, at the same original-scale equivalence as the other
+variants. The coupling rows of SG-Ter-Mer therefore do carry numerical weight---leaving them
+at base scale (local-only) is not optimal---but the effective way to scale them is the plain
+per-row kernel, not the metadata-driven coupling factor, which here matches leaving them
+untouched. The runtime lever under Gurobi is thus cheap per-row local scaling applied to all
+rows; it does not require the row-role metadata, and the structure-aware coupling treatment,
+which drives the conditioning diagnostics (\cref{tab:gurobi-gap0001-relative-conditioning}),
+is not what drives the runtime. This is the cleanest form of the dissociation developed in
+\cref{sec:discussion}: the rule that best improves solver-facing conditioning is not the rule
+that solves fastest. The demonstrated value of the generator metadata is in the numerical
+representation; the practical accelerator is a role-blind normalization the metadata is not
+needed to build.
+
+\begin{table}[t]
+\centering
+\caption{Role-blind flat control under Gurobi. The same per-row geometric-mean kernel used by the local stage, applied to \emph{every} row with no role or block metadata (single block, no coupling stage), against the full structure-aware rule and the local-only ablation. Solver-time $\sgm$ ($s=1$\,s), in seconds; paired speedup versus base and Cliff's $\delta$ ($<0$ faster).}
+\label{tab:flat-control}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}ll S[table-format=2.2] S[table-format=1.2] r @{}}
+\toprule
+Class & Variant & {$\sgm$ (s)} & {sp.\ vs base} & {Cliff's $\delta$} \\
+\midrule
+\multirow{3}{*}{Simple, $1\%$}
+ & \methodAug{} (full)        & 2.02 & 1.00 & $0.00$ \\
+ & \methodAug{}, local only   & 2.01 & 1.00 & $0.01$ \\
+ & Flat (role-blind)          & 2.02 & 0.99 & $0.02$ \\
+\addlinespace
+\multirow{3}{*}{SG-Ter-Mer, $1\%$}
+ & \methodAug{} (full)        & 8.38 & 1.22 & $-0.34$ \\
+ & \methodAug{}, local only   & 8.38 & 1.22 & $-0.34$ \\
+ & Flat (role-blind)          & \bfseries 5.25 & \bfseries 1.85 & $\mathbf{-0.64}$ \\
+\addlinespace
+\multirow{3}{*}{SG-Ter-Mer, $0.1\%$}
+ & \methodAug{} (full)        & 9.23 & 1.20 & $-0.37$ \\
+ & \methodAug{}, local only   & 9.22 & 1.18 & $-0.34$ \\
+ & Flat (role-blind)          & \bfseries 5.81 & \bfseries 1.86 & $\mathbf{-0.61}$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item The flat control passes the original-scale equivalence checker at the same rate as
+the other variants (\cref{subsec:original-scale-audit}); its speedup is not an artifact of a
+different or easier optimum. At $0.1\%$ Simple the pattern is the same as at $1\%$ and is
+omitted.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
 
 \subsection{Hyperparameter sensitivity}
 \label{subsec:hyperparam-results}
@@ -2369,7 +2421,7 @@ Claim & Evidence in this study & Limitation \\
 \midrule
 Algebraic equivalence & Positive factors multiply complete constraints; post-solve checks evaluate feasibility, integrality, and objectives in the original scale. & This claim concerns the mathematical MIP, not the path followed by branch-and-bound. \\
 Numerical representation & Structure-aware variants reduce solver-facing conditioning diagnostics in the harder classes. & Conditioning diagnostics describe representation; they do not prove faster MIP search. \\
-Gurobi performance & \methodAug{} and \methodMat{} improve robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The strongest variant depends on the instance class, and the claim is conditional on the tested pipeline. \\
+Gurobi performance & Per-row local scaling improves robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The lever is the per-row kernel, not the row-role metadata: a role-blind flat control matches or beats the structure-aware rule on runtime (\cref{tab:flat-control}); the claim is conditional on the tested pipeline. \\
 Solver dependence & CPLEX remains near parity or deteriorates in paired runtime evidence, even when some numerical diagnostics improve. & The result is tied to CPLEX 22.1.2.0, default settings, and the ClusterUY environment. \\
 Generalization & Generator-level block information can guide numerical preprocessing before export; the synthetic benchmark injects local and coupling imbalance by construction and confirms the intended conditioning response. & Runtime evidence still comes from one hydrothermal dispatch platform; the synthetic benchmark is a mechanism check, not a performance benchmark. \\
 \bottomrule
@@ -2419,8 +2471,13 @@ irregular even where conditioning improves \cite{elble2012scaling}, and the cond
 the LP relaxations is known to evolve along the branch-and-cut tree in ways a static snapshot
 of the exported matrix cannot summarize \cite{miltenberger2018numerics}.
 We therefore present conditioning as evidence that the representation improved, not as the
-proven cause of the speedup; the operational stage ablation (\cref{subsec:added-controls}) is
-the instrument meant to localize that cause.
+proven cause of the speedup. The role-blind flat control (\cref{tab:flat-control}) makes the
+dissociation sharpest: applying the plain per-row kernel to every row, with no metadata,
+matches the structure-aware rule in Simple and beats it in SG-Ter-Mer, so the rule that most
+improves conditioning is not the one that solves fastest, and the runtime accelerator is a
+cheap normalization that does not need the row roles. The generator metadata earns its place
+in the numerical representation---where the structure-aware coupling treatment measurably
+lowers the solver-level conditioning ratios---rather than as the source of the runtime gain.
 
 A third objection is that the right-hand side may be unnecessary, and the evidence supports it.
 \methodAug{} uses coefficients and right-hand sides and stays strongest in the Full class, yet
@@ -2575,25 +2632,30 @@ MIPs, and under Gurobi this often coincides with lower robust runtime or determi
 whereas under CPLEX 22.1.2.0 it does not. The method improves representation; acceleration remains
 solver-dependent.
 
-The main contribution is the local--block--coupling architecture---scale local rows first,
-summarize blocks second, scale coupling rows last with the scales of the blocks they connect---an
-order that uses information the generator has but a flat-matrix routine may not. Because each
-factor multiplies a complete constraint by a strictly positive scalar, feasible points, objective
-values, and integer restrictions are unchanged. The operational stage ablation
-(\cref{subsec:stage-attribution}) qualifies the architecture honestly: on this testbed the
-Gurobi runtime lever is the local stage, while the coupling stage is what most distinguishes
-the rule as structure-aware and what the conditioning diagnostics reward---so the
-architecture's value is split across the numerical and performance claims rather than
-concentrated in one. Establishing even this bounded result required
-separating four kinds of evidence---algebraic equivalence, original-scale feasibility, solver-facing
-diagnostics, and matched per-solver runtime---which is as much a methodological takeaway as the
-scaling rule itself.
+The contribution divides along the same line the evidence does. The local--block--coupling
+architecture---scale local rows first, summarize blocks second, scale coupling rows last with
+the scales of the blocks they connect---uses information the generator has but a flat-matrix
+routine may not, and, because each factor multiplies a complete constraint by a strictly
+positive scalar, feasible points, objective values, and integer restrictions are unchanged. On
+the \emph{numerical} side that architecture earns its keep: its coupling treatment lowers the
+solver-facing conditioning diagnostics more than any baseline. On the \emph{runtime} side the
+attribution is more sober. The stage ablation locates the Gurobi speedup in the local stage,
+and the role-blind flat control (\cref{tab:flat-control}) shows that the same per-row kernel
+applied to every row, with no metadata, matches the structure-aware rule in Simple and is
+substantially faster in SG-Ter-Mer. The practical accelerator is therefore a cheap per-row
+normalization that does not require the row roles, and the structure metadata, valuable for the
+representation, is not the source of the runtime gain. Establishing even this bounded result
+required separating four kinds of evidence---algebraic equivalence, original-scale feasibility,
+solver-facing diagnostics, and matched per-solver runtime---which is as much a methodological
+takeaway as the scaling rule itself: the rule that best conditions the matrix is not the rule
+that solves fastest, and only matched per-solver runtime tells them apart.
 
-Future work should test the mechanism beyond hydrothermal dispatch: larger synthetic suites
+Future work should test the mechanism beyond hydrothermal dispatch---larger synthetic suites
 and applications in logistics, production planning, and network design would show whether the
-effect persists as the engineering structure changes, and a role-blind control that applies
-the same per-row kernel to every row of the flat matrix would complete the attribution begun
-by the stage ablation.
+pattern persists as the engineering structure changes---and should ask why the role-blind
+kernel outperforms the structure-aware coupling treatment on the coupled class, since a
+coupling rule that at least matched it would reunite the numerical and runtime advantages the
+present evidence keeps apart.
 
 % Float barrier removed to improve two-column layout.
 
