@@ -121,7 +121,7 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) are usually exported to solvers as flat coefficient matrices, yet the generator that builds them knows which rows are local to a component, which variables a component owns, and which rows couple components. We ask whether this pre-export metadata can drive positive row scaling without changing the program. We propose a structure-aware row-scaling framework for block-structured MIPs: complete constraints, including right-hand sides, are multiplied by strictly positive factors, so the feasible set, objective, and integer restrictions are preserved exactly. The contribution is not row scaling itself, but using generator metadata to order it---local rows first, then representative block scales, then coupling rows relative to the blocks they connect. We evaluate the method on a hydrothermal dispatch platform emitting modular MIPs, treated as a generated block-structured testbed; the only metadata required are row roles, block ownership, and coupling incidence. Across three instance classes, two solvers, and two tolerances, positive row scaling is algebraically exact, structure-aware scaling robustly improves solver-facing numerical diagnostics, and runtime drops under Gurobi but not robustly under CPLEX. A role-blind control, however, locates the runtime effect in complete per-row scaling rather than in the metadata: the same kernel on every row matches the structure-aware rule on the simpler class and beats it on the coupled one. The metadata's value is thus in the numerical representation---the rule that best conditions the matrix is not the one that solves fastest---so the method is best read as a structure-aware preprocessing layer, not a solver-independent acceleration theorem.
+Generated mixed-integer programs (MIPs) are usually exported to solvers as flat coefficient matrices, yet the generator that builds them knows which rows are local to a component, which variables it owns, and which rows couple components. We ask whether this pre-export metadata can drive positive row scaling without changing the program. We propose a structure-aware row-scaling framework for block-structured MIPs: complete constraints, including right-hand sides, are multiplied by strictly positive factors, preserving the feasible set, objective, and integer restrictions exactly. The contribution is not row scaling itself but using generator metadata to order it---local rows, then block scales, then coupling rows relative to the blocks they connect. We evaluate the method on a hydrothermal dispatch platform emitting modular MIPs, treated as a generated block-structured testbed; the only metadata required are row roles, block ownership, and coupling incidence. Across three instance classes, two solvers, and two tolerances, positive row scaling is algebraically exact, structure-aware scaling robustly improves solver-facing numerical diagnostics, and runtime drops under Gurobi but not robustly under CPLEX. A role-blind control, however, locates the runtime effect in complete per-row scaling rather than in the metadata: the same kernel on every row matches the structure-aware rule on the simpler class and beats it on the coupled one. On operational data even the conditioning gain flows through that role-blind kernel; the metadata's distinctive contribution---separating local from coupling imbalance---is isolated only on a controlled synthetic benchmark. The method is thus best read as a structure-aware preprocessing layer whose practical lever is complete per-row normalization, not a solver-independent acceleration theorem.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -186,11 +186,16 @@ rows. It then summarizes the scale of each locally scaled block. Finally, it sca
 coupling rows with the scales of the blocks they connect. Throughout the paper, this
 local--block--coupling order is the main object of study.
 
-The paper contributes four elements: an algebraically exact positive row-scaling layer for
+The paper contributes five elements: an algebraically exact positive row-scaling layer for
 generated block-structured MIPs; a structure-aware rule that uses row roles, component
 ownership, and coupling incidence; idealized conditioning arguments that motivate the
-local--block--coupling order; and an empirical evaluation that separates numerical
-representation from solver-dependent performance. \Cref{fig:overview} summarizes the
+local--block--coupling order; an empirical evaluation that separates numerical
+representation from solver-dependent performance; and, from a role-blind control, the
+practical finding that in the two classes where we ran it (Simple and SG-Ter-Mer, under
+Gurobi) a complete per-row normalization matches or beats the structure-aware rule on runtime,
+because the role-based rule leaves the highest-magnitude rows---neither local nor
+coupling---unscaled, so completeness of coverage, not role sophistication, drives the runtime
+gain (untested on the Full class). \Cref{fig:overview} summarizes the
 contribution at a glance.
 
 \begin{figure}[t]
@@ -370,7 +375,7 @@ structure-aware rule need not. If one is a local block row and the other a coupl
 local row is scaled by its own coefficients while the coupling row is scaled relative to the
 \emph{already-scaled} blocks it links---so a coupling row with small raw coefficients can still
 receive a large factor when it joins a poorly scaled block, and conversely. Identical numbers,
-different roles, different factors: that is the lever a flat matrix cannot expose. The
+different roles, different factors: that is the distinction a flat matrix cannot expose---though, as \cref{subsec:stage-attribution} shows, this representational capability is not itself the runtime lever. The
 model stays monolithic, as with generic scaling: an external, auditable layer that uses
 generator metadata before the exported matrix loses it.
 
@@ -1732,7 +1737,7 @@ where the instance times out under all variants.
 
 % Result figures are allowed to float across adjacent subsections to avoid large
 % blank pages. Strategic barriers separate the Gurobi and CPLEX result blocks.
-\plotfigure{esc1_gurobi_1pct_boxplot.pdf}{\textwidth}{At $1\%$ MIPGap, the Gurobi speedup distributions place the structure-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. Values above the parity line indicate acceleration relative to the unscaled model. In all box plots, boxes span the interquartile range (IQR) and whiskers extend to the most extreme observation within $1.5\times$\,IQR; outliers are omitted, since tail behavior is captured by \PARten{} and the performance profiles.}{fig:boxplot-speedup-total-gap1}
+\plotfigure{esc1_gurobi_1pct_boxplot.pdf}{\textwidth}{At $1\%$ MIPGap, the Gurobi total-time speedup distributions place the structure-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. The axis is the \emph{total}-time speedup (\cref{eq:speedup}, $q=\mathrm{total}$), which includes preprocessing; on the easy Simple instances (a few seconds) that overhead dominates and pulls the Ruiz medians well below the solver-time and deterministic-effort parity of \cref{tab:robust-gurobi-1pct-mipgap} and the $\rho^{\mathrm{solver}}_\kappa$ scatter. Values above the parity line indicate acceleration relative to the unscaled model. In all box plots, boxes span the interquartile range (IQR) and whiskers extend to the most extreme observation within $1.5\times$\,IQR; outliers are omitted, since tail behavior is captured by \PARten{} and the performance profiles.}{fig:boxplot-speedup-total-gap1}
 
 \twoplotfigure{esc1_gurobi_1pct_scatter_rho.pdf}{Static coefficient-range ratio.}{fig:scatter-kappa-speedup-gap1}{esc1_gurobi_1pct_scatter_rhosolver.pdf}{Solver-level conditioning ratio.}{fig:scatter-kappa-solver-speedup-gap1}{At $1\%$ MIPGap, static coefficient-range compression and solver-level conditioning tell different stories. The contrast between panels shows why exported matrix compression alone should not be treated as evidence of easier branch-and-bound search. In panel (a) every static ratio lies below one, so the $\rho_\kappa=1$ reference sits outside the plotted range.}{fig:diagnostic-scatter-gap1}
 
@@ -2115,7 +2120,7 @@ severity only in the affected row classes: at \(S=6\), it reaches about
 separates local-row and coupling-row imbalance by construction
 (\cref{fig:synthetic-kappa-pre}).
 
-\twoplotfigure{fig3_kappa_antes_vs_S.pdf}{Pre-scaling condition number by pattern and severity.}{fig:synthetic-kappa-pre}{fig2_bars_log10_reduction.pdf}{Median reduction in $\log_{10}\kappa$.}{fig:synthetic-log-reduction}{Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows the median conditioning recovery obtained by the four scaling variants on the three imbalance patterns at $S\in\{3,6\}$; the \textit{none} control and the Base variant are omitted because their reduction is zero by construction (\cref{tab:synthetic_compact}). Bars are hatched by variant and outlined with a thin/thick edge for $S=3$/$S=6$, so the grouping reads without color.}{fig:synthetic-mechanism-summary}
+\twoplotfigure{fig3_kappa_antes_vs_S.pdf}{Pre-scaling condition number by pattern and severity.}{fig:synthetic-kappa-pre}{fig2_bars_log10_reduction.pdf}{Median reduction in $\log_{10}\kappa$.}{fig:synthetic-log-reduction}{Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows the median conditioning recovery obtained by the four scaling variants on the three imbalance patterns at $S\in\{3,6\}$; the \textit{none} control and the Base variant are omitted because their reduction is zero by construction (\cref{tab:synthetic_compact}). Bars are hatched by variant and outlined with a thin/thick edge (and a lighter/darker fill) for $S=3$/$S=6$, so the grouping reads without color.}{fig:synthetic-mechanism-summary}
 
 All scaling variants recover the conditioning despite the injected severity. In the severe
 local and mixed cases, \(\kappa^{\mathrm{pre}}\) is of order \(10^{14}\), whereas the
@@ -2151,7 +2156,7 @@ observable, which is what keeps the propositions informative rather than decorat
 per-block comparison of the proxy against the true block condition number would calibrate
 the link quantitatively and is the natural next step.
 
-Taken together, the four operational scenarios and the controlled synthetic check support a limited but useful interpretation. Under Gurobi, the structured preprocessing rules improve the numerical representation and often reduce solver time or deterministic effort. Under CPLEX, the same external transformations do not produce a robust runtime benefit and can be indistinguishable from, or worse than, the base in paired runtime evidence, even when some numerical diagnostics improve. The empirical message is therefore not that one scaling rule always wins. It is that generator-level structure can matter for MIP performance, but its value has to be measured through the full solver--model interaction.
+Taken together, the four operational scenarios and the controlled synthetic check support a limited but useful interpretation. Under Gurobi, the structured preprocessing rules improve the numerical representation and often reduce solver time or deterministic effort. Under CPLEX, the same external transformations do not produce a robust runtime benefit and can be indistinguishable from, or worse than, the base in paired runtime evidence, even when some numerical diagnostics improve. The empirical message is therefore not that one scaling rule always wins. It is that generator-level structure can matter for the numerical representation the solver sees, while whether that translates into performance must be measured through the full solver--model interaction rather than assumed from the metadata---the stage attribution of \cref{subsec:stage-attribution} localizes the Gurobi runtime effect to role-blind per-row normalization, not the row roles.
 
 \subsection{Solver-internal-scaling baseline}
 \label{subsec:internal-scaling}
@@ -2356,8 +2361,9 @@ only difference between the two scaled matrices. The runtime lever under Gurobi 
 coupling roles left a coverage gap over exactly the highest-magnitude rows, and the role-blind
 kernel wins by closing it, without using any metadata. The structure-aware rules do improve
 the solver-facing conditioning diagnostics (\cref{tab:gurobi-gap0001-relative-conditioning}),
-but on these operational classes that gain comes from the \emph{local} stage: the ablation
-shows the coupling-only variant leaves the solver-level conditioning ratio at one (it is inert
+but on these operational classes that gain comes from the \emph{local} stage: in the ablation
+runs the coupling-only variant leaves the solver-level conditioning ratio at one (recorded in
+the reproducibility artifacts; it is inert
 in both conditioning and runtime here), while the coupling treatment's ability to repair
 injected coupling imbalance is what the controlled synthetic \textit{coupling} pattern
 (\cref{subsec:synthetic-results}) demonstrates. Neither the conditioning improvement nor the
@@ -2528,11 +2534,14 @@ proven cause of the speedup. The role-blind flat control (\cref{tab:flat-control
 dissociation sharpest: applying the plain per-row kernel to every row, with no metadata,
 matches the structure-aware rule in Simple and beats it in SG-Ter-Mer, so the rule that most
 improves conditioning is not the one that solves fastest, and the runtime accelerator is a
-cheap normalization that does not need the row roles. The generator metadata earns its place
-in the numerical representation---the structure-aware rules lower the solver-level conditioning
-ratios, through the local stage on the operational classes and through the coupling stage on
-the controlled synthetic \textit{coupling} pattern---rather than as the source of the runtime
-gain.
+cheap normalization that does not need the row roles. The structure-aware rules do lower the
+solver-level conditioning ratios below the Ruiz and unscaled baselines; but on the operational
+classes that gain flows through the local stage, whose kernel is itself role-blind (a per-row
+geometric mean the flat control reproduces), and we do not measure whether a full-coverage
+flat kernel would condition them as well. The metadata's \emph{distinctive} numerical
+contribution---the local-versus-coupling separation a flat kernel cannot make---is therefore
+isolated cleanly only on the controlled synthetic \textit{coupling} pattern, not claimed as an
+operational conditioning advantage over a role-blind kernel.
 
 A third objection is that the right-hand side may be unnecessary, and the evidence supports it.
 \methodAug{} uses coefficients and right-hand sides and stays strongest in the Full class, yet
@@ -2692,11 +2701,12 @@ architecture---scale local rows first, summarize blocks second, scale coupling r
 the scales of the blocks they connect---uses information the generator has but a flat-matrix
 routine may not, and, because each factor multiplies a complete constraint by a strictly
 positive scalar, feasible points, objective values, and integer restrictions are unchanged. On
-the \emph{numerical} side that architecture earns its keep: the augmented rule lowers the
-solver-facing conditioning diagnostics more than any baseline (the matrix-only rule does so in
-Simple and Full and stays comparable to Ruiz in SG-Ter-Mer)---through the local stage on the
-operational classes, and through the coupling stage on the controlled synthetic pattern built
-to exercise it. On the \emph{runtime} side the attribution is more sober. The stage ablation locates the Gurobi speedup in the local stage,
+the \emph{numerical} side the augmented rule lowers the solver-facing conditioning diagnostics
+below every baseline (the matrix-only rule does so in Simple and Full and stays comparable to
+Ruiz in SG-Ter-Mer); on the operational classes that gain flows through the role-blind local
+kernel, so the metadata's \emph{distinctive} contribution---the local-versus-coupling
+separation---is isolated only on the synthetic pattern built to exercise it. On the
+\emph{runtime} side the attribution is more sober. The stage ablation locates the Gurobi speedup in the local stage,
 and the role-blind flat control (\cref{tab:flat-control}) shows that the same per-row kernel
 applied to every row, with no metadata, matches the structure-aware rule in Simple and is
 substantially faster in SG-Ter-Mer---because the role-based rule left a coverage gap over the
