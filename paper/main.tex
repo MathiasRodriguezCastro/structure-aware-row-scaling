@@ -261,9 +261,12 @@ generation and before solver invocation.
 The paper makes three claims of different strength: the algebraic claim is exact (positive row
 scaling preserves the MIP); the numerical claim is empirical (structure-aware scaling improves
 solver-facing conditioning in the tested instances); and the performance claim is conditional
-(under Gurobi the improved representation often reduces robust runtime or deterministic effort,
-while under CPLEX 22.1.2.0 it does not). The method improves representation; acceleration depends
-on how the solver uses it.
+(under Gurobi positive row scaling often reduces robust runtime or deterministic effort, while
+under CPLEX 22.1.2.0 it does not). A controlled ablation further separates the two: the runtime
+lever is a cheap per-row normalization that does not need the row-role metadata, whereas the
+metadata's measured value is in the conditioning diagnostics. The method improves
+representation; acceleration depends on how the solver uses it, and the rule that best
+conditions the matrix is not the rule that solves fastest.
 
 The rest of the paper follows this chain of evidence. \Cref{sec:related-work} identifies
 the research niche. \Cref{sec:model} defines the generated model structure and testbed.
