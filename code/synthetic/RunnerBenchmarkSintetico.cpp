@@ -55,6 +55,15 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.normalizacionFisica       = true;
         return true;
     }
+    if (nombre == "Flat") {                    // Control role-blind (= --plano del CLI):
+        cfg.escalamientoPlano         = true;  //   mismo kernel por fila sobre TODAS las filas,
+        cfg.aplicarEscalamientoLocal  = true;  //   sin metadata de roles ni bloques (un único
+        cfg.aplicarEscalamientoGlobal = false; //   bloque autodetectado), sin beta de bloque ni
+        cfg.escalamientoLocalPorFila  = true;  //   etapa de acoplamiento ni Ruiz.
+        cfg.normalizarBloqueTrasFilas = false;
+        cfg.usarEquilibradoRuiz       = false;
+        return true;
+    }
     return false;
 }
 
@@ -296,7 +305,7 @@ void RunnerBenchmarkSintetico::ejecutar() {
         bool esBase; PreprocesamientoMIP::Config tmp;
         if (!mapearVariante(v, esBase, tmp))
             throw std::runtime_error("RunnerBenchmarkSintetico - variante desconocida: '" + v +
-                "'. Válidas: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols.");
+                "'. Válidas: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols, Flat.");
     }
 
     SystemController& sc = SystemController::getInstance();
@@ -385,7 +394,12 @@ void RunnerBenchmarkSintetico::ejecutar() {
                 fm.tiempoPreproc = 0.0;
             } else {
                 PreprocesamientoMIP prep(*p, cfgVar);
-                registrarMetadata(prep, meta);
+                // Flat (role-blind) NO recibe metadata: el punto del control es correr el
+                // kernel sin roles ni bloques. Con bloques vacíos, autodetectarBloques()
+                // crea el bloque único "plano" con todas las filas (y la verificación de
+                // cobertura del modo plano exige exactamente eso).
+                if (!cfgVar.escalamientoPlano)
+                    registrarMetadata(prep, meta);
                 auto t0 = std::chrono::high_resolution_clock::now();
                 prep.ejecutar();
                 auto t1 = std::chrono::high_resolution_clock::now();

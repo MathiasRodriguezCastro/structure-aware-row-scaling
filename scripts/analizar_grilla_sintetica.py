@@ -51,7 +51,7 @@ plt.rcParams.update({
 })
 from scipy.stats import wilcoxon
 
-VARIANT_ORDER = ["Base", "SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols"]
+VARIANT_ORDER = ["Base", "SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols", "Flat"]
 PATTERN_ORDER = ["none", "local", "coupling", "mixed"]
 S_ORDER = [0, 3, 6]
 MIPGAP = 1e-3
@@ -318,15 +318,17 @@ def fig_bars_reduction(df, outdir):
     from matplotlib.colors import to_rgba
 
     patterns = ["local", "coupling", "mixed"]
-    variants = ["SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols"]
+    variants = ["SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols", "Flat"]
     # Okabe-Ito, same variant->color mapping as scripts/figuras_paper.py
-    # (palette order: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols).
+    # (palette order: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols; Flat takes the
+    # remaining Okabe-Ito sky blue).
     vcolors = {"SA-Aug": "#D55E00", "SA-Mat": "#009E73",
-               "Ruiz": "#CC79A7", "Ruiz+Cols": "#E69F00"}
-    # Non-color redundancy so the four variants are separable WITHOUT color
+               "Ruiz": "#CC79A7", "Ruiz+Cols": "#E69F00", "Flat": "#56B4E9"}
+    # Non-color redundancy so the variants are separable WITHOUT color
     # (colorblind readers / grayscale print): a distinct hatch per variant,
     # drawn with a dark edge so it reads as black lines on the fill.
-    vhatch = {"SA-Aug": "", "SA-Mat": "//", "Ruiz": "xx", "Ruiz+Cols": ".."}
+    vhatch = {"SA-Aug": "", "SA-Mat": "//", "Ruiz": "xx", "Ruiz+Cols": "..",
+              "Flat": "\\\\"}
     severities = [3, 6]
     # Severity is encoded THREE ways so it survives grayscale: fill opacity
     # (light vs solid, as before) PLUS border thickness (thin vs thick).
@@ -339,8 +341,8 @@ def fig_bars_reduction(df, outdir):
 
     fig, ax = plt.subplots(figsize=(7, 4.5))
     xs = np.arange(len(patterns))
-    pair_step = 0.22   # spacing between variant pairs within a pattern group
-    bar_w = 0.10       # width of each bar (S=3 / S=6 side by side)
+    pair_step = 0.17   # spacing between variant pairs within a pattern group
+    bar_w = 0.08       # width of each bar (S=3 / S=6 side by side)
     for vi, var in enumerate(variants):
         center = (vi - (len(variants) - 1) / 2.0) * pair_step
         for si, S in enumerate(severities):
@@ -370,9 +372,9 @@ def fig_bars_reduction(df, outdir):
                       linewidth=sev_lw[6], label="$S = 6$ (thick edge)")]
     # Legend in a single row ABOVE the axes: the tall 'local'/'mixed' bars
     # reach the top of the plotting area, so an inside legend would collide.
-    ax.legend(handles=handles, ncol=6, loc="lower left", mode="expand",
+    ax.legend(handles=handles, ncol=7, loc="lower left", mode="expand",
               bbox_to_anchor=(0, 1.02, 1, 0.08), borderaxespad=0,
-              handlelength=1.4, columnspacing=1.0)
+              handlelength=1.2, columnspacing=0.8)
     fig.tight_layout()
     _save(fig, outdir / "fig2_bars_log10_reduction")
     plt.rcParams["hatch.linewidth"] = prev_hatch_lw

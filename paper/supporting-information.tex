@@ -8,10 +8,15 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[labelfont=bf]{caption}
+\usepackage{booktabs,multirow,threeparttable}
 \usepackage[colorlinks=true,linkcolor=blue!60!black]{hyperref}
 
 \graphicspath{{figs/}}
 \renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\newcommand{\sgm}{\ensuremath{\operatorname{sgm}}}
+\newcommand{\PARten}{\ensuremath{\operatorname{PAR10}}}
+\newcommand{\methodAug}{SA-Aug}
 
 \begin{document}
 
@@ -22,10 +27,12 @@ Mathias Rodr\'iguez Castro
 \end{center}
 
 \bigskip
-\noindent This document contains the $0.1\%$-MIPGap Gurobi distributional, diagnostic, and
-performance-profile views (Scenario~2 of the main text). They mirror the corresponding
-$1\%$-MIPGap figures of the main text; the quantitative evidence for the scenario is in the
-main text tables.
+\noindent This document contains (i) the $0.1\%$-MIPGap Gurobi distributional, diagnostic, and
+performance-profile views (Scenario~2 of the main text; Figures~S1--S3), which mirror the
+corresponding $1\%$-MIPGap figures of the main text; (ii) the $0.1\%$-MIPGap CPLEX
+distributional and profile views (Scenario~4; Figure~S4); and (iii) the hyperparameter
+sensitivity of the structure-aware rule (Table~S1). The quantitative evidence for every
+scenario is in the main-text tables.
 
 \begin{figure}[!htbp]
 \centering
@@ -59,5 +66,51 @@ informative than the exported coefficient-range ratio.}
 persist across the heterogeneous instance pool rather than only in averages.}
 \label{fig:si-profile-gap01}
 \end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.485\textwidth}\centering
+  \includegraphics[width=\linewidth]{esc4_cplex_01pct_boxplot.pdf}
+  \caption{Total-time speedup distribution.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.485\textwidth}\centering
+  \includegraphics[width=\linewidth]{esc4_cplex_01pct_perfil.pdf}
+  \caption{Performance profile.}
+\end{subfigure}
+\caption{At $0.1\%$ MIPGap, the CPLEX visual evidence remains mixed under the stricter
+tolerance, supporting the solver-dependent interpretation of the main text.}
+\label{fig:si-cplex-gap01}
+\end{figure}
+
+\begin{table}[!htbp]
+\centering
+\caption{Hyperparameter sensitivity of \methodAug{} (Simple class, Gurobi, 1\% MIPGap).
+Solver-time $\sgm$ ($s=1$\,s) and \PARten{}, in seconds; default settings in bold.}
+\label{tab:si-hyperparam}
+\begin{threeparttable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Parameter & Value & {$\sgm$ (s)} & {\PARten{} (s)} \\
+\midrule
+\multirow{3}{*}{Band $u$}
+ & $1.5$ & 2.09 & 2.46 \\
+ & $\mathbf{2}$ & 2.07 & 2.45 \\
+ & $4$ & 2.12 & 2.49 \\
+\midrule
+\multirow{3}{*}{Window $[\varepsilon_{\min},\varepsilon_{\max}]$}
+ & $[10^{-6},10^{6}]$ & 2.04 & 2.40 \\
+ & $\mathbf{[10^{-9},10^{9}]}$ & 2.02 & 2.39 \\
+ & $[10^{-12},10^{12}]$ & 2.01 & 2.36 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Base $\sgm$ is $3.73$\,s for reference. Each row is a separate matched run; the
+spread across all settings ($\sgm\in[2.01,2.12]$) is far below the base-to-scaled gap, and
+the median paired speedup is $\approx 1.0$ throughout. The number of Ruiz iterations $K$ is a
+parameter of the Ruiz baselines, not of the structure-aware rule, so it is fixed at $K=4$;
+varying it leaves \methodAug{} unchanged, as expected.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
 
 \end{document}
