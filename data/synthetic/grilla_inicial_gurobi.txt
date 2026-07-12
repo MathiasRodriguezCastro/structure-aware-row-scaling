@@ -1,14 +1,16 @@
 # =============================================================================
 # Grilla inicial (Gurobi). Diseño:
 #   B=10, nc=8, nb=8, restrLocales=8, restrAcoplamiento=3
-#   patterns = none, local, coupling, mixed   (4)
+#   patterns = none, local, coupling, coupling_uniform, mixed   (5)
+#     (coupling = θ por fila, heterogéneo; coupling_uniform = un θ colectivo por instancia
+#      sobre las filas de acoplamiento: el caso de diseño de la etapa de acoplamiento)
 #   S        = 0, 3, 6                         (3)
 #   seeds    = 1..20                           (20)   -> base=1, numInstancias=20
 #   coef_family = uniform (default)
 #   variantes = Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols, Flat
 #   solver = Gurobi, mipgap=0.001, timeout=600
 #
-# Total: 4 × 3 × 20 = 240 instancias ; × 6 variantes = 1440 corridas.
+# Total: 5 × 3 × 20 = 300 instancias ; × 6 variantes = 1800 corridas.
 #
 # Salidas (en synthetic/resultados/grilla_inicial_gurobi/):
 #   metrics.csv                                  (una fila por instancia × variante)
@@ -28,7 +30,7 @@ Gurobi
 10
 8 8
 8 3
-none,local,coupling,mixed
+none,local,coupling,coupling_uniform,mixed
 0,3,6
 Base,SA-Aug,SA-Mat,Ruiz,Ruiz+Cols,Flat
 synthetic/resultados/grilla_inicial_gurobi/metrics.csv

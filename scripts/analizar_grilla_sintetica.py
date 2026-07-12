@@ -52,7 +52,7 @@ plt.rcParams.update({
 from scipy.stats import wilcoxon
 
 VARIANT_ORDER = ["Base", "SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols", "Flat"]
-PATTERN_ORDER = ["none", "local", "coupling", "mixed"]
+PATTERN_ORDER = ["none", "local", "coupling", "coupling_uniform", "mixed"]
 S_ORDER = [0, 3, 6]
 MIPGAP = 1e-3
 
@@ -111,9 +111,14 @@ def load_metrics(path: Path) -> pd.DataFrame:
     for c in num_cols:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
-    # is_feasible_original_scale: "true"/"false"/"NA" -> bool / NaN
-    fmap = {"true": True, "false": False, "True": True, "False": False}
-    df["is_feasible_bool"] = df["is_feasible_original_scale"].map(fmap)
+    # is_feasible_original_scale: "true"/"false"/"NA" -> bool / NaN. pandas ya
+    # convierte true/false a dtype bool; el .map(str->bool) de antes convertía
+    # TODO a NaN en ese caso y el conteo de infactibles quedaba en 0 siempre.
+    if df["is_feasible_original_scale"].dtype == bool:
+        df["is_feasible_bool"] = df["is_feasible_original_scale"]
+    else:
+        fmap = {"true": True, "false": False, "True": True, "False": False}
+        df["is_feasible_bool"] = df["is_feasible_original_scale"].map(fmap)
 
     # Derivadas de condicionamiento (por fila).
     df["log10_kappa_antes"] = safe_log10(df["kappa_antes"])
@@ -317,7 +322,7 @@ def fig_bars_reduction(df, outdir):
     from matplotlib.patches import Patch
     from matplotlib.colors import to_rgba
 
-    patterns = ["local", "coupling", "mixed"]
+    patterns = ["local", "coupling", "coupling_uniform", "mixed"]
     variants = ["SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols", "Flat"]
     # Okabe-Ito, same variant->color mapping as scripts/figuras_paper.py
     # (palette order: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols; Flat takes the
@@ -358,7 +363,7 @@ def fig_bars_reduction(df, outdir):
                    edgecolor=edge, linewidth=sev_lw[S])
     ax.axhline(0, color="k", lw=0.6)
     ax.set_xticks(xs)
-    ax.set_xticklabels(patterns)
+    ax.set_xticklabels([p.replace("coupling_uniform", "coupling-unif.") for p in patterns])
     ax.set_xlabel("imbalance pattern")
     ax.set_ylabel("median $\\Delta\\log_{10}\\kappa$ (pre $-$ post)")
     ax.grid(False, axis="x")
@@ -389,10 +394,11 @@ def fig_kappa_antes_vs_S(df, outdir):
     """
     # pattern -> (linestyle, marker, Okabe-Ito color)
     styles = {
-        "none":     ("-",  "o", "#0072B2"),
-        "local":    ("--", "s", "#D55E00"),
-        "coupling": ("-.", "^", "#009E73"),
-        "mixed":    (":",  "D", "#CC79A7"),
+        "none":             ("-",  "o", "#0072B2"),
+        "local":            ("--", "s", "#D55E00"),
+        "coupling":         ("-.", "^", "#009E73"),
+        "coupling_uniform": ("-.", "v", "#E69F00"),
+        "mixed":            (":",  "D", "#CC79A7"),
     }
     fig, ax = plt.subplots(figsize=(7, 5))
     base = df[df.variante == "Base"]
@@ -401,7 +407,8 @@ def fig_kappa_antes_vs_S(df, outdir):
         meds = [median_or_nan(base[(base.pattern == pat) & (base.severity_S == S)]["kappa_antes"])
                 for S in S_ORDER]
         open_marker = (pat == "mixed")  # open diamonds let 'local' show through
-        ax.plot(S_ORDER, meds, linestyle=ls, marker=mk, color=color, label=pat,
+        ax.plot(S_ORDER, meds, linestyle=ls, marker=mk, color=color,
+                label=pat.replace("coupling_uniform", "coupling-unif."),
                 markerfacecolor="none" if open_marker else color,
                 markeredgecolor=color, markersize=7 if open_marker else 5,
                 zorder=3 if pat == "mixed" else 2)

@@ -250,6 +250,22 @@ void PreprocesamientoMIP::clasificarRestricciones() {
         if (esRestriccionGlobal(i) || acoplamiento) indicesGlobales.push_back(i);
         if (acoplamiento) indicesAcoplamiento.push_back(i);
     }
+
+    // Los roles de fila y la incidencia de bloque son metadatos separados: una fila
+    // clasificada global/de-acoplamiento puede tocar variables de varios bloques, pero no es
+    // fila local y no entra a la etapa local ni a las escalas de bloque (R_local y
+    // R_coupling son disjuntos). El camino autodetectado ya lo garantiza (salta
+    // esRestriccionGlobal al agrupar); esto lo impone también para bloques registrados por
+    // prefijos, cuya membresía por incidencia de variables puede incluirlas.
+    if (!cfg.escalamientoPlano && !indicesGlobales.empty()) {
+        set<int> globales(indicesGlobales.begin(), indicesGlobales.end());
+        for (auto& bloque : bloques) {
+            auto& idx = bloque.indicesRestricciones;
+            idx.erase(remove_if(idx.begin(), idx.end(),
+                                [&](int i) { return globales.count(i) > 0; }),
+                      idx.end());
+        }
+    }
 }
 
 bool PreprocesamientoMIP::esRestriccionGlobal(int idx) const {
@@ -1026,17 +1042,37 @@ void PreprocesamientoMIP::aplicarEscalamientoGlobal() {
         return;
     }
 
+    int filasGammaAplicadas = 0;
     for (int idx : indicesAcoplamiento) {
         Restriccion* r = restricciones[idx];
+        // Ventana admisible (misma salvaguarda que la rama matricial y que las filas
+        // locales): el γ colectivo se aplica POR FILA solo si no saca ningún coeficiente
+        // de [ε_min, ε_max]; la fila que lo violaría queda a su escala base. Sin este
+        // chequeo, un γ≪1 sobre una fila de acoplamiento ya diminuta la empuja bajo la
+        // tolerancia de factibilidad del solver (la fila se vuelve numéricamente nula y
+        // la solución devuelta viola la fila original en O(1)).
+        double cmin = 1e300, cmax = 0.0;
+        for (const auto& [coef, _] : r->getTerminos()) {
+            double ac = std::abs(coef);
+            if (ac > 0.0) { cmin = std::min(cmin, ac); cmax = std::max(cmax, ac); }
+        }
+        if (cmin < 1e300 && (cmin * bestGamma < cfg.epsMinCoef || cmax * bestGamma > cfg.epsMaxCoef))
+            continue;
         auto terminos = r->getTerminos();
         for (auto& [coef, _] : terminos)
             coef *= bestGamma;
         r->setTerminos(terminos);
         r->setTerminoIndependiente(r->getTerminoIndependiente() * bestGamma);
+        ++filasGammaAplicadas;
     }
 
-    global.gamma = bestGamma;
-    global.filaGlobalEscalada = true;
+    if (filasGammaAplicadas > 0) {
+        global.gamma = bestGamma;
+        global.filaGlobalEscalada = true;
+    } else {
+        global.gamma = 1.0;
+        global.filaGlobalEscalada = false;
+    }
 }
 
 // ============================================================

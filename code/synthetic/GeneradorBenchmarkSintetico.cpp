@@ -51,18 +51,31 @@ MetadatosInstancia GeneradorBenchmarkSintetico::generar(Problema& problema) cons
     auto draw = [&](double a, double b) { return a + (b - a) * unif01(rng); };
 
     // θ_r = 10^{ξ}, ξ ~ U[-S, S]. Multiplica TODA la fila (coeficientes y RHS).
+    // coupling_uniform: un ÚNICO θ por instancia, compartido por todas las filas de
+    // acoplamiento (desbalance COLECTIVO tipo cambio de unidades: el caso de diseño de la
+    // etapa de acoplamiento, que aplica un γ colectivo relativo a los bloques). El patrón
+    // coupling (θ por fila) es el caso adversarial: heterogeneidad interna entre filas de
+    // acoplamiento que un γ único no puede comprimir.
+    double thetaUniforme = 1.0;
+    if (params.patron == PatronDesbalance::CouplingUniform && params.severidadS > 0) {
+        double xi = draw(-static_cast<double>(params.severidadS),
+                          static_cast<double>(params.severidadS));
+        thetaUniforme = std::pow(10.0, xi);
+    }
     auto factorDesbalance = [&]() -> double {
         if (params.severidadS == 0) return 1.0;
+        if (params.patron == PatronDesbalance::CouplingUniform) return thetaUniforme;
         double xi = draw(-static_cast<double>(params.severidadS),
                           static_cast<double>(params.severidadS));
         return std::pow(10.0, xi);
     };
     auto filaRecibeDesbalance = [&](bool esLocal) -> bool {
         switch (params.patron) {
-            case PatronDesbalance::None:     return false;
-            case PatronDesbalance::Local:    return esLocal;
-            case PatronDesbalance::Coupling: return !esLocal;
-            case PatronDesbalance::Mixed:    return true;
+            case PatronDesbalance::None:            return false;
+            case PatronDesbalance::Local:           return esLocal;
+            case PatronDesbalance::Coupling:        return !esLocal;
+            case PatronDesbalance::CouplingUniform: return !esLocal;
+            case PatronDesbalance::Mixed:           return true;
         }
         return false;
     };
@@ -211,6 +224,9 @@ bool GeneradorBenchmarkSintetico::parsearPatron(const std::string& s, PatronDesb
     if (s == "none")     { out = PatronDesbalance::None;     return true; }
     if (s == "local")    { out = PatronDesbalance::Local;    return true; }
     if (s == "coupling") { out = PatronDesbalance::Coupling; return true; }
+    if (s == "coupling_uniform" || s == "coupling-uniform") {
+        out = PatronDesbalance::CouplingUniform; return true;
+    }
     if (s == "mixed")    { out = PatronDesbalance::Mixed;    return true; }
     return false;
 }
@@ -224,10 +240,11 @@ bool GeneradorBenchmarkSintetico::parsearFamilia(const std::string& s, FamiliaCo
 
 std::string GeneradorBenchmarkSintetico::patronAString(PatronDesbalance p) {
     switch (p) {
-        case PatronDesbalance::None:     return "none";
-        case PatronDesbalance::Local:    return "local";
-        case PatronDesbalance::Coupling: return "coupling";
-        case PatronDesbalance::Mixed:    return "mixed";
+        case PatronDesbalance::None:            return "none";
+        case PatronDesbalance::Local:           return "local";
+        case PatronDesbalance::Coupling:        return "coupling";
+        case PatronDesbalance::CouplingUniform: return "coupling_uniform";
+        case PatronDesbalance::Mixed:           return "mixed";
     }
     return "none";
 }
