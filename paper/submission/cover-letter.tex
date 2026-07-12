@@ -1,0 +1,67 @@
+% Cover letter for the initial submission to
+% International Journal for Numerical Methods in Engineering (I{}JNME, Wiley).
+% Build: pdflatex cover-letter
+% Fill the [TO FILL] fields (editor name, date, ORCID line) before submitting.
+
+\documentclass[11pt]{letter}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newtxtext}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+
+\signature{Mathias Rodr\'iguez Castro}
+\address{Facultad de Ingenier\'ia\\Universidad de la Rep\'ublica\\Montevideo, Uruguay\\\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
+
+\begin{document}
+
+\begin{letter}{The Editors\\International Journal for Numerical Methods in Engineering}
+
+\opening{Dear Editors,}
+
+We submit for your consideration the manuscript \emph{``Structure-Aware Row Scaling
+for Block-Structured Mixed-Integer Programs''} as a Research Article.
+
+Model generators build mixed-integer programs (MIPs) component by component and know,
+before export, which rows are local to a component, which variables it owns, and which
+rows couple components---structure that the flat coefficient matrix handed to the solver
+discards. The paper asks whether this pre-export metadata can be reused as numerical
+information to drive positive row scaling, a transformation that changes the numbers the
+solver sees while leaving the feasible set, objective, and integer restrictions exactly
+unchanged. We believe the work fits I{}JNME's scope in numerical methods for engineering
+computation: it concerns the numerical representation of generated engineering
+optimization models and the interaction between that representation and commercial
+solvers, evaluated on a hydrothermal-dispatch platform used as a demanding
+block-structured testbed rather than as a domain application.
+
+The central contribution is methodological as much as algorithmic. Across three instance
+classes, two commercial solvers, and two optimality tolerances, we separate four kinds of
+evidence that are easily conflated---algebraic equivalence, numerical representation,
+solver-facing conditioning, and matched per-solver runtime---and show that they need not
+agree. Positive row scaling is exact; structure-aware scaling robustly improves
+solver-facing numerical diagnostics; and runtime improves under Gurobi but not robustly
+under CPLEX. A role-blind control then isolates the runtime lever as a cheap per-row
+normalization rather than the row-role metadata, with a class-dependent outcome that we
+trace to a coverage gap over the highest-magnitude rows. The result is a clean, controlled
+demonstration that the rule which best conditions a matrix is not the one that solves
+fastest---a cautionary and, we hope, useful lesson for numerical preprocessing of
+generated MIPs. We report the negative and mixed results (the CPLEX neutrality, and the
+class in which the structure-blind control loses) as fully as the positive ones.
+
+The work is original and is not under consideration elsewhere; no part has been previously
+published. The manuscript has a single author, who is responsible for all of its content.
+A reproducibility package---cleaned source code, the redistributable dispatch and synthetic
+instances, aggregate per-scenario results, and the scripts that rebuild every table and
+figure---is publicly available and archived with a DOI, as stated in the Data Availability
+Statement; the experiments were carried out on the ClusterUY high-performance computing
+platform. The manuscript declares no conflicts of interest and received no specific
+funding.
+
+We would be glad to suggest suitable reviewers on request, and we thank you for
+considering our submission.
+
+\closing{Sincerely,}
+
+\end{letter}
+\end{document}
