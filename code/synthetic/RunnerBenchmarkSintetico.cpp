@@ -79,6 +79,21 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
             return true;
         }
     }
+    // Sensibilidad del umbral de activación de la etapa de acoplamiento:
+    // "SA-Aug-rho<val>" corre SA-Aug con umbralRhoEscalamientoGlobal = <val> (la etapa
+    // dispara cuando ρ̂ > val). Solo benchmark sintético (donde el umbral discrimina).
+    {
+        const std::string pref = "SA-Aug-rho";
+        if (nombre.rfind(pref, 0) == 0) {
+            cfg.escalamientoLocalPorFila  = true;
+            cfg.normalizarBloqueTrasFilas = true;
+            cfg.usarEquilibradoRuiz       = false;
+            try {
+                cfg.umbralRhoEscalamientoGlobal = std::stod(nombre.substr(pref.size()));
+            } catch (...) { return false; }
+            return true;
+        }
+    }
     return false;
 }
 

@@ -1,0 +1,24 @@
+# =============================================================================
+# Sensibilidad del umbral de activación de la etapa de acoplamiento de SA-Aug
+# (ρ̂ > umbral). El umbral discrimina en el benchmark SINTÉTICO (en las clases
+# operacionales el proxy de acople está lejos del umbral por ambos lados).
+#   B=10, nc=8, nb=8, restrLocales=8, restrAcoplamiento=3
+#   patterns = coupling, coupling_uniform   (donde el acople es el objeto)
+#   S        = 6
+#   seeds    = 1..20
+#   variantes = Base, SA-Aug-rho2, rho5, rho10 (default), rho20, rho50
+#   solver = Gurobi, mipgap=0.001, timeout=600
+# Total: 2 × 1 × 20 = 40 instancias ; × 6 variantes = 240 corridas.
+# =============================================================================
+benchmarkSintetico --out synthetic/resultados/sensibilidad_umbral --summary synthetic/resultados/sensibilidad_umbral/summary.csv --timeout 600 --mipgap 0.001
+Gurobi
+1
+20
+10
+8 8
+8 3
+coupling,coupling_uniform
+6
+Base,SA-Aug-rho2,SA-Aug-rho5,SA-Aug-rho10,SA-Aug-rho20,SA-Aug-rho50
+synthetic/resultados/sensibilidad_umbral/metrics.csv
+salir
