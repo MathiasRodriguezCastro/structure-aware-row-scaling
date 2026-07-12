@@ -2365,11 +2365,19 @@ only difference between the two scaled matrices. The runtime lever under Gurobi 
 per-row normalization, but \emph{where} to apply it is class-dependent. In SG-Ter-Mer the
 structure-aware decomposition into local and
 coupling roles left a coverage gap over exactly the highest-magnitude rows, and the role-blind
-kernel wins by closing it, without using any metadata. In Full, by contrast, scaling every
-row indiscriminately is counterproductive and the role-informed selection wins; we did not
-isolate which rescalings the flat kernel overshoots there, so the Full mechanism, unlike the
-SG-Ter-Mer one, remains undiagnosed. Neither blanket coverage nor role selectivity dominates
-across classes: the control makes the trade-off measurable. The structure-aware rules do improve
+kernel wins by closing it, without using any metadata. In Full the same control loses, and
+exporting its matrices sharpens why the reversal is not a matter of \emph{which} rows are
+scaled: the flat kernel there scales exactly the same two families as in SG-Ter-Mer---the
+shortage-segment and generation-versus-demand rows---and no rows specific to the nonlinear-hydro
+Full model (verified by differencing the exported constraints on two instances). The matrix
+change is thus qualitatively identical across the two classes, yet its runtime effect flips
+sign. What differs is that in Full those shortage rows are no longer the range-dominating
+extremes---the nonlinear-hydro height and thermal structure absent from SG-Ter-Mer now sets the
+coefficient range---so bringing them to order one is a smaller, and here unfavorable, part of
+the whole. Why an identical rescaling closes a coverage gap in one model's branch-and-bound and
+perturbs another's is a solver-dynamics question our static matrix analysis cannot resolve;
+what the control establishes is that neither blanket coverage nor role selectivity dominates
+across classes, and the trade-off must be measured. The structure-aware rules do improve
 the solver-facing conditioning diagnostics (\cref{tab:gurobi-gap0001-relative-conditioning}),
 but on these operational classes that gain comes from the \emph{local} stage: in the ablation
 runs the coupling-only variant leaves the solver-level conditioning ratio at one (recorded in
@@ -2744,9 +2752,10 @@ that solves fastest, and only matched per-solver runtime tells them apart.
 
 Future work should test the mechanism beyond hydrothermal dispatch---larger synthetic suites
 and applications in logistics, production planning, and network design would show whether the
-pattern persists as the engineering structure changes---and should diagnose why blanket
-per-row scaling overshoots on the Full class, the one cell whose mechanism, unlike the
-SG-Ter-Mer coverage gap, remains unexplained. Two concrete lessons for structure-driven
+pattern persists as the engineering structure changes---and should trace, inside the solver,
+why the \emph{same} rescaling that closes the SG-Ter-Mer coverage gap slows the Full
+branch-and-bound (\cref{subsec:stage-attribution} shows the flat kernel scales the same rows in
+both classes, so the reversal is a solver-dynamics effect our static analysis cannot resolve). Two concrete lessons for structure-driven
 preprocessing already follow: a rule
 that scales only the rows it recognizes by role can silently miss the worst-scaled rows, and a
 rule that scales every row indiscriminately can overshoot on integrated models---so neither
