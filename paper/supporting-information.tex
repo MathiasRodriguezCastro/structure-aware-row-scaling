@@ -30,9 +30,11 @@ Mathias Rodr\'iguez Castro
 \noindent This document contains (i) the $0.1\%$-MIPGap Gurobi distributional, diagnostic, and
 performance-profile views (Scenario~2 of the main text; Figures~S1--S3), which mirror the
 corresponding $1\%$-MIPGap figures of the main text; (ii) the $0.1\%$-MIPGap CPLEX
-distributional and profile views (Scenario~4; Figure~S4); and (iii) the hyperparameter
-sensitivity of the structure-aware rule (Table~S1). The quantitative evidence for every
-scenario is in the main-text tables.
+distributional and profile views (Scenario~4; Figure~S4); (iii) the hyperparameter
+sensitivity of the structure-aware rule (Table~S1); (iv) the per-variant original-scale
+reliability breakdown with PAR10 under the three readings of the main text (Table~S2);
+and (v) the out-of-sample sensitivity of the reliability floor (Table~S3). The
+quantitative evidence for every scenario is in the main-text tables.
 
 \begin{figure}[!htbp]
 \centering
@@ -185,6 +187,33 @@ CPLEX & 0.1\% & Full & SA-Aug & 9 & 9 & $2.5\times10^{-5}$ & $2.4\times10^{-4}$ 
 CPLEX & 0.1\% & Full & SA-Mat & 8 & 7 & $1.8\times10^{-5}$ & $3.2\times10^{-4}$ & 11186 & 19803 & 18718 \\
 CPLEX & 0.1\% & Full & Ruiz & 2 & 2 & $1.7\times10^{-5}$ & $5.9\times10^{-4}$ & 5857 & 7917 & 7917 \\
 CPLEX & 0.1\% & Full & Ruiz+Cols & 2 & 1 & $9.9\times10^{-6}$ & $5.8\times10^{-4}$ & 11222 & 13398 & 12310 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Out-of-sample sensitivity of the reliability floor for the collective coupling
+factor (\methodAug{}), on twenty seeds ($21$--$40$) never used while designing the floor.
+Cells: coupling, coupling-uniform, and mixed patterns at severity $S=6$ ($60$ instances,
+Gurobi, MIPGap $10^{-3}$, $600$\,s limit). Median post-scaling condition number per
+pattern; number of runs failing original-scale verification; worst original-scale row
+violation; instances whose objective disagrees with the base beyond the MIPGap. The
+failure mode replicates out-of-sample with the floor disabled, and every floor value
+across three orders of magnitude eliminates it.}
+\label{tab:si-floor-sensitivity}
+\small
+\begin{tabular}{@{}l rrr rrr@{}}
+\toprule
+Floor & {coupling} & {coupling-unif.} & {mixed} & $n_{\mathrm{fail}}$ & $v_{\mathrm{max}}$ & {over gap} \\
+\midrule
+(pre-scaling)     & $4.4\times10^{8}$ & $3.3\times10^{6}$ & $1.5\times10^{14}$ & & & \\
+\addlinespace
+disabled          & $3.8\times10^{7}$ & $5.4\times10^{3}$ & $2.9\times10^{7}$ & 4 & $4.2\times10^{-1}$ & 4 \\
+$10^{-2}$         & $9.1\times10^{5}$ & $5.4\times10^{3}$ & $2.9\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+$10^{-3}$ (default) & $3.5\times10^{5}$ & $5.4\times10^{3}$ & $2.3\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+$10^{-4}$         & $1.0\times10^{6}$ & $5.4\times10^{3}$ & $2.3\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+$10^{-5}$         & $2.1\times10^{6}$ & $5.4\times10^{3}$ & $3.0\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}

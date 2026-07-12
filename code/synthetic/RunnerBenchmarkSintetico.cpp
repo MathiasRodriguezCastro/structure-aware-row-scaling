@@ -64,6 +64,21 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.usarEquilibradoRuiz       = false;
         return true;
     }
+    // Sensibilidad del piso de confiabilidad del γ colectivo: "SA-Aug-floor<val>" corre
+    // SA-Aug con pisoMagnitudGammaColectivo = <val> ("SA-Aug-floor0" = piso deshabilitado).
+    // Solo para el benchmark sintético (la campaña de sensibilidad usa seeds independientes).
+    {
+        const std::string pref = "SA-Aug-floor";
+        if (nombre.rfind(pref, 0) == 0) {
+            cfg.escalamientoLocalPorFila  = true;
+            cfg.normalizarBloqueTrasFilas = true;
+            cfg.usarEquilibradoRuiz       = false;
+            try {
+                cfg.pisoMagnitudGammaColectivo = std::stod(nombre.substr(pref.size()));
+            } catch (...) { return false; }
+            return true;
+        }
+    }
     return false;
 }
 

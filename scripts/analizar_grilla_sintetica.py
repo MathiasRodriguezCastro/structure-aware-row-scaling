@@ -202,6 +202,12 @@ def build_conditioning_reduction(df: pd.DataFrame) -> pd.DataFrame:
                 for var in VARIANT_ORDER:
                     if var == "Base":
                         continue
+                    # Ruiz+Cols coincide EXACTAMENTE con Ruiz en el sintético (sin metadata
+                    # de unidades su normalización física es inerte): incluirla duplicaría
+                    # una familia entera de hipótesis en la corrección BH. Se excluye de los
+                    # tests; la familia queda en 4 variantes x patrones x severidades.
+                    if var == "Ruiz+Cols":
+                        continue
                     cur = df[(df.pattern == pat) & (df.severity_S == S) & (df.variante == var)]
                     cur = cur[["instancia", col]].rename(columns={col: "var_val"})
                     merged = base.merge(cur, on="instancia", how="inner").dropna()

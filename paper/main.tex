@@ -137,7 +137,7 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) reach the solver as flat coefficient matrices, although the generator that builds them knows which rows belong to each component and which rows couple components. We ask whether this pre-export metadata can usefully drive positive row scaling---a transformation that multiplies complete constraints by strictly positive factors and therefore preserves the mathematical program exactly, while numerical feasibility of the returned solutions still has to be verified in the original scale. We propose a structure-aware row-scaling layer that applies a per-row geometric-mean normalization ordered by role (local rows, then block scales, then coupling rows) and evaluate it on a hydrothermal-dispatch generator against generic equilibration, the solvers' internal scaling, and a role-blind control that applies the same kernel to every row, across three instance classes, two commercial solvers, and two tolerances. The metadata acts as a selection policy that decides \emph{where} to normalize, and its value proves class- and solver-dependent: structure-aware scaling robustly improves solver-facing conditioning diagnostics relative to the unscaled model and the generic baselines on the operational testbed---though no general conditioning advantage over the role-blind kernel is found---and the runtime gains under Gurobi flow from the per-row kernel itself, with full coverage beating role selectivity on some classes and the reverse on the most integrated one, while no robust runtime gain appears under CPLEX. The main limitation is a single generated platform: the coverage-versus-selectivity trade-off must be measured per class and per solver rather than assumed from structure.
+Generated mixed-integer programs (MIPs) reach the solver as flat coefficient matrices, although the generator that builds them knows which rows belong to each component and which rows couple components. We ask whether this pre-export metadata can usefully drive positive row scaling---a transformation that multiplies complete constraints by strictly positive factors and therefore preserves the mathematical program exactly, while numerical feasibility of the returned solutions still has to be verified in the original scale. We propose a structure-aware row-scaling layer that applies a per-row geometric-mean normalization ordered by role (local rows, then block scales, then coupling rows) and evaluate it on a hydrothermal-dispatch generator against Ruiz-kernel baselines within the same pipeline, the solvers' internal scaling, and a fully role-blind control that applies the same kernel to every row, across three instance classes, two commercial solvers, and two tolerances. The metadata acts as a selection policy that decides \emph{where} to normalize, and its value proves class- and solver-dependent: structure-aware scaling robustly improves solver-facing conditioning diagnostics relative to the unscaled model and the generic baselines on the operational testbed---though no general conditioning advantage over the role-blind kernel is found---and the runtime gains under Gurobi flow from the per-row kernel itself, with full coverage beating role selectivity on some classes and the reverse on the most integrated one, while no robust runtime gain appears under CPLEX; penalizing runs whose returned solutions fail original-scale verification narrows the robust Gurobi advantage to one class. The main limitation is a single generated platform: the coverage-versus-selectivity trade-off must be measured per class and per solver rather than assumed from structure.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -256,8 +256,8 @@ components and, in doing so, knows each row's role (local or coupling), which bl
 each variable, and how coupling rows link blocks. A conventional export (dashed) hands the
 solver a flat matrix in which this structure is lost. The structure-aware layer instead
 reuses that pre-export metadata to choose positive row factors in a local--block--coupling
-order, then exports an \emph{algebraically equivalent} MIP whose representation is better
-scaled. The solver still receives a single flat matrix; only its numbers change.}
+order, then exports an \emph{algebraically equivalent} MIP whose representation is
+intended to be better scaled. The solver still receives a single flat matrix; only its numbers change.}
 \label{fig:overview}
 \end{figure}
 
@@ -290,12 +290,16 @@ generation and before solver invocation.
 The paper makes three claims of different strength: the algebraic claim is exact (positive row
 scaling preserves the MIP); the numerical claim is empirical (structure-aware scaling improves
 solver-facing conditioning in the tested instances); and the performance claim is conditional
-(under Gurobi positive row scaling often reduces robust runtime or deterministic effort, while
-under CPLEX 22.1.2.0 it does not). A controlled ablation further sharpens the attribution:
+(under intent-to-treat timing, positive row scaling under Gurobi reduces robust runtime or
+deterministic effort in the three classes; after penalizing solutions that fail
+original-scale verification, the robust advantage remains clearest in SG-Ter-Mer and does
+not survive in Simple or Full---and under CPLEX 22.1.2.0 there is no robust gain under
+either reading). A controlled ablation further sharpens the attribution:
 the conditioning improvement and most of the Gurobi runtime effect flow through the shared
 per-row normalization kernel, while the metadata acts as a class-dependent selection policy
-that determines \emph{where} that kernel is applied. The method improves
-representation; acceleration depends on how the solver uses it, and the rule that best
+that determines \emph{where} that kernel is applied. The method changed the
+representation in the intended direction on the operational testbed; acceleration depends
+on how the solver uses it, and the rule that best
 conditions the matrix is not the rule that solves fastest.
 
 The rest of the paper follows this chain of evidence. \Cref{sec:related-work} identifies
@@ -895,7 +899,7 @@ transformation algebraically transparent.
 
 The scaling method keeps the same structural roles visible throughout: local rows, blocks, and coupling rows. Local rows receive row factors first. Blocks then inherit representative scales from their scaled local rows. Coupling rows receive their factors last, using the blocks they connect. This order is the algorithmic expression of the numerical argument in \cref{subsec:ideal-block-scaling,subsec:global-coupling-theory} and of the proxy interpretation in \cref{subsec:ideal-to-proxies}.
 
-This section defines the numerical transformations tested in the results. The base variant is the unscaled model generated by the platform. The two proposed variants share the local--block--coupling architecture but are \emph{two different structural rules}: they differ both in whether the right-hand side participates in the scale diagnosis and in how coupling rows are treated (a single grid-selected factor in \methodAug{}, one factor per row in \methodMat{}), so their head-to-head comparison is not by itself a clean right-hand-side ablation. The clean ablation of the right-hand side is the local-only pair of \cref{subsec:stage-attribution}, whose members differ \emph{only} in whether $b$ enters the per-row extremes. The comparison with Ruiz-type baselines tests whether generator-level row roles add information beyond generic flat-matrix equilibration.
+This section defines the numerical transformations tested in the results. The base variant is the unscaled model generated by the platform. The two proposed variants share the local--block--coupling architecture but are \emph{two different structural rules}: they differ both in whether the right-hand side participates in the scale diagnosis and in how coupling rows are treated (a single grid-selected factor in \methodAug{}, one factor per row in \methodMat{}), so their head-to-head comparison is not by itself a clean right-hand-side ablation. The clean ablation of the right-hand side is the local-only pair of \cref{subsec:stage-attribution}, whose members differ \emph{only} in whether $b$ enters the per-row extremes. The comparison with the Ruiz-kernel baselines tests the choice of per-row kernel under the same structural pipeline; the fully role-blind comparison is carried by the flat control (\cref{subsec:added-controls,subsec:stage-attribution}).
 
 \subsection{Base formulation}
 
@@ -980,9 +984,10 @@ no local rows enter at unit scale. The effective coupling proxy of row $r$ is
 \end{equation}
 the magnitude of the row relative to the representative scales of the blocks it connects,
 and $\rho=\max_r \widehat\rho_r^{A,b}$ is the worst such magnitude over the coupling
-rows. \methodAug{} then scales the coupling block by a \emph{single} factor
-$\gamma^{A,b}$, applied to every coupling row and chosen to minimize the conditioning
-surrogate that the idealized analysis suggests:
+rows. \methodAug{} then computes a \emph{single candidate} factor
+$\gamma^{A,b}$ for the coupling block, chosen to minimize the conditioning
+surrogate that the idealized analysis suggests, and applies it to each coupling row that
+passes the per-row safeguards of \cref{subsec:safeguards}:
 \begin{equation}
 \gamma^{A,b}=\argmin_{\gamma}\,\Phi(\gamma),
 \qquad
@@ -1004,18 +1009,25 @@ proxy of the diagonal factor $\widetilde D$, not the block scale $s_i^{A,b}$ of
 \cref{eq:augmented-block-scale}, which enters only the coupling proxy $\widehat\rho_r$.
 The minimizer is found on the fixed logarithmic grid
 $\gamma=10^{k/10}$, $k=-60,\ldots,60$ ($121$ log-uniform points spanning
-$[10^{-6},10^{6}]$). The stage is skipped when the effective coupling is
+$[10^{-6},10^{6}]$). The stage is skipped as a whole when the effective coupling is
 already moderate---$\rho\le 10$ in all experiments, the only rule used to declare it
 so---or when the minimizer falls inside the
-near-identity band $(1/u,u)=(0.5,2)$ of the safeguards; there are no further gating rules. The grid search resolves explicitly the trade-off
+near-identity band $(1/u,u)=(0.5,2)$ of the safeguards. After these block-level tests,
+each coupling row is additionally subject to the per-row coefficient-window and
+reliability-floor safeguards of \cref{subsec:safeguards}, which may veto the factor on
+individual rows; the final transformation is therefore a row-selective diagonal scaling
+with entries in $\{1,\gamma^{A,b}\}$, not necessarily a uniform scaling of the whole
+coupling block. The grid search resolves explicitly the trade-off
 exposed by \cref{eq:scaled-balance-factorization}: decreasing $\gamma$ improves the
 triangular factor but degrades the diagonal one. In the ideal spectral reading
 ($\rho=\norm{LD^{-1}}_2$ and $\kappa_B$ from the singular values of $\widetilde D$),
 submultiplicativity of $\kappa_2$ over that factorization gives $\kappa_2$ of the scaled
 balance block at most $\kappa_T(\gamma\rho)\,\kappa_B(\gamma)=\Phi(\gamma)$, so minimizing
 $\Phi$ minimizes this ideal-scale bound; on the exported rectangular matrices $\Phi$ is
-evaluated from cheap coefficient proxies as a surrogate, and no formal bound to the true
-$\kappa_2$ is claimed (\cref{subsec:ideal-to-proxies}). The released implementation evaluates
+evaluated from cheap coefficient proxies as a surrogate, no formal bound to the true
+$\kappa_2$ is claimed (\cref{subsec:ideal-to-proxies}), and when the per-row safeguards
+veto the factor on some rows the factorization-based surrogate motivates the
+\emph{candidate} but does not describe the exported, row-selective transformation. The released implementation evaluates
 these proxies from coefficient summaries of the generated model; the exact evaluation order is
 documented in the reproducibility repository.
 This sequence is the
@@ -1146,18 +1158,26 @@ The coefficient window bounds the magnitudes of the scaled coefficients, but it 
 by itself bound the effect of a small total row factor $d_r$ on the \emph{original-scale}
 residual: a solution the solver accepts at absolute feasibility tolerance
 $\varepsilon_{\mathrm{solver}}$ on the scaled row can violate the original row by up to
-$\varepsilon_{\mathrm{solver}}/d_r$. The per-row kernel is intrinsically safe in this
-respect---it normalizes each row's geometric mean to one, so the scaled row keeps
-magnitude of order one and the residual amplification, relative to the row's own
-magnitude, stays at tolerance level. A \emph{collective} factor, chosen to fit the
-largest coupling rows, has no such guarantee for a row that was individually small.
-The collective factor $\gamma$ is therefore applied to a coupling row only if the row's
-largest scaled coefficient magnitude remains at least $10^{-3}$; rows below the floor keep
-their base scale. This bounds the original-scale residual, relative to the row's leading
-coefficient, by $10^{3}\,\varepsilon_{\mathrm{solver}}$ without referencing any
-solver-internal parameter. The floor is not decorative: disabling it on the synthetic
-benchmark produces order-one original-scale violations
-(\cref{subsec:synthetic-results}).
+$\varepsilon_{\mathrm{solver}}/d_r$. The \emph{coefficient-only} per-row kernel offers a
+structural protection here: it centers the smallest and largest nonzero coefficient
+magnitudes geometrically around one, so the largest scaled coefficient
+$\sqrt{M_r/m_r}$ never falls below one and the amplification, relative to the row's
+leading coefficient, stays at tolerance level. The \emph{augmented} kernel does not
+inherit this protection: because $\lvert b_r\rvert$ enters the extremes, a row whose
+right-hand side dominates its coefficients can have all its coefficients scaled far below
+one---this is visibly the source of the largest absolute entries in the operational audit,
+which sit on rows of very large right-hand side (\cref{subsec:original-scale-audit}). A
+\emph{collective} factor, chosen to fit the largest coupling rows, has no per-row
+protection at all. The collective factor $\gamma$ is therefore applied to a coupling row
+only if the row's largest scaled coefficient magnitude remains at least $10^{-3}$; rows
+below the floor keep their base scale. The scope of this safeguard is deliberately
+limited: it bounds the amplification relative to the row's largest \emph{coefficient}
+only---not relative to $\lvert b_r\rvert$ or to the row's activity
+$\sum_j\lvert a_{rj}\rvert\,\lvert x_j\rvert$---and it protects the collective coupling
+factor, not the local factors. It prevents the observed common-factor failure mode on the
+reported synthetic suite (\cref{subsec:synthetic-results}); it is not a general guarantee
+of numerical safety, and a mixed row-scale floor incorporating $\lvert b_r\rvert$ and
+variable-scale bounds from the generator is a natural refinement.
 
 Because each admitted factor is a strictly positive multiplier applied to a complete
 constraint---both its coefficients and its right-hand side---the feasible set and the
@@ -1181,17 +1201,25 @@ campaigns.
 
 \subsection{Ruiz-type baselines}
 
-We compare the proposed variants with two generic baselines. The first,
-\methodRuiz{}, applies iterative row equilibration based on the maximum norm. The
-second, \methodRuizCols{}, combines Ruiz-type row equilibration with continuous-column
-scaling and physical normalization. These baselines separate the effect of generic
-coefficient compression from the effect of exploiting model structure.
+We compare the proposed variants with two \emph{kernel-swap} baselines that run inside the
+same structural pipeline. The first,
+\methodRuiz{}, replaces the local per-row kernel with iterative max-norm equilibration
+applied to the block row sets; the
+second, \methodRuizCols{}, adds continuous-column
+scaling and physical normalization. Both retain the row classification and the shared
+coupling stage (which never activates on the operational classes, where
+$\widehat\rho\le10$ throughout, but does act on the synthetic benchmark;
+\cref{subsec:synthetic-results}). They are therefore \emph{not} fully role-blind
+flat-matrix methods: they isolate the choice of \emph{kernel} under the same selection
+policy, while the fully role-blind selection ablation---the same kernel with no roles at
+all---is the flat control of \cref{subsec:stage-attribution}.
 
 \methodRuiz{} is deliberately not a weak foil: max-norm equilibration is a standard, strong
-flat-matrix scheme, and \methodRuizCols{} additionally grants it the column-scaling lever the
-structure-aware rule forgoes. The baselines isolate a narrow question---whether row roles and
-coupling incidence carry numerical information that a flat-matrix equilibrator, however well
-tuned, cannot recover once export has discarded them; the separate ``could the solver have done
+scheme, and \methodRuizCols{} additionally grants it the column-scaling lever the
+structure-aware rule forgoes. Together with the flat control these baselines split the
+comparison into two clean questions---does the geometric-mean kernel beat a Ruiz kernel
+under the same selection policy, and does the role-based selection beat full
+coverage under the same kernel; the separate ``could the solver have done
 this itself'' control is the internal-scaling baseline of \cref{subsec:internal-scaling}. Every
 variant hands the solver the same monolithic MIP; only the pre-export row factors differ.
 
@@ -1556,17 +1584,25 @@ variants always run under the solver's default internal-scaling configuration, a
 main experiments.
 
 \paragraph{Hyperparameter sensitivity}
-The method fixes three constants: the near-identity band $u=2$ (\cref{eq:near-identity}),
-the admissible coefficient window $[\varepsilon_{\min},\varepsilon_{\max}]=[10^{-9},10^{9}]$
-(\cref{eq:coef-window}), and the number of Ruiz iterations $K=4$. We report a sensitivity
-analysis over $u\in\{1.5,2,4\}$, $K\in\{2,4,8\}$, and the window over
-$\{[10^{-6},10^{6}],[10^{-9},10^{9}],[10^{-12},10^{12}]\}$ on the Simple class under Gurobi.
-The $K$ sweep also tests whether the irregular matched behavior of the Ruiz baseline is an
-artifact of a particular iteration count. The results are reported in the Supporting
-Information (Table~S1) and are summarized in one sentence: the runtime conclusions are
-insensitive to both constants ($\sgm$ within $[2.01,2.12]$\,s across the entire sweep,
-against $3.73$\,s for the base), and varying $K$ leaves the structure-aware rule unchanged,
-as expected.
+The constants of the proposed rules are, for \methodAug{}: the near-identity band $u=2$
+(\cref{eq:near-identity}), the admissible coefficient window
+$[\varepsilon_{\min},\varepsilon_{\max}]=[10^{-9},10^{9}]$ (\cref{eq:coef-window}), the
+coupling activation threshold $\widehat\rho>10$, the reliability floor $10^{-3}$, the
+$\gamma$ grid ($121$ log-uniform points on $[10^{-6},10^{6}]$), and the hard clip
+$[10^{-8},10^{8}]$; \methodMat{} shares $u$, the window, and the clip, and adds the
+moderation window $(10^{-6},10^{6})$ on the block extremes. The Ruiz iteration count $K=4$
+is a parameter of the baselines, not of the proposed rules. Three sensitivity analyses are
+reported. On the Simple class under Gurobi we sweep $u\in\{1.5,2,4\}$ and the coefficient
+window over $\{[10^{-6},10^{6}],[10^{-9},10^{9}],[10^{-12},10^{12}]\}$: the runtime
+conclusions are insensitive ($\sgm$ within $[2.01,2.12]$\,s across the sweep, against
+$3.73$\,s for the base; Table~S1, Supporting Information). The reliability floor is swept
+over three orders of magnitude on independent synthetic seeds
+(\cref{subsec:synthetic-results}; Table~S3). The coupling threshold is not swept: on the
+operational classes the coupling proxy sits far from it on both sides
+($\widehat\rho\approx3\times10^{-4}$ in Simple, $\approx1$ in SG-Ter-Mer and Full), so no
+nearby value changes any operational run, and the stage ablation bounds the consequence of
+the stage as a whole. A separate $K\in\{2,4,8\}$ sweep for the Ruiz baselines confirms
+their irregular matched behavior is not an artifact of the iteration count.
 
 \paragraph{Operational stage ablation}
 The synthetic benchmark isolates local and coupling imbalance by construction, but the
@@ -1666,20 +1702,28 @@ test is a Wilcoxon on \emph{capped} times, an approximation for censored data. T
 \emph{sign} of every such pair is nevertheless exact---the side that finished below the
 limit is faster whatever the censored value---so only the rank magnitudes of those pairs
 are approximate, and their number is small (zero to four pairs per scenario--class cell
-for the structure-aware variants, none in SG-Ter-Mer). Second, alongside the test statistic $W$ we report Cliff's
-$\delta$, computed between the two matched time vectors; $\delta$ is an unpaired effect
-measure and does not exploit the pairing, so we accompany it, wherever a paired effect is
-needed, with the median of the per-instance paired speedup ratios (equivalently, the
-median log time ratio), which is a genuinely paired effect size and is what the
-flat-control and ablation tables display. We also report the raw $p$-value and the
+for the structure-aware variants, none in SG-Ter-Mer); the reported $p$-values should be
+read as approximate wherever such pairs exist, and a paired sign test on the observable
+wins---which is exact under one-sided censoring---agrees in direction with the significant
+Wilcoxon results in every cell but one (Simple under Gurobi at $0.1\%$ for \methodMat{},
+where wins sit at parity, $95$ against $100$, and the Wilcoxon significance comes from the
+magnitudes of the improvements rather than from their count). Second, as the effect size we report the
+matched-pairs rank-biserial correlation
+$r_{\mathrm{rb}}=(T^{+}-T^{-})/(T^{+}+T^{-})$, computed from the same signed ranks as $W$,
+together with the median of the per-instance paired speedup ratios; both are genuinely
+paired quantities, unlike distribution-overlap measures such as Cliff's $\delta$, which we
+do not use. We also report the raw $p$-value and the
 Benjamini--Hochberg adjusted value $q_{\mathrm{BH}}$. The Benjamini--Hochberg correction is applied within each scenario (solver $\times$
 tolerance), over the family of all four scaled variants across the three instance classes
 (twelve paired tests); the tables display the two structure-aware variants, while
 $q_{\mathrm{BH}}$ reflects that full family. In the synthetic benchmark, the adjustment is
-applied jointly over the $75$ paired condition-number comparisons---five variants against
+applied jointly over the $60$ paired condition-number comparisons---four variants against
 the base, five imbalance patterns, three severity levels---within the condition-number
-metric. With the convention used here, negative values of $\delta$ indicate that the
-variant tends to be faster than the base, whereas positive values indicate deterioration.
+metric; \methodRuizCols{} is excluded from that family because it coincides exactly with
+\methodRuiz{} on the synthetic instances (no unit metadata), so including it would
+duplicate a full set of hypotheses. With the convention used here, negative values of $r_{\mathrm{rb}}$ indicate that
+the variant tends to be faster than the base, whereas positive values indicate
+deterioration.
 
 A word on what the instances are replicates \emph{of}. The $204$, $68$, and $34$ instances
 of a class are distinct operational scenarios---different inflow, demand, and cost
@@ -1709,6 +1753,18 @@ weak conditioning--speedup association is not a size artifact; the
 same comparison shows the solver-level diagnostic predicts speedup markedly better than the static
 proxy (Williams--Steiger $Z\approx6.1$, $p<10^{-8}$), while either association stays
 weak---consistent with conditioning being at most a partial mediator (\cref{sec:discussion}).
+These pooled tests treat variant--instance observations as independent, but each instance
+contributes one observation per variant and those observations share the same base time
+and model structure, and pooling can also mix between-class differences with within-class
+association. Two complements address this. First, a cluster bootstrap that resamples whole
+instances (all variants of an instance together; $298$ clusters, $2000$ resamples) leaves
+both conclusions intact: the solver-level association remains negative
+($\rho=-0.26$, cluster $95\%$ CI $[-0.32,-0.19]$) and its advantage over the static proxy
+remains positive ($|\rho_{\mathrm{solver}}|-|\rho_{\mathrm{proxy}}|$ CI $[0.16,0.31]$,
+excluding zero). Second, the association is present, with the same sign, \emph{within}
+each class ($-0.31$ Simple, $-0.13$ SG-Ter-Mer, $-0.12$ Full at $1\%$) and is further
+decomposed by variant in the table notes; it is never strong anywhere, which is the
+substantive point.
 
 \section{Computational results}
 \label{sec:results}
@@ -1726,10 +1782,11 @@ external scalings do not produce a robust runtime gain.
 \label{subsec:original-scale-audit}
 
 Before the per-scenario results, we report the original-scale verification promised in
-\cref{subsec:metrics} for the four operational campaigns; this is not a secondary audit but
-the numerical-reliability half of the equivalence claim, since algebraic equivalence of the
-mathematical program does not by itself guarantee that the solver's returned solution meets
-the original constraints within an absolute tolerance. After every completed run, the
+\cref{subsec:metrics} for the four operational campaigns; this is not a secondary audit.
+It complements the algebraic equivalence result---which is proved exactly by the
+positivity of the factors and needs no empirical support---by assessing a distinct
+question: whether the finite-precision solution the solver returns satisfies the original
+formulation within the stated tolerances. After every completed run, the
 returned solution is evaluated on the original, unscaled constraints (the row-only variants
 transform no variables; only \methodRuizCols{} requires mapping the variables back to their
 original units);
@@ -1801,10 +1858,24 @@ penalizes every such run as a computational failure at \PARten{} cost, exactly l
 timeout (the base column is essentially unchanged by this adjustment: it passes at
 $97.1$--$100\%$ in the Gurobi scenarios). Because the strict criterion is absolute and
 therefore not invariant to the physical units of a row, we also report a third,
-\emph{mixed} absolute--relative reading: a run additionally passes when its residual is at
-most $10^{-6}$ relative to the magnitude of the violated row, so that a tolerance-level
+\emph{mixed} absolute--relative reading, defined precisely as follows. For each row the
+verifier computes the residual $v_r=(a_r^{\top}x-b_r)_{+}$ for $\le$ rows,
+$v_r=(b_r-a_r^{\top}x)_{+}$ for $\ge$ rows, and $v_r=\lvert a_r^{\top}x-b_r\rvert$ for
+equalities, and the relative residual
+\begin{equation}
+v_r^{\mathrm{rel}}=\frac{v_r}{1+\lvert b_r\rvert},
+\label{eq:relative-residual}
+\end{equation}
+whose denominator uses $\lvert b_r\rvert$ as the row-magnitude proxy and degrades to the
+absolute residual when $b_r=0$; bound and integrality checks keep their absolute
+thresholds. A run passes the mixed reading if every row satisfies $v_r\le10^{-4}$
+\emph{or} $v_r^{\mathrm{rel}}\le\tau_{\mathrm{rel}}$ with $\tau_{\mathrm{rel}}=10^{-6}$
+(the order of the solvers' feasibility tolerance), so that a tolerance-level
 residual on a row of order $10^{8}$ is not treated like an operationally meaningful
-violation. The full per-variant breakdown---failure counts, median and maximum violations,
+violation. The class separation below does not depend on this convention: sweeping
+$\tau_{\mathrm{rel}}\in\{10^{-7},10^{-6},10^{-5}\}$ leaves SG-Ter-Mer at zero failures
+even at the strictest setting and moves the Simple and Full failure counts by at most a
+few runs per cell. The full per-variant breakdown---failure counts, median and maximum violations,
 and \PARten{} under all three readings for every scenario, class, and scaled
 variant---is Table~S2 of the Supporting Information. The three readings separate the
 classes cleanly. The SG-Ter-Mer exceedances are pure absolute-threshold artifacts on rows
@@ -2025,29 +2096,30 @@ not just generic equilibration in another form.
 \small
 \begin{tabular}{@{}lllrrrr@{}}
 \toprule
-Scenario & Class & Variant & $W$ & $p$ & $q_{\mathrm{BH}}$ & Cliff's $\delta$ \\
+Scenario & Class & Variant & $W$ & $p$ & $q_{\mathrm{BH}}$ & $r_{\mathrm{rb}}$ \\
 \midrule
-1\% MIPGap & Simple & \methodAug & 7535.0 & 0.0057 & 0.0097 & $-0.090$ \\
-1\% MIPGap & Simple & \methodMat & 3011.0 & $<10^{-4}$ & $<10^{-4}$ & $-0.210$ \\
-1\% MIPGap & Full & \methodAug & 175.0 & 0.0984 & 0.1476 & $-0.082$ \\
-1\% MIPGap & Full & \methodMat & 172.0 & 0.1406 & 0.1875 & $-0.073$ \\
-1\% MIPGap & SG-Ter-Mer & \methodAug & 501.0 & 0.0001 & 0.0005 & $-0.138$ \\
-1\% MIPGap & SG-Ter-Mer & \methodMat & 115.0 & $<10^{-4}$ & $<10^{-4}$ & $-0.239$ \\
-0.1\% MIPGap & Simple & \methodAug & 6963.0 & 0.0010 & 0.0024 & $-0.077$ \\
-0.1\% MIPGap & Simple & \methodMat & 7069.0 & 0.0016 & 0.0028 & $-0.080$ \\
-0.1\% MIPGap & Full & \methodAug & 97.0 & 0.0262 & 0.0393 & $-0.144$ \\
-0.1\% MIPGap & Full & \methodMat & 173.0 & 0.7140 & 0.7140 & $-0.023$ \\
-0.1\% MIPGap & SG-Ter-Mer & \methodAug & 456.0 & 0.0004 & 0.0018 & $-0.145$ \\
-0.1\% MIPGap & SG-Ter-Mer & \methodMat & 341.0 & $<10^{-4}$ & 0.0002 & $-0.158$ \\
+1\% MIPGap & Simple & \methodAug & 7535.0 & 0.0057 & 0.0097 & $-0.227$ \\
+1\% MIPGap & Simple & \methodMat & 3011.0 & $<10^{-4}$ & $<10^{-4}$ & $-0.691$ \\
+1\% MIPGap & Full & \methodAug & 175.0 & 0.0984 & 0.1476 & $-0.337$ \\
+1\% MIPGap & Full & \methodMat & 172.0 & 0.1406 & 0.1875 & $-0.306$ \\
+1\% MIPGap & SG-Ter-Mer & \methodAug & 501.0 & 0.0001 & 0.0005 & $-0.547$ \\
+1\% MIPGap & SG-Ter-Mer & \methodMat & 115.0 & $<10^{-4}$ & $<10^{-4}$ & $-0.896$ \\
+0.1\% MIPGap & Simple & \methodAug & 6963.0 & 0.0010 & 0.0024 & $-0.264$ \\
+0.1\% MIPGap & Simple & \methodMat & 7069.0 & 0.0016 & 0.0028 & $-0.260$ \\
+0.1\% MIPGap & Full & \methodAug & 97.0 & 0.0262 & 0.0393 & $-0.487$ \\
+0.1\% MIPGap & Full & \methodMat & 173.0 & 0.7140 & 0.7140 & $-0.085$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodAug & 456.0 & 0.0004 & 0.0018 & $-0.518$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodMat & 341.0 & $<10^{-4}$ & 0.0002 & $-0.639$ \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-\emph{Notes.} Tests are paired against the base formulation on matched instances. Negative
-Cliff's $\delta$ means that the variant tends to be faster. Double-timeout pairs are
-excluded from the Wilcoxon test and retained through \PARten{} and the performance
-profiles. The effective number of matched pairs equals the full class pool (Simple
-$195$--$197$, SG-Ter-Mer $61$--$67$) except in Full, where double-timeouts reduce it to
-$27$--$32$; zero-difference pairs are dropped by the Wilcoxon zero method.
+\emph{Notes.} Tests are paired against the base formulation on matched instances.
+$r_{\mathrm{rb}}$ is the matched-pairs rank-biserial correlation computed from the same
+signed ranks as $W$; negative values mean the variant tends to be faster. Double-timeout
+pairs are excluded from the Wilcoxon test and retained through \PARten{} and the
+performance profiles. The effective number of matched pairs equals the full class pool
+(Simple $195$--$197$, SG-Ter-Mer $61$--$67$) except in Full, where double-timeouts reduce
+it to $27$--$32$; zero-difference pairs are dropped by the Wilcoxon zero method.
 \end{flushleft}
 \end{table*}
 
@@ -2129,7 +2201,7 @@ stream and is comparable within this table but not against the Gurobi tables
 \end{flushleft}
 \end{table*}
 
-\noindent For CPLEX, \cref{tab:robust-cplex-1pct-mipgap} has to be interpreted differently from the Gurobi tables: the class-consistent structure-aware pattern is absent, and in SG-Ter-Mer the base scale already gives the best shifted geometric time and \PARten{}. The Simple class shows the descriptive--paired dissociation most clearly: \methodMat{} lowers the class $\sgm$ ($2.23\!\to\!1.68$\,s) and \PARten{} ($6.2\!\to\!3.4$\,s), yet its paired test is significantly \emph{unfavorable} (Cliff's $\delta=+0.125$, \cref{tab:wilcoxon-structured-cplex}): a few hard instances in the tail accelerate enough to move the aggregates while the typical instance slows slightly. Where a CPLEX aggregate improves, it is therefore a tail effect, not a per-instance speedup. \Cref{fig:cplex-gap1-visual-summary} shows the corresponding distributional and profile views.
+\noindent For CPLEX, \cref{tab:robust-cplex-1pct-mipgap} has to be interpreted differently from the Gurobi tables: the class-consistent structure-aware pattern is absent, and in SG-Ter-Mer the base scale already gives the best shifted geometric time and \PARten{}. The Simple class shows the descriptive--paired dissociation most clearly: \methodMat{} lowers the class $\sgm$ ($2.23\!\to\!1.68$\,s) and \PARten{} ($6.2\!\to\!3.4$\,s), yet its paired test is significantly \emph{unfavorable} ($r_{\mathrm{rb}}=+0.29$, with $61$ paired wins against $143$ losses, \cref{tab:wilcoxon-structured-cplex}): a few hard instances in the tail accelerate enough to move the aggregates while the typical instance slows slightly. Where a CPLEX aggregate improves, it is therefore a tail effect, not a per-instance speedup. \Cref{fig:cplex-gap1-visual-summary} shows the corresponding distributional and profile views.
 
 
 \twoplotfigure{esc3_cplex_1pct_boxplot.pdf}{Total-time speedup distribution.}{fig:boxplot-speedup-total-cplex1}{esc3_cplex_1pct_perfil.pdf}{Performance profile.}{fig:profile-cplex-gap001}{At $1\%$ MIPGap, the CPLEX distributional and performance-profile views break the Gurobi pattern. The plots therefore serve as a solver contrast.}{fig:cplex-gap1-visual-summary}
@@ -2184,24 +2256,26 @@ stricter tolerance, supporting the solver-dependent interpretation.
 \small
 \begin{tabular}{@{}lllrrrr@{}}
 \toprule
-Scenario & Class & Variant & $W$ & $p$ & $q_{\mathrm{BH}}$ & Cliff's $\delta$ \\
+Scenario & Class & Variant & $W$ & $p$ & $q_{\mathrm{BH}}$ & $r_{\mathrm{rb}}$ \\
 \midrule
-1\% MIPGap & Simple & \methodAug & 9377.0 & 0.2016 & 0.3456 & $-0.058$ \\
-1\% MIPGap & Simple & \methodMat & 7460.0 & 0.0004 & 0.0023 & $+0.125$ \\
-1\% MIPGap & Full & \methodAug & 172.0 & 0.3357 & 0.4284 & $+0.032$ \\
-1\% MIPGap & Full & \methodMat & 131.0 & 0.1042 & 0.2083 & $-0.153$ \\
-1\% MIPGap & SG-Ter-Mer & \methodAug & 1068.0 & 0.5211 & 0.5211 & $-0.003$ \\
-1\% MIPGap & SG-Ter-Mer & \methodMat & 740.0 & 0.0082 & 0.0326 & $+0.055$ \\
-0.1\% MIPGap & Simple & \methodAug & 8765.0 & 0.0453 & 0.1213 & $-0.024$ \\
-0.1\% MIPGap & Simple & \methodMat & 10056.0 & 0.7230 & 0.7230 & $+0.005$ \\
-0.1\% MIPGap & Full & \methodAug & 173.0 & 0.7140 & 0.7230 & $-0.001$ \\
-0.1\% MIPGap & Full & \methodMat & 125.0 & 0.2079 & 0.3563 & $-0.038$ \\
-0.1\% MIPGap & SG-Ter-Mer & \methodAug & 1085.0 & 0.5908 & 0.7089 & $-0.021$ \\
-0.1\% MIPGap & SG-Ter-Mer & \methodMat & 985.0 & 0.2507 & 0.3760 & $-0.011$ \\
+1\% MIPGap & Simple & \methodAug & 9377.0 & 0.2016 & 0.3456 & $-0.103$ \\
+1\% MIPGap & Simple & \methodMat & 7460.0 & 0.0004 & 0.0023 & $+0.286$ \\
+1\% MIPGap & Full & \methodAug & 172.0 & 0.3357 & 0.4284 & $+0.209$ \\
+1\% MIPGap & Full & \methodMat & 131.0 & 0.1042 & 0.2083 & $-0.355$ \\
+1\% MIPGap & SG-Ter-Mer & \methodAug & 1068.0 & 0.5211 & 0.5211 & $+0.090$ \\
+1\% MIPGap & SG-Ter-Mer & \methodMat & 740.0 & 0.0082 & 0.0326 & $+0.369$ \\
+0.1\% MIPGap & Simple & \methodAug & 8765.0 & 0.0453 & 0.1213 & $-0.162$ \\
+0.1\% MIPGap & Simple & \methodMat & 10056.0 & 0.7230 & 0.7230 & $-0.029$ \\
+0.1\% MIPGap & Full & \methodAug & 173.0 & 0.7140 & 0.7230 & $-0.085$ \\
+0.1\% MIPGap & Full & \methodMat & 125.0 & 0.2079 & 0.3563 & $-0.288$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodAug & 1085.0 & 0.5908 & 0.7089 & $+0.075$ \\
+0.1\% MIPGap & SG-Ter-Mer & \methodMat & 985.0 & 0.2507 & 0.3760 & $-0.160$ \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-\emph{Notes.} Tests are paired against the base formulation on matched instances. Under
+\emph{Notes.} Tests are paired against the base formulation on matched instances.
+$r_{\mathrm{rb}}$ is the matched-pairs rank-biserial correlation from the same signed
+ranks as $W$ (negative = variant faster). Under
 CPLEX, the effect signs are small, inconsistent, or unfavorable. They do not support a
 robust positive structure-aware runtime effect. The effective number of matched pairs
 equals the full class pool (Simple $203$--$204$, SG-Ter-Mer $68$) except in Full, where
@@ -2305,7 +2379,7 @@ severity only in the affected row classes: at \(S=6\), it reaches about
 separates local-row, per-row coupling, and collective coupling imbalance by construction
 (\cref{fig:synthetic-kappa-pre}).
 
-\twoplotfigure{fig3_kappa_antes_vs_S.pdf}{Pre-scaling condition number by pattern and severity.}{fig:synthetic-kappa-pre}{fig2_bars_log10_reduction.pdf}{Median reduction in $\log_{10}\kappa$.}{fig:synthetic-log-reduction}{Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows the median conditioning recovery obtained by the four scaling variants and the role-blind flat control on the four imbalance patterns at $S\in\{3,6\}$; the \textit{none} control and the Base variant are omitted because their reduction is zero by construction (\cref{tab:synthetic_compact}). The coupling-uniform group pools both directions of the shared factor; \cref{tab:synthetic_compact} splits them. Bars are hatched by variant and outlined with a thin/thick edge (and a lighter/darker fill) for $S=3$/$S=6$, so the grouping reads without color.}{fig:synthetic-mechanism-summary}
+\twoplotfigure{fig3_kappa_antes_vs_S.pdf}{Pre-scaling condition number by pattern and severity.}{fig:synthetic-kappa-pre}{fig2_bars_log10_reduction.pdf}{Median reduction in $\log_{10}\kappa$.}{fig:synthetic-log-reduction}{Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows the median conditioning recovery obtained by the four scaling variants and the role-blind flat control on the four imbalance patterns at $S\in\{3,6\}$. The Base variant is omitted because its reduction is zero by construction; the \textit{none} pattern is omitted from this panel for readability and reported in \cref{tab:synthetic_compact}, where, unlike Base, some rules \emph{worsen} the condition number on that negative control. The coupling-uniform group pools both directions of the shared factor; \cref{tab:synthetic_compact} splits them. Bars are hatched by variant and outlined with a thin/thick edge (and a lighter/darker fill) for $S=3$/$S=6$, so the grouping reads without color.}{fig:synthetic-mechanism-summary}
 
 The shared per-row kernel is validated cleanly. The two variants that normalize every
 row they reach individually recover the conditioning in every pattern: the full-coverage
@@ -2369,14 +2443,23 @@ the coupling rows that were \emph{individually} small it pushes the scaled row i
 regime where the solver's absolute feasibility tolerance maps back to order one in
 original units---the solver returns claimed-optimal solutions that violate the original
 row. A factor fitted to the most extreme rows must not be allowed to determine the scale
-of rows it does not fit; per-row normalization never enters this regime, because it brings
-each row to order one individually. With the floor enabled (the default), the failure mode
+of rows it does not fit; the per-row treatments never enter this regime here, because they
+center each row's coefficient extremes geometrically around one. With the floor enabled
+(the default), the failure mode
 is eliminated---all \(1800\) runs pass verification, the worst row violation is
 \(1.3\times10^{-6}\), every cross-variant objective spread is below the MIPGap---and the
 partial recovery on the heterogeneous cells even improves, since the large rows are still
-repaired while the fragile ones stay at their benign base scale. The synthetic benchmark
-thus reproduces, under controlled conditions, the reliability mechanism the operational
-audit measures, and turns it into a designed safeguard.
+repaired while the fragile ones stay at their benign base scale. Because the floor was
+designed after observing the failure mode on these instances, we validate it
+out-of-sample: on an independent set of twenty seeds never used in the design, disabling
+the floor reproduces the failure mode ($4$ verification failures with violations up to
+$4.2\times10^{-1}$ and $4$ objective disagreements beyond the gap), while \emph{every}
+floor value in $\{10^{-2},10^{-3},10^{-4},10^{-5}\}$ eliminates all failures with
+comparable conditioning, so the effect is neither an artifact of the calibration seeds nor
+of the specific threshold $10^{-3}$ (Table~S3, Supporting Information). The synthetic
+benchmark thus reproduces, under controlled conditions, the reliability mechanism the
+operational audit measures, and turns it into a designed, independently validated
+safeguard.
 
 This is the empirical bridge promised in \cref{subsec:ideal-to-proxies}, and it answers the
 natural worry that the idealized propositions---stated for square, nonsingular blocks under
@@ -2395,7 +2478,7 @@ between blocks with ill-conditioned interiors, column imbalance, or rows with id
 coefficient extremes but different roles---are either untreated by design or not exercised,
 and are natural extensions of the generator.
 
-Taken together, the four operational scenarios and the controlled synthetic check support a limited but useful interpretation. Under Gurobi, the structured preprocessing rules improve the numerical representation and often reduce solver time or deterministic effort. Under CPLEX, the same external transformations do not produce a robust runtime benefit and can be indistinguishable from, or worse than, the base in paired runtime evidence, even when some numerical diagnostics improve. The empirical message is therefore not that one scaling rule always wins. It is that generator-level structure can matter for the numerical representation the solver sees, while whether that translates into performance must be measured through the full solver--model interaction rather than assumed from the metadata (\cref{subsec:stage-attribution}).
+Taken together, the four operational scenarios and the controlled synthetic check support a limited but useful interpretation. Under Gurobi, the structured preprocessing rules improve the numerical representation and, under intent-to-treat timing, often reduce solver time or deterministic effort (\cref{subsec:original-scale-audit} gives the reliability-adjusted readings). Under CPLEX, the same external transformations do not produce a robust runtime benefit and can be indistinguishable from, or worse than, the base in paired runtime evidence, even when some numerical diagnostics improve. The empirical message is therefore not that one scaling rule always wins. It is that generator-level structure can matter for the numerical representation the solver sees, while whether that translates into performance must be measured through the full solver--model interaction rather than assumed from the metadata (\cref{subsec:stage-attribution}).
 
 \subsection{Solver-internal-scaling baseline}
 \label{subsec:internal-scaling}
@@ -2576,7 +2659,7 @@ role-blind variant, run on all three classes. In Simple it is indistinguishable 
 full architecture ($\sgm$ $2.02$ at $1\%$, matching $2.01$ and $2.02$; the same at $0.1\%$),
 so the row-role metadata adds nothing to runtime there. In SG-Ter-Mer it is markedly
 \emph{faster} than either: $\sgm$ $5.25$ against $8.38$ for both the full rule and local-only
-at $1\%$ (paired speedup $1.85\times$ versus $1.22\times$, Cliff's $\delta=-0.64$), and
+at $1\%$ (paired speedup $1.85\times$ versus $1.22\times$, $r_{\mathrm{rb}}=-0.86$), and
 $5.81$ against $9.23$ at $0.1\%$, with the same original-scale verification behavior as the
 other variants. In Full the outcome \emph{reverses}: blanket application of the same kernel is
 slower than the role-informed rule ($\sgm$ $85.2$ against $71.8$ at $1\%$, paired speedup
@@ -2640,33 +2723,33 @@ selectivity choice rather than the source of a uniform gain (\cref{sec:discussio
 
 \begin{table}[t]
 \centering
-\caption{Role-blind flat control under Gurobi. The same per-row geometric-mean kernel used by the local stage, applied to \emph{every} row with no role or block metadata (single block, no coupling stage), against the full structure-aware rule and the local-only ablation. Solver-time $\sgm$ ($s=1$\,s), in seconds; paired speedup versus base and Cliff's $\delta$ ($<0$ faster).}
+\caption{Role-blind flat control under Gurobi. The same per-row geometric-mean kernel used by the local stage, applied to \emph{every} row with no role or block metadata (single block, no coupling stage), against the full structure-aware rule and the local-only ablation. Solver-time $\sgm$ ($s=1$\,s), in seconds; paired speedup versus base and matched-pairs rank-biserial correlation $r_{\mathrm{rb}}$ ($<0$ faster).}
 \label{tab:flat-control}
 \begin{threeparttable}
 \small
 \begin{tabular}{@{}ll S[table-format=2.2] S[table-format=1.2] r @{}}
 \toprule
-Class & Variant & {$\sgm$ (s)} & {Med.\ paired sp.\tnote{a}} & {Cliff's $\delta$} \\
+Class & Variant & {$\sgm$ (s)} & {Med.\ paired sp.\tnote{a}} & {$r_{\mathrm{rb}}$} \\
 \midrule
 \multirow{3}{*}{Simple, $1\%$}
- & \methodAug{} (full)        & 2.02 & 1.00 & $0.00$ \\
- & \methodAug{}, local only   & 2.01 & 1.00 & $0.01$ \\
- & Flat (role-blind)          & 2.02 & 0.99 & $0.02$ \\
+ & \methodAug{} (full)        & 2.02 & 1.00 & $-0.23$ \\
+ & \methodAug{}, local only   & 2.01 & 1.00 & $-0.23$ \\
+ & Flat (role-blind)          & 2.02 & 0.99 & $-0.23$ \\
 \addlinespace
 \multirow{3}{*}{SG-Ter-Mer, $1\%$}
- & \methodAug{} (full)        & 8.38 & 1.22 & $-0.34$ \\
- & \methodAug{}, local only   & 8.38 & 1.22 & $-0.34$ \\
- & Flat (role-blind)          & \bfseries 5.25 & \bfseries 1.85 & $\mathbf{-0.64}$ \\
+ & \methodAug{} (full)        & 8.38 & 1.22 & $-0.51$ \\
+ & \methodAug{}, local only   & 8.38 & 1.22 & $-0.52$ \\
+ & Flat (role-blind)          & \bfseries 5.25 & \bfseries 1.85 & $\mathbf{-0.86}$ \\
 \addlinespace
 \multirow{3}{*}{SG-Ter-Mer, $0.1\%$}
- & \methodAug{} (full)        & 9.23 & 1.20 & $-0.37$ \\
- & \methodAug{}, local only   & 9.22 & 1.18 & $-0.34$ \\
- & Flat (role-blind)          & \bfseries 5.81 & \bfseries 1.86 & $\mathbf{-0.61}$ \\
+ & \methodAug{} (full)        & 9.23 & 1.20 & $-0.54$ \\
+ & \methodAug{}, local only   & 9.22 & 1.18 & $-0.53$ \\
+ & Flat (role-blind)          & \bfseries 5.81 & \bfseries 1.86 & $\mathbf{-0.84}$ \\
 \addlinespace
 \multirow{3}{*}{Full, $1\%$}
- & \methodAug{} (full)        & \bfseries 71.77 & \bfseries 1.38 & $\mathbf{-0.38}$ \\
- & \methodAug{}, local only   & 71.84 & 1.38 & $-0.38$ \\
- & Flat (role-blind)          & 85.23 & 1.13 & $-0.19$ \\
+ & \methodAug{} (full)        & \bfseries 71.77 & \bfseries 1.38 & $\mathbf{-0.34}$ \\
+ & \methodAug{}, local only   & 71.84 & 1.38 & $-0.34$ \\
+ & Flat (role-blind)          & 85.23 & 1.13 & $-0.16$ \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
@@ -2710,7 +2793,7 @@ performance.
 \toprule
 Claim & Evidence in this study & Limitation \\
 \midrule
-Algebraic equivalence & Positive factors multiply complete constraints; post-solve checks evaluate feasibility, integrality, and objectives in the original scale. & This claim concerns the mathematical MIP, not the path followed by branch-and-bound. \\
+Algebraic equivalence & Positive factors multiply complete constraints; the claim is proved analytically. The post-solve original-scale checks are separate evidence of \emph{numerical reliability} of the returned solutions, not of equivalence. & This claim concerns the mathematical MIP, not the path followed by branch-and-bound nor finite-precision behavior. \\
 Numerical representation & Structure-aware variants reduce solver-facing conditioning diagnostics in the harder classes. & Conditioning diagnostics describe representation; they do not prove faster MIP search. \\
 Gurobi performance & Per-row local scaling improves robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The lever is the per-row kernel; the role metadata's runtime effect is class-dependent---a role-blind flat control ties in Simple, wins in SG-Ter-Mer, and loses in Full (\cref{tab:flat-control})---and the claim is conditional on the tested pipeline. \\
 Solver dependence & CPLEX remains near parity or deteriorates in paired runtime evidence, even when some numerical diagnostics improve. & The result is tied to CPLEX 22.1.2.0, default settings, and the ClusterUY environment. \\
@@ -2960,9 +3043,12 @@ problem but change its numerical representation.
 
 The answer to the research question is qualified but affirmative: structure-aware positive row
 scaling improves solver-facing numerical diagnostics for the tested block-structured hydrothermal
-MIPs, and under Gurobi this often coincides with lower robust runtime or deterministic effort,
-whereas under CPLEX 22.1.2.0 it does not. The method improves representation; acceleration remains
-solver-dependent.
+MIPs, and under Gurobi this often coincides with lower robust runtime or deterministic effort
+under intent-to-treat timing---after penalizing runs that fail original-scale verification, the
+robust runtime advantage remains clearest in SG-Ter-Mer and does not survive in Simple or
+Full---whereas under CPLEX 22.1.2.0 there is no robust gain under either reading. The method
+changed the representation in the intended direction on the operational testbed; acceleration
+remains solver-dependent.
 
 The contribution divides along the same line the evidence does. The local--block--coupling
 architecture---scale local rows first, summarize blocks second, scale coupling rows last with

@@ -1,0 +1,27 @@
+# =============================================================================
+# Sensibilidad del piso de confiabilidad del γ colectivo (SA-Aug), en seeds
+# INDEPENDIENTES de la grilla principal (el piso 1e-3 se diseñó tras observar el
+# failure mode en seeds 1..20; esta campaña valida en seeds 21..40 para evitar
+# calibrar y evaluar sobre los mismos datos).
+#   B=10, nc=8, nb=8, restrLocales=8, restrAcoplamiento=3
+#   patterns = coupling, coupling_uniform, mixed   (las celdas donde el piso actúa)
+#   S        = 6
+#   seeds    = 21..40 (base=21, numInstancias=20)
+#   variantes = Base, SA-Aug-floor0 (deshabilitado), SA-Aug-floor1e-2, 1e-3, 1e-4, 1e-5
+#   solver = Gurobi, mipgap=0.001, timeout=600
+# Total: 3 × 1 × 20 = 60 instancias ; × 6 variantes = 360 corridas.
+# Uso (desde code/):
+#   cat ../data/synthetic/sensibilidad_piso_gurobi.txt | ./build/SistemaElectrico
+# =============================================================================
+benchmarkSintetico --out synthetic/resultados/sensibilidad_piso --summary synthetic/resultados/sensibilidad_piso/summary.csv --timeout 600 --mipgap 0.001
+Gurobi
+21
+20
+10
+8 8
+8 3
+coupling,coupling_uniform,mixed
+6
+Base,SA-Aug-floor0,SA-Aug-floor1e-2,SA-Aug-floor1e-3,SA-Aug-floor1e-4,SA-Aug-floor1e-5
+synthetic/resultados/sensibilidad_piso/metrics.csv
+salir
