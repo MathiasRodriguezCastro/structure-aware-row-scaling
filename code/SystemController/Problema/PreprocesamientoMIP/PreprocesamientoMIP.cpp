@@ -1058,6 +1058,11 @@ void PreprocesamientoMIP::aplicarEscalamientoGlobal() {
         }
         if (cmin < 1e300 && (cmin * bestGamma < cfg.epsMinCoef || cmax * bestGamma > cfg.epsMaxCoef))
             continue;
+        // Piso de magnitud escalada (salvaguarda de confiabilidad): si el γ colectivo dejara
+        // el mayor |coef| de ESTA fila por debajo del piso, la fila queda a su escala base.
+        // Ver Config::pisoMagnitudGammaColectivo.
+        if (cmax > 0.0 && cmax * bestGamma < cfg.pisoMagnitudGammaColectivo)
+            continue;
         auto terminos = r->getTerminos();
         for (auto& [coef, _] : terminos)
             coef *= bestGamma;

@@ -43,6 +43,14 @@ struct PreprocesamientoConfig {
     double umbralFactorEscalamiento  = 2.0;    ///< No aplicar factores dentro de [1/u, u]  (hiperparámetro u)
     double epsMinCoef                = 1e-9;   ///< Ventana de coeficiente admisible: cota inferior ε_min
     double epsMaxCoef                = 1e9;    ///< Ventana de coeficiente admisible: cota superior ε_max
+    /// Piso de magnitud escalada para el γ COLECTIVO de acoplamiento: γ se aplica a una fila
+    /// solo si su mayor |coef| escalado queda >= este piso. Acota la amplificación del residuo
+    /// en escala original: la tolerancia absoluta ε del solver sobre la fila escalada mapea a
+    /// lo sumo a ε/piso RELATIVO a la magnitud de la fila original (con piso 1e-3 y ε=1e-6,
+    /// residuo relativo <= 1e-3). El kernel por fila lo garantiza solo (geomean escalada = 1);
+    /// el γ colectivo, fijado por las filas grandes, puede empujar una fila individualmente
+    /// chica al régimen frágil sin este piso (visto en el benchmark sintético, coupling S=6).
+    double pisoMagnitudGammaColectivo = 1e-3;
 };
 
 /**

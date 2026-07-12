@@ -113,4 +113,80 @@ varying it leaves \methodAug{} unchanged, as expected.
 \end{threeparttable}
 \end{table}
 
+
+\begin{table}[!htbp]
+\centering
+\caption{Per-variant original-scale reliability breakdown of the four operational
+campaigns (the main text's original-scale audit table pools the scaled variants). For each solver, MIPGap,
+class, and variant: number of completed runs failing the strict absolute criterion
+($v_{\mathrm{row}}>10^{-4}$ or $v_{\mathrm{int}}>10^{-5}$; $n_{\mathrm{fail}}$) and the
+mixed absolute--relative criterion (additionally requiring the residual to exceed
+$10^{-6}$ relative to the violated row's magnitude; $n_{\mathrm{fail}}^{\mathrm{mix}}$);
+median and maximum row violation over completed runs; and PAR10 under the three readings
+(intent-to-treat as returned; strict, failures penalized as timeouts; mixed). Timeouts:
+$600$\,s for Simple, $3600$\,s otherwise; base-column PAR10 values are in the main-text
+tables.}
+\label{tab:si-reliability}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}llllrrccrrr@{}}
+\toprule
+Solver & Gap & Class & Variant & $n_{\mathrm{fail}}$ & $n_{\mathrm{fail}}^{\mathrm{mix}}$ &
+$v_{\mathrm{med}}$ & $v_{\mathrm{max}}$ & \multicolumn{3}{c}{PAR10 (ITT / strict / mixed)} \\
+\midrule
+Gurobi & 1\% & Simple & SA-Aug & 12 & 12 & $1.8\times10^{-6}$ & $3.7\times10^{-3}$ & 3 & 368 & 368 \\
+Gurobi & 1\% & Simple & SA-Mat & 19 & 18 & $1.4\times10^{-6}$ & $1.9\times10^{-3}$ & 2 & 561 & 532 \\
+Gurobi & 1\% & Simple & Ruiz & 55 & 52 & $1.2\times10^{-5}$ & $4.9\times10^{-3}$ & 27 & 1689 & 1599 \\
+Gurobi & 1\% & Simple & Ruiz+Cols & 19 & 10 & $5.9\times10^{-6}$ & $2.8\times10^{-3}$ & 55 & 625 & 355 \\
+Gurobi & 1\% & SG-Ter-Mer & SA-Aug & 1 & 0 & $6.1\times10^{-7}$ & $1.6\times10^{-4}$ & 562 & 1100 & 562 \\
+Gurobi & 1\% & SG-Ter-Mer & SA-Mat & 1 & 0 & $5.9\times10^{-7}$ & $5.9\times10^{-4}$ & 21 & 558 & 21 \\
+Gurobi & 1\% & SG-Ter-Mer & Ruiz & 1 & 0 & $6.9\times10^{-7}$ & $5.9\times10^{-4}$ & 567 & 1095 & 567 \\
+Gurobi & 1\% & SG-Ter-Mer & Ruiz+Cols & 1 & 0 & $1.9\times10^{-6}$ & $1.1\times10^{-1}$ & 585 & 1113 & 585 \\
+Gurobi & 1\% & Full & SA-Aug & 6 & 6 & $5.7\times10^{-6}$ & $2.6\times10^{-3}$ & 3308 & 9640 & 9640 \\
+Gurobi & 1\% & Full & SA-Mat & 2 & 2 & $2.9\times10^{-6}$ & $2.8\times10^{-4}$ & 2487 & 4665 & 4665 \\
+Gurobi & 1\% & Full & Ruiz & 2 & 2 & $3.1\times10^{-6}$ & $1.7\times10^{-4}$ & 4436 & 6522 & 6522 \\
+Gurobi & 1\% & Full & Ruiz+Cols & 1 & 0 & $4.8\times10^{-6}$ & $8.5\times10^{-4}$ & 4696 & 5777 & 4696 \\
+\midrule
+Gurobi & 0.1\% & Simple & SA-Aug & 21 & 17 & $1.9\times10^{-6}$ & $2.3\times10^{-3}$ & 109 & 752 & 631 \\
+Gurobi & 0.1\% & Simple & SA-Mat & 30 & 26 & $1.5\times10^{-6}$ & $3.0\times10^{-3}$ & 76 & 954 & 837 \\
+Gurobi & 0.1\% & Simple & Ruiz & 44 & 40 & $6.5\times10^{-6}$ & $4.9\times10^{-3}$ & 68 & 1391 & 1272 \\
+Gurobi & 0.1\% & Simple & Ruiz+Cols & 20 & 10 & $6.8\times10^{-6}$ & $1.2\times10^{0}$ & 131 & 742 & 437 \\
+Gurobi & 0.1\% & SG-Ter-Mer & SA-Aug & 1 & 0 & $6.2\times10^{-7}$ & $1.6\times10^{-4}$ & 594 & 1165 & 594 \\
+Gurobi & 0.1\% & SG-Ter-Mer & SA-Mat & 1 & 0 & $5.8\times10^{-7}$ & $1.0\times10^{-3}$ & 22 & 559 & 22 \\
+Gurobi & 0.1\% & SG-Ter-Mer & Ruiz & 0 & 0 & $6.7\times10^{-7}$ & $3.8\times10^{-6}$ & 587 & 587 & 587 \\
+Gurobi & 0.1\% & SG-Ter-Mer & Ruiz+Cols & 1 & 0 & $1.9\times10^{-6}$ & $1.1\times10^{-1}$ & 629 & 1209 & 629 \\
+Gurobi & 0.1\% & Full & SA-Aug & 2 & 2 & $5.0\times10^{-6}$ & $2.8\times10^{-4}$ & 3890 & 6283 & 6283 \\
+Gurobi & 0.1\% & Full & SA-Mat & 3 & 1 & $2.0\times10^{-6}$ & $2.4\times10^{-4}$ & 4694 & 7769 & 5750 \\
+Gurobi & 0.1\% & Full & Ruiz & 2 & 2 & $3.9\times10^{-6}$ & $3.4\times10^{-4}$ & 4976 & 7257 & 7257 \\
+Gurobi & 0.1\% & Full & Ruiz+Cols & 2 & 1 & $6.8\times10^{-6}$ & $2.1\times10^{-4}$ & 6140 & 8451 & 7294 \\
+\midrule
+CPLEX & 1\% & Simple & SA-Aug & 167 & 167 & $3.2\times10^{-4}$ & $4.4\times10^{-1}$ & 3 & 4912 & 4912 \\
+CPLEX & 1\% & Simple & SA-Mat & 161 & 161 & $2.7\times10^{-4}$ & $4.4\times10^{-1}$ & 3 & 4736 & 4736 \\
+CPLEX & 1\% & Simple & Ruiz & 160 & 160 & $2.9\times10^{-4}$ & $3.0\times10^{-1}$ & 4 & 4707 & 4707 \\
+CPLEX & 1\% & Simple & Ruiz+Cols & 67 & 66 & $1.6\times10^{-5}$ & $1.1\times10^{-3}$ & 3 & 1972 & 1943 \\
+CPLEX & 1\% & SG-Ter-Mer & SA-Aug & 0 & 0 & $6.6\times10^{-7}$ & $4.7\times10^{-6}$ & 10 & 10 & 10 \\
+CPLEX & 1\% & SG-Ter-Mer & SA-Mat & 0 & 0 & $2.4\times10^{-7}$ & $1.4\times10^{-6}$ & 6 & 6 & 6 \\
+CPLEX & 1\% & SG-Ter-Mer & Ruiz & 0 & 0 & $6.9\times10^{-7}$ & $5.4\times10^{-6}$ & 10 & 10 & 10 \\
+CPLEX & 1\% & SG-Ter-Mer & Ruiz+Cols & 0 & 0 & $1.9\times10^{-6}$ & $1.4\times10^{-5}$ & 15 & 15 & 15 \\
+CPLEX & 1\% & Full & SA-Aug & 9 & 9 & $2.2\times10^{-5}$ & $8.4\times10^{-4}$ & 5546 & 15014 & 15014 \\
+CPLEX & 1\% & Full & SA-Mat & 8 & 7 & $1.4\times10^{-5}$ & $1.2\times10^{-3}$ & 6498 & 14932 & 13875 \\
+CPLEX & 1\% & Full & Ruiz & 5 & 5 & $2.6\times10^{-5}$ & $4.9\times10^{-4}$ & 3506 & 8744 & 8744 \\
+CPLEX & 1\% & Full & Ruiz+Cols & 2 & 1 & $7.8\times10^{-6}$ & $3.7\times10^{-4}$ & 4681 & 6793 & 5737 \\
+\midrule
+CPLEX & 0.1\% & Simple & SA-Aug & 164 & 164 & $3.4\times10^{-4}$ & $7.9\times10^{2}$ & 41 & 4855 & 4855 \\
+CPLEX & 0.1\% & Simple & SA-Mat & 165 & 165 & $2.8\times10^{-4}$ & $7.9\times10^{2}$ & 72 & 4915 & 4915 \\
+CPLEX & 0.1\% & Simple & Ruiz & 159 & 159 & $2.9\times10^{-4}$ & $3.0\times10^{-1}$ & 71 & 4737 & 4737 \\
+CPLEX & 0.1\% & Simple & Ruiz+Cols & 59 & 58 & $1.5\times10^{-5}$ & $3.9\times10^{2}$ & 105 & 1838 & 1808 \\
+CPLEX & 0.1\% & SG-Ter-Mer & SA-Aug & 0 & 0 & $6.7\times10^{-7}$ & $5.6\times10^{-6}$ & 21 & 21 & 21 \\
+CPLEX & 0.1\% & SG-Ter-Mer & SA-Mat & 0 & 0 & $2.4\times10^{-7}$ & $2.5\times10^{-6}$ & 16 & 16 & 16 \\
+CPLEX & 0.1\% & SG-Ter-Mer & Ruiz & 0 & 0 & $7.0\times10^{-7}$ & $3.8\times10^{-6}$ & 8 & 8 & 8 \\
+CPLEX & 0.1\% & SG-Ter-Mer & Ruiz+Cols & 0 & 0 & $2.0\times10^{-6}$ & $1.4\times10^{-5}$ & 539 & 539 & 539 \\
+CPLEX & 0.1\% & Full & SA-Aug & 9 & 9 & $2.5\times10^{-5}$ & $2.4\times10^{-4}$ & 8930 & 18283 & 18283 \\
+CPLEX & 0.1\% & Full & SA-Mat & 8 & 7 & $1.8\times10^{-5}$ & $3.2\times10^{-4}$ & 11186 & 19803 & 18718 \\
+CPLEX & 0.1\% & Full & Ruiz & 2 & 2 & $1.7\times10^{-5}$ & $5.9\times10^{-4}$ & 5857 & 7917 & 7917 \\
+CPLEX & 0.1\% & Full & Ruiz+Cols & 2 & 1 & $9.9\times10^{-6}$ & $5.8\times10^{-4}$ & 11222 & 13398 & 12310 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \end{document}

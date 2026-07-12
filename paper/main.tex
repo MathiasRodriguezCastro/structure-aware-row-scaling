@@ -137,7 +137,7 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) reach the solver as flat coefficient matrices, although the generator that builds them knows which rows belong to each component and which rows couple components. We ask whether this pre-export metadata can usefully drive positive row scaling---a transformation that multiplies complete constraints by strictly positive factors and therefore preserves the mathematical program exactly, while numerical feasibility of the returned solutions still has to be verified in the original scale. We propose a structure-aware row-scaling layer that applies a per-row geometric-mean normalization ordered by role (local rows, then block scales, then coupling rows) and evaluate it on a hydrothermal-dispatch generator against generic equilibration, the solvers' internal scaling, and a role-blind control that applies the same kernel to every row, across three instance classes, two commercial solvers, and two tolerances. The metadata acts as a selection policy that decides \emph{where} to normalize, and its value proves class- and solver-dependent: structure-aware scaling robustly improves solver-facing conditioning diagnostics, but the runtime gains under Gurobi flow from the per-row kernel itself, with full coverage beating role selectivity on some classes and the reverse on the most integrated one, and no robust runtime gain appears under CPLEX. The main limitation is a single generated platform: the coverage-versus-selectivity trade-off must be measured per class and per solver rather than assumed from structure.
+Generated mixed-integer programs (MIPs) reach the solver as flat coefficient matrices, although the generator that builds them knows which rows belong to each component and which rows couple components. We ask whether this pre-export metadata can usefully drive positive row scaling---a transformation that multiplies complete constraints by strictly positive factors and therefore preserves the mathematical program exactly, while numerical feasibility of the returned solutions still has to be verified in the original scale. We propose a structure-aware row-scaling layer that applies a per-row geometric-mean normalization ordered by role (local rows, then block scales, then coupling rows) and evaluate it on a hydrothermal-dispatch generator against generic equilibration, the solvers' internal scaling, and a role-blind control that applies the same kernel to every row, across three instance classes, two commercial solvers, and two tolerances. The metadata acts as a selection policy that decides \emph{where} to normalize, and its value proves class- and solver-dependent: structure-aware scaling robustly improves solver-facing conditioning diagnostics relative to the unscaled model and the generic baselines on the operational testbed---though no general conditioning advantage over the role-blind kernel is found---and the runtime gains under Gurobi flow from the per-row kernel itself, with full coverage beating role selectivity on some classes and the reverse on the most integrated one, while no robust runtime gain appears under CPLEX. The main limitation is a single generated platform: the coverage-versus-selectivity trade-off must be measured per class and per solver rather than assumed from structure.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -153,8 +153,9 @@ Generated mixed-integer programs (MIPs) reach the solver as flat coefficient mat
 \begin{itemize}
   \item Model generators know each row's role, block ownership, and coupling incidence---metadata
   a flat export discards but that can drive numerical preprocessing.
-  \item Positive, structure-keyed row factors applied in a local--block--coupling order improve
-  the solver-facing representation without changing the MIP.
+  \item Positive, structure-keyed row factors applied in a local--block--coupling order improved
+  the solver-facing representation on the operational testbed without changing the MIP; on an
+  already well-scaled model the selective rule can widen the exported range instead.
   \item The runtime lever is per-row normalization; whether roles should gate it is
   class-dependent. A role-blind control ties the structure-aware rule on the simplest class,
   beats it on the coupled class (the role-based rule missed the worst-scaled rows), and loses
@@ -534,21 +535,31 @@ b_1\\ b_2\\ \vdots\\ b_B\\ h
 The matrices $A_i$ encode local restrictions. The matrices $L_i$ encode each block's contribution to the global coupling rows, such as demand balance in the hydrothermal
 testbed.
 
-Row roles and block incidence are separate metadata fields, and the row taxonomy is a
-partition: writing $\mathcal{R}_{\mathrm{cpl}}$ for the coupling row set,
+Row roles and block incidence are separate metadata fields, and the row taxonomy splits
+the complete row set $\mathcal{R}_{\mathrm{all}}$ into three pairwise disjoint classes:
+the local sets $\mathcal{R}_i$, the coupling set $\mathcal{R}_{\mathrm{cpl}}$, and a
+residual set $\mathcal{R}_{\mathrm{other}}$ of rows that are global but not coupling,
 \begin{equation}
-\mathcal{R}_i\cap\mathcal{R}_j=\varnothing\ (i\neq j),
+\mathcal{R}_{\mathrm{all}}
+=\Bigl(\textstyle\bigcup_{i\in\mathcal{B}}\mathcal{R}_i\Bigr)
+\,\dot\cup\,\mathcal{R}_{\mathrm{cpl}}
+\,\dot\cup\,\mathcal{R}_{\mathrm{other}},
 \qquad
-\Bigl(\textstyle\bigcup_{i\in\mathcal{B}}\mathcal{R}_i\Bigr)\cap\mathcal{R}_{\mathrm{cpl}}
-=\varnothing .
+\mathcal{R}_i\cap\mathcal{R}_j=\varnothing\ (i\neq j).
 \label{eq:role-disjointness}
 \end{equation}
 A coupling row is incident to several blocks through the variables it involves, but it is
 not classified as a local row of any of them and does not enter the local-row normalization
 stage; the implementation enforces this by removing role-classified global and coupling
-rows from every block row set before scaling. Rows that are global but not coupling (for
-example, market shortage segments in the testbed) belong to neither set and are left to
-whatever treatment their stage assigns---in the proposed rules, none.
+rows from every block row set before scaling. The residual class
+$\mathcal{R}_{\mathrm{other}}$ (for example, the market shortage segments of the testbed)
+is a genuine design decision, not an afterthought: a policy must be chosen for it---leave
+it unscaled, normalize it row by row with the same kernel, or diagnose it and normalize
+only on a trigger. The structure-aware rules studied here take the most selective policy
+(leave $\mathcal{R}_{\mathrm{other}}$ unscaled), and the role-blind flat control of
+\cref{subsec:stage-attribution} realizes the opposite extreme (normalize every row); the
+operational comparison between them is precisely what measures the cost of this choice,
+which turns out to be class-dependent (\cref{tab:flat-control}).
 
 This structure suggests three scaling decisions: scale local rows inside each block; compute representative block scales after local row scaling; and scale global coupling rows with those block scales. The goal is to reduce harmful scale heterogeneity without erasing the modular meaning of the formulation.
 
@@ -859,9 +870,13 @@ We state the scope of this argument once and plainly: the propositions describe 
 nonsingular blocks under exact SVD scaling, the proxies act on rectangular,
 inequality-based matrices, and we establish no bound relating the proxy scale to the
 ideal spectral factor in \cref{prop:ideal-block-scaling}. The propositions therefore
-motivate the design, and its empirical validity is verified directly in the controlled
-synthetic suite of \cref{subsec:synthetic-benchmark}, where blocks are small, singular
-values are cheap to compute, and conditioning is measurable by construction.
+motivate the design, and the controlled
+synthetic suite of \cref{subsec:synthetic-benchmark}---where blocks are small, singular
+values are cheap to compute, and conditioning is measurable by construction---tests it
+empirically with a bounded outcome: it validates the shared per-row proxy under
+row-multiplicative imbalance and exercises the common block-relative coupling factor on
+the oversized branch of its collective design case
+(\cref{subsec:synthetic-results}).
 
 This bridge also explains why the proposed method is row-based. Positive row scaling
 preserves the original units and domains of all variables; integer and binary variables do
@@ -1090,6 +1105,7 @@ side alone; the clean right-hand-side ablation is the local-only pair reported w
 stage ablation (\cref{subsec:stage-attribution}), which shares every other design choice.
 
 \subsection{Safeguards}
+\label{subsec:safeguards}
 
 All applied scaling factors---the local row factors and the coupling-row factors in the
 augmented or matrix-only variants---are subject to two per-factor safeguards, applied
@@ -1124,6 +1140,24 @@ coefficients, the factor $\theta$ is admitted only if
 \end{equation}
 Otherwise, the factor is not applied and the corresponding row or coupling row is left at its base scale. The coupling factor is additionally hard-clipped to
 $\gamma \in [10^{-8},\,10^{8}]$ prior to this check.
+
+\paragraph{Reliability floor for the collective coupling factor}
+The coefficient window bounds the magnitudes of the scaled coefficients, but it does not
+by itself bound the effect of a small total row factor $d_r$ on the \emph{original-scale}
+residual: a solution the solver accepts at absolute feasibility tolerance
+$\varepsilon_{\mathrm{solver}}$ on the scaled row can violate the original row by up to
+$\varepsilon_{\mathrm{solver}}/d_r$. The per-row kernel is intrinsically safe in this
+respect---it normalizes each row's geometric mean to one, so the scaled row keeps
+magnitude of order one and the residual amplification, relative to the row's own
+magnitude, stays at tolerance level. A \emph{collective} factor, chosen to fit the
+largest coupling rows, has no such guarantee for a row that was individually small.
+The collective factor $\gamma$ is therefore applied to a coupling row only if the row's
+largest scaled coefficient magnitude remains at least $10^{-3}$; rows below the floor keep
+their base scale. This bounds the original-scale residual, relative to the row's leading
+coefficient, by $10^{3}\,\varepsilon_{\mathrm{solver}}$ without referencing any
+solver-internal parameter. The floor is not decorative: disabling it on the synthetic
+benchmark produces order-one original-scale violations
+(\cref{subsec:synthetic-results}).
 
 Because each admitted factor is a strictly positive multiplier applied to a complete
 constraint---both its coefficients and its right-hand side---the feasible set and the
@@ -1194,8 +1228,14 @@ so that bounds, objective interpretation, and integrality remain unchanged.
 \State Compute $\widehat\rho_r^{A,b}$ for every coupling row using \cref{eq:augmented-coupling-rho}; set $\rho\gets\max_r\widehat\rho_r^{A,b}$
 \If{$\rho$ exceeds the coupling threshold}
   \State Set $\gamma^{A,b}\gets\argmin_{\gamma}\Phi(\gamma)$ over the logarithmic grid $\gamma\in[10^{-6},10^{6}]$ (\cref{eq:augmented-coupling-factor})
-  \If{$\gamma^{A,b}$ lies outside the near-identity band}
-    \State Update $d_r\gets d_r\gamma^{A,b}$ for every coupling row $r$
+  \State Clip $\gamma^{A,b}$ to $[10^{-8},10^{8}]$
+  \If{$\gamma^{A,b}$ lies outside the near-identity band \eqref{eq:near-identity}}
+    \For{each coupling row $r$}
+      \If{$\gamma^{A,b}$ keeps row $r$ inside the coefficient window \eqref{eq:coef-window}
+          \textbf{and} above the reliability floor (\cref{subsec:safeguards})}
+        \State Update $d_r\gets d_r\gamma^{A,b}$
+      \EndIf
+    \EndFor
   \EndIf
 \EndIf
 \State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
@@ -1234,7 +1274,9 @@ instances), whereas speedups, tests, and all base comparisons use matched base--
 which both runs succeeded, and are therefore unaffected by the unbalanced descriptive counts.
 
 Each measurement is tied to the part of the argument it can support: algebraic equivalence
-is checked by descaling and original-scale feasibility and integrality tests; the numerical
+is proved analytically, and the numerical reliability of each returned solution is checked
+by the original-scale feasibility and integrality tests (with variables mapped back to
+original units only for the column-scaling baseline); the numerical
 claim by exported coefficient-range summaries and solver-level conditioning diagnostics; the
 performance claim by matched base--variant speedups, deterministic effort, performance
 profiles, and primal--dual progress; and solver dependence by separate Gurobi and CPLEX
@@ -1618,12 +1660,25 @@ times are strongly skewed and include censored observations, solver-time compari
 use the Wilcoxon signed-rank test on matched, non-double-timeout pairs. Pairs in which
 both the base and the variant reach the time limit are treated as censored for this
 paired test; their global effect is still reflected in \PARten{} and in the Dolan--Mor\'e
-performance profiles. Alongside the test statistic $W$, we report the raw $p$-value, the
-Benjamini--Hochberg adjusted value $q_{\mathrm{BH}}$, and Cliff's $\delta$ as an effect
-size. The Benjamini--Hochberg correction is applied within each scenario (solver $\times$
+performance profiles. Two conventions of this test must be stated plainly. First, in
+pairs where exactly one side reaches the limit, that side enters at the capped time: the
+test is a Wilcoxon on \emph{capped} times, an approximation for censored data. The
+\emph{sign} of every such pair is nevertheless exact---the side that finished below the
+limit is faster whatever the censored value---so only the rank magnitudes of those pairs
+are approximate, and their number is small (zero to four pairs per scenario--class cell
+for the structure-aware variants, none in SG-Ter-Mer). Second, alongside the test statistic $W$ we report Cliff's
+$\delta$, computed between the two matched time vectors; $\delta$ is an unpaired effect
+measure and does not exploit the pairing, so we accompany it, wherever a paired effect is
+needed, with the median of the per-instance paired speedup ratios (equivalently, the
+median log time ratio), which is a genuinely paired effect size and is what the
+flat-control and ablation tables display. We also report the raw $p$-value and the
+Benjamini--Hochberg adjusted value $q_{\mathrm{BH}}$. The Benjamini--Hochberg correction is applied within each scenario (solver $\times$
 tolerance), over the family of all four scaled variants across the three instance classes
 (twelve paired tests); the tables display the two structure-aware variants, while
-$q_{\mathrm{BH}}$ reflects that full family. With the convention used here, negative values of $\delta$ indicate that the
+$q_{\mathrm{BH}}$ reflects that full family. In the synthetic benchmark, the adjustment is
+applied jointly over the $75$ paired condition-number comparisons---five variants against
+the base, five imbalance patterns, three severity levels---within the condition-number
+metric. With the convention used here, negative values of $\delta$ indicate that the
 variant tends to be faster than the base, whereas positive values indicate deterioration.
 
 A word on what the instances are replicates \emph{of}. The $204$, $68$, and $34$ instances
@@ -1744,18 +1799,28 @@ subsections retain them as returned, since filtering on an outcome correlated wi
 treatment would bias the runtime comparison. A \emph{reliability-adjusted} complement
 penalizes every such run as a computational failure at \PARten{} cost, exactly like a
 timeout (the base column is essentially unchanged by this adjustment: it passes at
-$97.1$--$100\%$ in the Gurobi scenarios). Under that harsher reading the SG-Ter-Mer
-advantage survives---\methodMat{} keeps the lowest \PARten{} ($558$ vs the base's $573$\,s
-at $1\%$, and $559$ vs $613$\,s at $0.1\%$, with a single penalized run per variant, each
-worth ${\sim}535$\,s of \PARten{} on this class size---the metric is deliberately
-coarse)---whereas the Simple and Full \PARten{} advantages do not (in Simple, $12$--$30$
-penalized runs per scaled variant put every variant above the base at both gaps; in Full,
+$97.1$--$100\%$ in the Gurobi scenarios). Because the strict criterion is absolute and
+therefore not invariant to the physical units of a row, we also report a third,
+\emph{mixed} absolute--relative reading: a run additionally passes when its residual is at
+most $10^{-6}$ relative to the magnitude of the violated row, so that a tolerance-level
+residual on a row of order $10^{8}$ is not treated like an operationally meaningful
+violation. The full per-variant breakdown---failure counts, median and maximum violations,
+and \PARten{} under all three readings for every scenario, class, and scaled
+variant---is Table~S2 of the Supporting Information. The three readings separate the
+classes cleanly. The SG-Ter-Mer exceedances are pure absolute-threshold artifacts on rows
+of large magnitude: under the mixed reading every failure vanishes and the
+reliability-adjusted \PARten{} returns to its intent-to-treat value, so the SG-Ter-Mer
+advantage survives all three readings (under the strict one, \methodMat{} still keeps the
+lowest \PARten{}, $558$ vs the base's $573$\,s at $1\%$ and $559$ vs $613$\,s at $0.1\%$,
+with a single penalized run per variant, each worth ${\sim}535$\,s of \PARten{} on this
+class size---the metric is deliberately coarse). The Simple and Full exceedances are
+mostly \emph{not} rescued by the mixed reading (their residuals exceed $10^{-6}$ in
+relative terms as well), so those \PARten{} advantages hold under intent-to-treat but
+under neither reliability-adjusted reading (in Simple, $12$--$30$ penalized runs per
+scaled variant put every variant above the base at both gaps; in Full,
 \methodAug{} moves from $3{,}308$ vs $3{,}385$\,s to $9{,}640$ vs $3{,}385$\,s at $1\%$).
-The two readings bracket the honest conclusion: the per-instance analysis above attributes
-the Simple and Full tails mostly to the absolute threshold on rows of large original
-magnitude (relative residuals at the $10^{-6}$ level), under which reading the
-intent-to-treat results stand; a reader who insists on the strict absolute criterion
-should weight the SG-Ter-Mer evidence, which survives both readings.
+A reader who weighs reliability strictly should therefore rest the Gurobi runtime case on
+SG-Ter-Mer.
 
 \begin{table*}[t]
 \centering
@@ -2199,30 +2264,34 @@ none & 0 & 1.34e3 & 1.26e4 & 2.49e3 & 1.19e4 & 1.09e3 & $2.27\times10^{-13}$ & $
 local & 3 & 1.84e8 & 1.44e4 & 4.68e3 & 3.51e4 & 1.07e3 & $2.91\times10^{-11}$ & $0$ \\
 local & 6 & 1.49e14 & 1.38e4 & 4.02e3 & 3.77e4 & 1.07e3 & $1.49\times10^{-8}$ & $0$ \\
 \addlinespace
-coupling & 3 & 6.86e5 & 5.56e5 & 2.53e3 & 5.56e5 & 1.22e3 & $1.43\times10^{-7}$ & $2.02\times10^{-6}$ \\
-coupling & 6 & 4.87e8 & 4.48e7 & 2.49e3 & 6.63e7 & 1.22e3 & $9.42\times10^{-1}$ & $2.03\times10^{-6}$ \\
+coupling & 3 & 6.86e5 & 3.47e4 & 2.53e3 & 6.06e4 & 1.22e3 & $1.16\times10^{-10}$ & $0$ \\
+coupling & 6 & 4.87e8 & 3.33e5 & 2.49e3 & 3.58e5 & 1.22e3 & $1.19\times10^{-7}$ & $2.03\times10^{-6}$ \\
 \addlinespace
-coupling-unif.$^{a}$ & 3 & 1.35e5 & 4.32e3 & 2.54e3 & 4.49e3 & 1.25e3 & $1.16\times10^{-10}$ & $0$ \\
-coupling-unif.$^{a}$ & 6 & 3.18e7 & 7.13e3 & 2.50e3 & 7.59e3 & 1.20e3 & $2.38\times10^{-7}$ & $3.27\times10^{-7}$ \\
+c.-unif., $\theta{>}1$ ($n{=}7$) & 3 & 3.16e5 & 3.99e3 & 2.57e3 & 4.52e3 & 1.05e3 & \multirow{2}{*}{$1.16\times10^{-10}$} & \multirow{2}{*}{$0$} \\
+c.-unif., $\theta{\le}1$ ($n{=}13$) & 3 & 4.11e4 & 4.82e3 & 2.51e3 & 4.46e3 & 1.30e3 & & \\
 \addlinespace
-mixed & 3 & 2.06e8 & 5.75e5 & 4.68e3 & 6.94e5 & 1.18e3 & $3.80\times10^{-10}$ & $0$ \\
-mixed & 6 & 1.52e14 & 2.38e8 & 4.02e3 & 2.38e8 & 1.22e3 & $8.59\times10^{-1}$ & $1.28\times10^{-7}$ \\
+c.-unif., $\theta{>}1$ ($n{=}7$) & 6 & 6.94e7 & 3.78e3 & 2.57e3 & 4.37e3 & 1.05e3 & \multirow{2}{*}{$2.38\times10^{-7}$} & \multirow{2}{*}{$3.27\times10^{-7}$} \\
+c.-unif., $\theta{\le}1$ ($n{=}13$) & 6 & 3.19e6 & 2.36e5 & 2.50e3 & 2.68e5 & 1.29e3 & & \\
+\addlinespace
+mixed & 3 & 2.06e8 & 5.00e4 & 4.68e3 & 4.86e4 & 1.18e3 & $5.82\times10^{-11}$ & $0$ \\
+mixed & 6 & 1.52e14 & 6.01e6 & 4.02e3 & 6.01e6 & 1.22e3 & $1.31\times10^{-6}$ & $1.28\times10^{-7}$ \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
 \emph{Notes.} Values are medians by pattern, severity, and variant, except for the two
 violation columns, which report worst original-scale violations in the corresponding
-pattern--severity cell. The grid contains 20 seeds per cell. The synthetic benchmark is a
+pattern--severity cell (the coupling-uniform cells are reported whole). The grid contains
+20 seeds per cell; the coupling-uniform rows are split by the direction of the shared
+factor $\theta$, with subgroup sizes in the row labels. Dispersion for the key contrast at
+$S=6$: \methodAug{} spans $[3.4,5.2]\times10^{3}$ (interquartile) on the oversized branch
+it repairs, and $[3.8\times10^{3},\,5.2\times10^{6}]$ on the undersized branch its
+one-sided trigger leaves untreated, whose pre-scaling spread is itself
+$[3.8\times10^{4},\,6.9\times10^{7}]$. The synthetic benchmark is a
 conditioning and reliability check, not a runtime benchmark. \methodRuizCols{} is omitted
 as a column: the synthetic instances carry no unit metadata, so its physical-normalization
-step is inert and it coincides with \methodRuiz{} everywhere.
-\emph{(a)} The coupling-uniform medians pool both directions of the shared factor; split
-by direction at $S=6$, the seven oversized instances ($\theta>1$) give \methodAug{}
-$6.9\times10^{7}\to3.8\times10^{3}$ (the coupling stage activates and repairs its design
-case), while the thirteen undersized ones ($\theta\le1$) give
-$3.2\times10^{6}\to2.4\times10^{5}$ (the one-sided $\widehat\rho>10$ trigger leaves them at
-base scale; see text). The two $v_{\mathrm{row}}$ entries of order one are genuine
-numerical-reliability events of the single-factor coupling variants, analyzed in the text.
+step is inert and it coincides with \methodRuiz{} everywhere. All $1800$ runs pass the
+original-scale verification with the reliability floor of \cref{subsec:safeguards} enabled
+(its ablation is analyzed in the text).
 \end{flushleft}
 \end{table*}
 
@@ -2256,61 +2325,75 @@ designs behave on the rows their taxonomy assigns to the coupling stage.
 
 There the two structure-aware coupling designs separate exactly where the analysis says
 they should. On \textit{coupling-uniform}, the collective displacement the block-relative
-stage is designed for, the stage activates and repairs it: on the oversized instances the
+stage is designed for, the stage activates and repairs its \emph{oversized} branch: the
 single factor \(\gamma\) drives the coupling proxy from
 \(\widehat\rho\approx10^{2}\)--\(10^{5}\) to \(\widehat\rho\approx1\) and the median
-\(\kappa\) from \(6.9\times10^{7}\) to \(3.8\times10^{3}\) at \(S=6\). Its activation rule
+\(\kappa\) from \(6.9\times10^{7}\) to \(3.8\times10^{3}\) at \(S=6\) on the \(\theta>1\)
+subgroup. The activation rule
 is one-sided by design---the stage fires only when the coupling rows are \emph{large}
-relative to the blocks (\(\widehat\rho>10\))---so the undersized instances are left at
+relative to the blocks (\(\widehat\rho>10\))---so the undersized subgroup is left at
 base scale (\(3.2\times10^{6}\to2.4\times10^{5}\)), which the per-row treatments repair
-(\methodMat{} \(2.5\times10^{3}\), flat \(1.3\times10^{3}\)). On the heterogeneous
+(\methodMat{} \(2.5\times10^{3}\), flat \(1.3\times10^{3}\)). The stage is therefore
+validated for oversized collective coupling imbalance only; a symmetric or trigger-free
+variant (letting the minimization of \(\Phi\) decide the direction) is untested design
+space, and not trivially safe to adopt: operationally the Simple class sits deep in the
+undersized regime (\(\widehat\rho\approx3\times10^{-4}\)), where the one-sided rule keeps
+the stage silent and the ablation shows that silence costs nothing there
+(\cref{subsec:stage-attribution}). On the heterogeneous
 \textit{coupling} pattern the single collective factor cannot compress the spread
-\emph{among} the coupling rows, and \methodAug{}'s median \(\kappa\) stays within an order
-of magnitude of the unscaled value while \methodMat{} and the flat kernel recover fully:
+\emph{among} the coupling rows: with the reliability floor of \cref{subsec:safeguards}
+protecting the individually small rows, \methodAug{} recovers partially
+(\(4.9\times10^{8}\to3.3\times10^{5}\) at \(S=6\)) while \methodMat{} and the flat kernel
+recover fully (\(2.5\times10^{3}\) and \(1.2\times10^{3}\)):
 the per-row versus collective design choice, not the metadata itself, is what the coupling
 patterns discriminate. Two further observations keep the attribution honest. First, the
 Ruiz variants run inside the same pipeline (their kernel replaces the local stage; the
 coupling stage is shared), so they track \methodAug{} on the coupling patterns and differ
-only on block rows. Second, the negative control now exposes a coverage cost of
+only on block rows. Second, the negative control exposes a coverage cost of
 selectivity: rescaling the block rows while the role-classified rows keep their natural
 scale widens the exported range by about an order of magnitude on \textit{none}
 (\methodAug{} \(1.3\times10^{3}\to1.3\times10^{4}\)), a small but statistically significant
 worsening that full coverage avoids.
 
-The severe heterogeneous cells also produce genuine numerical-reliability events, and they
-are informative rather than embarrassing. In the \textit{coupling} and \textit{mixed}
-cells at \(S=6\), the single-factor variants (\methodAug{} and the Ruiz family, which
-share the coupling stage) fail original-scale verification on \(29\) of the \(1800\) runs,
-with row violations up to \(9.4\times10^{-1}\) and cross-variant objective spreads beyond
-the MIPGap on \(10\) of \(300\) instances; \methodMat{}, the flat control, and the base
-never fail. The mechanism is exactly the \(\varepsilon/d_r\) mapping of
+The severe heterogeneous cells also identify a genuine \emph{failure mode} of the
+common-factor design, which motivated the reliability floor of \cref{subsec:safeguards}.
+With the floor disabled, the single-factor variants (\methodAug{} and the Ruiz family,
+which share the coupling stage) fail original-scale verification on \(29\) of the \(1800\)
+runs in the \textit{coupling} and \textit{mixed} cells at \(S=6\), with row violations up
+to \(9.4\times10^{-1}\) and cross-variant objective spreads beyond the MIPGap on \(10\) of
+\(300\) instances; \methodMat{}, the flat control, and the base never fail. The mechanism
+is exactly the \(\varepsilon/d_r\) mapping of
 \cref{subsec:original-scale-audit}: the collective coupling scale is genuinely of order
 \(10^{5}\)--\(10^{6}\), so the admitted factor \(\gamma\) is legitimately small, and on
 the coupling rows that were \emph{individually} small it pushes the scaled row into the
 regime where the solver's absolute feasibility tolerance maps back to order one in
 original units---the solver returns claimed-optimal solutions that violate the original
-row. Per-row normalization never enters this regime, because it brings each row to order
-one individually. The synthetic benchmark thus reproduces, under controlled conditions,
-the reliability mechanism the operational audit measures, and it does so precisely for
-the design (a collective factor over heterogeneous rows) that the conditioning columns
-already flag as inadequate. Outside those two cells the checks are clean: the maximum
-row violation is \(2.4\times10^{-7}\), the maximum integrality violation
-\(2.0\times10^{-6}\), and every cross-variant objective spread is below the MIPGap.
+row. A factor fitted to the most extreme rows must not be allowed to determine the scale
+of rows it does not fit; per-row normalization never enters this regime, because it brings
+each row to order one individually. With the floor enabled (the default), the failure mode
+is eliminated---all \(1800\) runs pass verification, the worst row violation is
+\(1.3\times10^{-6}\), every cross-variant objective spread is below the MIPGap---and the
+partial recovery on the heterogeneous cells even improves, since the large rows are still
+repaired while the fragile ones stay at their benign base scale. The synthetic benchmark
+thus reproduces, under controlled conditions, the reliability mechanism the operational
+audit measures, and turns it into a designed safeguard.
 
 This is the empirical bridge promised in \cref{subsec:ideal-to-proxies}, and it answers the
 natural worry that the idealized propositions---stated for square, nonsingular blocks under
 exact SVD scaling---say little about a rule built from cheap coefficient proxies on
 rectangular, inequality-based matrices. The per-row proxy responds to precisely the
 imbalance the analysis isolates, and the coupling stage realizes the trade-off of
-\cref{prop:triangular-coupling} on its design case: it drives the block-relative proxy to
-order one and recovers the conditioning there, while declining, by its one-sided trigger,
-the cases outside that design. The scope of the check is therefore bounded and explicit:
-the synthetic benchmark validates the shared per-row normalization kernel under controlled
-row-scale imbalance, and it validates the block-relative coupling stage only on its
-collective design case; phenomena beyond row-multiplicative imbalance---scale separation
+\cref{prop:triangular-coupling} on the branch it treats: it drives the block-relative proxy
+to order one and recovers the conditioning there. The scope of the check is therefore
+bounded and explicit:
+the synthetic suite validates the shared per-row normalization kernel under
+row-multiplicative imbalance, and it exercises the common block-relative coupling factor
+only on the \emph{oversized} branch of its collective design case; the undersized branch,
+severe inter-row heterogeneity, and phenomena beyond row-multiplicative
+imbalance---scale separation
 between blocks with ill-conditioned interiors, column imbalance, or rows with identical
-coefficient extremes but different roles---are not exercised and are natural extensions of
-the generator.
+coefficient extremes but different roles---are either untreated by design or not exercised,
+and are natural extensions of the generator.
 
 Taken together, the four operational scenarios and the controlled synthetic check support a limited but useful interpretation. Under Gurobi, the structured preprocessing rules improve the numerical representation and often reduce solver time or deterministic effort. Under CPLEX, the same external transformations do not produce a robust runtime benefit and can be indistinguishable from, or worse than, the base in paired runtime evidence, even when some numerical diagnostics improve. The empirical message is therefore not that one scaling rule always wins. It is that generator-level structure can matter for the numerical representation the solver sees, while whether that translates into performance must be measured through the full solver--model interaction rather than assumed from the metadata (\cref{subsec:stage-attribution}).
 
@@ -2494,8 +2577,8 @@ full architecture ($\sgm$ $2.02$ at $1\%$, matching $2.01$ and $2.02$; the same 
 so the row-role metadata adds nothing to runtime there. In SG-Ter-Mer it is markedly
 \emph{faster} than either: $\sgm$ $5.25$ against $8.38$ for both the full rule and local-only
 at $1\%$ (paired speedup $1.85\times$ versus $1.22\times$, Cliff's $\delta=-0.64$), and
-$5.81$ against $9.23$ at $0.1\%$, at the same original-scale equivalence as the other
-variants. In Full the outcome \emph{reverses}: blanket application of the same kernel is
+$5.81$ against $9.23$ at $0.1\%$, with the same original-scale verification behavior as the
+other variants. In Full the outcome \emph{reverses}: blanket application of the same kernel is
 slower than the role-informed rule ($\sgm$ $85.2$ against $71.8$ at $1\%$, paired speedup
 $1.13\times$ against $1.38\times$; the flat kernel is slower on $21$ of $31$ optimal pairs,
 median ratio $1.09$, and the direction persists at $0.1\%$), so on the most integrated class
@@ -2631,7 +2714,7 @@ Algebraic equivalence & Positive factors multiply complete constraints; post-sol
 Numerical representation & Structure-aware variants reduce solver-facing conditioning diagnostics in the harder classes. & Conditioning diagnostics describe representation; they do not prove faster MIP search. \\
 Gurobi performance & Per-row local scaling improves robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The lever is the per-row kernel; the role metadata's runtime effect is class-dependent---a role-blind flat control ties in Simple, wins in SG-Ter-Mer, and loses in Full (\cref{tab:flat-control})---and the claim is conditional on the tested pipeline. \\
 Solver dependence & CPLEX remains near parity or deteriorates in paired runtime evidence, even when some numerical diagnostics improve. & The result is tied to CPLEX 22.1.2.0, default settings, and the ClusterUY environment. \\
-Generalization & Generator-level block information can guide numerical preprocessing before export; the synthetic benchmark injects local and coupling imbalance by construction, validates the per-row kernel throughout, and validates the coupling stage on its collective design case. & Runtime evidence still comes from one hydrothermal dispatch platform; the synthetic benchmark is a mechanism check restricted to row-multiplicative imbalance, not a performance benchmark. \\
+Generalization & Generator-level block information can guide numerical preprocessing before export; the synthetic benchmark injects local and coupling imbalance by construction, validates the per-row kernel throughout, and exercises the coupling stage on the oversized branch of its collective design case. & Runtime evidence still comes from one hydrothermal dispatch platform; the synthetic benchmark is a mechanism check restricted to row-multiplicative imbalance, not a performance benchmark. \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
@@ -2692,9 +2775,12 @@ solver-level conditioning ratios below the Ruiz and unscaled baselines; but that
 through the local stage, whose kernel is itself role-blind, and the synthetic benchmark
 bounds the claim exactly: there the full-coverage flat kernel matches or beats every
 structure-aware variant on the global coefficient range---as it must, since every injection
-is a positive row multiplier---while the coupling stage's distinctive contribution is
-confined to its collective design case (\cref{subsec:synthetic-results}). No conditioning
-advantage over a role-blind kernel is therefore claimed: the metadata's operational
+is a positive row multiplier---while the coupling stage's distinctive repair is
+confined to the oversized branch of its collective design case
+(\cref{subsec:synthetic-results}). The coupling metadata make the collective-factor
+intervention \emph{possible}; the benchmark validates that intervention only for oversized
+uniform coupling displacement, and it does not establish a general conditioning advantage
+of metadata over full-coverage per-row scaling. The metadata's operational
 contribution is \emph{selection}---where to apply the kernel---and becomes runtime-visible
 only where the taxonomy's coverage genuinely differs from full coverage
 (\cref{tab:flat-control}).
@@ -2732,8 +2818,11 @@ contrast---and never on one coefficient-range statistic or one runtime table. Th
 all four layers and keeps their claims separate.
 
 The controlled synthetic benchmark closes part of the gap: when the source of imbalance is known
-by construction, the variants respond as intended and preserve original-scale feasibility and
-objective values. It does not close the performance gap---the synthetic instances solve in
+by construction, the variants respond as intended at the level of conditioning, and with the
+reliability floor in place original-scale feasibility and objective agreement hold across the
+grid; the same severe heterogeneous coupling cells expose, with the floor disabled, the
+numerical-reliability failure mode of the common-factor variants
+(\cref{subsec:synthetic-results}). It does not close the performance gap---the synthetic instances solve in
 milliseconds---so runtime claims still come from operational instances, and the operational
 stage ablation (\cref{subsec:added-controls}) separates local-row normalization from the
 coupling-row treatment on real data. Other domains (logistics, production planning, network
@@ -2837,8 +2926,19 @@ Seed-replicated runs would nonetheless be a stronger control and are left as fut
 The numerical diagnostics have limited reach: exported coefficient ranges are static matrix
 summaries, and solver-level conditioning depends on the state the solver exposes and on auxiliary
 fixed-integer LP computations; neither measures full MIP difficulty. The paper therefore reports
-original-scale feasibility, integrality after descaling, objective checks, performance profiles,
+original-scale feasibility, integrality in original variable units, objective checks, performance profiles,
 deterministic effort, paired tests, and primal--dual progress as complementary evidence.
+
+A related limitation is that the selective rule carries no global acceptance test: it can
+degrade an already well-scaled representation even when every individual factor passes the
+per-factor safeguards, as the synthetic negative control shows (\methodAug{} widens the
+exported range about tenfold on \textit{none}, \cref{tab:synthetic_compact}). An acceptance
+rule---scale provisionally, recompute the diagnostic, keep the transformation only if it
+does not worsen---would prevent this by construction, but it is not innocuous to bolt on:
+keyed to the exported range, it would have rejected the scaling on roughly a third of the
+operational structured runs, many of which nevertheless ran faster, precisely because the
+exported range is a weak predictor of runtime (\cref{tab:gurobi-conditioning-correlations}).
+Designing an acceptance diagnostic that tracks the runtime-relevant effect is left open.
 
 Finally, the experiments use operational data whose raw inputs may not be fully redistributable,
 so the reproducibility package includes public code, aggregate results, paired-instance
