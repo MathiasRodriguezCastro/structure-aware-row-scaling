@@ -121,7 +121,7 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) are usually exported to solvers as flat coefficient matrices, yet the generator that builds them knows which rows are local to a component, which variables it owns, and which rows couple components. We ask whether this pre-export metadata can drive positive row scaling without changing the program. We propose a structure-aware row-scaling framework for block-structured MIPs: complete constraints, including right-hand sides, are multiplied by strictly positive factors, preserving the feasible set, objective, and integer restrictions exactly. The contribution is not row scaling itself but using generator metadata to order it---local rows, then block scales, then coupling rows relative to the blocks they connect. We evaluate the method on a hydrothermal dispatch platform emitting modular MIPs, treated as a generated block-structured testbed; the only metadata required are row roles, block ownership, and coupling incidence. Across three instance classes, two solvers, and two tolerances, positive row scaling is algebraically exact, structure-aware scaling robustly improves solver-facing numerical diagnostics, and runtime drops under Gurobi but not robustly under CPLEX. A role-blind control, however, locates the runtime effect in complete per-row scaling rather than in the metadata: the same kernel on every row matches the structure-aware rule on the simpler class and beats it on the coupled one. On operational data even the conditioning gain flows through that role-blind kernel; the metadata's distinctive contribution---separating local from coupling imbalance---is isolated only on a controlled synthetic benchmark. The method is thus best read as a structure-aware preprocessing layer whose practical lever is complete per-row normalization, not a solver-independent acceleration theorem.
+Generated mixed-integer programs (MIPs) are usually exported to solvers as flat coefficient matrices, yet the generator that builds them knows which rows are local to a component, which variables it owns, and which rows couple components. We ask whether this pre-export metadata can drive positive row scaling without changing the program. We propose a structure-aware row-scaling framework for block-structured MIPs: complete constraints, including right-hand sides, are multiplied by strictly positive factors, preserving the feasible set, objective, and integer restrictions exactly. The contribution is not row scaling itself but using generator metadata to order it---local rows, then block scales, then coupling rows relative to the blocks they connect. We evaluate the method on a hydrothermal dispatch platform emitting modular MIPs, treated as a generated block-structured testbed; the only metadata required are row roles, block ownership, and coupling incidence. Across three instance classes, two solvers, and two tolerances, positive row scaling is algebraically exact, structure-aware scaling robustly improves solver-facing numerical diagnostics, and runtime drops under Gurobi but not robustly under CPLEX. A role-blind control locates the lever in the per-row kernel itself and shows that role selectivity is class-dependent: applied to every row, the kernel ties the structure-aware rule on the simplest class, beats it on the coupled one (whose worst-scaled rows the role-based rule misses), and loses on the most integrated one. The conditioning gain on operational data also flows through that kernel; the metadata's distinctive contribution---separating local from coupling imbalance---is isolated only on a controlled synthetic benchmark. The method is best read as a structure-aware preprocessing layer, not a solver-independent acceleration theorem.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -139,10 +139,10 @@ Generated mixed-integer programs (MIPs) are usually exported to solvers as flat 
   a flat export discards but that can drive numerical preprocessing.
   \item Positive, structure-keyed row factors applied in a local--block--coupling order improve
   the solver-facing representation without changing the MIP.
-  \item The runtime lever, in the two classes where we ran a role-blind control, is
-  \emph{complete} per-row normalization, not the row-role metadata: a rule that scales only the
-  rows it recognizes by role can miss the worst-scaled rows, so a practical layer should cover
-  every row rather than rely on role sophistication.
+  \item The runtime lever is per-row normalization; whether roles should gate it is
+  class-dependent. A role-blind control ties the structure-aware rule on the simplest class,
+  beats it on the coupled class (the role-based rule missed the worst-scaled rows), and loses
+  on the most integrated one---so coverage and selectivity must be measured, not assumed.
   \item The runtime benefit is also solver-dependent---present under Gurobi, absent under
   CPLEX---so scaling gains should be validated per solver, not assumed.
 \end{itemize}
@@ -190,12 +190,12 @@ The paper contributes five elements: an algebraically exact positive row-scaling
 generated block-structured MIPs; a structure-aware rule that uses row roles, component
 ownership, and coupling incidence; idealized conditioning arguments that motivate the
 local--block--coupling order; an empirical evaluation that separates numerical
-representation from solver-dependent performance; and, from a role-blind control, the
-practical finding that in the two classes where we ran it (Simple and SG-Ter-Mer, under
-Gurobi) a complete per-row normalization matches or beats the structure-aware rule on runtime,
-because the role-based rule leaves the highest-magnitude rows---neither local nor
-coupling---unscaled, so completeness of coverage, not role sophistication, drives the runtime
-gain (untested on the Full class). \Cref{fig:overview} summarizes the
+representation from solver-dependent performance; and, from a role-blind control run on all
+three classes under Gurobi, the practical finding that the coverage-versus-selectivity choice
+is class-dependent: a complete per-row normalization ties the structure-aware rule in Simple,
+beats it in SG-Ter-Mer---where the role-based rule leaves the highest-magnitude rows, neither
+local nor coupling, unscaled---and loses to it in Full, where role-informed selectivity
+retains a runtime edge. \Cref{fig:overview} summarizes the
 contribution at a glance.
 
 \begin{figure}[t]
@@ -2264,8 +2264,9 @@ The synthetic benchmark isolates local and coupling imbalance by construction; t
 operational ablation of \cref{subsec:added-controls} does the same on the real
 hydrothermal classes by running the local-only and coupling-only variants alongside the
 full architecture under Gurobi. \Cref{tab:stage-ablation} reports the result for the three
-classes at the $1\%$ tolerance (for Simple and SG-Ter-Mer, the $0.1\%$ tolerance shows the
-same ordering). In the Full class several instances reach the one-hour limit under every
+classes at the $1\%$ tolerance (the $0.1\%$ tolerance shows the
+same ordering in all three classes; in Full, local-only $326$ against $326$\,s for the full
+rule and coupling-only $376$ at the base's $374$\,s). In the Full class several instances reach the one-hour limit under every
 variant, so its $\sgm$ is computed over the solved subset and \PARten{} carries the
 censoring.
 
@@ -2319,8 +2320,8 @@ attribution is likewise carried by $\sgm$ over the solved subset.
 \end{threeparttable}
 \end{table*}
 
-The attribution is unambiguous and consistent across the three classes (and, for Simple and
-SG-Ter-Mer, both tolerances): the
+The attribution is unambiguous and consistent across the three classes and both
+tolerances: the
 local-only variant recovers essentially the full benefit (Simple $\sgm$ $3.73\!\to\!2.01$
 against $2.02$ for the full rule; Full $82.55\!\to\!70.94$ against $71.41$; SG-Ter-Mer
 $14.42\!\to\!8.58$ against $8.55$), whereas the
@@ -2332,13 +2333,17 @@ Because the local stage is, in isolation, a per-row geometric mean of the coeffi
 extremes---a kernel computable from the flat matrix without any row-role information---the
 natural sharpening of this control is to apply that same kernel to \emph{every} row, with no
 roles and no coupling stage. \Cref{tab:flat-control} reports this
-role-blind variant. In Simple it is indistinguishable from the local-only rule and from the
+role-blind variant, run on all three classes. In Simple it is indistinguishable from the local-only rule and from the
 full architecture ($\sgm$ $2.02$ at $1\%$, matching $2.01$ and $2.02$; the same at $0.1\%$),
 so the row-role metadata adds nothing to runtime there. In SG-Ter-Mer it is markedly
 \emph{faster} than either: $\sgm$ $5.25$ against $8.38$ for both the full rule and local-only
 at $1\%$ (paired speedup $1.85\times$ versus $1.22\times$, Cliff's $\delta=-0.64$), and
 $5.81$ against $9.23$ at $0.1\%$, at the same original-scale equivalence as the other
-variants.
+variants. In Full the outcome \emph{reverses}: blanket application of the same kernel is
+slower than the role-informed rule ($\sgm$ $85.2$ against $71.8$ at $1\%$, paired speedup
+$1.13\times$ against $1.38\times$; the flat kernel is slower on $21$ of $31$ optimal pairs,
+median ratio $1.09$, and the direction persists at $0.1\%$), so on the most integrated class
+the role-based selection of which rows to scale retains a runtime edge.
 
 Exporting the scaled matrices identifies the mechanism precisely, and it is not the coupling
 treatment. In SG-Ter-Mer the model has $2160$ global rows: $360$ demand-balance
@@ -2357,22 +2362,28 @@ in the matrix. The flat kernel, scaling every row by $1/\sqrt{M_r m_r}$ over its
 lowers the exported coefficient-and-right-hand-side range ratio from $3.7\times10^{11}$ to
 $1.3\times10^{10}$, and it is the
 only difference between the two scaled matrices. The runtime lever under Gurobi is therefore
-\emph{complete} per-row normalization: the structure-aware decomposition into local and
+per-row normalization, but \emph{where} to apply it is class-dependent. In SG-Ter-Mer the
+structure-aware decomposition into local and
 coupling roles left a coverage gap over exactly the highest-magnitude rows, and the role-blind
-kernel wins by closing it, without using any metadata. The structure-aware rules do improve
+kernel wins by closing it, without using any metadata. In Full, by contrast, scaling every
+row indiscriminately is counterproductive and the role-informed selection wins; we did not
+isolate which rescalings the flat kernel overshoots there, so the Full mechanism, unlike the
+SG-Ter-Mer one, remains undiagnosed. Neither blanket coverage nor role selectivity dominates
+across classes: the control makes the trade-off measurable. The structure-aware rules do improve
 the solver-facing conditioning diagnostics (\cref{tab:gurobi-gap0001-relative-conditioning}),
 but on these operational classes that gain comes from the \emph{local} stage: in the ablation
 runs the coupling-only variant leaves the solver-level conditioning ratio at one (recorded in
 the reproducibility artifacts; it is inert
 in both conditioning and runtime here), while the coupling treatment's ability to repair
 injected coupling imbalance is what the controlled synthetic \textit{coupling} pattern
-(\cref{subsec:synthetic-results}) demonstrates. Neither the conditioning improvement nor the
-runtime gain, then, is driven by the coupling metadata on the operational testbed. This is the
+(\cref{subsec:synthetic-results}) demonstrates. The coupling metadata drives neither the
+conditioning improvement nor the runtime gain on the operational testbed; the row-role
+metadata, used as a \emph{selection filter} for the per-row kernel, has a class-dependent
+runtime effect---absent in Simple, negative in SG-Ter-Mer, positive in Full. This is the
 cleanest form of the dissociation developed in
 \cref{sec:discussion}: the rule that best improves solver-facing conditioning is not the rule
-that solves fastest. The demonstrated value of the generator metadata is in the numerical
-representation; the practical accelerator is a role-blind, full-coverage normalization the
-metadata is not needed to build.
+that solves fastest, and the metadata's runtime role is an empirical selectivity choice
+rather than the source of a uniform gain.
 
 \begin{table}[t]
 \centering
@@ -2398,13 +2409,21 @@ Class & Variant & {$\sgm$ (s)} & {sp.\ vs base} & {Cliff's $\delta$} \\
  & \methodAug{} (full)        & 9.23 & 1.20 & $-0.37$ \\
  & \methodAug{}, local only   & 9.22 & 1.18 & $-0.34$ \\
  & Flat (role-blind)          & \bfseries 5.81 & \bfseries 1.86 & $\mathbf{-0.61}$ \\
+\addlinespace
+\multirow{3}{*}{Full, $1\%$}
+ & \methodAug{} (full)        & \bfseries 71.77 & \bfseries 1.38 & $\mathbf{-0.38}$ \\
+ & \methodAug{}, local only   & 71.84 & 1.38 & $-0.38$ \\
+ & Flat (role-blind)          & 85.23 & 1.13 & $-0.19$ \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]\footnotesize
 \item The flat control passes the original-scale equivalence checker at the same rate as
 the other variants (\cref{subsec:original-scale-audit}); its speedup is not an artifact of a
 different or easier optimum. At $0.1\%$ Simple the pattern is the same as at $1\%$ and is
-omitted. This is an independent paired batch, so the \methodAug{} (full) and local-only $\sgm$
+omitted; at $0.1\%$ Full the direction also persists over the $30$ of $34$ instances
+completed within the campaign budget ($\sgm$ $262$ for \methodAug{} vs $298$ for the flat
+kernel; paired median ratio $1.14$, flat slower on $17$ of $27$ optimal pairs). This is an
+independent paired batch, so the \methodAug{} (full) and local-only $\sgm$
 differ slightly from \cref{tab:stage-ablation} ($8.38$ here vs $8.55/8.58$\,s in SG-Ter-Mer) by
 run-to-run variability (\cref{sec:validity}); all comparisons are within-table.
 \end{tablenotes}
@@ -2480,7 +2499,7 @@ Claim & Evidence in this study & Limitation \\
 \midrule
 Algebraic equivalence & Positive factors multiply complete constraints; post-solve checks evaluate feasibility, integrality, and objectives in the original scale. & This claim concerns the mathematical MIP, not the path followed by branch-and-bound. \\
 Numerical representation & Structure-aware variants reduce solver-facing conditioning diagnostics in the harder classes. & Conditioning diagnostics describe representation; they do not prove faster MIP search. \\
-Gurobi performance & Per-row local scaling improves robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The lever is the per-row kernel, not the row-role metadata: a role-blind flat control matches or beats the structure-aware rule on runtime in Simple and SG-Ter-Mer (\cref{tab:flat-control}; not run on Full); the claim is conditional on the tested pipeline. \\
+Gurobi performance & Per-row local scaling improves robust runtime or deterministic-effort metrics in the main Gurobi scenarios. & The lever is the per-row kernel; the role metadata's runtime effect is class-dependent---a role-blind flat control ties in Simple, wins in SG-Ter-Mer, and loses in Full (\cref{tab:flat-control})---and the claim is conditional on the tested pipeline. \\
 Solver dependence & CPLEX remains near parity or deteriorates in paired runtime evidence, even when some numerical diagnostics improve. & The result is tied to CPLEX 22.1.2.0, default settings, and the ClusterUY environment. \\
 Generalization & Generator-level block information can guide numerical preprocessing before export; the synthetic benchmark injects local and coupling imbalance by construction and confirms the intended conditioning response. & Runtime evidence still comes from one hydrothermal dispatch platform; the synthetic benchmark is a mechanism check, not a performance benchmark. \\
 \bottomrule
@@ -2532,9 +2551,11 @@ of the exported matrix cannot summarize \cite{miltenberger2018numerics}.
 We therefore present conditioning as evidence that the representation improved, not as the
 proven cause of the speedup. The role-blind flat control (\cref{tab:flat-control}) makes the
 dissociation sharpest: applying the plain per-row kernel to every row, with no metadata,
-matches the structure-aware rule in Simple and beats it in SG-Ter-Mer, so the rule that most
-improves conditioning is not the one that solves fastest, and the runtime accelerator is a
-cheap normalization that does not need the row roles. The structure-aware rules do lower the
+matches the structure-aware rule in Simple and beats it in SG-Ter-Mer---while in Full the
+role-informed selection keeps a runtime edge over the blanket kernel---so the rule that most
+improves conditioning is not the one that solves fastest, and the runtime accelerator is the
+cheap per-row normalization itself, with the row roles acting only as a class-dependent
+selection filter. The structure-aware rules do lower the
 solver-level conditioning ratios below the Ruiz and unscaled baselines; but on the operational
 classes that gain flows through the local stage, whose kernel is itself role-blind (a per-row
 geometric mean the flat control reproduces), and we do not measure whether a full-coverage
@@ -2707,13 +2728,15 @@ Ruiz in SG-Ter-Mer); on the operational classes that gain flows through the role
 kernel, so the metadata's \emph{distinctive} contribution---the local-versus-coupling
 separation---is isolated only on the synthetic pattern built to exercise it. On the
 \emph{runtime} side the attribution is more sober. The stage ablation locates the Gurobi speedup in the local stage,
-and the role-blind flat control (\cref{tab:flat-control}) shows that the same per-row kernel
-applied to every row, with no metadata, matches the structure-aware rule in Simple and is
-substantially faster in SG-Ter-Mer---because the role-based rule left a coverage gap over the
-high-magnitude global rows that belong to no local block and are not coupling rows, exactly
-the rows the flat kernel reaches. The practical accelerator is therefore a cheap, complete
-per-row normalization that does not require the row roles, and the structure metadata, valuable
-for the representation, is not the source of the runtime gain. Establishing even this bounded result
+and the role-blind flat control (\cref{tab:flat-control}) shows that the row roles act as a
+class-dependent selection filter for the same per-row kernel: applied to every row with no
+metadata, the kernel matches the structure-aware rule in Simple, is substantially faster in
+SG-Ter-Mer---the role-based rule left a coverage gap over the high-magnitude global rows that
+belong to no local block and are not coupling rows, exactly the rows the flat kernel
+reaches---and is slower in Full, where the role-informed selection retains the edge. The
+practical accelerator is therefore the cheap per-row normalization itself; the metadata does
+not produce a uniform runtime gain, but deciding \emph{where} to apply the kernel is an
+empirical choice per class that the flat control makes measurable. Establishing even this bounded result
 required separating four kinds of evidence---algebraic equivalence, original-scale feasibility,
 solver-facing diagnostics, and matched per-solver runtime---which is as much a methodological
 takeaway as the scaling rule itself: the rule that best conditions the matrix is not the rule
@@ -2721,13 +2744,14 @@ that solves fastest, and only matched per-solver runtime tells them apart.
 
 Future work should test the mechanism beyond hydrothermal dispatch---larger synthetic suites
 and applications in logistics, production planning, and network design would show whether the
-pattern persists as the engineering structure changes---and should extend the role-blind
-control to the Full class, on which it was not run (\cref{tab:flat-control} covers Simple and
-SG-Ter-Mer). A concrete lesson for structure-driven
-preprocessing already follows from the coverage gap identified in those two classes: a rule
-that scales only the rows it recognizes by role can silently miss the worst-scaled rows, so
-completeness of coverage, not role sophistication, is what a practical scaling layer should
-guarantee.
+pattern persists as the engineering structure changes---and should diagnose why blanket
+per-row scaling overshoots on the Full class, the one cell whose mechanism, unlike the
+SG-Ter-Mer coverage gap, remains unexplained. Two concrete lessons for structure-driven
+preprocessing already follow: a rule
+that scales only the rows it recognizes by role can silently miss the worst-scaled rows, and a
+rule that scales every row indiscriminately can overshoot on integrated models---so neither
+completeness of coverage nor role sophistication should be assumed; a practical scaling layer
+should measure both, exactly as the role-blind control does here.
 
 % Float barrier removed to improve two-column layout.
 
