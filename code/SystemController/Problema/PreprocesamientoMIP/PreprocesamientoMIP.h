@@ -51,6 +51,13 @@ struct PreprocesamientoConfig {
     /// el γ colectivo, fijado por las filas grandes, puede empujar una fila individualmente
     /// chica al régimen frágil sin este piso (visto en el benchmark sintético, coupling S=6).
     double pisoMagnitudGammaColectivo = 1e-3;
+    /// Piso de magnitud escalada para los factores LOCALES AUMENTADOS de SA-Aug (α_r con |RHS|
+    /// en los extremos). Cuando el lado derecho domina la fila, α_r puede dejar el mayor |coef|
+    /// (sin contar |RHS|) por debajo de la tolerancia del solver → el residuo original se
+    /// amplifica (fallos de verificación de Simple/Full). Si >0, α_r se aplica solo si el mayor
+    /// |coef| escalado (excluyendo |RHS|) queda >= este piso; si no, la fila queda a escala base.
+    /// Default 0 = DESHABILITADO (byte-idéntico; el kernel matricial no lo necesita, no usa RHS).
+    double pisoMagnitudFactorLocal = 0.0;
 };
 
 /**

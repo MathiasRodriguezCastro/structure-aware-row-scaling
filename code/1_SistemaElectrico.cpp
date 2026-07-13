@@ -941,6 +941,12 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     if (!parseDoubleStrict(args[++i], _emax, "--ventana-coef ε_max")) return;
                     cfg.epsMinCoef = _emin;
                     cfg.epsMaxCoef = _emax;
+                } else if (args[i] == "--piso-local" && i + 1 < args.size()) {
+                    // Piso de confiabilidad para los factores locales AUMENTADOS de SA-Aug
+                    // (protege filas con |RHS| dominante). Opt-in; 0 = inactivo.
+                    double _piso;
+                    if (!parseDoubleStrict(args[++i], _piso, "--piso-local")) return;
+                    cfg.pisoMagnitudFactorLocal = std::max(0.0, _piso);
                 } else if (args[i] == "--solo-local") {
                     // R5 (ablación): solo etapa local (fila/bloque), sin escalado de acoplamiento.
                     cfg.aplicarEscalamientoLocal  = true;

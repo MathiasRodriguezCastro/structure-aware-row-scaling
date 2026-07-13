@@ -779,6 +779,14 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
                     if (filaMax <= 0.0 || filaMin <= 0.0 || filaMin >= 1e300)
                         continue;
                     alpha = 1.0 / sqrt(filaMax * filaMin);
+                    // Piso de confiabilidad LOCAL (opt-in): el residuo en escala original de una
+                    // fila escalada por d_r queda acotado por ε_solver/d_r (la solución cumple la
+                    // fila escalada a tolerancia ε; al desescalar se amplifica por 1/d_r). Cuando
+                    // |RHS| domina los extremos, α_r se vuelve diminuto y amplifica el residuo
+                    // (fallos de Simple/Full). El piso acota d_r≥piso ⇒ residuo≤ε_solver/piso, sin
+                    // referir a ε_solver: si α_r<piso la fila queda a escala base. Default 0=inactivo.
+                    if (cfg.pisoMagnitudFactorLocal > 0.0 && alpha < cfg.pisoMagnitudFactorLocal)
+                        continue;
                 }
                 if (alpha > 0.5 && alpha < 2.0)
                     continue;
