@@ -1,4 +1,4 @@
-# Structure-Aware Row Scaling for Block-Structured Mixed-Integer Programs
+# Coverage versus Selectivity in Pre-Export Row Scaling for Generated Mixed-Integer Programs
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20648950.svg)](https://doi.org/10.5281/zenodo.20648950)
 
