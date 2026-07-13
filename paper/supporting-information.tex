@@ -223,10 +223,11 @@ $10^{-5}$         & $2.1\times10^{6}$ & $5.4\times10^{3}$ & $3.0\times10^{6}$ & 
 
 \begin{table}[!htbp]
 \centering
-\caption{Optional local reliability floor for \methodAug{}, evaluated on the twelve Simple
+\caption{Optional local reliability floor (\methodAug{}-LF), evaluated on the twelve Simple
 instances (Gurobi, $1\%$ MIPGap) whose \methodAug{} runs fail original-scale verification.
-The floor requires the applied local factor $d_r\ge\varepsilon_{\mathrm{floor}}$, bounding
-the original-scale residual by $\varepsilon_{\mathrm{solver}}/\varepsilon_{\mathrm{floor}}$;
+The floor applies the local factor only if $\alpha_r^{A,b}\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$,
+so $d_r\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ bounds the conditional
+original-scale residual by $\varepsilon/\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$;
 rows below the floor stay at base scale. $n_{\mathrm{fail}}$ is the number of the twelve runs
 failing the strict absolute criterion; $\sigma_{\mathrm{gm}}$ is the shifted geometric mean
 solver time ($s=1$\,s); $\kappa^{\mathrm{post}}$ is the median exported condition number;
@@ -238,22 +239,28 @@ reference.}
 \toprule
 Variant & $n_{\mathrm{fail}}$ & $\sigma_{\mathrm{gm}}$ (s) & $\kappa^{\mathrm{post}}$ & $v_{\mathrm{max}}$ \\
 \midrule
-Base                                   & 0  & 4.26 & --        & 0 \\
-\methodAug{} (no floor, default)       & 12 & 2.29 & $6.6\times10^{9}$  & $3.7\times10^{-3}$ \\
-\methodAug{} $+$ local floor $10^{-3}$ & 6  & 4.64 & $2.0\times10^{14}$ & $4.0\times10^{-2}$ \\
-\methodAug{} $+$ local floor $10^{-2}$ & 0  & 2.63 & $5.5\times10^{11}$ & $7.4\times10^{-5}$ \\
-\methodMat{}                           & 5  & 2.57 & $4.5\times10^{12}$ & $1.9\times10^{-3}$ \\
+Base                                     & 0  & 4.90 & --        & 0 \\
+\methodAug{} (no floor, default)         & 12 & 2.47 & $6.6\times10^{9}$  & $3.7\times10^{-3}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-1}$ & 0  & 2.64 & $5.5\times10^{11}$ & $5.3\times10^{-5}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-2}$ & 0  & 2.89 & $5.5\times10^{11}$ & $7.4\times10^{-5}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-3}$ & 6  & 5.52 & $2.0\times10^{14}$ & $4.0\times10^{-2}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-4}$ & 6  & 2.19 & $2.0\times10^{14}$ & $5.3\times10^{-4}$ \\
+\methodMat{}                             & 5  & 2.57 & $4.5\times10^{12}$ & $1.9\times10^{-3}$ \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}\footnotesize
-\emph{Notes.} On this failing subset the local floor at $10^{-2}$ eliminates every
-verification failure while retaining a solver-time advantage over the base
-($\sigma_{\mathrm{gm}}$ $2.63$ vs $4.26$\,s), even though it \emph{raises} the exported
+\emph{Notes.} The floor is monotone: $n_{\mathrm{fail}}$ falls from $12$ (no floor) to $6$
+(shallow floors $10^{-3}$/$10^{-4}$, which protect only the most extreme rows) to $0$
+($10^{-2}$/$10^{-1}$), consistent with the residual bound
+$\varepsilon/\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$. At the effective floor $10^{-2}$
+the variant eliminates every failure while retaining a solver-time advantage over the base
+($\sigma_{\mathrm{gm}}$ $2.89$ vs $4.90$\,s), even though it \emph{raises} the exported
 condition number (the protected rows are exactly the over-compressed large-right-hand-side
 rows)---a further illustration that exported conditioning is a weak predictor of runtime.
-The floor at $10^{-3}$ is too shallow (six failures remain and the residual bound is only
-$\varepsilon_{\mathrm{solver}}/10^{-3}$). The floor is off by default; a full-class runtime
-characterization across all Simple and Full instances is the natural next step.
+The $\sigma_{\mathrm{gm}}$ values on twelve instances are noisy and are not a full-class
+estimate. This subset was selected by a post-treatment outcome (the \methodAug{} failures),
+so the table is a demonstration on the failing set; the full-class reliability and runtime
+effect, and the behavior on Full, remain untested.
 \end{flushleft}
 \end{table}
 

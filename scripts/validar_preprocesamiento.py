@@ -56,6 +56,7 @@ VARIANT_FLAGS = {
     # --- R6: SA-Aug con piso de confiabilidad LOCAL (acota d_r >= piso => residuo original
     # <= eps_solver/piso; protege filas con |RHS| dominante, el origen de los fallos de
     # verificacion original-scale de Simple/Full). Opt-in; barrido de piso.
+    "estructurado_pisolocal_1em4":      "preprocesar --local-estructurado --piso-local 1e-4",
     "estructurado_pisolocal_1em3":      "preprocesar --local-estructurado --piso-local 1e-3",
     "estructurado_pisolocal_1em2":      "preprocesar --local-estructurado --piso-local 1e-2",
     "estructurado_pisolocal_1em1":      "preprocesar --local-estructurado --piso-local 1e-1",
