@@ -135,7 +135,8 @@ class RunSummary:
     root_time: float | None = None         # tiempo de pared al final de la raíz
     tiempo_determinista: float | None = None   # work_units (Gurobi) o dettime_ticks (CPLEX)
     speedup_det_vs_base: float | None = None   # T_det base / T_det variante
-    primal_integral: float | None = None       # (1/T)∫ gap(t) dt (marcador [SOLVE])
+    # Campo histórico: gap relativo medio sobre el horizonte observado del callback.
+    primal_integral: float | None = None       # (1/t_K) sum trapecios (marcador [SOLVE])
     # --- Condicionamiento de árbol (CPLEX KappaStats; None en Gurobi y datos viejos) ---
     kappa_arbol_max: float | None = None
     kappa_attention: float | None = None

@@ -19,10 +19,13 @@ Usage:
   # R1 (compare base across internal-scaling settings vs the aware variants):
   analizar_revision.py r1 --root results-revision/r1-internal-scaling/simple-gurobi-1pct
 
+  # Direct Table-16 internal/SA ratios under the main capped-time convention:
+  analizar_revision.py r1pairs --root results-revision/r1-internal-scaling/simple-gurobi-1pct
+
   # R3 (one estructurado run per sweep point, each its own folder):
   analizar_revision.py r3 --root results-revision/r3-hyperparam/simple-gurobi-1pct
 """
-import argparse, csv, math, glob, os, sys
+import argparse, csv, math, glob, os, statistics, sys
 from pathlib import Path
 
 TIMELIMIT = 3600.0  # solver --timeout used in the campaign
@@ -36,14 +39,17 @@ def load(resumen: Path):
             v = r.get("variante", "")
             inst = r.get("instancia", "")
             st = (r.get("status") or "").upper()
+            solver_status = (r.get("status_solver") or "").upper()
             ts = r.get("tiempo_solver_s", "")
             try:
                 t = float(ts)
             except (TypeError, ValueError):
                 t = None
             ok = (st == "OK") and (t is not None)
-            timeout = ok and t >= 0.99 * TIMELIMIT
-            out.setdefault(v, []).append(dict(inst=inst, t=t, ok=ok, timeout=timeout))
+            timeout = solver_status == "TIME_LIMIT" or (ok and t >= 0.99 * TIMELIMIT)
+            normal = ok and solver_status == "OPTIMAL"
+            out.setdefault(v, []).append(
+                dict(inst=inst, t=t, ok=ok, timeout=timeout, normal=normal))
     return out
 
 
@@ -181,12 +187,84 @@ def cmd_r1(args):
                 ["fila", "n_ok", "n_to", "sgm_tsol", "PAR10", "speedup_vs_defbase", "cliff_d"], rows)
 
 
+def direct_capped_ratio(sa_runs, internal_runs):
+    """Return internal/SA median using the manuscript's paired convention."""
+    by_internal = {r["inst"]: r for r in internal_runs}
+    ratios = []
+    double_noncompletion = one_sided_capped = missing = 0
+    for sa in sa_runs:
+        internal = by_internal.get(sa["inst"])
+        if internal is None:
+            missing += 1
+            continue
+        sa_noncompletion = not sa["normal"]
+        int_noncompletion = not internal["normal"]
+        if sa_noncompletion and int_noncompletion:
+            double_noncompletion += 1
+            continue
+        if sa_noncompletion or int_noncompletion:
+            one_sided_capped += 1
+        t_sa = TIMELIMIT if sa_noncompletion else sa["t"]
+        t_internal = TIMELIMIT if int_noncompletion else internal["t"]
+        if t_sa is None or t_internal is None or t_sa <= 0:
+            missing += 1
+            continue
+        ratios.append(t_internal / t_sa)
+    return {
+        "n": len(ratios),
+        "median": statistics.median(ratios) if ratios else None,
+        "double_noncompletion": double_noncompletion,
+        "one_sided_capped": one_sided_capped,
+        "missing": missing,
+    }
+
+
+def cmd_r1pairs(args):
+    """Rebuild the direct postselected ratios and sample sizes in Table 16."""
+    root = Path(args.root)
+    aware_path = root / "aware-default" / "resumen.csv"
+    if not aware_path.exists():
+        raise SystemExit(f"missing {aware_path}")
+    aware = load(aware_path)
+
+    settings = []
+    for sub in sorted(root.glob("base-*")):
+        path = sub / "resumen.csv"
+        if not path.exists():
+            continue
+        runs = load(path).get("base", [])
+        score = sgm([r["t"] for r in runs if r["ok"]])
+        if score is not None:
+            settings.append((score, sub.name, runs))
+    if not settings:
+        raise SystemExit(f"no internal-scaling settings below {root}")
+    selected_sgm, selected_name, selected_runs = min(settings)
+
+    rows = []
+    for variant in ("estructurado", "estructurado_matricial"):
+        result = direct_capped_ratio(aware.get(variant, []), selected_runs)
+        rows.append([
+            variant, result["n"], fmt(result["median"], 6),
+            result["double_noncompletion"], result["one_sided_capped"],
+            result["missing"],
+        ])
+    print_table(
+        f"Table 16 direct ratios — {root}\n"
+        f"selected={selected_name}; sgm={selected_sgm:.6g}; ratio=T_internal/T_SA",
+        ["variant", "n", "median_ratio", "double_noncomp", "one_capped", "missing"],
+        rows,
+    )
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     p5 = sub.add_parser("r5"); p5.add_argument("--dir", required=True); p5.set_defaults(fn=cmd_r5)
     p3 = sub.add_parser("r3"); p3.add_argument("--root", required=True); p3.set_defaults(fn=cmd_r3)
     p1 = sub.add_parser("r1"); p1.add_argument("--root", required=True); p1.set_defaults(fn=cmd_r1)
+    p1pairs = sub.add_parser("r1pairs")
+    p1pairs.add_argument("--root", required=True)
+    p1pairs.set_defaults(fn=cmd_r1pairs)
     ap.add_argument("--timelimit", type=float, default=None)
     args = ap.parse_args()
     if args.timelimit:

@@ -417,7 +417,9 @@ void RunnerBenchmarkSintetico::ejecutar() {
                 fm.rhoAntes   = diag.getDiagnosticoGlobal().rhoAprox;
             }
 
-            // 3) Aplicar variante (escala el modelo en sitio) y κ/ρ DESPUÉS.
+            // 3) Aplicar variante y medir después. Los campos CSV kappa_* conservan
+            // el nombre heredado, pero almacenan el proxy max(|A|,|b|)/min+,
+            // no el número de condición espectral kappa_2(A).
             if (esBase) {
                 fm.kappaDespues = fm.kappaAntes;
                 fm.rhoDespues   = fm.rhoAntes;

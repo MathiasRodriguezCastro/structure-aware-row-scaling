@@ -25,7 +25,10 @@ import matplotlib.pyplot as plt
 PALETTE = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#000000"]
 plt.rcParams.update({
     "font.family": "serif",
-    "font.serif": ["Nimbus Roman", "Times New Roman", "Times", "DejaVu Serif"],
+    # Use one TrueType family for both text and math.  Embedding the available
+    # CFF Nimbus face as PDF font type 42 triggers Poppler's font-type mismatch
+    # warning; STIXGeneral remains fully embedded and passes ``pdffonts`` cleanly.
+    "font.serif": ["STIXGeneral"],
     "mathtext.fontset": "stix",
     "font.size": 11,
     "axes.titlesize": 12,
@@ -105,14 +108,16 @@ SCENARIOS = [
 ]
 
 
-def load_rows(suffix: str):
+def load_rows(suffix: str, incluir_errores: bool = False):
     rows = []
     for nombre, base_folder in GROUPS.items():
         folder = base_folder + suffix
         if not (ROOT / "results" / folder).exists():
             print(f"  [skip] sin carpeta: {folder}")
             continue
-        rows += A.cargar_grupo(nombre, [folder], ROOT / "results")
+        rows += A.cargar_grupo(
+            nombre, [folder], ROOT / "results",
+            incluir_errores=incluir_errores)
     return rows
 
 
@@ -120,11 +125,12 @@ def main():
     for tag, suffix, is_gurobi in SCENARIOS:
         print(f"== {tag} ==")
         rows = load_rows(suffix)
+        raw_rows = load_rows(suffix, incluir_errores=True)
         if not rows:
             print("  (sin datos, salto)")
             continue
         A.figura_boxplot(rows, FIGS / f"{tag}_boxplot.pdf")
-        A.figura_perfil_desempeno(rows, FIGS / f"{tag}_perfil.pdf", TIMEOUT,
+        A.figura_perfil_desempeno(raw_rows, FIGS / f"{tag}_perfil.pdf", TIMEOUT,
                                   estilos=PERFIL_STYLE)
         if is_gurobi:  # the manuscript only uses the conditioning scatters for Gurobi
             # rho_kappa data live entirely below 1 (max ~2.4e-2): crop the x axis to the

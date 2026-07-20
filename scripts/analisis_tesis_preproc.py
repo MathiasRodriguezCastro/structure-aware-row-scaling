@@ -32,10 +32,10 @@ cada carpeta debe contener un `resumen.csv`. El script concatena los batches, ag
 la columna `grupo`, y deduplica por (grupo, instancia, variante).
 
 Uso:
-    python3 utils/analisis_tesis_preproc.py --output ejecuciones/analisis_tesis
-    python3 utils/analisis_tesis_preproc.py --config grupos.json --timeout 1800
+    python3 scripts/analisis_tesis_preproc.py --output ejecuciones/analisis_tesis
+    python3 scripts/analisis_tesis_preproc.py --config grupos.json --timeout 3600
     # dry-run sobre una sola carpeta, sin fusionar nada:
-    python3 utils/analisis_tesis_preproc.py \
+    python3 scripts/analisis_tesis_preproc.py \
         --grupo "SG-Ter-Mer=resultados/resultados-cluster/validacion-preproc-sg-b1" \
         --output /tmp/analisis_sg
 """
@@ -173,7 +173,7 @@ def cliffs_delta(a: list[float], b: list[float]) -> tuple[float | None, str]:
 
 
 def wilcoxon_pareado(x: list[float], y: list[float]) -> tuple[float | None, float | None]:
-    """Wilcoxon de rangos con signo pareado (x vs y). Devuelve (W, p)."""
+    """Wilcoxon bilateral reproducible (x-y), sin corrección de continuidad."""
     if _scipy_stats is None:
         return None, None
     pares = [(xi, yi) for xi, yi in zip(x, y)
@@ -182,10 +182,19 @@ def wilcoxon_pareado(x: list[float], y: list[float]) -> tuple[float | None, floa
         return None, None
     xs = [p[0] for p in pares]
     ys = [p[1] for p in pares]
-    if all(abs(a - b) < 1e-12 for a, b in pares):
+    diferencias = [a - b for a, b in pares]
+    if all(d == 0.0 for d in diferencias):
         return None, None
+    no_cero = [d for d in diferencias if d != 0.0]
+    absolutos = [abs(d) for d in no_cero]
+    tiene_ceros = len(no_cero) != len(diferencias)
+    tiene_empates = len(set(absolutos)) != len(absolutos)
+    metodo = ('exact' if len(no_cero) <= 50 and not tiene_ceros
+              and not tiene_empates else 'asymptotic')
     try:
-        res = _scipy_stats.wilcoxon(xs, ys, zero_method="wilcox")
+        res = _scipy_stats.wilcoxon(
+            diferencias, zero_method="wilcox", alternative="two-sided",
+            correction=False, method=metodo)
         return float(res.statistic), float(res.pvalue)
     except ValueError:
         return None, None
@@ -335,8 +344,14 @@ def spearman_parcial(x, y, z) -> tuple[float | None, float | None, int]:
 # --------------------------------------------------------------------------- #
 # Carga y agrupación (sin tocar las carpetas de origen)
 # --------------------------------------------------------------------------- #
-def cargar_grupo(nombre: str, carpetas: list[str], base_dir: Path) -> list[dict]:
-    """Lee y concatena los resumen.csv de un grupo; deduplica (instancia, variante)."""
+def cargar_grupo(nombre: str, carpetas: list[str], base_dir: Path,
+                 incluir_errores: bool = False) -> list[dict]:
+    """Lee y concatena los CSV; opcionalmente conserva filas no completadas.
+
+    La carga descriptiva histórica mantiene solo ``status=OK``.  La carga cruda
+    se usa exclusivamente para construir pares censurados sin premiar abortos
+    unilaterales.
+    """
     vistos: dict[tuple[str, str], dict] = {}
     for carpeta in carpetas:
         p = Path(carpeta)
@@ -352,7 +367,8 @@ def cargar_grupo(nombre: str, carpetas: list[str], base_dir: Path) -> list[dict]
                 var = (row.get("variante") or "").strip()
                 if not inst or not var:
                     continue
-                if (row.get("status") or "").strip() != "OK":
+                if (not incluir_errores
+                        and (row.get("status") or "").strip() != "OK"):
                     continue
                 row["grupo"] = nombre
                 # Si una instancia/variante aparece en dos batches, gana la última leída.
@@ -360,12 +376,15 @@ def cargar_grupo(nombre: str, carpetas: list[str], base_dir: Path) -> list[dict]
     return list(vistos.values())
 
 
-def cargar_todo(grupos: dict[str, list[str]], base_dir: Path) -> list[dict]:
+def cargar_todo(grupos: dict[str, list[str]], base_dir: Path,
+                incluir_errores: bool = False, anunciar: bool = True) -> list[dict]:
     rows: list[dict] = []
     for nombre, carpetas in grupos.items():
-        g = cargar_grupo(nombre, carpetas, base_dir)
-        print(f"[grupo] {nombre}: {len(g)} filas OK "
-              f"({len(set((r['instancia'] for r in g)))} instancias)")
+        g = cargar_grupo(nombre, carpetas, base_dir, incluir_errores)
+        if anunciar:
+            tipo = "filas crudas" if incluir_errores else "filas OK"
+            print(f"[grupo] {nombre}: {len(g)} {tipo} "
+                  f"({len(set((r['instancia'] for r in g)))} instancias)")
         rows.extend(g)
     return rows
 
@@ -425,36 +444,106 @@ def stats_resumen(rows: list[dict]) -> list[dict]:
     return out
 
 
+def _estado_pareado(row: dict | None) -> str:
+    """Clasifica una celda cruda como ok, timeout o abort."""
+    if not row:
+        return "abort"
+    if (row.get("status_solver") or "").strip() == "TIME_LIMIT":
+        return "timeout"
+    if ((row.get("rc") or "").strip() == "0"
+            and (row.get("status") or "").strip() != "ERROR"
+            and (row.get("status_solver") or "").strip() == "OPTIMAL"):
+        return "ok"
+    return "abort"
+
+
+def _valor_pareado(row: dict | None, estado: str, columna: str,
+                   timeout: float) -> float | None:
+    """Tiempo observado si completa; cap exacto si no completa."""
+    if estado != "ok":
+        return timeout
+    valor = _to_float(row.get(columna) if row else None)
+    if valor is None or not math.isfinite(valor) or valor < 0.0:
+        return None
+    return valor
+
+
 def stats_wilcoxon(rows: list[dict], timeout: float) -> list[dict]:
-    """Una fila por (grupo, variante) con Wilcoxon y δ de Cliff sobre T_solver y T_total."""
+    """Wilcoxon pareado con no-finalizaciones unilaterales al cap.
+
+    Usa las filas crudas: excluye instancias uniformemente no disponibles y
+    pares donde ambos lados no completan; si solo un lado no completa, lo
+    conserva a ``timeout``. Esta es la misma construcción de
+    ``scripts/paired_tests.py``.
+    """
     out = []
     grupos_presentes = [g for g in GRUPO_ORDEN if any(r.get("grupo") == g for r in rows)]
-    grupos_presentes += [g for g in {r.get("grupo") for r in rows}
-                         if g and g not in grupos_presentes]
+    grupos_presentes += sorted(g for g in {r.get("grupo") for r in rows}
+                               if g and g not in grupos_presentes)
     for grupo in grupos_presentes:
+        by_inst: dict[str, dict[str, dict]] = {}
+        for row in rows:
+            if row.get("grupo") == grupo:
+                by_inst.setdefault(row.get("instancia") or "", {})[
+                    row.get("variante") or ""] = row
+        variantes_campania = ["base"] + VARIANTES_ORDEN
+        uniformes = {
+            inst for inst, cells in by_inst.items()
+            if all(cells.get(v, {}).get("rc") not in (None, "0")
+                   for v in variantes_campania)
+        }
         for variante in VARIANTES_ORDEN:
-            var_rows, base_rows = emparejar(rows, grupo, variante)
-            if not var_rows:
+            candidatos = []
+            doble_timeout = doble_abort = doble_otro = unilaterales = 0
+            for inst, cells in by_inst.items():
+                if inst in uniformes:
+                    continue
+                vr, br = cells.get(variante), cells.get("base")
+                ve, be = _estado_pareado(vr), _estado_pareado(br)
+                if ve != "ok" and be != "ok":
+                    if ve == be == "timeout":
+                        doble_timeout += 1
+                    elif ve == be == "abort":
+                        doble_abort += 1
+                    else:
+                        doble_otro += 1
+                    continue
+                if ve != "ok" or be != "ok":
+                    unilaterales += 1
+                candidatos.append((vr, ve, br, be))
+            if not candidatos:
                 continue
-            fila = {"grupo": grupo, "variante": variante, "n_pares": len(var_rows)}
-
-            # Censura: descartar pares donde AMBOS están en timeout (speedup artificial).
-            pares_validos = [
-                (vr, br) for vr, br in zip(var_rows, base_rows)
-                if not (es_timeout(vr, timeout) and es_timeout(br, timeout))
-            ]
-            fila["n_pares_no_censurados"] = len(pares_validos)
+            fila = {
+                "grupo": grupo,
+                "variante": variante,
+                "n_pool_comun": len(by_inst) - len(uniformes),
+                "n_uniform_missing": len(uniformes),
+                "n_double_timeout": doble_timeout,
+                "n_double_abort": doble_abort,
+                "n_other_double_noncompletion": doble_otro,
+                "n_one_sided_capped": unilaterales,
+            }
 
             for col, key in (("tiempo_solver_s", "solver"),
                              ("tiempo_total_s", "total")):
-                xv = [_to_float(vr.get(col)) for vr, _ in pares_validos]
-                xb = [_to_float(br.get(col)) for _, br in pares_validos]
+                pares_validos = []
+                for vr, ve, br, be in candidatos:
+                    xv_i = _valor_pareado(vr, ve, col, timeout)
+                    xb_i = _valor_pareado(br, be, col, timeout)
+                    if xv_i is not None and xb_i is not None:
+                        pares_validos.append((xv_i, xb_i))
+                xv = [a for a, _ in pares_validos]
+                xb = [b for _, b in pares_validos]
                 w, p = wilcoxon_pareado(xv, xb)
                 d, mag = cliffs_delta(_clean(xv), _clean(xb))
+                fila[f"n_pares_{key}"] = len(pares_validos)
                 fila[f"W_{key}"] = w
                 fila[f"p_{key}"] = p
                 fila[f"cliff_{key}"] = d
                 fila[f"cliff_{key}_mag"] = mag
+            # Alias histórico: el manuscrito usa el test de tiempo de solver.
+            fila["n_pares"] = fila["n_pool_comun"]
+            fila["n_pares_no_censurados"] = fila["n_pares_solver"]
             out.append(fila)
 
     # Corrección por comparaciones múltiples (Benjamini-Hochberg) sobre toda la familia
@@ -962,8 +1051,9 @@ def tabla_robustez_tex(stats: list[dict]) -> str:
         r"Métricas robustas de eficiencia por variante (incluye \emph{base}). "
         r"$\mathrm{sgm}\,T_{\text{sol}}$: media geométrica desplazada del tiempo de solver "
         r"($s=1$); speedup$^{\det}$: cociente de tiempo determinista (\texttt{Work}/\textit{ticks}) "
-        r"base/variante; PAR10: tiempo penalizado (timeouts $\times 10$); PI: integral "
-        r"primal--dual $(1/T)\int\gamma(t)dt$; gap raíz: gap relativo al final del nodo raíz. "
+        r"base/variante; PAR10$_{\rm avail}$: tiempo penalizado (timeouts $\times 10$; "
+        r"abortos excluidos); $\bar\gamma_{\rm cb}$: gap relativo medio normalizado por "
+        r"el horizonte observado del callback; gap raíz: gap relativo al final del nodo raíz. "
         r"Mediana sobre el grupo.",
         "tab:robustez-preproc", "llccccc")
 
@@ -1117,11 +1207,17 @@ def figura_scatter(rows: list[dict], out: Path,
 
 def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float,
                             estilos: dict | None = None) -> bool:
-    """Perfil de desempeño (Dolan–Moré) sobre T_solver: para cada variante, fracción de
-    instancias resueltas dentro de un factor τ del mejor tiempo entre las variantes de esa
-    instancia. Una curva por variante (incluida base); maneja timeouts como 'nunca dentro de τ'.
-    estilos: kwargs extra de ax.plot por variante (color/linestyle fijos, para redundancia
-    no cromática); default = comportamiento histórico (ciclo de colores, todo sólido)."""
+    """Perfil Dolan--Moré sobre un pool común y costos operacionales.
+
+    Para cada grupo se eliminan de todas las curvas los registros uniformemente
+    no disponibles (``rc != 0`` en las cinco variantes) y los casos sin ningún
+    tiempo de terminación admisible. Un ``OPTIMAL`` con ``status=OK`` y ``rc=0``
+    usa su tiempo de solver; timeout, abort, fila ausente o tiempo inválido
+    reciben ``10*timeout``. Por tanto, todas las curvas de un panel comparten el
+    mismo denominador y ``r_iv = c_iv/min_v(c_iv)`` es siempre finito.
+
+    ``estilos`` contiene kwargs opcionales de ``ax.plot`` por variante.
+    """
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -1138,25 +1234,52 @@ def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float,
                              squeeze=False)
     algo = False
     for ax, grupo in zip(axes[0], grupos):
-        # razones de desempeño r_{i,v} = t_{i,v} / min_v t_{i,v}, por instancia.
-        by_inst: dict[str, dict[str, float]] = {}
+        # Razones r_{i,v}=c_{i,v}/min_v c_{i,v} sobre un denominador común.
+        by_inst: dict[str, dict[str, dict]] = {}
         for r in rows:
             if r.get("grupo") != grupo:
                 continue
-            t = _to_float(r.get("tiempo_solver_s"))
-            if t is None or t <= 0:
-                t = float("inf") if es_timeout(r, timeout) else None
-            if t is not None:
-                by_inst.setdefault(r.get("instancia") or "", {})[r.get("variante")] = t
+            by_inst.setdefault(r.get("instancia") or "", {})[
+                r.get("variante")] = r
         ratios: dict[str, list[float]] = {v: [] for v in variantes}
+        excluded_uniform = excluded_no_timing = 0
         for d in by_inst.values():
-            mejor = min((x for x in d.values() if x != float("inf")), default=None)
-            if mejor is None or mejor <= 0:
+            uniformly_unavailable = all(
+                d.get(v, {}).get("rc") not in (None, "0") for v in variantes)
+            if uniformly_unavailable:
+                excluded_uniform += 1
                 continue
+
+            costs: dict[str, float] = {}
+            completed: list[float] = []
             for v in variantes:
-                if v in d:
-                    ratios[v].append(d[v] / mejor)
-        taus = [1.0 + 0.05 * i for i in range(0, 200)]   # τ ∈ [1, ~11]
+                row = d.get(v)
+                t = _to_float((row or {}).get("tiempo_solver_s"))
+                valid = bool(
+                    row
+                    and row.get("rc") == "0"
+                    and row.get("status") == "OK"
+                    and row.get("status_solver") == "OPTIMAL"
+                    and t is not None and t > 0)
+                if valid:
+                    costs[v] = t
+                    completed.append(t)
+                else:
+                    costs[v] = 10.0 * timeout
+            if not completed:
+                excluded_no_timing += 1
+                continue
+            best = min(completed)
+            for v in variantes:
+                ratios[v].append(costs[v] / best)
+
+        all_ratios = [value for values in ratios.values() for value in values]
+        max_ratio = max(all_ratios, default=1.0)
+        if max_ratio <= 1.0:
+            taus = [1.0]
+        else:
+            log_max = math.log10(max_ratio)
+            taus = [10.0 ** (log_max * i / 249.0) for i in range(250)]
         for v in variantes:
             rs = ratios[v]
             if not rs:
@@ -1172,6 +1295,11 @@ def figura_perfil_desempeno(rows: list[dict], out: Path, timeout: float,
         ax.set_title(grupo)
         ax.set_ylim(0, 1.02)
         ax.legend(fontsize=8)
+        print(
+            f"[perfil] {grupo}: n={len(next(iter(ratios.values()), []))}, "
+            f"uniformes_excluidas={excluded_uniform}, "
+            f"sin_tiempo_excluidas={excluded_no_timing}, "
+            f"tau_max={max_ratio:.6g}")
     if not algo:
         plt.close(fig)
         return False
@@ -1208,8 +1336,8 @@ def main() -> int:
                              "Si se usa, reemplaza GRUPOS por completo.")
     parser.add_argument("--base-dir", type=Path, default=Path("."),
                         help="Directorio base para rutas relativas (def: cwd).")
-    parser.add_argument("--timeout", type=float, default=1800.0,
-                        help="Límite de tiempo (s) para clasificar censura (def: 1800).")
+    parser.add_argument("--timeout", type=float, default=3600.0,
+                        help="Límite de tiempo (s) para clasificar censura (def: 3600).")
     parser.add_argument("--output", type=Path, default=Path("ejecuciones/analisis_tesis"))
     args = parser.parse_args()
 
@@ -1228,6 +1356,13 @@ def main() -> int:
     rows = cargar_todo(grupos, args.base_dir)
     if not rows:
         raise SystemExit("No se cargaron filas. Revisá las rutas de GRUPOS/--config.")
+    # El resto del pipeline conserva la carga descriptiva histórica status=OK.
+    # Solo Wilcoxon necesita las filas crudas para retener abortos unilaterales
+    # al cap en lugar de eliminarlos antes del emparejamiento.
+    rows_pareados = cargar_todo(
+        grupos, args.base_dir, incluir_errores=True, anunciar=False)
+    if not rows_pareados:
+        raise SystemExit("No se cargaron filas crudas para los tests pareados.")
 
     out = args.output
     out.mkdir(parents=True, exist_ok=True)
@@ -1235,7 +1370,7 @@ def main() -> int:
     figs.mkdir(exist_ok=True)
 
     resumen = stats_resumen(rows)
-    wilcoxon = stats_wilcoxon(rows, args.timeout)
+    wilcoxon = stats_wilcoxon(rows_pareados, args.timeout)
     censura = stats_censura(rows, args.timeout)
     correlacion = stats_correlacion(rows, "matrix_kappa_ratio_vs_base")
     correlacion_ksolver = stats_correlacion(rows, "kappa_solver_ratio_vs_base")
@@ -1304,7 +1439,8 @@ def main() -> int:
     figura_scatter(rows, figs / "scatter_kappa_solver_speedup.pdf",
                    "kappa_solver_ratio_vs_base",
                    r"$\rho_\kappa^{\mathrm{solver}}$ (cond. de la base, variante/base)")
-    figura_perfil_desempeno(rows, figs / "perfil_desempeno.pdf", args.timeout)
+    figura_perfil_desempeno(
+        rows_pareados, figs / "perfil_desempeno.pdf", args.timeout)
 
     # Resumen por consola
     print("\n=== CORRELACIÓN ρ_κ (rango coef.) vs speedup_solver (Spearman) ===")

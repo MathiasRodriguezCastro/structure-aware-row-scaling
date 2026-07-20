@@ -63,8 +63,12 @@ Con `numInstancias > 1`, la instancia `idx` usa `seed = seedBase + idx`.
 
 ## Salidas
 
-- **CSV de métricas** (siempre, `<rutaCsvSalida>`): una fila por `(instancia, variante)` con
-  `kappa_antes/despues`, `rho_antes/despues`, tiempos, objetivo, etc.
+- **CSV de métricas** (siempre, `<rutaCsvSalida>`): una fila por
+  `(instancia, variante)` con `kappa_antes/despues`,
+  `rho_antes/despues`, tiempos, objetivo, etc. Los nombres
+  `kappa_*` son heredados: miden
+  `max(|A|,|b|)/min⁺(|A|,|b|)`, un proxy global de rango, no
+  `κ₂(A)`.
 - **`manifest.json`** (con `--out`): parámetros de la instancia + de la corrida + rutas.
 - **`row_metadata.csv`** / **`column_metadata.csv`** (con `--out`): metadata explícita de
   filas y columnas (incluye `applied_scale_factor`, `block_id`, tipos…).

@@ -42,7 +42,7 @@ GRBVar crearVariableGurobi(GRBModel& m, const Variable* v, bool binaria) {
 }
 
 // Callback de SOLO LECTURA: registra la cota dual y el tiempo al terminar el nodo raíz del
-// B&B, y acumula la INTEGRAL PRIMAL–DUAL (1/T)∫γ(t)dt a lo largo de la resolución. No agrega
+// B&B, y acumula el GAP RELATIVO MEDIO sobre el horizonte observado del callback. No agrega
 // cortes ni lazy constraints, por lo que no altera la búsqueda (solo un overhead mínimo).
 // Best-effort: si algún info no está disponible, los campos quedan en su valor centinela.
 class MonitorCallback : public GRBCallback {
@@ -51,7 +51,7 @@ public:
     double rootObjBst =  GRB_INFINITY;  // incumbente (puede no existir aún en la raíz)
     double rootTime   = -1.0;           // tiempo de pared al final de la raíz
     bool   capturada  = false;
-    // Integral primal–dual: área de γ(t) (gap relativo) vs tiempo, por trapecios.
+    // Área de γ(t) vs tiempo por trapecios; integralPrimal() la normaliza por tFinal.
     double integral   = 0.0;
     double ultimoT    = -1.0;
     double ultimoGap  = 1.0;

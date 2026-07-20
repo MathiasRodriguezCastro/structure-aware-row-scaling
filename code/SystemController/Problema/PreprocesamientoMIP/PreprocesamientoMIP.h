@@ -125,6 +125,7 @@ public:
     struct DiagnosticoGlobal {
         double normaMaxTotal   = 0.0;
         double normaMinTotal   = 1e300;
+        // Nombre heredado: max(|A|,|b|)/min^+(|A|,|b|), no kappa_2(A).
         double kappaTotal      = 0.0;
         double rhoAprox        = 0.0;  ///< ‖L D⁻¹‖ aproximado
         double gamma           = 1.0;  ///< Factor aplicado a fila global

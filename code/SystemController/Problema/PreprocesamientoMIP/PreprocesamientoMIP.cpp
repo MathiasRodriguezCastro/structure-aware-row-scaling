@@ -392,7 +392,8 @@ void PreprocesamientoMIP::calcularDiagnosticoGlobal() {
 
     auto& restricciones = prob.getRestricciones();
 
-    // Rango total de coeficientes
+    // Proxy global de rango sobre coeficientes y términos independientes.
+    // Es max(|A|,|b|)/min^+(|A|,|b|), no un número de condición espectral.
     for (auto& r : restricciones) {
         double rhs = std::abs(r->getTerminoIndependiente());
         if (rhs > 0.0) {
@@ -1143,7 +1144,7 @@ void PreprocesamientoMIP::imprimirReporte() const {
     cout << "Rango de coeficientes (toda la matriz):\n";
     cout << "  max |coef| = " << scientific << setprecision(3) << global.normaMaxTotal << "\n";
     cout << "  min |coef| = " << scientific << setprecision(3) << global.normaMinTotal << "\n";
-    cout << "  kappa aprox= " << scientific << global.kappaTotal << "\n\n";
+    cout << "  proxy rango= " << scientific << global.kappaTotal << "\n\n";
 
     // Por bloque
     cout << "Diagnostico por bloque:\n";

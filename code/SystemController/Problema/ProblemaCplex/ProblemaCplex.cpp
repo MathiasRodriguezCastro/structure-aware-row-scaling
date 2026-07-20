@@ -20,7 +20,8 @@ struct EstadoMonitorCplex {
 };
 }
 
-// Callback informativo de SOLO LECTURA: acumula (1/T)∫γ(t)dt por trapecios y captura el
+// Callback informativo de SOLO LECTURA: acumula el área de γ(t) por trapecios, luego
+// la normaliza por el último timestamp observado, y captura el
 // gap/tiempo al final del nodo raíz. No altera la búsqueda.
 ILOMIPINFOCALLBACK1(MonitorCplexCB, EstadoMonitorCplex&, st) {
     double t = getCplexTime();

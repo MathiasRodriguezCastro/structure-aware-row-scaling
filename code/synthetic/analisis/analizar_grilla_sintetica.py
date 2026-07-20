@@ -9,7 +9,7 @@ Lee (SIN modificarlos):
 
 y escribe en <results>/analysis/ :
     synthetic_summary_table.csv / .tex
-    synthetic_conditioning_reduction.csv      (comparaciones vs Base: Wilcoxon + BH)
+    synthetic_conditioning_reduction.csv      (nombre heredado; proxy de rango vs Base)
     synthetic_objective_feasibility_checks.csv
     figuras paper-ready (.pdf y .png)
 
@@ -20,8 +20,11 @@ con punto), así que NO depende de LC_NUMERIC. Aun así se recomienda correr con
     LC_ALL=C python3 synthetic/analisis/analizar_grilla_sintetica.py
 
 Enfoque conceptual (instancias chicas, resuelven en ms): el análisis NO vende
-speedup; se enfoca en control del desbalance, recuperación del condicionamiento,
+speedup; se enfoca en control del desbalance, recuperación del proxy global de rango,
 preservación de factibilidad/objetivo y comparación limpia entre variantes.
+
+Los campos heredados kappa_antes/kappa_despues NO son números de condición
+espectrales: almacenan max(|A|,|b|)/min^+(|A|,|b|).
 """
 
 import argparse
@@ -32,10 +35,29 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")  # backend sin display (paper-ready a archivo)
 import matplotlib.pyplot as plt
+# Unified publication style (matches scripts/figuras_paper.py): serif + colorblind palette
+# + subtle grid + despined axes, consistent with the manuscript typography.
+plt.rcParams.update({
+    "font.family": "serif",
+    # A single TrueType family avoids the CFF/font-type mismatch produced by
+    # Nimbus Roman under matplotlib's PDF type-42 embedding.
+    "font.serif": ["STIXGeneral"],
+    "mathtext.fontset": "stix",
+    "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11,
+    "axes.spines.top": False, "axes.spines.right": False,
+    "axes.grid": True, "axes.axisbelow": True,
+    "axes.prop_cycle": plt.cycler(color=["#0072B2", "#D55E00", "#009E73",
+                                         "#CC79A7", "#E69F00", "#56B4E9", "#000000"]),
+    "grid.color": "0.8", "grid.linestyle": ":", "grid.linewidth": 0.6, "grid.alpha": 0.7,
+    "legend.frameon": False, "legend.fontsize": 9,
+    "xtick.labelsize": 9, "ytick.labelsize": 9,
+    "lines.linewidth": 1.8, "savefig.bbox": "tight", "savefig.pad_inches": 0.03,
+    "pdf.fonttype": 42,
+})
 from scipy.stats import wilcoxon
 
-VARIANT_ORDER = ["Base", "SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols"]
-PATTERN_ORDER = ["none", "local", "coupling", "mixed"]
+VARIANT_ORDER = ["Base", "SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols", "Flat"]
+PATTERN_ORDER = ["none", "local", "coupling", "coupling_uniform", "mixed"]
 S_ORDER = [0, 3, 6]
 MIPGAP = 1e-3
 
@@ -94,11 +116,17 @@ def load_metrics(path: Path) -> pd.DataFrame:
     for c in num_cols:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
-    # is_feasible_original_scale: "true"/"false"/"NA" -> bool / NaN
-    fmap = {"true": True, "false": False, "True": True, "False": False}
-    df["is_feasible_bool"] = df["is_feasible_original_scale"].map(fmap)
+    # is_feasible_original_scale: "true"/"false"/"NA" -> bool / NaN. pandas ya
+    # convierte true/false a dtype bool; el .map(str->bool) de antes convertía
+    # TODO a NaN en ese caso y el conteo de infactibles quedaba en 0 siempre.
+    if df["is_feasible_original_scale"].dtype == bool:
+        df["is_feasible_bool"] = df["is_feasible_original_scale"]
+    else:
+        fmap = {"true": True, "false": False, "True": True, "False": False}
+        df["is_feasible_bool"] = df["is_feasible_original_scale"].map(fmap)
 
-    # Derivadas de condicionamiento (por fila).
+    # Derivadas del proxy global de rango. Se conservan los nombres de columnas
+    # heredados por compatibilidad; no representan kappa_2(A).
     df["log10_kappa_antes"] = safe_log10(df["kappa_antes"])
     df["log10_kappa_despues"] = safe_log10(df["kappa_despues"])
     df["log10_rho_antes"] = safe_log10(df["rho_antes"])
@@ -157,7 +185,7 @@ def write_latex(summary: pd.DataFrame, path: Path):
 
     latex = tex.to_latex(index=False, escape=True, float_format=f,
                          caption="Resumen de la grilla sintética por (pattern, S, variante): "
-                                 "factibilidad, condicionamiento (mediana de $\\kappa$ antes/después, "
+                                 "factibilidad, proxy global de rango (mediana antes/después, "
                                  "reducción en $\\log_{10}$), $\\rho$ posterior, tiempos y violaciones máximas.",
                          label="tab:synthetic_summary")
     path.write_text(latex, encoding="utf-8")
@@ -179,6 +207,12 @@ def build_conditioning_reduction(df: pd.DataFrame) -> pd.DataFrame:
                 base = base[["instancia", col]].rename(columns={col: "base_val"})
                 for var in VARIANT_ORDER:
                     if var == "Base":
+                        continue
+                    # Ruiz+Cols coincide EXACTAMENTE con Ruiz en el sintético (sin metadata
+                    # de unidades su normalización física es inerte): incluirla duplicaría
+                    # una familia entera de hipótesis en la corrección BH. Se excluye de los
+                    # tests; la familia queda en 4 variantes x patrones x severidades.
+                    if var == "Ruiz+Cols":
                         continue
                     cur = df[(df.pattern == pat) & (df.severity_S == S) & (df.variante == var)]
                     cur = cur[["instancia", col]].rename(columns={col: "var_val"})
@@ -281,49 +315,126 @@ def fig_box_kappa_despues(df, outdir):
             if i == 0:
                 ax.set_title(f"S = {S}", fontsize=10)
             if j == 0:
-                ax.set_ylabel(f"{pat}\n$\\log_{{10}}\\kappa_{{post}}$", fontsize=9)
+                ax.set_ylabel(
+                    f"{pat}\n$\\log_{{10}}\\widehat{{\\kappa}}_{{\\mathrm{{range}},post}}$",
+                    fontsize=9,
+                )
             ax.grid(True, axis="y", alpha=0.3)
-    fig.suptitle("Condicionamiento posterior $\\log_{10}\\kappa_{post}$ por variante "
+    fig.suptitle("Proxy global de rango posterior por variante "
                  "(filas = pattern, columnas = S)", fontsize=12)
     fig.tight_layout(rect=[0, 0, 1, 0.98])
     _save(fig, outdir / "fig1_boxplot_log10_kappa_despues")
 
 
 def fig_bars_reduction(df, outdir):
-    fig, axes = plt.subplots(len(PATTERN_ORDER), len(S_ORDER),
-                             figsize=(12, 12), sharey=True)
-    for i, pat in enumerate(PATTERN_ORDER):
-        for j, S in enumerate(S_ORDER):
-            ax = axes[i][j]
-            sub = df[(df.pattern == pat) & (df.severity_S == S)]
-            meds = [median_or_nan(sub[sub.variante == v]["log10_reduction"]) for v in VARIANT_ORDER]
-            ax.bar(range(len(VARIANT_ORDER)), meds, color="tab:blue", alpha=0.8)
-            ax.set_xticks(range(len(VARIANT_ORDER)))
-            ax.set_xticklabels(VARIANT_ORDER, rotation=45, fontsize=7)
-            ax.axhline(0, color="k", lw=0.6)
-            if i == 0:
-                ax.set_title(f"S = {S}", fontsize=10)
-            if j == 0:
-                ax.set_ylabel(f"{pat}\nmediana $\\Delta\\log_{{10}}\\kappa$", fontsize=9)
-            ax.grid(True, axis="y", alpha=0.3)
-    fig.suptitle("Reducción mediana de condicionamiento "
-                 "$\\log_{10}\\kappa_{pre}-\\log_{10}\\kappa_{post}$ por variante", fontsize=12)
-    fig.tight_layout(rect=[0, 0, 1, 0.98])
+    """Single-panel grouped bars: median log10 range-proxy reduction (pre - post).
+
+    x = pattern (excluding 'none', the ~0 negative control); within each group,
+    the four scaled variants (Base excluded: trivially 0), each as a pair of
+    bars for severity S=3 (light) and S=6 (solid). All labels in English; the
+    LaTeX caption provides the title.
+    """
+    from matplotlib.patches import Patch
+    from matplotlib.colors import to_rgba
+
+    patterns = ["local", "coupling", "coupling_uniform", "mixed"]
+    variants = ["SA-Aug", "SA-Mat", "Ruiz", "Ruiz+Cols", "Flat"]
+    # Okabe-Ito, same variant->color mapping as scripts/figuras_paper.py
+    # (palette order: Base, SA-Aug, SA-Mat, Ruiz, Ruiz+Cols; Flat takes the
+    # remaining Okabe-Ito sky blue).
+    vcolors = {"SA-Aug": "#D55E00", "SA-Mat": "#009E73",
+               "Ruiz": "#CC79A7", "Ruiz+Cols": "#E69F00", "Flat": "#56B4E9"}
+    # Non-color redundancy so the variants are separable WITHOUT color
+    # (colorblind readers / grayscale print): a distinct hatch per variant,
+    # drawn with a dark edge so it reads as black lines on the fill.
+    vhatch = {"SA-Aug": "", "SA-Mat": "//", "Ruiz": "xx", "Ruiz+Cols": "..",
+              "Flat": "\\\\"}
+    severities = [3, 6]
+    # Severity is encoded THREE ways so it survives grayscale: fill opacity
+    # (light vs solid, as before) PLUS border thickness (thin vs thick).
+    sev_alpha = {3: 0.45, 6: 1.0}
+    sev_lw = {3: 0.5, 6: 1.6}
+    edge = "black"
+
+    prev_hatch_lw = plt.rcParams["hatch.linewidth"]
+    plt.rcParams["hatch.linewidth"] = 0.7  # crisper hatch lines in the PDF
+
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+    xs = np.arange(len(patterns))
+    pair_step = 0.17   # spacing between variant pairs within a pattern group
+    bar_w = 0.08       # width of each bar (S=3 / S=6 side by side)
+    for vi, var in enumerate(variants):
+        center = (vi - (len(variants) - 1) / 2.0) * pair_step
+        for si, S in enumerate(severities):
+            meds = [median_or_nan(df[(df.pattern == pat) & (df.severity_S == S)
+                                     & (df.variante == var)]["log10_reduction"])
+                    for pat in patterns]
+            off = center + (si - 0.5) * bar_w
+            # Alpha baked into the FACE only, so the black edge and hatch stay
+            # crisp at both severities (a whole-bar alpha would fade them too).
+            ax.bar(xs + off, meds, width=bar_w,
+                   facecolor=to_rgba(vcolors[var], sev_alpha[S]),
+                   hatch=vhatch[var],
+                   edgecolor=edge, linewidth=sev_lw[S])
+    ax.axhline(0, color="k", lw=0.6)
+    ax.set_xticks(xs)
+    ax.set_xticklabels([p.replace("coupling_uniform", "coupling-unif.") for p in patterns])
+    ax.set_xlabel("imbalance pattern")
+    ax.set_ylabel(
+        "median $\\Delta\\log_{10}\\widehat{\\kappa}_{\\mathrm{range}}$ (pre $-$ post)"
+    )
+    ax.grid(False, axis="x")
+    # Variant handles carry BOTH the color and the hatch; severity handles show
+    # the opacity + border-thickness mapping (neutral gray, no hatch).
+    handles = [Patch(facecolor=vcolors[v], hatch=vhatch[v], edgecolor=edge,
+                     linewidth=0.8, label=v) for v in variants]
+    handles += [Patch(facecolor=to_rgba("0.45", sev_alpha[3]), edgecolor=edge,
+                      linewidth=sev_lw[3], label="$S = 3$ (thin edge)"),
+                Patch(facecolor=to_rgba("0.45", sev_alpha[6]), edgecolor=edge,
+                      linewidth=sev_lw[6], label="$S = 6$ (thick edge)")]
+    # Legend in a single row ABOVE the axes: the tall 'local'/'mixed' bars
+    # reach the top of the plotting area, so an inside legend would collide.
+    ax.legend(handles=handles, ncol=7, loc="lower left", mode="expand",
+              bbox_to_anchor=(0, 1.02, 1, 0.08), borderaxespad=0,
+              handlelength=1.2, columnspacing=0.8)
+    fig.tight_layout()
     _save(fig, outdir / "fig2_bars_log10_reduction")
+    plt.rcParams["hatch.linewidth"] = prev_hatch_lw
 
 
 def fig_kappa_antes_vs_S(df, outdir):
+    """Median pre-scaling range proxy (Base variant) vs severity S, log scale.
+
+    'local' and 'mixed' overlap almost exactly, so each pattern gets a distinct
+    line style AND marker (mixed drawn dotted with open markers over local's
+    dashes) to keep both visible. English labels; no embedded title.
+    """
+    # pattern -> (linestyle, marker, Okabe-Ito color)
+    styles = {
+        "none":             ("-",  "o", "#0072B2"),
+        "local":            ("--", "s", "#D55E00"),
+        "coupling":         ("-.", "^", "#009E73"),
+        "coupling_uniform": ("-.", "v", "#E69F00"),
+        "mixed":            (":",  "D", "#CC79A7"),
+    }
     fig, ax = plt.subplots(figsize=(7, 5))
     base = df[df.variante == "Base"]
     for pat in PATTERN_ORDER:
+        ls, mk, color = styles[pat]
         meds = [median_or_nan(base[(base.pattern == pat) & (base.severity_S == S)]["kappa_antes"])
                 for S in S_ORDER]
-        ax.plot(S_ORDER, meds, marker="o", label=pat)
+        open_marker = (pat == "mixed")  # open diamonds let 'local' show through
+        ax.plot(S_ORDER, meds, linestyle=ls, marker=mk, color=color,
+                label=pat.replace("coupling_uniform", "coupling-unif."),
+                markerfacecolor="none" if open_marker else color,
+                markeredgecolor=color, markersize=7 if open_marker else 5,
+                zorder=3 if pat == "mixed" else 2)
     ax.set_yscale("log")
     ax.set_xticks(S_ORDER)
-    ax.set_xlabel("Severidad S")
-    ax.set_ylabel("mediana $\\kappa_{pre}$ (escala log)")
-    ax.set_title("$\\kappa_{pre}$ crece con S solo cuando el pattern inyecta desbalance")
+    ax.set_xlabel("Severity $S$")
+    ax.set_ylabel(
+        "median $\\widehat{\\kappa}_{\\mathrm{range,pre}}$ (log scale)"
+    )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(title="pattern")
     fig.tight_layout()

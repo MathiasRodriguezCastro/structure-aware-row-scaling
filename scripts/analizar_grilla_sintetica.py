@@ -9,7 +9,7 @@ Lee (SIN modificarlos):
 
 y escribe en <results>/analysis/ :
     synthetic_summary_table.csv / .tex
-    synthetic_conditioning_reduction.csv      (comparaciones vs Base: Wilcoxon + BH)
+    synthetic_conditioning_reduction.csv      (nombre heredado; proxy de rango vs Base)
     synthetic_objective_feasibility_checks.csv
     figuras paper-ready (.pdf y .png)
 
@@ -20,8 +20,11 @@ con punto), así que NO depende de LC_NUMERIC. Aun así se recomienda correr con
     LC_ALL=C python3 synthetic/analisis/analizar_grilla_sintetica.py
 
 Enfoque conceptual (instancias chicas, resuelven en ms): el análisis NO vende
-speedup; se enfoca en control del desbalance, recuperación del condicionamiento,
+speedup; se enfoca en control del desbalance, recuperación del proxy global de rango,
 preservación de factibilidad/objetivo y comparación limpia entre variantes.
+
+Los campos heredados kappa_antes/kappa_despues NO son números de condición
+espectrales: almacenan max(|A|,|b|)/min^+(|A|,|b|).
 """
 
 import argparse
@@ -36,7 +39,9 @@ import matplotlib.pyplot as plt
 # + subtle grid + despined axes, consistent with the manuscript typography.
 plt.rcParams.update({
     "font.family": "serif",
-    "font.serif": ["Nimbus Roman", "Times New Roman", "Times", "DejaVu Serif"],
+    # A single TrueType family avoids the CFF/font-type mismatch produced by
+    # Nimbus Roman under matplotlib's PDF type-42 embedding.
+    "font.serif": ["STIXGeneral"],
     "mathtext.fontset": "stix",
     "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11,
     "axes.spines.top": False, "axes.spines.right": False,
@@ -120,7 +125,8 @@ def load_metrics(path: Path) -> pd.DataFrame:
         fmap = {"true": True, "false": False, "True": True, "False": False}
         df["is_feasible_bool"] = df["is_feasible_original_scale"].map(fmap)
 
-    # Derivadas de condicionamiento (por fila).
+    # Derivadas del proxy global de rango. Se conservan los nombres de columnas
+    # heredados por compatibilidad; no representan kappa_2(A).
     df["log10_kappa_antes"] = safe_log10(df["kappa_antes"])
     df["log10_kappa_despues"] = safe_log10(df["kappa_despues"])
     df["log10_rho_antes"] = safe_log10(df["rho_antes"])
@@ -179,7 +185,7 @@ def write_latex(summary: pd.DataFrame, path: Path):
 
     latex = tex.to_latex(index=False, escape=True, float_format=f,
                          caption="Resumen de la grilla sintética por (pattern, S, variante): "
-                                 "factibilidad, condicionamiento (mediana de $\\kappa$ antes/después, "
+                                 "factibilidad, proxy global de rango (mediana antes/después, "
                                  "reducción en $\\log_{10}$), $\\rho$ posterior, tiempos y violaciones máximas.",
                          label="tab:synthetic_summary")
     path.write_text(latex, encoding="utf-8")
@@ -309,16 +315,19 @@ def fig_box_kappa_despues(df, outdir):
             if i == 0:
                 ax.set_title(f"S = {S}", fontsize=10)
             if j == 0:
-                ax.set_ylabel(f"{pat}\n$\\log_{{10}}\\kappa_{{post}}$", fontsize=9)
+                ax.set_ylabel(
+                    f"{pat}\n$\\log_{{10}}\\widehat{{\\kappa}}_{{\\mathrm{{range}},post}}$",
+                    fontsize=9,
+                )
             ax.grid(True, axis="y", alpha=0.3)
-    fig.suptitle("Condicionamiento posterior $\\log_{10}\\kappa_{post}$ por variante "
+    fig.suptitle("Proxy global de rango posterior por variante "
                  "(filas = pattern, columnas = S)", fontsize=12)
     fig.tight_layout(rect=[0, 0, 1, 0.98])
     _save(fig, outdir / "fig1_boxplot_log10_kappa_despues")
 
 
 def fig_bars_reduction(df, outdir):
-    """Single-panel grouped bars: median log10 conditioning reduction (pre - post).
+    """Single-panel grouped bars: median log10 range-proxy reduction (pre - post).
 
     x = pattern (excluding 'none', the ~0 negative control); within each group,
     the four scaled variants (Base excluded: trivially 0), each as a pair of
@@ -371,7 +380,9 @@ def fig_bars_reduction(df, outdir):
     ax.set_xticks(xs)
     ax.set_xticklabels([p.replace("coupling_uniform", "coupling-unif.") for p in patterns])
     ax.set_xlabel("imbalance pattern")
-    ax.set_ylabel("median $\\Delta\\log_{10}\\kappa$ (pre $-$ post)")
+    ax.set_ylabel(
+        "median $\\Delta\\log_{10}\\widehat{\\kappa}_{\\mathrm{range}}$ (pre $-$ post)"
+    )
     ax.grid(False, axis="x")
     # Variant handles carry BOTH the color and the hatch; severity handles show
     # the opacity + border-thickness mapping (neutral gray, no hatch).
@@ -392,7 +403,7 @@ def fig_bars_reduction(df, outdir):
 
 
 def fig_kappa_antes_vs_S(df, outdir):
-    """Median pre-scaling condition number (Base variant) vs severity S, log scale.
+    """Median pre-scaling range proxy (Base variant) vs severity S, log scale.
 
     'local' and 'mixed' overlap almost exactly, so each pattern gets a distinct
     line style AND marker (mixed drawn dotted with open markers over local's
@@ -421,7 +432,9 @@ def fig_kappa_antes_vs_S(df, outdir):
     ax.set_yscale("log")
     ax.set_xticks(S_ORDER)
     ax.set_xlabel("Severity $S$")
-    ax.set_ylabel("median $\\kappa_{\\mathrm{pre}}$ (log scale)")
+    ax.set_ylabel(
+        "median $\\widehat{\\kappa}_{\\mathrm{range,pre}}$ (log scale)"
+    )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(title="pattern")
     fig.tight_layout()

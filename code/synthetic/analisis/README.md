@@ -36,23 +36,25 @@ En `--results-dir` (default `synthetic/resultados/grilla_inicial_gurobi/`):
 
 | Archivo | Contenido |
 |---|---|
-| `synthetic_summary_table.csv` / `.tex` | Por `(pattern, S, variante)`: `n`, `n_feasible`, `n_status_ok`, medianas de κ antes/después, factor de reducción, reducción en log10, ρ antes/después, tiempos, y violaciones máximas. El `.tex` es para apéndice. |
-| `synthetic_conditioning_reduction.csv` | Comparaciones **vs Base** por `(pattern, S, variante≠Base)` para `log10(κ_post)` y `log10(ρ_post)`: `n_pairs`, `median_diff_log10_vs_base` (tamaño de efecto), `wilcoxon_stat`, `p_value`, `p_value_bh` (Benjamini–Hochberg por métrica). Wilcoxon signed-rank pareado por instancia (misma seed). |
+| `synthetic_summary_table.csv` / `.tex` | Por `(pattern, S, variante)`: `n`, `n_feasible`, `n_status_ok`, medianas del proxy global de rango antes/después, factor de reducción, reducción en log10, ρ antes/después, tiempos, y violaciones máximas. El `.tex` es para apéndice. |
+| `synthetic_conditioning_reduction.csv` | Archivo de nombre heredado con comparaciones **vs Base** por `(pattern, S, variante≠Base)` para el proxy global de rango y `log10(ρ_post)`: `n_pairs`, `median_diff_log10_vs_base` (tamaño de efecto), `wilcoxon_stat`, `p_value`, `p_value_bh` (Benjamini–Hochberg por métrica). Wilcoxon signed-rank pareado por instancia (misma seed). |
 | `synthetic_objective_feasibility_checks.csv` | Por `(pattern, S)` + fila `TOTAL`: `max_rel_obj_spread` (entre variantes, por instancia), `n_instancias_over_mipgap`, `max_original_row_violation`, `max_integrality_violation`, `n_infeasible_rows`. |
 
 ### Figuras (`.pdf` + `.png`)
 
 | Archivo | Qué muestra |
 |---|---|
-| `fig1_boxplot_log10_kappa_despues` | Distribución de `log10(κ_post)` por variante, grilla `pattern × S`. Detalle de dispersión. |
-| `fig2_bars_log10_reduction` | Reducción mediana de condicionamiento `log10(κ_pre) − log10(κ_post)` por variante, grilla `pattern × S`. Resultado principal. |
-| `fig3_kappa_antes_vs_S` | `κ_pre` (mediana, escala log) vs `S`, una línea por `pattern`. Valida que el desbalance lo controlan `pattern` y `S`. |
+| `fig1_boxplot_log10_kappa_despues` | Distribución de `log10(kappa_range_post)` por variante, grilla `pattern × S`. Detalle de dispersión. |
+| `fig2_bars_log10_reduction` | Reducción mediana del proxy de rango `log10(kappa_range_pre) − log10(kappa_range_post)` por variante, grilla `pattern × S`. Resultado principal. |
+| `fig3_kappa_antes_vs_S` | `kappa_range_pre` (mediana, escala log) vs `S`, una línea por `pattern`. Valida que el desbalance lo controlan `pattern` y `S`. |
 | `fig4_feasibility_violations` | Violaciones máximas (fila + integralidad) por `pattern/S`, escala log, con la tolerancia 1e-5. |
 
 ## Métricas / método
 
-- **Reducción de condicionamiento** se mide en `log10` (escala apropiada para κ que abarca
-  ~10³–10¹⁴). El tamaño de efecto reportado es la **mediana de la diferencia pareada** en
+- **Reducción del proxy global de rango** se mide en `log10` (escala apropiada para
+  valores que abarcan ~10³–10¹⁴). Los campos `kappa_*` conservan su nombre heredado,
+  pero representan `max(|A|,|b|)/min⁺(|A|,|b|)`, no `κ₂(A)`. El tamaño de
+  efecto reportado es la **mediana de la diferencia pareada** en
   `log10` respecto de Base.
 - **Significancia**: Wilcoxon signed-rank pareado por instancia, con ajuste **BH** por familia
   de comparaciones (una familia por métrica).
@@ -60,5 +62,5 @@ En `--results-dir` (default `synthetic/resultados/grilla_inicial_gurobi/`):
   y que las violaciones en escala original queden bajo tolerancia.
 
 > Enfoque deliberado: las instancias son chicas (resuelven en ms). El análisis **no** mide
-> speedup; se enfoca en control del desbalance, recuperación del condicionamiento y
+> speedup; se enfoca en control del desbalance, recuperación del proxy global de rango y
 > preservación de factibilidad/objetivo.
