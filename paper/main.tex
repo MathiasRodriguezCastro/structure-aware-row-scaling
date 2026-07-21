@@ -154,8 +154,9 @@ augmented Simple contrast at $0.1\%$ has nominal adjusted values below $0.05$ ac
 reported multiplicity and operational-family analyses, while reliability-adjusted PAR10
 favors the selective rule there. The current prototype has lower preprocessing-plus-solver
 time under full coverage in the two fast classes, but most of that preprocessing difference
-comes from rebuilding metadata the generator already possesses, and a cached-metadata
-sensitivity retains only two of those eight orderings. In Full, the selective point
+comes from rebuilding metadata the generator already possesses; a cached-metadata
+sensitivity moves the effects toward parity and leaves only two of the eight contrasts with
+$q_{6}<0.05$. In Full, the selective point
 estimate is not retained under an adversarial missing-pair sensitivity. The observed effect
 of external preprocessing differs between the tested Gurobi and CPLEX pipelines, though no
 formal cross-solver interaction is estimated. Overall, metadata-driven selectivity is not
@@ -185,7 +186,11 @@ search.
   (a margin driven mainly by the current prototype's metadata-processing cost in Simple and
   by a mixture of that cost and solver response in SG-Ter-Mer, and worth tens of
   milliseconds per instance in absolute terms); the Full selectivity
-  direction is conditional on the $27$ eligible pairs. On capped solver time the medians
+  direction is conditional on the $27$ eligible pairs.
+  \item When the selective rule is charged only for diagnosis and factor application, as in a
+  generator that reuses its structural taxonomy, most of that observed Flat timing advantage
+  disappears: six directional orderings remain, but only two contrasts keep within-tolerance
+  nominal adjusted values below $0.05$. On capped solver time the medians
   are at most $1.6\%$ and the augmented Simple contrast at $0.1\%$ is the only comparison
   whose nominal adjusted values remain below $0.05$ across the reported multiplicity and
   operational-family analyses; all coefficient-only comparisons remain inconclusive.
@@ -674,7 +679,7 @@ One minimizer is
 \end{proposition}
 
 \noindent The proof, which constructs the optimal scalar per block and evaluates the
-resulting spectrum, is given in Appendix~\ref{app:proofs}.
+resulting spectrum, is given in the Supporting Information (Section~S1).
 
 This proposition is not used as an algorithmic recipe. The generated MIPs considered in
 this paper contain rectangular local matrices, inequalities, bounds, redundant rows, and
@@ -750,7 +755,7 @@ factors preserve singular values, the same formula applies to the factor with $-
 \end{proposition}
 
 \noindent The proof, which bounds the effect of the coupling factor on the extreme
-singular values, is given in Appendix~\ref{app:proofs}.
+singular values, is given in the Supporting Information (Section~S1).
 
 Applied to \eqref{eq:balance-factorization}, the proposition shows that the balance row
 should not be treated as an ordinary local row. Its numerical effect depends on the
@@ -2992,14 +2997,20 @@ its preprocessing component is measured under the cleanest protocol available ra
 under load. The effect is substantial. The median ratios collapse towards parity---in Simple
 from $1.029$ to $1.001$ at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from
 $1.053$ to $1.007$ and from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose
-prototype preprocessing-plus-solver ordering had adjusted values below $0.05$, only two
-retain them: the coefficient-only Simple contrast at $1\%$ ($q_{6}=0.0002$) and the augmented
-Simple contrast at $0.1\%$ ($q_{6}=0.008$). The augmented SG-Ter-Mer contrasts fall to
+prototype preprocessing-plus-solver ordering had adjusted values below $0.05$, six keep a
+direction favoring the role-blind rule but only two retain within-tolerance nominal adjusted
+values below $0.05$: the coefficient-only Simple contrast at $1\%$ ($q_{6}=0.0002$) and the
+augmented Simple contrast at $0.1\%$ ($q_{6}=0.008$). Those two also survive the joint and
+operational-family corrections ($q_{12}=0.0005$ and $0.008$;
+$q_{12}^{\mathrm{blk}}=0.008$ and $0.013$). The augmented SG-Ter-Mer contrasts fall to
 $q_{6}=0.094$ and $0.051$, and both coefficient-only SG-Ter-Mer contrasts to $q_{6}\ge0.29$.
 The Full augmented direction is unchanged in sign and strength
-($0.877$, $q_{6}=0.045$ at $0.1\%$). Read together with the phase breakdown, the operational
-reading is therefore that the role-blind advantage observed in the fast classes is mostly an
-artifact of what the prototype recomputes, not a property of covering more rows.
+($0.877$, $q_{6}=0.045$ at $0.1\%$), but it rests on the same $27$ eligible pairs and is
+likewise not retained by the adversarial signed-rank sensitivity over the four unrecorded
+instances ($p=0.43$). Read together with the phase breakdown, the reading is therefore that
+most of the magnitude and apparent uniformity of the fast-class role-blind advantage comes
+from metadata reconstruction in the prototype; a smaller, class- and kernel-dependent
+residual coverage effect remains after that stage is removed.
 
 \begin{table}[t]
 \centering
@@ -3008,10 +3019,16 @@ recomputed on
 $T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
 which removes the prototype's metadata-reconstruction stage. Median ratios are SA/Flat on
 the same log-ratio variable; negative $r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are
-the BH values within tolerance and jointly. Exploratory, like
+the BH value within the six-test tolerance family; the joint $q_{12}$ and operational-family
+sensitivities are quoted in the text. The analysis conditions on the per-instance median
+preprocessing times estimated from the low-contention replication, and its adjusted values do
+not propagate timing-estimation uncertainty. The cached Full-Augmented result at $0.1\%$ uses
+the same $27$ eligible pairs as \cref{tab:flat-control} and is likewise not retained by the
+adversarial signed-rank sensitivity over the four unrecorded instances. Exploratory, like
 \cref{tab:flat-control}.}
 \label{tab:flat-cached}
 \small
+\setlength{\belowcaptionskip}{2pt}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llc r rrr@{}}
 \toprule
@@ -3060,7 +3077,8 @@ against $6.1$--$9.1\times$ under load, and $2.7$--$3.1\times$ on the smaller abs
 of the dedicated batches. Pinned medians are $0.049$ against $0.008$\,s in Simple, $0.030$
 against $0.006$\,s in SG-Ter-Mer and $0.077$ against $0.014$\,s in Full (per-cell values,
 dispersion and family counts in Table~S10). We therefore read the direction of the
-preprocessing gap as established, and take the pinned protocol as the estimate of its
+preprocessing gap as established, and use the pinned protocol as the cleaner reference
+estimate for this implementation and hardware environment rather than as a universal
 intrinsic size.
 
 The absolute magnitudes matter for how much this is worth
@@ -3199,11 +3217,12 @@ integer solutions whenever their solver paths produce different incumbents.
 \centering
 \caption{Direct coverage-versus-selectivity comparison under Gurobi for both per-row
 kernels: structure-aware (SA) versus role-blind Flat reruns from the same dedicated
-class--tolerance batch, on the exploratory endpoint hierarchy of
-\cref{subsec:statistical}.
-Endpoints: preprocessing-plus-solver time
-$T_{\mathrm{pre+solve}}=T_{\rm preproc}+T_{\rm solver}$ (operational) and capped solver
-time (decomposition). The paired variable is $d_i=\log(T_{\mathrm{Flat},i}/T_{\mathrm{SA},i})$;
+class--tolerance batch, on the exploratory endpoint hierarchy of Section~\ref{subsec:statistical}.
+Endpoints: \emph{prototype} preprocessing-plus-solver time
+$T_{\mathrm{pre+solve}}^{\mathrm{prototype}}=T_{\rm preproc}+T_{\rm solver}$, which charges the
+prototype's metadata reconstruction, and capped solver time (decomposition). The
+generator-integrated counterpart is the cached-metadata sensitivity of
+\cref{tab:flat-cached}. The paired variable is $d_i=\log(T_{\mathrm{Flat},i}/T_{\mathrm{SA},i})$;
 median ratios are SA/Flat, negative $r_{\mathrm{rb}}$ favors Flat, and $q_{6}$ is the BH
 value within the six-test tolerance family of each endpoint.}
 \label{tab:flat-control}
@@ -3390,11 +3409,14 @@ comparison says nothing about the metadata. Second, the choice of \emph{coverage
 whether the row-role selection helps is a metadata question, and it is answered only by the
 two role-blind controls (SA-Aug versus Flat-Aug and SA-Mat versus Flat-Mat,
 \cref{subsec:stage-attribution}). In the reported default-seed campaign, the direct tests
-answer it endpoint by endpoint: in preprocessing-plus-solver time the implemented Flat
-pipeline has the lower observed time in the two fast classes at both tolerances, the Full selectivity direction is conditional on its
-eligible pairs, and on solver time alone only the augmented Simple contrast at $0.1\%$
+answer it endpoint by endpoint. In the prototype preprocessing-plus-solver endpoint, Flat has
+lower observed time in the two fast classes at both tolerances; in the cached-metadata
+sensitivity that better approximates generator-integrated deployment, the effects move close
+to parity and only two fast-class contrasts retain $q_{6}<0.05$. The Full selectivity
+direction is conditional on its eligible pairs under both endpoints, and on solver time alone
+only the augmented Simple contrast at $0.1\%$
 remains below the nominal $0.05$ threshold after every reported multiplicity and
-operational-family adjustment applied to the capped solver-time endpoint, with all
+operational-family adjustment applied to that endpoint, with all
 matrix-only solver-time contrasts
 inconclusive. Third,
 whether the solver could have done this itself: the internal-scaling control
@@ -3610,8 +3632,9 @@ SG-Ter-Mer result is therefore scoped to the reported default-seed campaign, and
 direction and magnitude must not be treated as stable. Moreover, the operational scenarios
 share generator structure and form identifiable Simple and SG-Ter-Mer families; treating all
 rows as independent can overstate precision. On solver time, the block-sign sensitivity
-retains Simple but not SG-Ter-Mer after adjustment; the preprocessing-plus-solver and Work
-endpoints do retain SG-Ter-Mer (Table~S10). The Work replication of both augmented
+retains Simple but not SG-Ter-Mer after adjustment; the prototype preprocessing-plus-solver
+and Work endpoints do retain SG-Ter-Mer (Table~S10), whereas the cached-metadata sensitivity
+moves the SG-Ter-Mer comparisons to or above the nominal $0.05$ threshold. The Work replication of both augmented
 $0.1\%$ directions makes pure wall-clock scheduling noise a less likely explanation, but
 it does not eliminate seed- or trajectory-level variability; seed-replicated runs are left
 as future work. The preprocessing-plus-solver endpoint is built from calls that the dedicated
@@ -3691,8 +3714,10 @@ entirely from local-row normalization. The direct role-blind controls
 (\cref{tab:flat-control}) show that coverage and selectivity cannot be generalized across
 the two kernels or across endpoints. These exploratory single-default-seed controls are
 developed in full in \cref{subsec:stage-attribution}; their lesson is that the ordering
-depends on what one measures---preprocessing-plus-solver time, where the selective rule pays
-for its own diagnosis, against solver time alone, where the effects are small and the
+depends on what one measures---prototype preprocessing-plus-solver time, where the selective
+implementation pays mainly for reconstructing metadata, against the cached-metadata
+sensitivity, where only diagnosis and factor application are charged, against solver time
+alone, where the effects are small and the
 reliability-adjusted reading can point the other way. They were run only under Gurobi:
 the value of external preprocessing is solver-dependent, and whether the same
 coverage-versus-selectivity ordering persists under CPLEX remains untested. Establishing this
@@ -3718,117 +3743,6 @@ preprocessing, which on fast instances can decide the preprocessing-plus-solver 
 
 % Float barrier removed to improve two-column layout.
 
-
-\appendix
-\section{Proofs of the spectral propositions}
-\label{app:proofs}
-
-\noindent\textbf{Proof of \cref{prop:ideal-block-scaling}.}
-\begin{proof}
-For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
-\begin{equation*}
-\diag(\alpha_1 I,\ldots,\alpha_B I)D
-=
-\diag(\alpha_1 A_1,\ldots,\alpha_B A_B).
-\end{equation*}
-The singular values of a block-diagonal matrix are the union of the singular values of
-its blocks. Therefore, for every $i$,
-\begin{equation*}
-\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-\ge
-\kappa_2(\alpha_i A_i)
-=
-\kappa_2(A_i).
-\end{equation*}
-Taking the maximum over $i$ gives the lower bound
-\begin{equation*}
-\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-\ge
-\max_i \kappa_2(A_i)
-\end{equation*}
-for every admissible block scaling.
-
-Now choose $\alpha_i=(M_i m_i)^{-1/2}$. Then the largest and smallest singular values of
-$\alpha_i A_i$ are
-\begin{align*}
-\sigma_{\max}(\alpha_i A_i)
-&=\sqrt{\frac{M_i}{m_i}}=\sqrt{\kappa_2(A_i)},\\
-\sigma_{\min}(\alpha_i A_i)
-&=\sqrt{\frac{m_i}{M_i}}=\frac{1}{\sqrt{\kappa_2(A_i)}}.
-\end{align*}
-Because the singular values of the complete block-diagonal matrix are obtained by
-pooling the singular values of its blocks,
-\begin{equation*}
-\sigma_{\max}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-=
-\sqrt{\max_i \kappa_2(A_i)},
-\end{equation*}
-and
-\begin{equation*}
-\sigma_{\min}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-=
-\frac{1}{\sqrt{\max_i \kappa_2(A_i)}}.
-\end{equation*}
-The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
-\end{proof}
-
-\noindent\textbf{Proof of \cref{prop:triangular-coupling}.}
-\begin{proof}
-Let $R=U\Sigma V^\top$ be a singular value decomposition (SVD) of $R$, with $U$ and $V$
-orthogonal. Orthogonal multiplication does not change singular values, and hence
-$T_R$ has the same singular values as
-\begin{equation*}
-\begin{bmatrix}
-V^\top & 0\\
-0 & U^\top
-\end{bmatrix}
-\begin{bmatrix}
-I_n & 0\\
-R & I_m
-\end{bmatrix}
-\begin{bmatrix}
-V & 0\\
-0 & U
-\end{bmatrix}
-=
-\begin{bmatrix}
-I_n & 0\\
-\Sigma & I_m
-\end{bmatrix}.
-\end{equation*}
-For each singular value $\sigma$ of $R$, the nontrivial part reduces to the two-dimensional
-block
-\begin{equation*}
-B_\sigma=
-\begin{bmatrix}
-1 & 0\\
-\sigma & 1
-\end{bmatrix}.
-\end{equation*}
-The squared singular values of $B_\sigma$ are the eigenvalues of
-\begin{equation*}
-B_\sigma^\top B_\sigma=
-\begin{bmatrix}
-1+\sigma^2 & \sigma\\
-\sigma & 1
-\end{bmatrix},
-\end{equation*}
-namely
-\begin{equation*}
-\lambda_{\pm}(\sigma)=
-\frac{\sigma^2+2\pm \sigma\sqrt{\sigma^2+4}}{2}.
-\end{equation*}
-Their product is one, and $\lambda_+(\sigma)$ is increasing for $\sigma\ge0$. Additional
-directions associated with zero singular values of $R$ contribute singular values equal to
-one. Therefore the largest squared singular value of $T_R$ is $\lambda_+(\rho)$ and the
-smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
-\begin{align*}
-\kappa_2(T_R)
-&=\lambda_+(\rho)\\
-&=\frac{\rho^2+2+\rho\sqrt{\rho^2+4}}{2}\\
-&=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
-\end{align*}
-\end{proof}
 
 \bmsection*{Author Contributions}
 

@@ -5,6 +5,9 @@
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{newtxtext,newtxmath}
+\usepackage{amsmath}
+\newenvironment{proof}{\par\noindent\textit{Proof.}\ }{\hfill\qedsymbol\par\medskip}
+\providecommand{\qedsymbol}{\ensuremath{\square}}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[labelfont=bf]{caption}
@@ -49,6 +52,117 @@ reliability audit (Table~S9); and (xii) the multiplicity, operational-family, bo
 preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities for that
 direct comparison, together with its per-contrast attrition and preprocessing-time
 distributions (Table~S10).
+
+\section*{S1. Proofs of the spectral propositions}
+\noindent These are the full proofs of the two propositions stated in Section~3 of the
+main text, moved here to keep the motivation and the method adjacent.
+
+\noindent\textbf{Proof of \cref{prop:ideal-block-scaling}.}
+\begin{proof}
+For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
+\begin{equation*}
+\diag(\alpha_1 I,\ldots,\alpha_B I)D
+=
+\diag(\alpha_1 A_1,\ldots,\alpha_B A_B).
+\end{equation*}
+The singular values of a block-diagonal matrix are the union of the singular values of
+its blocks. Therefore, for every $i$,
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\kappa_2(\alpha_i A_i)
+=
+\kappa_2(A_i).
+\end{equation*}
+Taking the maximum over $i$ gives the lower bound
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\max_i \kappa_2(A_i)
+\end{equation*}
+for every admissible block scaling.
+
+Now choose $\alpha_i=(M_i m_i)^{-1/2}$. Then the largest and smallest singular values of
+$\alpha_i A_i$ are
+\begin{align*}
+\sigma_{\max}(\alpha_i A_i)
+&=\sqrt{\frac{M_i}{m_i}}=\sqrt{\kappa_2(A_i)},\\
+\sigma_{\min}(\alpha_i A_i)
+&=\sqrt{\frac{m_i}{M_i}}=\frac{1}{\sqrt{\kappa_2(A_i)}}.
+\end{align*}
+Because the singular values of the complete block-diagonal matrix are obtained by
+pooling the singular values of its blocks,
+\begin{equation*}
+\sigma_{\max}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\sqrt{\max_i \kappa_2(A_i)},
+\end{equation*}
+and
+\begin{equation*}
+\sigma_{\min}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\frac{1}{\sqrt{\max_i \kappa_2(A_i)}}.
+\end{equation*}
+The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
+\end{proof}
+
+\noindent\textbf{Proof of \cref{prop:triangular-coupling}.}
+\begin{proof}
+Let $R=U\Sigma V^\top$ be a singular value decomposition (SVD) of $R$, with $U$ and $V$
+orthogonal. Orthogonal multiplication does not change singular values, and hence
+$T_R$ has the same singular values as
+\begin{equation*}
+\begin{bmatrix}
+V^\top & 0\\
+0 & U^\top
+\end{bmatrix}
+\begin{bmatrix}
+I_n & 0\\
+R & I_m
+\end{bmatrix}
+\begin{bmatrix}
+V & 0\\
+0 & U
+\end{bmatrix}
+=
+\begin{bmatrix}
+I_n & 0\\
+\Sigma & I_m
+\end{bmatrix}.
+\end{equation*}
+For each singular value $\sigma$ of $R$, the nontrivial part reduces to the two-dimensional
+block
+\begin{equation*}
+B_\sigma=
+\begin{bmatrix}
+1 & 0\\
+\sigma & 1
+\end{bmatrix}.
+\end{equation*}
+The squared singular values of $B_\sigma$ are the eigenvalues of
+\begin{equation*}
+B_\sigma^\top B_\sigma=
+\begin{bmatrix}
+1+\sigma^2 & \sigma\\
+\sigma & 1
+\end{bmatrix},
+\end{equation*}
+namely
+\begin{equation*}
+\lambda_{\pm}(\sigma)=
+\frac{\sigma^2+2\pm \sigma\sqrt{\sigma^2+4}}{2}.
+\end{equation*}
+Their product is one, and $\lambda_+(\sigma)$ is increasing for $\sigma\ge0$. Additional
+directions associated with zero singular values of $R$ contribute singular values equal to
+one. Therefore the largest squared singular value of $T_R$ is $\lambda_+(\rho)$ and the
+smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
+\begin{align*}
+\kappa_2(T_R)
+&=\lambda_+(\rho)\\
+&=\frac{\rho^2+2+\rho\sqrt{\rho^2+4}}{2}\\
+&=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
+\end{align*}
+\end{proof}
 
 \medskip
 \noindent Here, \PARten{} (including its ITT/strict/mixed superscripts) denotes the

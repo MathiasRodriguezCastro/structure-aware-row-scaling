@@ -220,7 +220,11 @@ FUNCTION {format.names}
   numnames 'namesleft :=
   { namesleft #0 > }
 
-  {s nameptr "{ll }{v}{f{}}" format.name$ 't :=
+  % LOCAL FIX (build copy only): the upstream format string "{ll }{v}{f{}}" leaves a
+  % dangling space after the surname when there are no given names, which renders
+  % corporate authors as "Gurobi Optimization LLC ." Moving the separator in front of
+  % the optional parts removes it without changing personal-name output.
+  {s nameptr "{ll}{ v}{ f{}}" format.name$ 't :=
     namesleft #1 >
     {t * ", " * }
     {t}
@@ -249,9 +253,15 @@ FUNCTION {format.editors}
 { editor empty$
     { "" }
     { editor format.names
+      % LOCAL FIX (build copy only): format.names always appends ". " (it is written
+      % for the author list, which is followed by the title). For an editor list the
+      % upstream code then glues "\kern-2pt, eds." onto that period-space, rendering
+      % "Klapp J. , eds."  Drop the trailing ". " before appending, giving the AMA
+      % form "Klapp J, eds."
+      duplicate$ text.length$ #2 - #1 swap$ substring$
       editor num.names$ #1 >
-    { "\kern-2pt, eds." * }
-    { "\kern-2pt, ed." * }
+    { ", eds." * }
+    { ", ed." * }
       if$
     }
   if$
