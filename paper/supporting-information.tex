@@ -837,12 +837,29 @@ $0.003$\,s in every cell.
 
 \emph{Order-randomized preprocessing replication}
 (\texttt{scripts/preproc\_timing\_replication.py}; $R=20$, seeded order per repetition,
-fresh process per call, MIP never solved, $12$ concurrent workers on a $16$-core
-workstation without CPU pinning). Per class and kernel, medians of the per-instance median
-call time (selective versus role-blind, seconds), the median paired ratio, the
+fresh process per call, MIP never solved). Two protocols were run: a \emph{concurrent}
+stress test ($12$ workers on a $16$-core workstation, no CPU pinning) and a
+\emph{low-contention} estimate (one worker, every call pinned to one logical CPU via
+\texttt{--pin-cpu}). The pinned protocol is the cleaner estimator---relative IQR
+$0.00$--$0.02$ against $0.18$--$1.83$---and gives, per class and kernel, selective versus
+role-blind medians and paired ratios:
+Simple/Aug $0.0487$ vs $0.0083$ ($5.85\times$; cached $0.0087$ vs $0.0081$, $1.08\times$);
+Simple/Mat $0.0499$ vs $0.0083$ ($6.00\times$; cached $0.0099$ vs $0.0081$, $1.23\times$);
+SG-Ter-Mer/Aug $0.0300$ vs $0.0059$ ($5.07\times$; cached $0.0058$ vs $0.0057$,
+$1.01\times$); SG-Ter-Mer/Mat $0.0307$ vs $0.0058$ ($5.28\times$; cached $0.0065$ vs
+$0.0056$, $1.15\times$); Full/Aug $0.0773$ vs $0.0136$ ($5.71\times$; cached $0.0141$ vs
+$0.0132$, $1.07\times$); Full/Mat $0.0797$ vs $0.0137$ ($5.81\times$; cached $0.0161$ vs
+$0.0133$, $1.21\times$). All $612$ instance--kernel records favor the role-blind rule on the
+full call under both protocols. On the cached counterpart the role-blind rule has the lower
+median in $20$--$32$ of the $34$ operational families per cell, so that residual is
+descriptive rather than uniform.
+
+The concurrent protocol is retained as a stress test of the direction under adverse
+measurement conditions. Its per-class and per-kernel values---medians of the per-instance
+median call time (selective versus role-blind, seconds), the median paired ratio, the
 cached-metadata counterpart $T_{\rm diagnosis}+T_{\rm application}$, and the relative
-interquartile range (IQR over median), which replaces the coefficient of variation because
-the latter is unstable for short, skewed timings:
+interquartile range, which replaces the coefficient of variation because the latter is
+unstable for short, skewed timings---are:
 Simple/Aug $0.272$ vs $0.031$ ($8.38\times$; cached $0.032$ vs $0.029$, $1.08\times$;
 relative IQR $0.32$ vs $1.51$);
 Simple/Mat $0.281$ vs $0.031$ ($8.58\times$; cached $0.040$ vs $0.029$, $1.40\times$;

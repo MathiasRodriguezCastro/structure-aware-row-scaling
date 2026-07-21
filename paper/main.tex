@@ -2987,18 +2987,17 @@ recompute the whole paired comparison on the cached-metadata endpoint
 $T_{\mathrm{pre+solve}}^{\mathrm{cached}}
 =T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$
 (\cref{tab:flat-cached}). This sensitivity splices the per-instance cached preprocessing
-times of the replication onto the solver times of the original batches; because the
-replication ran under concurrent load, its preprocessing component is if anything
-overstated, so the sensitivity is conservative towards the role-blind rule. The effect is
-substantial. The median ratios collapse towards parity---in Simple from $1.029$ to $1.003$
-at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from $1.053$ to $1.007$ and
-from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose prototype
-preprocessing-plus-solver ordering had adjusted values below $0.05$, only two retain
-them: the coefficient-only Simple contrast at $1\%$ ($q_{6}<0.001$) and the augmented
-Simple contrast at $0.1\%$ ($q_{6}=0.003$). The augmented SG-Ter-Mer contrasts fall to
-$q_{6}=0.064$ and $0.055$, and both coefficient-only SG-Ter-Mer contrasts to $q_{6}\ge0.2$.
-The Full augmented direction is unchanged in sign and comparable in strength
-($0.877$, $q_{6}=0.052$ at $0.1\%$). Read together with the phase breakdown, the operational
+times of the low-contention replication onto the solver times of the original batches, so
+its preprocessing component is measured under the cleanest protocol available rather than
+under load. The effect is substantial. The median ratios collapse towards parity---in Simple
+from $1.029$ to $1.001$ at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from
+$1.053$ to $1.007$ and from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose
+prototype preprocessing-plus-solver ordering had adjusted values below $0.05$, only two
+retain them: the coefficient-only Simple contrast at $1\%$ ($q_{6}=0.0002$) and the augmented
+Simple contrast at $0.1\%$ ($q_{6}=0.008$). The augmented SG-Ter-Mer contrasts fall to
+$q_{6}=0.094$ and $0.051$, and both coefficient-only SG-Ter-Mer contrasts to $q_{6}\ge0.29$.
+The Full augmented direction is unchanged in sign and strength
+($0.877$, $q_{6}=0.045$ at $0.1\%$). Read together with the phase breakdown, the operational
 reading is therefore that the role-blind advantage observed in the fast classes is mostly an
 artifact of what the prototype recomputes, not a property of covering more rows.
 
@@ -3019,20 +3018,20 @@ the BH values within tolerance and jointly. Exploratory, like
 Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ \\
 \midrule
 \multirow{6}{*}{$1\%$}
- & Simple & Aug & 204 & 1.0026 & $-0.189$ & 0.058 \\
- & Simple & Mat & 204 & 1.0068 & $-0.502$ & $<0.001$ \\
- & SG-Ter-Mer & Aug & 67 & 1.0068 & $-0.301$ & 0.064 \\
- & SG-Ter-Mer & Mat & 67 & 1.0052 & $-0.189$ & 0.215 \\
- & Full & Aug & 31 & 0.9217 & $+0.351$ & 0.135 \\
- & Full & Mat & 32 & 0.9907 & $+0.231$ & 0.262 \\
+ & Simple & Aug & 204 & 1.0008 & $-0.124$ & 0.185 \\
+ & Simple & Mat & 204 & 1.0019 & $-0.333$ & 0.0002 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0074 & $-0.303$ & 0.094 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.148$ & 0.291 \\
+ & Full & Aug & 31 & 0.9197 & $+0.355$ & 0.173 \\
+ & Full & Mat & 32 & 0.9869 & $+0.242$ & 0.286 \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
- & Simple & Aug & 204 & 1.0100 & $-0.278$ & 0.003 \\
- & Simple & Mat & 203 & 1.0009 & $-0.072$ & 0.445 \\
- & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.310$ & 0.055 \\
- & SG-Ter-Mer & Mat & 67 & 1.0096 & $-0.155$ & 0.407 \\
- & Full & Aug & 27 & 0.8772 & $+0.519$ & 0.052 \\
- & Full & Mat & 27 & 0.9805 & $+0.048$ & 0.841 \\
+ & Simple & Aug & 204 & 1.0096 & $-0.259$ & 0.008 \\
+ & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 \\
+ & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 \\
+ & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3050,12 +3049,19 @@ SG-Ter-Mer families and all $34$ Full singletons have a positive median
 selective-minus-Flat difference in both kernels. The combined preprocessing-plus-solver
 comparisons of \cref{tab:flat-control} remain based on the original fixed-order solve
 batches; this replication validates the preprocessing-overhead direction, not the combined
-endpoint. The \emph{magnitude}, moreover, is protocol-dependent: under the replication's
-concurrent load the median paired selective-to-Flat ratio is $6.1$--$9.1\times$, against
-$2.7$--$3.1\times$ on the smaller absolute values of the dedicated batches (per-cell
-medians, dispersion, and family counts in Table~S10). We therefore read the direction of
-the preprocessing gap as established and its absolute size as specific to the machine and
-load under which it is measured.
+endpoint. Because a concurrent replication is a stress test rather than a clean estimator of
+a millisecond-scale quantity, we repeated it in a low-contention protocol---one worker,
+every call pinned to a single logical CPU, otherwise identical. That protocol is far
+quieter: the relative interquartile range falls to $0.00$--$0.02$ from $0.18$--$1.83$, and
+absolute times fall about fivefold. The direction is unchanged---again $306/306$ instances
+in both kernels---so the sign survives both a loaded and a quiet machine, while the
+magnitude does not: the median paired selective-to-Flat ratio is $5.1$--$6.0\times$ pinned
+against $6.1$--$9.1\times$ under load, and $2.7$--$3.1\times$ on the smaller absolute values
+of the dedicated batches. Pinned medians are $0.049$ against $0.008$\,s in Simple, $0.030$
+against $0.006$\,s in SG-Ter-Mer and $0.077$ against $0.014$\,s in Full (per-cell values,
+dispersion and family counts in Table~S10). We therefore read the direction of the
+preprocessing gap as established, and take the pinned protocol as the estimate of its
+intrinsic size.
 
 The absolute magnitudes matter for how much this is worth
 (\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
