@@ -818,7 +818,7 @@ a reliable counterpart on the same instance, as defined in the main text. At Ful
 instances 045--048 are absent from both policies. Under an equal-penalty imputation for those
 four unrecorded instances the ordering is unchanged and the added pairs are operational ties;
 that assumption does not address selection under unequal missing outcomes, for which the
-adversarial signed-rank sensitivity is reported in the main text and Table~S11. The key reliability
+adversarial signed-rank sensitivity is reported in the main text and Table~S12. The key reliability
 sensitivity is visible in Simple/Augmented: the small Flat solver-time advantage at $0.1\%$
 reverses under both strict and mixed costs. SG-Ter-Mer/Augmented retains a small descriptive
 Flat advantage because neither policy has a mixed failure.
@@ -835,9 +835,9 @@ instance-level and operational-family inference for the two
 central $0.1\%$ augmented contrasts on the prototype preprocessing-plus-solver implementation endpoint and on the
 capped solver-time decomposition, on the shared paired variable
 $d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$, with the Hodges--Lehmann pseudomedian expressed
-as the typical SA/Flat ratio $\exp(-\widehat\theta_{\rm HL})$. Panel B repeats the
-family analysis for Gurobi Work units. Panel C relocates the path-specific diagnostic from
-the main timing table because it does not hold the integer solution fixed across policies.
+as the typical SA/Flat ratio $\exp(-\widehat\theta_{\rm HL})$. Panel B reports the corresponding Gurobi Work-unit sensitivity. Panel C reports the
+own-incumbent path-specific diagnostic, which does not hold the integer solution fixed across
+policies.
 Panel B reports the corresponding Gurobi Work-unit sensitivity and Panel C the own-incumbent
 path-specific diagnostic.}
 \label{tab:si-flat-sensitivities}
@@ -904,7 +904,7 @@ med. $\rho_{\kappa,\rm SA}^{\rm solver}/\rho_{\kappa,\rm Flat}^{\rm solver}$ \\
 \begin{landscape}
 \begin{table}[!p]
 \centering
-\caption{Attrition, preprocessing timing, measurement environment, and the cached-metadata and hardware-transfer sensitivities of the direct SA--Flat controls. Panel D reports single-call preprocessing summaries from the original fixed-order solve batches. Panel E uses per-instance median preprocessing times estimated from the replicated low-contention protocols; the uncertainty of those estimated medians is not propagated into the derived inferential quantities.}
+\caption{Attrition, original-batch preprocessing timing, and release-versus-diagnostic cached-metadata sensitivities for the direct SA--Flat controls. Panel D reports single-call preprocessing summaries from the original fixed-order solve batches. Panels E1--E2 use per-instance median preprocessing times estimated from the replicated low-contention protocols; uncertainty in those estimated medians is not propagated into the derived inferential quantities.}
 \label{tab:si-flat-attrition}
 \scriptsize
 \setlength{\tabcolsep}{3.0pt}
@@ -1017,18 +1017,32 @@ crossing at every evaluated grid point. Additional within-tolerance $q_6$ crossi
 appear at the evaluated point $\rho=2$; the exact transition threshold between $1$ and $2$ is
 not identified by this grid. The transfer factors are hypothetical: the workstation-to-ClusterUY
 transfer was never observed, and the only measured perturbation is the change of toolchain on
-the same machine. Comparing Panels E1 and E2 gives that implied toolchain ratio, defined as the
-ratio of the two builds' per-cell cached ratios,
-$\rho=\bigl[\operatorname{med}_i(T^{\rm cached}_{{\rm SA},i}/T^{\rm cached}_{{\rm Flat},i})\bigr]_{\rm release}
-\big/\bigl[\operatorname{med}_i(\cdot)\bigr]_{\rm diagnostic}$, where each per-cell ratio is the
-exponentiated median of the per-instance log ratios of cached preprocessing medians (the
-quantity computed by \texttt{scripts/cached\_transfer\_sensitivity.py}). Its values are
+the same machine. Comparing Panels E1 and E2 gives the implied toolchain ratio. Writing, for build
+$b\in\{\text{release},\text{diagnostic}\}$, class $c$ and kernel $k$,
+\[
+R_{b,c,k}=\exp\!\Bigl[\operatorname{median}_{i}
+\log\bigl(T^{\mathrm{cached},b}_{\mathrm{SA},i}/T^{\mathrm{cached},b}_{\mathrm{Flat},i}\bigr)\Bigr],
+\qquad
+\rho^{\mathrm{toolchain}}_{c,k}=\frac{R_{\mathrm{release},c,k}}{R_{\mathrm{diagnostic},c,k}},
+\]
+which is a ratio of exponentiated median log-ratios, not a ratio of marginal median
+preprocessing times (the quantity computed by
+\texttt{scripts/cached\_transfer\_sensitivity.py}). Its values are
 $0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and $0.966$ for Full/Aug, Full/Mat,
 SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat; optimization leaves the full-call
 ratios essentially unchanged ($5.38$--$6.12\times$ against $5.07$--$6.00\times$) and the
-metadata share at $81$--$83\%$. Exporting the scaled model with both builds on six instances
-across the three classes and both kernels gives $24/24$ byte-identical exports, so the builds
-differ in cost and not in the transformation applied.
+metadata share at $81$--$83\%$. Exporting the preprocessed model with both builds over all $306$
+instances, both kernels and both coverage policies gives $1204/1224$ byte-identical exports
+(\texttt{scripts/build\_invariance\_audit.py}; full record in
+\texttt{results-revision/preproc-timing/build\_invariance.csv}). All Simple and SG-Ter-Mer
+records are identical. The $20$ exceptions are five Full instances under all four variants,
+where the nonlinear-hydro linearization coefficients differ by one unit in the last place
+($4.7\times10^{-16}$ relative); the discrepancy is therefore in model construction under
+optimized floating-point contraction, not in the scaling factors or safeguard decisions. The complete contrast-by-grid values---every contrast, grid
+point, median ratio, $r_{\rm rb}$, $p$, $q_6$ and $q_{12}$---are in
+\texttt{results-revision/preproc-timing/cached\_transfer\_sensitivity.csv} of the
+reproducibility package, regenerated by
+\texttt{scripts/cached\_transfer\_sensitivity.py -\/-dump-csv}.
 
 \vspace{4pt}
 \noindent\scriptsize\textbf{Release-build absolute times} (medians with interquartile range,
@@ -1050,7 +1064,7 @@ diagnostic build.
 
 
 \noindent\footnotesize
-\emph{Notes to Tables~S10--S11.} Both time endpoints use the paired variable
+\emph{Notes to Tables~S10--S12.} Both time endpoints use the paired variable
 $d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$; negative values favor Flat. The test, the effect
 size, and the median ratio are computed on this one scale and share its direction
 convention but do not target an identical estimand; the Hodges--Lehmann column is the

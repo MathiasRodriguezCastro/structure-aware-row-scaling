@@ -110,6 +110,8 @@ def main():
     ap.add_argument('--cached-csv',
                     default='results-revision/preproc-timing/replicated_pinned.csv')
     ap.add_argument('--root', default='.')
+    ap.add_argument('--dump-csv', default=None,
+                    help='write the full contrast-by-grid table to this CSV')
     args = ap.parse_args()
     cached = {}
     for r in csv.DictReader(open(args.cached_csv)):
@@ -140,6 +142,24 @@ def main():
             rho, len(sig), ','.join(f'{k[1][:4]}/{k[2][:3]} {k[0]}' for k in sig),
             med[('1%', 'Simple', 'Matrix-only')], med[('0.1%', 'Simple', 'Augmented')],
             med[('0.1%', 'SG-Ter-Mer', 'Augmented')]))
+
+    if args.dump_csv:
+        import csv as _csv
+        rows = []
+        for label, pairs in (('common', [(l, l) for l in common]),
+                             ('policy-ratio', [(r, 1.0) for r in (0.25, 0.5, 1.0, 2.0, 4.0)])):
+            for lam_sa, lam_flat in pairs:
+                res, med, eff, q6, q12, ns = contrasts(cached, lam_sa, lam_flat, args.root)
+                for k in sorted(res):
+                    rows.append({'grid': label, 'lambda_sa': lam_sa, 'lambda_flat': lam_flat,
+                                 'gap': k[0], 'class': k[1], 'kernel': k[2], 'n': ns[k],
+                                 'median_sa_over_flat': f'{med[k]:.6f}',
+                                 'r_rb': f'{eff[k]:.6f}', 'p': f'{res[k]:.8g}',
+                                 'q6': f'{q6[k]:.8g}', 'q12': f'{q12[k]:.8g}'})
+        with open(args.dump_csv, 'w', newline='') as fh:
+            w = _csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+            w.writeheader(); w.writerows(rows)
+        print(f'wrote {len(rows)} grid rows to {args.dump_csv}')
 
     print()
     print('== Per-contrast detail at lambda = 1 ==')

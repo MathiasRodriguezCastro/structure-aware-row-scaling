@@ -1934,9 +1934,11 @@ compares variants within a scenario; but to the extent that scenarios are correl
 effective number of independent replicates is smaller than the nominal $n$ and the reported
 instance-level $p$-values may understate uncertainty. On the solver-time decomposition
 the family-sign sensitivity leaves only the augmented Simple contrast below $0.05$ after
-adjustment; on the preprocessing-plus-solver endpoint it leaves every Simple and
-SG-Ter-Mer contrast below the nominal $0.05$ threshold, while the augmented Full contrast at
-$0.1\%$ remains conditional on its eligible pairs (\cref{subsec:stage-attribution}). We therefore call the
+adjustment; on the \emph{prototype} preprocessing-plus-solver endpoint it leaves every Simple
+and SG-Ter-Mer contrast below the nominal $0.05$ threshold, while on the release-build
+cached-metadata sensitivity only the augmented Simple contrast at $0.1\%$ remains below the
+reported joint and operational-family thresholds and the augmented Full contrast stays
+conditional on its eligible pairs (\cref{subsec:stage-attribution}). We therefore call the
 SG-Ter-Mer solver-time result nominal, read the tests as evidence about scenarios of
 this platform, and lean on effect sizes and cross-class consistency rather than on any single
 $p$-value (\cref{sec:validity}).
@@ -3003,7 +3005,7 @@ below $0.05$: the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$), which al
 the joint and operational-family corrections ($q_{12}=0.021$, $q_{12}^{\mathrm{blk}}=0.031$)
 and is small in median magnitude, about $0.9\%$. It indicates a systematic directional
 difference in this campaign, not a large operational speedup. The augmented SG-Ter-Mer
-contrasts fall to $q_{6}=0.115$ and $0.052$, and every coefficient-only fast-class contrast
+contrasts fall to $q_{6}=0.115$ and $0.051$, and every coefficient-only fast-class contrast
 to $q_{6}\ge0.115$. The directional reversals occur in SG-Ter-Mer coefficient-only at $1\%$
 and Simple coefficient-only at $0.1\%$; the other six continue to point toward the role-blind
 rule.
@@ -3018,10 +3020,20 @@ cached ratios towards parity, and enough to change one conclusion: under the dia
 the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the release
 build it falls to $q_{6}=0.115$. Splicing release preprocessing onto diagnostic-build solver times is only legitimate if
 optimization changes the \emph{cost} of preprocessing without changing the transformation it
-produces, so we verified that directly: exporting the scaled model with both builds on six
-instances spanning the three classes and both kernels, in selective and role-blind mode, gives
-$24/24$ byte-identical exports. The two builds therefore differ in speed alone, not in row
-factors, scaled rows, or safeguard decisions. This build comparison provides one observed
+produces, so we verified that directly over every available record: exporting the preprocessed
+model with both builds for all $306$ instances, both kernels and both coverage policies gives
+$1204$ byte-identical exports out of $1224$
+(\texttt{scripts/build\_invariance\_audit.py}). Every Simple and SG-Ter-Mer record is
+identical, so for the two fast classes---where the cached comparison is decided---the builds
+differ in speed alone, not in row factors, scaled rows, or safeguard decisions. The $20$
+exceptions are five Full instances (029, 035, 045, 047, 048), each differing under all four
+variants, which locates the discrepancy in model construction rather than in scaling: the
+differing entries are the nonlinear-hydro linearization coefficients, and they differ by one
+unit in the last place ($4.7\times10^{-16}$ relative, in $720$ of $47{,}173$ coefficients on
+a representative instance), as expected when optimization changes floating-point contraction.
+Two of the five (029, 035) fall inside the analysed Full pools; for those the release
+preprocessing time corresponds to a model differing from the archived one only at the last
+bit. This build comparison provides one observed
 policy-specific
 \emph{toolchain} perturbation rather than a direct estimate of the workstation-to-ClusterUY
 transfer ratio: the implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ remains in
@@ -3036,17 +3048,16 @@ build sensitivity in Table~S11. Writing
 $T^{\mathrm{cached}}(\lambda)=T_{\rm solver}+\lambda\,T^{\mathrm{cached}}_{\rm preproc}$,
 a common factor varies the overall weight of preprocessing but does not model policy-specific
 hardware or compiler effects: the two rules execute different code, so a change of machine or
-toolchain need not rescale them by the same factor. Over the finite grid
-$\lambda\in\{0.25,0.5,1,2,4,8\}$ the augmented Simple contrast at $0.1\%$ is retained at every
-point and is the only one below the threshold for $\lambda\le2$, with the coefficient-only
-Simple contrast at $1\%$ joining it at $\lambda\ge4$. Allowing the policies to transfer
-differently---sweeping $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ with $\lambda_{\rm Flat}=1$
-over $\{0.25,0.5,1,2,4\}$---leaves that same single contrast retained for $\rho\le1$, and adds
-two more at $\rho=2$ and four more at $\rho=4$. The qualitative conclusion is therefore stable
-in the direction that matters: the cached effects stay close to parity and one small Simple
-contrast carries them, while a large asymmetric advantage for the role-blind rule would
-require the selective rule's preprocessing to transfer at least twice as poorly as its
-counterpart.
+toolchain need not rescale them by the same factor. On the evaluated common-factor grid
+$\lambda\in\{0.25,0.5,1,2,4,8\}$, one fast-class contrast has $q_{6}<0.05$ for
+$\lambda\le2$, and two do at the evaluated points $\lambda=4$ and $8$; the augmented Simple
+contrast at $0.1\%$ has $q_{6}<0.05$ at every evaluated grid point. On the policy-specific
+grid $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}\in\{0.25,0.5,1,2,4\}$ with
+$\lambda_{\rm Flat}=1$, the corresponding counts are one for $\rho\le1$, three at $\rho=2$
+and five at $\rho=4$. Additional $q_{6}$ crossings therefore first appear at the evaluated
+point $\rho=2$, but the transition threshold between $1$ and $2$ is not identified by this
+grid. These counts concern within-tolerance $q_{6}$ only and do not imply retention under the
+joint or operational-family adjustments.
 
 The absolute magnitudes matter for how much this is worth
 (\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
@@ -3277,7 +3288,7 @@ Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ & $q_{1
 \multirow{6}{*}{$0.1\%$}
  & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 \\
  & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 \\
- & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.052 & 0.092 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 \\
  & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 \\
  & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
  & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
@@ -3656,7 +3667,11 @@ as future work. The cached-metadata comparison is toolchain-sensitive at the sca
 reported effects: compiler optimization changes the Simple coefficient-only $1\%$ adjusted
 value from $q_{6}=0.0002$ in the diagnostic build to $q_{6}=0.115$ in the release build. We
 therefore use the release build as the implementation-cost sensitivity of record and interpret
-all near-parity cached contrasts cautiously. The prototype preprocessing-plus-solver endpoint
+all near-parity cached contrasts cautiously. The full export audit also shows that build
+invariance is not exact everywhere: five Full instances construct last-bit-different
+nonlinear-hydro coefficients under optimization, so for those the release preprocessing time
+is measured on a model that differs from the archived one at the level of floating-point
+rounding. The two fast classes, which decide the cached comparison, are exactly invariant. The prototype preprocessing-plus-solver endpoint
 is built from calls that the dedicated
 batches timed once each in a fixed order; the separate order-randomized replication
 (\cref{subsec:stage-attribution}) confirms the \emph{direction} of the preprocessing gap on
