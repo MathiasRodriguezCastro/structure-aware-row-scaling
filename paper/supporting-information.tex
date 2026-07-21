@@ -830,16 +830,23 @@ In Panel D, ``Recorded'' counts instances present in the batch CSV (at Full $0.1
 instances 045--048 were not recorded), the common pool removes uniformly unavailable
 instances (none here beyond the unrecorded ones), and double noncompletions are pairs in
 which neither policy completes. No pair is dropped for a missing time and no exact-zero
-difference occurs; $n$ used applies to both endpoints. Preprocessing calls are timed once
-each, with the C++ high-resolution wall clock, in the batch's fixed (un-randomized)
-execution order and without repetitions; per-policy IQRs are at most $0.003$\,s in every
-cell. The batches contain no one-sided aborts, so the $10T_{\max}$ abort sensitivity is
+difference occurs; $n$ used applies to both endpoints. In these batches the preprocessing
+calls are timed once each, with the C++ high-resolution wall clock, in the batch's fixed
+(un-randomized) execution order and without repetitions; per-policy IQRs are at most
+$0.003$\,s in every cell. The separate order-randomized replication of the preprocessing
+call alone (\texttt{scripts/preproc\_timing\_replication.py}) is reported in the main text. The batches contain no one-sided aborts, so the $10T_{\max}$ abort sensitivity is
 identical to the primary convention. Each of the six dedicated CSVs contains both SA and
 Flat reruns from the same class--tolerance batch, independent of the main campaign.
-Worst-case missing-pair sensitivity (Full augmented $0.1\%$, pre+solve endpoint):
-appending instances 045--048 with adverse signs at above-maximal ranks gives $p=0.47$,
-$r_{\rm rb}=+0.15$ ($n=31$), so the adjusted Full contrast is conditional on the $27$
-eligible observed pairs; the three double timeouts enter as operational ties (exact zeros).
+Adversarial signed-rank sensitivity for the four unrecorded pairs (Full augmented $0.1\%$,
+pre+solve endpoint): appending instances 045--048 with the adverse sign at above-maximal
+ranks gives $p=0.47$, $r_{\rm rb}=+0.15$ ($n=31$), so the adjusted Full contrast is
+conditional on the $27$ eligible observed pairs. This construction bounds the signed-rank
+evidence under adverse missing pairs; it is not a universal worst-case bound for the median
+ratio, the Hodges--Lehmann estimate, or the reliability-adjusted aggregate costs. On the
+same augmented sample the adversarial location estimates remain directionally favorable to
+selectivity (median SA/Flat $0.9596$, HL $0.9465$); the matrix-only counterpart moves the
+other way (median $1.0861$, HL $1.0977$, $p=0.34$). The three double timeouts enter as
+operational ties (exact zeros).
 \end{minipage}
 \end{table}
 \end{landscape}

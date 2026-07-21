@@ -46,12 +46,14 @@ The script additionally reports:
   paired difference, because the end-to-end margin is preprocessing-driven
   in the fast classes and each cell is a single un-randomized wall-clock
   measurement;
-* a worst-case missing-pair sensitivity for the Full 0.1% augmented
-  contrast: the four unrecorded instances (045-048) are appended with the
-  most adverse sign and above-maximal ranks, since multiplicity adjustment
-  does not address missing-data selection. Double timeouts enter Wilcoxon
-  as exact zeros (dropped by the wilcox convention), which is equivalent to
-  treating them as operational ties.
+* an adversarial signed-rank sensitivity for the unrecorded pairs of the
+  Full contrasts: the four unrecorded instances (045-048) are appended with
+  the adverse sign and above-maximal ranks, since multiplicity adjustment
+  does not address missing-data selection. It bounds the signed-rank
+  evidence only; the accompanying adversarial median and Hodges-Lehmann
+  ratios are reported alongside. Double timeouts enter Wilcoxon as exact
+  zeros (dropped by the wilcox convention), which is equivalent to treating
+  them as operational ties.
 
 Time endpoints use the paired log ratio d_i = log(T_Flat/T_SA); Work (a
 deterministic count that can be zero) keeps the paired difference Flat-SA.
@@ -251,19 +253,28 @@ def iqr(values):
     return (percentile(ordered, 0.75) - percentile(ordered, 0.25))
 
 
-def worst_case_missing_pairs(differences, n_missing):
-    """Append n_missing pairs with the most adverse sign at above-maximal
-    ranks and re-test: a bound on what the unrecorded pairs could do."""
+def adversarial_missing_pairs(differences, n_missing):
+    """Adversarial signed-rank sensitivity for unrecorded pairs.
+
+    Appends n_missing pairs carrying the adverse sign at above-maximal ranks
+    and re-tests. This bounds the SIGNED-RANK evidence under adverse missing
+    pairs; it is not a universal worst-case bound for the median ratio, the
+    Hodges-Lehmann estimate, or reliability-adjusted aggregate costs. The
+    accompanying median/HL columns give the corresponding adversarial location
+    estimates on the augmented sample.
+    """
     if not differences or n_missing <= 0:
         return None
     direction = 1.0 if statistics.median(differences) > 0 else -1.0
     magnitude = max(abs(d) for d in differences) * 1.001
     adverse = [-direction * magnitude * (1.0 + k * 1e-6)
                for k in range(n_missing)]
-    statistic, pvalue, effect, zeros, method = wilcoxon_summary(
-        differences + adverse)
+    augmented = differences + adverse
+    statistic, pvalue, effect, zeros, method = wilcoxon_summary(augmented)
     return {'W': statistic, 'p': pvalue, 'r_rb': effect, 'method': method,
-            'n': len(differences) + n_missing}
+            'n': len(augmented),
+            'median_ratio': math.exp(-statistics.median(augmented)),
+            'hl_ratio': math.exp(-hodges_lehmann(augmented))}
 
 
 def percentile(sorted_values, probability):
@@ -498,7 +509,7 @@ def analyze(folder, class_name, abort_multiplier):
         # convention.
         hl_solver = math.exp(-hodges_lehmann(differences))
         hl_total = math.exp(-hodges_lehmann(total_differences))
-        worst_case = worst_case_missing_pairs(
+        worst_case = adversarial_missing_pairs(
             total_differences, NOMINAL_N[class_name] - observed_n)
 
         work_differences = [
@@ -700,8 +711,10 @@ def main():
             if row['worst_case_total']:
                 wc = row['worst_case_total']
                 print(
-                    f"  WORST-CASE missing pairs (total endpoint, "
-                    f"n={wc['n']}): p={wc['p']:.6g} r_rb={wc['r_rb']:+.3f}")
+                    f"  ADVERSARIAL signed-rank sensitivity, unrecorded pairs "
+                    f"(pre+solve endpoint, n={wc['n']}): p={wc['p']:.6g} "
+                    f"r_rb={wc['r_rb']:+.3f} median_SA/Flat={wc['median_ratio']:.4f} "
+                    f"HL_SA/Flat={wc['hl_ratio']:.4f}")
             print(f"  SA   {format_reliability(row['sa_reliability'])}")
             print(f"  Flat {format_reliability(row['flat_reliability'])}")
 
