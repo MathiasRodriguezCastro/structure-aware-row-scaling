@@ -818,7 +818,7 @@ a reliable counterpart on the same instance, as defined in the main text. At Ful
 instances 045--048 are absent from both policies. Under an equal-penalty imputation for those
 four unrecorded instances the ordering is unchanged and the added pairs are operational ties;
 that assumption does not address selection under unequal missing outcomes, for which the
-adversarial signed-rank sensitivity is reported in the main text and Table~S12. The key reliability
+adversarial signed-rank sensitivity is reported in the main text and in the Notes to Tables~S10--S12. The key reliability
 sensitivity is visible in Simple/Augmented: the small Flat solver-time advantage at $0.1\%$
 reverses under both strict and mixed costs. SG-Ter-Mer/Augmented retains a small descriptive
 Flat advantage because neither policy has a mixed failure.
@@ -857,6 +857,30 @@ SG-Ter-Mer & prototype pre+solve & 67/34 & 1.0473 & 1.1577 & [1.0170, 1.2065] &
 0.00031 & 0.00063 & 0.00063 & 0.00056 & 0.00111 & 0.00117 \\
 SG-Ter-Mer & solver & 67/34 & 1.0159 & 1.1229 & [0.9797, 1.1309] &
 0.02616 & 0.05232 & 0.09346 & 0.03320 & 0.06640 & 0.11980 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel A2: prototype preprocessing-plus-solver endpoint, all twelve contrasts}\\[2pt]
+\begin{tabular}{@{}lllrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & $q_6$ & $q_{12}$ & $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Augmented & 204 & $7.9\times10^{-26}$ & $1.6\times10^{-25}$ & $1.0\times10^{-9}$ & $2.1\times10^{-9}$ \\
+ & Simple & Matrix-only & 204 & $3.0\times10^{-32}$ & $6.0\times10^{-32}$ & $7.0\times10^{-10}$ & $1.4\times10^{-9}$ \\
+ & SG-Ter-Mer & Augmented & 67 & 0.00057 & 0.00063 & 0.00117 & 0.00117 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.01126 & 0.01287 & 0.01893 & 0.02163 \\
+ & Full & Augmented & 31 & 0.1502 & 0.1502 & 0.1502 & 0.1502 \\
+ & Full & Matrix-only & 32 & 0.3403 & 0.3712 & 0.3403 & 0.3712 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Augmented & 204 & $2.0\times10^{-10}$ & $1.3\times10^{-10}$ & $3.1\times10^{-7}$ & $2.1\times10^{-7}$ \\
+ & Simple & Matrix-only & 203 & $4.9\times10^{-8}$ & $4.9\times10^{-8}$ & 0.00042 & 0.00042 \\
+ & SG-Ter-Mer & Augmented & 67 & 0.00063 & 0.00063 & 0.00111 & 0.00117 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.02239 & 0.02468 & 0.02765 & 0.03072 \\
+ & Full & Augmented & 27 & 0.02239 & 0.02487 & 0.02765 & 0.02798 \\
+ & Full & Matrix-only & 27 & 0.8408 & 0.8408 & 0.8408 & 0.8408 \\
 \bottomrule
 \end{tabular}
 
@@ -942,16 +966,16 @@ $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
  & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 & 0.173 & 0.162 \\
  & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 & 0.173 & 0.120 \\
  & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 & 0.337 & 0.450 \\
- & Full & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 & 0.173 & 0.173 \\
- & Full & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 & 0.337 & 0.396 \\
+ & Full$^\dagger$ & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 & 0.173 & 0.173 \\
+ & Full$^\dagger$ & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 & 0.337 & 0.396 \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
  & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 & 0.016 & 0.031 \\
  & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 & 0.546 & 0.469 \\
  & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 & 0.065 & 0.120 \\
  & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 & 0.546 & 0.496 \\
- & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 & 0.045 & 0.090 \\
- & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
+ & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 & 0.045 & 0.090 \\
+ & Full$^\dagger$ & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
 \bottomrule
 \end{tabular}
 
@@ -975,7 +999,7 @@ $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
  & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 & 0.460 & 0.633 & 0.576 \\
  & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 & 0.075 & 0.065 & 0.095 \\
  & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 & 0.460 & 0.633 & 0.512 \\
- & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.060 & 0.045 & 0.060 \\
+ & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.060 & 0.045 & 0.060 \\
  & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
 \bottomrule
 \end{tabular}
@@ -995,7 +1019,7 @@ the change of toolchain on the same machine.
 \label{tab:si-flat-transfer}
 
 \noindent\scriptsize
-\noindent\scriptsize The Simple and SG-Ter-Mer exports are byte-identical across builds. Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see Table~S12 and \texttt{build\_invariance.csv}.\par\vspace{4pt}
+\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \texttt{results-revision/preproc-timing/build\_invariance.csv}.\par\vspace{4pt}
 
 \textbf{Panel E3: release-build cross-environment transfer-factor sensitivity}\\[2pt]
 \begin{tabular}{@{}lrrrrrr@{}}
@@ -1013,6 +1037,13 @@ Ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ & $0.25$ & $0.5$ & $1$ & $2$ & 
 \vspace{4pt}
 \vspace{6pt}
 \noindent\textbf{Measurement and build-audit details.}\par\vspace{2pt}
+\noindent\scriptsize The crossing contrasts are identified as follows. On the common-factor
+grid, Simple/Augmented at $0.1\%$ crosses at every point; Simple/Matrix-only at $1\%$ joins it
+at $\lambda=4$ and $8$. On the policy-specific grid, Simple/Augmented at $0.1\%$ crosses at
+every point; at $\rho=2$ it is joined by SG-Ter-Mer/Augmented at $0.1\%$ and
+Simple/Matrix-only at $1\%$; at $\rho=4$ also by SG-Ter-Mer/Augmented at $1\%$ and
+Simple/Augmented at $1\%$. No Full contrast crosses at any grid point.\par\vspace{4pt}
+
 \noindent\scriptsize The release-build endpoint (Panel E1) is the implementation-cost
 sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
 to show the sensitivity of the cached comparison to compiler optimization. Panel E3 reports
@@ -1058,7 +1089,7 @@ median [IQR]; an IQR below $0.001$\,ms is shown as $<0.001$ rather than rounded 
 absolute times quoted elsewhere in these notes are from the diagnostic build.\\[3pt]
 \begin{tabular}{@{}llrrrr@{}}
 \toprule
- & & \multicolumn{2}{c}{Full call (ms)} & \multicolumn{2}{c}{Cached counterpart (ms)} \\
+ & & \multicolumn{2}{c}{Prototype preprocessing call (ms)} & \multicolumn{2}{c}{Cached preprocessing counterpart (ms)} \\
 \cmidrule(lr){3-4}\cmidrule(lr){5-6}
 Class & Kernel & SA & Flat & SA & Flat \\
 \midrule

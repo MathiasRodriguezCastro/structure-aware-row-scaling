@@ -155,8 +155,9 @@ reported multiplicity and operational-family analyses, while reliability-adjuste
 favors the selective rule there. The current prototype has lower preprocessing-plus-solver
 time under full coverage in the two fast classes, but most of that preprocessing difference
 comes from rebuilding metadata the generator already possesses; a cached-metadata
-sensitivity on a release build moves the effects toward parity and leaves one of the eight
-contrasts with a within-tolerance nominal adjusted value below $0.05$. In Full, the selective direction is not supported by the adversarial signed-rank
+sensitivity on a release build moves the effects toward parity and, under the baseline
+cross-protocol construction, leaves one of the eight fast-class contrasts with a
+within-tolerance nominal adjusted value below $0.05$. In Full, the selective direction is not supported by the adversarial signed-rank
 sensitivity over the unrecorded pairs. The observed effect
 of external preprocessing differs between the tested Gurobi and CPLEX pipelines, though no
 formal cross-solver interaction is estimated. Overall, metadata-driven selectivity is not
@@ -189,9 +190,9 @@ search.
   direction is conditional on the $27$ eligible pairs.
   \item When the selective rule is charged only for diagnosis and factor application, as in a
   generator that reuses its structural taxonomy, most of that observed Flat timing advantage
-  disappears: six directional orderings remain, but on a release build only one contrast
-  (Simple, augmented, $0.1\%$; about $0.9\%$ in median) keeps a within-tolerance nominal
-  adjusted value below $0.05$. On capped solver time the medians
+  disappears: six directional orderings remain, but on a release build---under the baseline
+  cross-protocol construction---only one contrast (Simple, augmented, $0.1\%$; about $0.9\%$
+  in median) keeps a within-tolerance nominal adjusted value below $0.05$. On capped solver time the medians
   are at most $1.6\%$ and the augmented Simple contrast at $0.1\%$ is the only comparison
   whose nominal adjusted values remain below $0.05$ across the reported multiplicity and
   operational-family analyses; all coefficient-only comparisons remain inconclusive.
@@ -2978,11 +2979,15 @@ negligible for the role-blind rule, which needs no roles at all
 cached-metadata counterpart
 $T_{\mathrm{preproc}}^{\mathrm{cached}}=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}$
 that removes the prototype's metadata-reconstruction stage while retaining diagnosis and
-factor application---collapses the gap from
-roughly $6$--$9\times$ to $1.08$--$1.40\times$ (medians of the paired ratio; e.g.\
-$0.032$ against $0.029$\,s in Simple and $0.020$ against $0.018$\,s in SG-Ter-Mer). It does
-not, however, reverse it: the role-blind kernel remains marginally cheaper in all six
-class--kernel cells, and is cheaper on $408$ of the $612$ instance--kernel records. That
+factor application---collapses the gap substantially. In the non-optimized concurrent stress test the median
+paired preprocessing ratio falls from roughly $6$--$9\times$ to $1.08$--$1.40\times$; the
+cleaner pinned diagnostic protocol produces smaller absolute times, and the release-build
+values used in \cref{tab:flat-cached} are reported separately in Table~S12. It does
+not, however, reverse the ordering: the role-blind kernel remains marginally cheaper in all
+six class--kernel cells under every protocol, and under the pinned release build---the
+sensitivity of record---it has the lower cached preprocessing time on $585$ of the $612$
+instance--kernel records ($607/612$ pinned diagnostic, $408/612$ in the noisier concurrent
+protocol; \texttt{results-revision/preproc-timing/}). That
 residual is markedly less uniform than the full preprocessing gap, which held on every
 instance and every family: aggregating to operational families, the role-blind rule has the
 lower median in $20$--$32$ of the $34$ families per cell (median family ratio
@@ -3011,8 +3016,8 @@ and Simple coefficient-only at $0.1\%$; the other six continue to point toward t
 rule.
 
 The build matters here, and measurably. Our campaigns were compiled without
-optimization---the production executable uses the same \texttt{-std=c++17 -g} flags as the
-instrumented one---so we repeated the pinned microbenchmark with a release build
+optimization---the executable used in the original solver campaigns was compiled with the same
+\texttt{-std=c++17 -g} flags as the instrumented diagnostic build---so we repeated the pinned microbenchmark with a release build
 ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$) and take it as the implementation-cost sensitivity of
 record. Optimization shrinks every preprocessing time about sixfold and leaves the full-call
 ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it moves the
@@ -3059,7 +3064,11 @@ $\lambda_{\rm Flat}=1$, the corresponding counts are one for $\rho\le1$, three a
 and five at $\rho=4$. Additional $q_{6}$ crossings therefore first appear at the evaluated
 point $\rho=2$, but the transition threshold between $1$ and $2$ is not identified by this
 grid. These counts concern within-tolerance $q_{6}$ only and do not imply retention under the
-joint or operational-family adjustments. Complete contrast-by-grid values are provided in
+joint or operational-family adjustments. The $\lambda$ and $\rho$ grids are exploratory
+log-spaced stress ranges, chosen to vary the relative preprocessing contribution by factors of
+two over a deliberately broad interval; they are not confidence regions or calibrated
+estimates of the workstation-to-ClusterUY transfer. The contrasts crossing at each grid point
+are identified in Table~S12. Complete contrast-by-grid values are provided in
 \texttt{results-revision/preproc-timing/cached\_transfer\_sensitivity.csv} in the
 reproducibility package.
 
