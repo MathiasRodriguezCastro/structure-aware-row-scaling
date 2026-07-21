@@ -46,8 +46,9 @@ accounting (Table~S6);
 \texttt{Read::Scale}$=-1$ audit (Table~S7); and (x) the archived runtime comparison used for
 the coupling-stage activation audit (Table~S8); (xi) the direct SA--Flat strict/mixed
 reliability audit (Table~S9); and (xii) the multiplicity, operational-family, bootstrap,
-total-time, deterministic-effort, and own-incumbent sensitivities for that direct
-comparison, together with its per-contrast attrition (Table~S10).
+preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities for that
+direct comparison, together with its per-contrast attrition and preprocessing-time
+distributions (Table~S10).
 
 \medskip
 \noindent Here, \PARten{} (including its ITT/strict/mixed superscripts) denotes the
@@ -664,7 +665,9 @@ equals Base.
 from one dedicated class--tolerance batch; both SA and Flat were rerun in that batch.
 Timeouts (TO), strict/mixed original-scale verification failures (S/M), and fixed-pool
 \PARten{} are reported for both coverage policies. Each \PARten{} cell is
-ITT/strict/mixed in seconds.}
+ITT/strict/mixed in seconds, on the capped solver-time cost $c^{(k,\mathrm{solver})}$ of
+the main text; recomputing with the preprocessing-plus-solver cost shifts every cell by
+less than $0.2$\,s and changes no ordering.}
 \label{tab:si-flat-reliability}
 \scriptsize
 \setlength{\tabcolsep}{3.2pt}
@@ -707,31 +710,34 @@ Flat advantage because neither policy has a mixed failure.
 \begin{table}[!p]
 \centering
 \caption{Magnitude, dependence, and attrition sensitivities for the direct SA--Flat
-contrasts. Panel A reports instance-level and operational-family inference for the two
-central $0.1\%$ augmented contrasts on both endpoints (primary total pipeline time,
-secondary capped solver time), on the shared paired variable
-$d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$. Panel B repeats the
+contrasts (exploratory endpoint hierarchy; see the main text). Panel A reports
+instance-level and operational-family inference for the two
+central $0.1\%$ augmented contrasts on both endpoints (preprocessing-plus-solver
+operational endpoint, capped solver-time decomposition), on the shared paired variable
+$d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$, with the Hodges--Lehmann pseudomedian expressed
+as the typical SA/Flat ratio $\exp(-\widehat\theta_{\rm HL})$. Panel B repeats the
 family analysis for Gurobi Work units. Panel C relocates the path-specific diagnostic from
 the main timing table because it does not hold the integer solution fixed across policies.
-Panel D gives the per-contrast attrition of the main flat-control table.}
+Panel D gives the per-contrast attrition and preprocessing-time distributions of the main
+flat-control table.}
 \label{tab:si-flat-sensitivities}
 \scriptsize
 \setlength{\tabcolsep}{3.0pt}
 \textbf{Panel A: paired log time ratio and dependence (central augmented $0.1\%$ contrasts)}\\[2pt]
-\begin{tabular}{@{}llrrrrrrrrr@{}}
+\begin{tabular}{@{}llrrrrrrrrrr@{}}
 \toprule
-Class & Endpoint & $n/G$ & med. SA/Flat & family-bootstrap 95\% CI &
+Class & Endpoint & $n/G$ & med. SA/Flat & HL SA/Flat & family-bootstrap 95\% CI &
 $p_{\rm inst}$ & $q_6$ & $q_{12}$ &
 $p_{\rm block}$ & $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
 \midrule
-Simple & total & 204/34 & 1.0320 & [1.0274, 1.0418] &
+Simple & pre+solve & 204/34 & 1.0320 & 1.0359 & [1.0274, 1.0418] &
 $3.3\times10^{-11}$ & $2.0\times10^{-10}$ & $1.3\times10^{-10}$ &
 $5.1\times10^{-8}$ & $3.1\times10^{-7}$ & $2.1\times10^{-7}$ \\
-Simple & solver & 204/34 & 1.0093 & [1.0019, 1.0212] &
+Simple & solver & 204/34 & 1.0093 & 1.0135 & [1.0019, 1.0212] &
 0.00173 & 0.01038 & 0.02075 & 0.00266 & 0.01595 & 0.03190 \\
-SG-Ter-Mer & total & 67/34 & 1.0473 & [1.0170, 1.2065] &
+SG-Ter-Mer & pre+solve & 67/34 & 1.0473 & 1.1577 & [1.0170, 1.2065] &
 0.00031 & 0.00063 & 0.00063 & 0.00056 & 0.00111 & 0.00117 \\
-SG-Ter-Mer & solver & 67/34 & 1.0159 & [0.9797, 1.1309] &
+SG-Ter-Mer & solver & 67/34 & 1.0159 & 1.1229 & [0.9797, 1.1309] &
 0.02616 & 0.05232 & 0.09346 & 0.03320 & 0.06640 & 0.11980 \\
 \bottomrule
 \end{tabular}
@@ -774,32 +780,35 @@ med. $\rho_{\kappa,\rm SA}^{\rm solver}/\rho_{\kappa,\rm Flat}^{\rm solver}$ \\
 \end{tabular}
 
 \vspace{7pt}
-\textbf{Panel D: per-contrast attrition (both kernels, both tolerances)}\\[2pt]
-\begin{tabular}{@{}lllrrrrr@{}}
+\textbf{Panel D: per-contrast attrition and preprocessing-time distributions}\\[2pt]
+\begin{tabular}{@{}lllrrrrr rrr@{}}
 \toprule
-Gap & Class & Kernel & Nominal & Recorded & Common pool & Double noncompl. & $n$ used \\
+Gap & Class & Kernel & Nominal & Recorded & Common pool & Double noncompl. & $n$ used &
+med.\ $T_{\rm pre}^{\rm SA}$ (s) & med.\ $T_{\rm pre}^{\rm Flat}$ (s) & med.\ diff (s) \\
 \midrule
 \multirow{6}{*}{$1\%$}
- & Simple & Augmented & 204 & 204 & 204 & 0 & 204 \\
- & Simple & Matrix-only & 204 & 204 & 204 & 0 & 204 \\
- & SG-Ter-Mer & Augmented & 68 & 68 & 68 & 1 & 67 \\
- & SG-Ter-Mer & Matrix-only & 68 & 68 & 68 & 1 & 67 \\
- & Full & Augmented & 34 & 34 & 34 & 3 & 31 \\
- & Full & Matrix-only & 34 & 34 & 34 & 2 & 32 \\
+ & Simple & Augmented & 204 & 204 & 204 & 0 & 204 & 0.074 & 0.025 & $+0.050$ \\
+ & Simple & Matrix-only & 204 & 204 & 204 & 0 & 204 & 0.077 & 0.025 & $+0.053$ \\
+ & SG-Ter-Mer & Augmented & 68 & 68 & 68 & 1 & 67 & 0.049 & 0.019 & $+0.031$ \\
+ & SG-Ter-Mer & Matrix-only & 68 & 68 & 68 & 1 & 67 & 0.051 & 0.019 & $+0.033$ \\
+ & Full & Augmented & 34 & 34 & 34 & 3 & 31 & 0.121 & 0.041 & $+0.080$ \\
+ & Full & Matrix-only & 34 & 34 & 34 & 2 & 32 & 0.125 & 0.041 & $+0.084$ \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
- & Simple & Augmented & 204 & 204 & 204 & 0 & 204 \\
- & Simple & Matrix-only & 204 & 204 & 204 & 1 & 203 \\
- & SG-Ter-Mer & Augmented & 68 & 68 & 68 & 1 & 67 \\
- & SG-Ter-Mer & Matrix-only & 68 & 68 & 68 & 1 & 67 \\
- & Full & Augmented & 34 & 30 & 30 & 3 & 27 \\
- & Full & Matrix-only & 34 & 30 & 30 & 3 & 27 \\
+ & Simple & Augmented & 204 & 204 & 204 & 0 & 204 & 0.077 & 0.025 & $+0.051$ \\
+ & Simple & Matrix-only & 204 & 204 & 204 & 1 & 203 & 0.079 & 0.025 & $+0.054$ \\
+ & SG-Ter-Mer & Augmented & 68 & 68 & 68 & 1 & 67 & 0.051 & 0.019 & $+0.032$ \\
+ & SG-Ter-Mer & Matrix-only & 68 & 68 & 68 & 1 & 67 & 0.052 & 0.019 & $+0.033$ \\
+ & Full & Augmented & 34 & 30 & 30 & 3 & 27 & 0.120 & 0.041 & $+0.079$ \\
+ & Full & Matrix-only & 34 & 30 & 30 & 3 & 27 & 0.124 & 0.041 & $+0.083$ \\
 \bottomrule
 \end{tabular}
 \begin{minipage}{0.96\linewidth}\footnotesize
 \emph{Notes.} Both time endpoints use the paired variable
-$d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$; negative values favor Flat, and the tested
-estimand coincides with the reported median ratio. \(G\) is the number of operational
+$d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$; negative values favor Flat. The test, the effect
+size, and the median ratio are computed on this one scale and share its direction
+convention but do not target an identical estimand; the Hodges--Lehmann column is the
+location estimate aligned with the signed-rank test. \(G\) is the number of operational
 families. Simple groups the six
 \texttt{casoXX[a--f]} scenarios with a common root; SG-Ter-Mer groups each
 \texttt{instanceXXX}/\texttt{instance(XXX+48)} pair (34 pairs, no singletons); Full is
@@ -807,11 +816,13 @@ singleton by construction.
 The exact block-sign test preserves each scenario's absolute-rank contribution, sums those
 contributions within family, and flips one common sign per family; its null distribution is
 computed by dynamic programming. The percentile bootstrap resamples whole families
-($B=2000$, seed 12345; the total- and solver-time intervals are drawn from one RNG stream in
-that order). Negative Work \(r_{\rm rb}\) favors Flat under the sign convention of
+($B=2000$, seed 12345; the pre+solve and solver-time intervals are drawn from one RNG
+stream in that order). Negative Work \(r_{\rm rb}\) favors Flat under the sign convention of
 the main table. Work reproduces both augmented $0.1\%$ solver-time directions but, with
 medians 2 versus 2 in Simple and
-7 versus 4 in SG-Ter-Mer, does not turn the small solver-time effects into large speedups.
+7 versus 4 in SG-Ter-Mer, does not turn the small solver-time effects into large speedups;
+a single default-seed run per cell means seed- and trajectory-level variability is not
+eliminated.
 In Panel C each policy fixes the integer variables to the incumbent found by that same run.
 The ratio can therefore reflect both representation and a different integer solution; no
 common-incumbent diagnostic can be reconstructed from the archived artifacts.
@@ -819,7 +830,16 @@ In Panel D, ``Recorded'' counts instances present in the batch CSV (at Full $0.1
 instances 045--048 were not recorded), the common pool removes uniformly unavailable
 instances (none here beyond the unrecorded ones), and double noncompletions are pairs in
 which neither policy completes. No pair is dropped for a missing time and no exact-zero
-difference occurs; $n$ used applies to both endpoints.
+difference occurs; $n$ used applies to both endpoints. Preprocessing calls are timed once
+each, with the C++ high-resolution wall clock, in the batch's fixed (un-randomized)
+execution order and without repetitions; per-policy IQRs are at most $0.003$\,s in every
+cell. The batches contain no one-sided aborts, so the $10T_{\max}$ abort sensitivity is
+identical to the primary convention. Each of the six dedicated CSVs contains both SA and
+Flat reruns from the same class--tolerance batch, independent of the main campaign.
+Worst-case missing-pair sensitivity (Full augmented $0.1\%$, pre+solve endpoint):
+appending instances 045--048 with adverse signs at above-maximal ranks gives $p=0.47$,
+$r_{\rm rb}=+0.15$ ($n=31$), so the adjusted Full contrast is conditional on the $27$
+eligible observed pairs; the three double timeouts enter as operational ties (exact zeros).
 \end{minipage}
 \end{table}
 \end{landscape}

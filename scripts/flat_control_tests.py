@@ -8,13 +8,18 @@ the main Base-versus-SA campaign. Two kernel-matched contrasts are used:
 * Flat-Aug versus SA-Aug (coefficient-and-right-hand-side kernel), and
 * Flat-Mat versus SA-Mat (coefficient-only kernel).
 
-The primary operational endpoint is total pipeline time
-T_total = T_preproc + T_solver, because it includes the cost of the
-intervention itself; capped solver time is the secondary endpoint that
-isolates the subsequent solver response. For both endpoints the primary
-paired variable is the log time ratio d_i = log(T_Flat,i / T_SA,i), so the
-magnitude, the interval, and the test all live on the same relative scale;
-negative values favor full coverage (Flat). A one-sided timeout is
+The endpoint hierarchy was selected after inspection of the direct-control
+data and is therefore EXPLORATORY: preprocessing-plus-solver time
+T_pre+solve = T_preproc + T_solver is the operational endpoint (it charges
+each rule the cost of its own intervention, but excludes model construction,
+solver load, and verification, so it is not literally the whole pipeline);
+capped solver time is the decomposition endpoint that isolates the
+subsequent solver response. Neither is a preregistered confirmatory
+outcome. For both endpoints the paired variable is the log time ratio
+d_i = log(T_Flat,i / T_SA,i), so the magnitude, the interval, and the test
+all live on the same relative scale (they are computed on one scale but do
+not target one identical estimand; the Hodges-Lehmann pseudomedian is also
+reported); negative values favor full coverage (Flat). A one-sided timeout is
 right-censored at T_max=3600 s. A one-sided pipeline/algorithmic abort receives
 T_max as an operational-failure convention; use --abort-penalty par10 for the
 10*T_max sensitivity. Double non-completions and required missing times are
@@ -33,8 +38,20 @@ The script additionally reports:
   ratio in the two central 0.1%-MIPGap augmented contrasts;
 * total time including external preprocessing, deterministic Gurobi Work, and
   the own-incumbent path-specific diagnostic;
-* common-pool ITT, strict, and mixed PAR10 for SA and Flat. These use a
-  10*T_max failure cost and the verifier thresholds in the manuscript.
+* common-pool ITT, strict, and mixed PAR10 for SA and Flat, on BOTH cost
+  bases: capped solver time (as in the manuscript's main PAR10 tables) and
+  preprocessing-plus-solver time. These use a 10*T_max failure cost and the
+  verifier thresholds in the manuscript;
+* per-policy preprocessing-time distributions (median, IQR) and the median
+  paired difference, because the end-to-end margin is preprocessing-driven
+  in the fast classes and each cell is a single un-randomized wall-clock
+  measurement;
+* a worst-case missing-pair sensitivity for the Full 0.1% augmented
+  contrast: the four unrecorded instances (045-048) are appended with the
+  most adverse sign and above-maximal ranks, since multiplicity adjustment
+  does not address missing-data selection. Double timeouts enter Wilcoxon
+  as exact zeros (dropped by the wilcox convention), which is equivalent to
+  treating them as operational ties.
 
 Time endpoints use the paired log ratio d_i = log(T_Flat/T_SA); Work (a
 deterministic count that can be zero) keeps the paired difference Flat-SA.
@@ -218,6 +235,37 @@ def exact_block_sign_p(differences, families):
     return extreme / (2 ** len(integer_contributions)), len(contributions)
 
 
+def hodges_lehmann(differences):
+    """Pseudomedian: median of all Walsh averages (d_i + d_j)/2, i <= j."""
+    walsh = []
+    n = len(differences)
+    for i in range(n):
+        di = differences[i]
+        for j in range(i, n):
+            walsh.append((di + differences[j]) / 2.0)
+    return statistics.median(walsh)
+
+
+def iqr(values):
+    ordered = sorted(values)
+    return (percentile(ordered, 0.75) - percentile(ordered, 0.25))
+
+
+def worst_case_missing_pairs(differences, n_missing):
+    """Append n_missing pairs with the most adverse sign at above-maximal
+    ranks and re-test: a bound on what the unrecorded pairs could do."""
+    if not differences or n_missing <= 0:
+        return None
+    direction = 1.0 if statistics.median(differences) > 0 else -1.0
+    magnitude = max(abs(d) for d in differences) * 1.001
+    adverse = [-direction * magnitude * (1.0 + k * 1e-6)
+               for k in range(n_missing)]
+    statistic, pvalue, effect, zeros, method = wilcoxon_summary(
+        differences + adverse)
+    return {'W': statistic, 'p': pvalue, 'r_rb': effect, 'method': method,
+            'n': len(differences) + n_missing}
+
+
 def percentile(sorted_values, probability):
     position = (len(sorted_values) - 1) * probability
     lower = int(position)
@@ -288,13 +336,16 @@ def mixed_fail(row):
 def reliability_readings(by_instance, pool, variant):
     counts = collections.Counter()
     totals = {'itt': 0.0, 'strict': 0.0, 'mixed': 0.0}
+    totals_ps = {'itt': 0.0, 'strict': 0.0, 'mixed': 0.0}
     for instance in pool:
         row = by_instance[instance].get(variant)
         status = classify(row)
+        preproc = finite_number(row or {}, 'tiempo_preprocesamiento_s') or 0.0
         if status != 'ok':
             counts[status] += 1
             for reading in totals:
                 totals[reading] += PAR10_PENALTY
+                totals_ps[reading] += PAR10_PENALTY + preproc
             continue
         counts['ok'] += 1
         time = solver_time(row)
@@ -305,6 +356,11 @@ def reliability_readings(by_instance, pool, variant):
         totals['itt'] += time
         totals['strict'] += PAR10_PENALTY if fail_strict else time
         totals['mixed'] += PAR10_PENALTY if fail_mixed else time
+        totals_ps['itt'] += time + preproc
+        totals_ps['strict'] += (PAR10_PENALTY + preproc) if fail_strict \
+            else time + preproc
+        totals_ps['mixed'] += (PAR10_PENALTY + preproc) if fail_mixed \
+            else time + preproc
     return {
         'n': len(pool),
         'n_ok': counts['ok'],
@@ -315,6 +371,9 @@ def reliability_readings(by_instance, pool, variant):
         'par_itt': totals['itt'] / len(pool),
         'par_strict': totals['strict'] / len(pool),
         'par_mixed': totals['mixed'] / len(pool),
+        'par_itt_ps': totals_ps['itt'] / len(pool),
+        'par_strict_ps': totals_ps['strict'] / len(pool),
+        'par_mixed_ps': totals_ps['mixed'] / len(pool),
     }
 
 
@@ -353,6 +412,9 @@ def analyze(folder, class_name, abort_multiplier):
         total_ratios = []
         total_families = []
         cluster_total_logs = collections.defaultdict(list)
+        preproc_sa = []
+        preproc_flat = []
+        preproc_diffs = []
         work_sa = []
         work_flat = []
         work_families = []
@@ -393,6 +455,14 @@ def analyze(folder, class_name, abort_multiplier):
                 cluster_total_logs[family].append(
                     math.log(sa_total / flat_total))
 
+            sa_preproc = finite_number(sa_row or {}, 'tiempo_preprocesamiento_s')
+            flat_preproc = finite_number(
+                flat_row or {}, 'tiempo_preprocesamiento_s')
+            if sa_preproc is not None and flat_preproc is not None:
+                preproc_sa.append(sa_preproc)
+                preproc_flat.append(flat_preproc)
+                preproc_diffs.append(sa_preproc - flat_preproc)
+
             sa_work_value = finite_number(sa_row or {}, 'work_units')
             flat_work_value = finite_number(flat_row or {}, 'work_units')
             if (sa_work_value is not None and flat_work_value is not None
@@ -423,6 +493,13 @@ def analyze(folder, class_name, abort_multiplier):
          total_method) = wilcoxon_summary(total_differences)
         total_p_block, total_effective_blocks = exact_block_sign_p(
             total_differences, total_families)
+        # Hodges-Lehmann pseudomedian on the log scale, reported as the
+        # typical SA/Flat ratio exp(-theta_HL) to match the median-ratio
+        # convention.
+        hl_solver = math.exp(-hodges_lehmann(differences))
+        hl_total = math.exp(-hodges_lehmann(total_differences))
+        worst_case = worst_case_missing_pairs(
+            total_differences, NOMINAL_N[class_name] - observed_n)
 
         work_differences = [
             flat - sa for flat, sa in zip(work_flat, work_sa)
@@ -449,6 +526,15 @@ def analyze(folder, class_name, abort_multiplier):
             'n_total': len(total_ratios),
             'median_total_ratio': statistics.median(total_ratios),
             'n_total_families': len(set(total_families)),
+            'hl_solver': hl_solver,
+            'hl_total': hl_total,
+            'worst_case_total': worst_case,
+            'preproc_median_sa': statistics.median(preproc_sa),
+            'preproc_iqr_sa': iqr(preproc_sa),
+            'preproc_median_flat': statistics.median(preproc_flat),
+            'preproc_iqr_flat': iqr(preproc_flat),
+            'preproc_median_diff': statistics.median(preproc_diffs),
+            'n_preproc': len(preproc_diffs),
             'total_W': total_statistic,
             'total_p': total_p,
             'total_r_rb': total_effect,
@@ -491,8 +577,10 @@ def format_reliability(reading):
     return (
         f"TO={reading['n_timeout']} abort={reading['n_abort']} "
         f"fail_s/m={reading['n_fail_strict']}/{reading['n_fail_mixed']} "
-        f"PAR10_ITT/s/m={reading['par_itt']:.1f}/"
-        f"{reading['par_strict']:.1f}/{reading['par_mixed']:.1f}"
+        f"PAR10solver_ITT/s/m={reading['par_itt']:.1f}/"
+        f"{reading['par_strict']:.1f}/{reading['par_mixed']:.1f} "
+        f"PAR10pre+solve_ITT/s/m={reading['par_itt_ps']:.1f}/"
+        f"{reading['par_strict_ps']:.1f}/{reading['par_mixed_ps']:.1f}"
     )
 
 
@@ -600,6 +688,20 @@ def main():
                 f"q_block6={row['work_q_block6']:.8g} | "
                 f"own_inc_rho={row['median_diagnostic_ratio']:.4f} "
                 f"(n={row['n_diagnostic']})")
+            print(
+                f"  HL(SA/Flat) total={row['hl_total']:.4f} "
+                f"solver={row['hl_solver']:.4f} | preproc s: "
+                f"SA med={row['preproc_median_sa']:.3f} "
+                f"IQR={row['preproc_iqr_sa']:.3f}, "
+                f"Flat med={row['preproc_median_flat']:.3f} "
+                f"IQR={row['preproc_iqr_flat']:.3f}, "
+                f"med(SA-Flat)={row['preproc_median_diff']:+.3f} "
+                f"(n={row['n_preproc']})")
+            if row['worst_case_total']:
+                wc = row['worst_case_total']
+                print(
+                    f"  WORST-CASE missing pairs (total endpoint, "
+                    f"n={wc['n']}): p={wc['p']:.6g} r_rb={wc['r_rb']:+.3f}")
             print(f"  SA   {format_reliability(row['sa_reliability'])}")
             print(f"  Flat {format_reliability(row['flat_reliability'])}")
 
