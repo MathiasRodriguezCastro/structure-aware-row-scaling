@@ -1369,7 +1369,7 @@ platform for scientific computing in Uruguay \cite{nesmachnow2019clusteruy}.
 
 \begin{table*}[t]
 \centering
-\caption{Four solver--tolerance scenarios separate solver dependence from gap-tolerance effects.}
+\caption{Four solver--tolerance scenarios examine how the observed external-preprocessing effect changes across solver pipelines and MIPGap tolerances.}
 \label{tab:solver-scenarios}
 \begin{threeparttable}
 \small
@@ -2585,12 +2585,12 @@ fixed-pool profile views.
 
 \subsection{Scenario 4: CPLEX with 0.1\% MIPGap}
 
-The stricter CPLEX setting confirms the same solver dependence and makes the negative runtime conclusion clearer. The structured variants remain at or near parity in deterministic effort, and the clearest descriptive improvement in shifted geometric solver time comes from Ruiz rather than from the proposed structure-aware rules; the matrix-only rule does lower the shifted geometric time on Full (from $421.6$ to $370.5$\,s), but this is descriptive only, as the paired test on that class is not significant ($p=0.21$). This is a useful negative result: external scaling may improve some numerical diagnostics without becoming a robust runtime accelerator for CPLEX in this environment.
+The stricter CPLEX setting reinforces the cross-pipeline contrast and makes the negative CPLEX runtime conclusion clearer. The structured variants remain at or near parity in deterministic effort, and the clearest descriptive improvement in shifted geometric solver time comes from Ruiz rather than from the proposed structure-aware rules; the matrix-only rule does lower the shifted geometric time on Full (from $421.6$ to $370.5$\,s), but this is descriptive only, as the paired test on that class is not significant ($p=0.21$). This is a useful negative result: external scaling may improve some numerical diagnostics without becoming a robust runtime accelerator for CPLEX in this environment.
 
 \begin{table*}[t]
 \centering
 \footnotesize
-\caption{At $0.1\%$ MIPGap, CPLEX remains close to parity for the structure-aware variants, confirming solver dependence.}
+\caption{At $0.1\%$ MIPGap, CPLEX remains close to parity for the structure-aware variants, reinforcing the contrast with the Gurobi results in the tested pipelines.}
 \label{tab:robust-cplex-01pct-mipgap}
 \begin{tabular}{@{}ll S[table-format=3.0] S[table-format=3.2] S[table-format=1.2] r @{}}
 \toprule
@@ -2989,12 +2989,9 @@ not, however, reverse the ordering. The cell-level median cached preprocessing t
 for the role-blind rule in all six class--kernel cells under each protocol, although the
 record-level direction is not uniform: under the pinned release build---the sensitivity of
 record---it has the lower per-instance median on $585$ of the $612$ instance--kernel records
-($607/612$ pinned diagnostic, $408/612$ in the noisier concurrent protocol; computed by
-\texttt{scripts/preproc\_timing\_replication.py} from the \texttt{cached\_sa\_s} and
-\texttt{cached\_flat\_s} columns of, respectively,
-\path{results-revision/preproc-timing/replicated_pinned_release.csv},
-\path{results-revision/preproc-timing/replicated_pinned.csv} and
-\path{results-revision/preproc-timing/replicated.csv}). These record-level counts
+($607/612$ pinned diagnostic, $408/612$ in the noisier concurrent protocol; reproduced by
+\path{scripts/preproc_timing_replication.py}; the exact input files, protocol labels and
+columns are listed in Table~S12). These record-level counts
 condition on the $R=20$ per-instance median estimates: they measure the direction of the
 estimated medians and do not propagate within-instance timing uncertainty. To screen that
 noise we classify each record by comparing its paired difference against the dispersion
@@ -3005,8 +3002,10 @@ $B_i$ the larger of the two policies' interquartile ranges over the $R=20$ repet
 test, or a domain-calibrated practical-significance margin. The classification gives $461$
 role-blind-favoured records, $1$ selective-favoured record and $150$ ties under the pinned
 release build; $554$, $0$ and $58$ under the pinned diagnostic build; and $37$, $0$ and $575$
-under the concurrent protocol, whose count is close to a coin flip precisely because almost
-every record there is measurement-indeterminate. That
+under the concurrent protocol. Its raw lower-median count of $408/612$ is substantially closer
+to parity than under either pinned protocol, and the screen classifies $575/612$ of its records
+as within-dispersion ties, showing that the raw sign count there is dominated by differences
+that are small relative to within-instance timing dispersion. That
 residual is markedly less uniform than the full preprocessing gap, which held on every
 instance and every family: aggregating to operational families, the role-blind rule has the
 lower family median in $20$--$32$ of the $34$ families per cell (median family ratio
