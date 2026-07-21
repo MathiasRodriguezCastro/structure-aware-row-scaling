@@ -3264,7 +3264,12 @@ $T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+
 which removes the prototype's metadata-reconstruction stage. Preprocessing components come
 from the \emph{release} build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$), which is the
 implementation-cost sensitivity of record; the non-optimized diagnostic build is retained as
-an audit in Table~S11. Median ratios are SA/Flat on
+an audit in Table~S11. All Simple and SG-Ter-Mer exported models are byte-identical across
+the diagnostic and release builds. For Full, five instances exhibit last-bit
+model-construction differences across builds, including two that enter the analysed pools;
+the four Full rows (marked $\dagger$) are therefore approximate cross-build timing
+sensitivities, whereas the central fast-class comparison changes preprocessing cost only.
+Median ratios are SA/Flat on
 the common log-ratio variable, and negative $r_{\mathrm{rb}}$ favors Flat. The value $q_6$ is
 BH-adjusted within the six-test tolerance family, whereas $q_{12}$ uses the joint twelve-test
 family. The operational-family adjusted values are reported in Table~S11. The analysis conditions on the per-instance median
@@ -3286,16 +3291,16 @@ Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ & $q_{1
  & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 \\
  & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 \\
  & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 \\
- & Full & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 \\
- & Full & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 \\
+ & Full$^\dagger$ & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 \\
+ & Full$^\dagger$ & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
  & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 \\
  & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 \\
  & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 \\
  & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 \\
- & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
- & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
+ & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
+ & Full$^\dagger$ & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
 \bottomrule
 \end{tabular}
 \end{table}
