@@ -932,51 +932,88 @@ med.\ $T_{\rm pre}^{\rm SA}$ (s) & med.\ $T_{\rm pre}^{\rm Flat}$ (s) & med.\ di
 \end{tabular}
 
 \vspace{7pt}
-\textbf{Panel E: cached-metadata endpoint (non-optimized diagnostic build) and
-hardware-transfer sensitivity}\\[2pt]
-\noindent\scriptsize The main-text cached table uses the \emph{release} build
-($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$); the values below come from the non-optimized
-diagnostic build and are retained as an audit. Comparing the two gives the only
-policy-specific transfer factor we measure rather than assume: the implied
-$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ is $0.947$, $0.942$, $1.012$, $0.994$, $0.978$
-and $0.966$ for Full/Aug, Full/Mat, SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and
-Simple/Mat respectively. Optimization leaves the full-call ratios essentially unchanged
-($5.38$--$6.12\times$ release against $5.07$--$6.00\times$ diagnostic) and the metadata share
-at $81$--$83\%$, but moves the cached ratios toward parity, which is why the coefficient-only
-Simple contrast at $1\%$ has $q_6=0.0002$ here and $q_6=0.115$ on the release build.\par
-\vspace{3pt}\scriptsize
-\begin{tabular}{@{}lllrrrrr@{}}
+\textbf{Panel E1: release-build cached-metadata endpoint (implementation-cost sensitivity of record)}\\[2pt]
+\begin{tabular}{@{}lllrrrrrrr@{}}
 \toprule
-Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ \\
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ &
+$q_{6,\rm block}$ & $q_{12,\rm block}$ \\
 \midrule
 \multirow{6}{*}{$1\%$}
- & Simple & Augmented & 204 & 1.0008 & $-0.124$ & 0.1854 & 0.2119 \\
- & Simple & Matrix-only & 204 & 1.0019 & $-0.333$ & 0.0002 & 0.0005 \\
- & SG-Ter-Mer & Augmented & 67 & 1.0074 & $-0.303$ & 0.0935 & 0.0748 \\
- & SG-Ter-Mer & Matrix-only & 67 & 0.9976 & $-0.148$ & 0.2911 & 0.3882 \\
- & Full & Augmented & 31 & 0.9197 & $+0.355$ & 0.1730 & 0.1730 \\
- & Full & Matrix-only & 32 & 0.9869 & $+0.242$ & 0.2864 & 0.3580 \\
+ & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 & 0.364 & 0.337 & 0.450 \\
+ & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 & 0.173 & 0.162 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 & 0.173 & 0.120 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 & 0.337 & 0.450 \\
+ & Full & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 & 0.173 & 0.173 \\
+ & Full & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 & 0.337 & 0.396 \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
- & Simple & Augmented & 204 & 1.0096 & $-0.259$ & 0.0082 & 0.0082 \\
- & Simple & Matrix-only & 203 & 0.9983 & $+0.065$ & 0.5063 & 0.4603 \\
- & SG-Ter-Mer & Augmented & 67 & 1.0159 & $-0.314$ & 0.0507 & 0.0748 \\
- & SG-Ter-Mer & Matrix-only & 67 & 1.0036 & $-0.116$ & 0.5063 & 0.4603 \\
- & Full & Augmented & 27 & 0.8771 & $+0.529$ & 0.0452 & 0.0603 \\
- & Full & Matrix-only & 27 & 0.9804 & $+0.053$ & 0.8223 & 0.8223 \\
+ & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 & 0.016 & 0.031 \\
+ & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 & 0.546 & 0.469 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 & 0.065 & 0.120 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 & 0.546 & 0.496 \\
+ & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 & 0.045 & 0.090 \\
+ & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel E2: non-optimized diagnostic-build audit}\\[2pt]
+\begin{tabular}{@{}lllrrrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ &
+$q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0008 & $-0.124$ & 0.185 & 0.212 & 0.258 & 0.295 \\
+ & Simple & Mat & 204 & 1.0019 & $-0.333$ & 0.0002 & 0.0005 & 0.004 & 0.008 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0074 & $-0.303$ & 0.093 & 0.075 & 0.119 & 0.095 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.148$ & 0.291 & 0.388 & 0.310 & 0.414 \\
+ & Full & Aug & 31 & 0.9197 & $+0.355$ & 0.173 & 0.173 & 0.173 & 0.173 \\
+ & Full & Mat & 32 & 0.9869 & $+0.242$ & 0.286 & 0.358 & 0.286 & 0.358 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0096 & $-0.259$ & 0.008 & 0.008 & 0.013 & 0.013 \\
+ & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 & 0.460 & 0.633 & 0.576 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 & 0.075 & 0.065 & 0.095 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 & 0.460 & 0.633 & 0.512 \\
+ & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.060 & 0.045 & 0.060 \\
+ & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\end{table}
+\end{landscape}
+
+\noindent\scriptsize
+\textbf{Panel E3: release-build hardware-transfer sensitivity}\\[2pt]
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Grid point & \multicolumn{6}{c}{Fast-class contrasts with $q_6<0.05$ (of eight)} \\
+\midrule
+Common $\lambda$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & $8$ \\
+ & 1 & 1 & 1 & 1 & 2 & 2 \\
+\addlinespace
+Ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & --- \\
+ & 1 & 1 & 1 & 3 & 5 & --- \\
 \bottomrule
 \end{tabular}
 
 \vspace{4pt}
-\noindent\scriptsize Transfer sensitivity, evaluated on the finite grids below and reported as
-the count of the eight fast-class contrasts with $q_6<0.05$. Common factor
-$\lambda\in\{0.25,0.5,1,2,4,8\}$: $1,2,2,2,3,3$. Policy-specific ratio
-$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ with $\lambda_{\rm Flat}=1$,
-$\rho\in\{0.25,0.5,1,2,4\}$: $3,2,2,5,7$; at $\rho=0.25$ the coefficient-only Simple median
-falls to $0.9975$, reversing that ordering. Reproducible with
+\noindent\scriptsize The release-build endpoint (Panel E1) is the implementation-cost
+sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
+to show the sensitivity of the cached comparison to compiler optimization. The augmented
+Simple contrast at $0.1\%$ is the single contrast retained at every grid point of Panel E3;
+additional contrasts appear only for $\rho\ge2$, that is, when the selective rule's
+preprocessing is assumed to transfer at least twice as poorly as the role-blind rule's.
+Comparing Panels E1 and E2 gives the implied toolchain ratio
+$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ of $0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and
+$0.966$ for Full/Aug, Full/Mat, SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat;
+optimization leaves the full-call ratios essentially unchanged ($5.38$--$6.12\times$ against
+$5.07$--$6.00\times$) and the metadata share at $81$--$83\%$. Reproducible with
 \texttt{scripts/cached\_transfer\_sensitivity.py}.
-\end{table}
-\end{landscape}
+\normalsize
+
 
 \noindent\footnotesize
 \emph{Notes to Tables~S10--S11.} Both time endpoints use the paired variable
