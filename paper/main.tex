@@ -156,8 +156,8 @@ favors the selective rule there. The current prototype has lower preprocessing-p
 time under full coverage in the two fast classes, but most of that preprocessing difference
 comes from rebuilding metadata the generator already possesses; a cached-metadata
 sensitivity moves the effects toward parity and leaves only two of the eight contrasts with
-$q_{6}<0.05$. In Full, the selective point
-estimate is not retained under an adversarial missing-pair sensitivity. The observed effect
+within-tolerance nominal adjusted values below $0.05$. In Full, the selective direction is not supported by the adversarial signed-rank
+sensitivity over the unrecorded pairs. The observed effect
 of external preprocessing differs between the tested Gurobi and CPLEX pipelines, though no
 formal cross-solver interaction is estimated. Overall, metadata-driven selectivity is not
 uniformly superior, and improved numerical diagnostics need not translate into faster MIP
@@ -2953,9 +2953,11 @@ applies it to \emph{every} row, with no roles, blocks, or coupling stage. We imp
 missing controls: Flat-Aug uses the coefficient-and-right-hand-side extremes of \methodAug{},
 whereas Flat-Mat uses the coefficient-only extremes of \methodMat{}. \Cref{tab:flat-control}
 compares each Flat rule directly with its selective counterpart on the same eligible capped-time
-pairs, rather than comparing two separate speedups against Base. Preprocessing-plus-solver
-time is the operational endpoint (\cref{subsec:statistical}; the hierarchy was selected
-after inspecting these data and is exploratory). On that endpoint the observed ordering is
+pairs, rather than comparing two separate speedups against Base. Prototype
+preprocessing-plus-solver time is the implementation endpoint observed in the dedicated solve
+batches; the cached-metadata sensitivity approximates a generator-integrated implementation
+(\cref{subsec:statistical}; the hierarchy was selected after inspecting these data and is
+exploratory). On that endpoint the observed ordering is
 the same at both tolerances in the two fast classes: the \emph{implemented Flat preprocessing
 pipeline} has lower observed preprocessing-plus-solver time in Simple and SG-Ter-Mer under
 both kernels, with observed median
@@ -2991,10 +2993,18 @@ Because that reconstruction is precisely what the proposed architecture assumes 
 recompute the whole paired comparison on the cached-metadata endpoint
 $T_{\mathrm{pre+solve}}^{\mathrm{cached}}
 =T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$
-(\cref{tab:flat-cached}). This sensitivity splices the per-instance cached preprocessing
-times of the low-contention replication onto the solver times of the original batches, so
-its preprocessing component is measured under the cleanest protocol available rather than
-under load. The effect is substantial. The median ratios collapse towards parity---in Simple
+(\cref{tab:flat-cached}). This is a \emph{cross-protocol counterfactual}: it combines
+preprocessing medians measured on the pinned workstation with solver times from the ClusterUY
+batches, so it does not represent an observed single-machine pipeline, and its absolute ratios
+depend on the relative speed of the two environments. Because the cached effects sit close to
+one, we check that dependence directly by evaluating
+$T^{\mathrm{cached}}(\lambda)=T_{\rm solver}+\lambda\,T^{\mathrm{cached}}_{\rm preproc}$
+over a wide band of hardware-transfer factors. The conclusion is stable: across
+$\lambda\in[0.25,8]$---a $32$-fold range---the number of fast-class contrasts with
+$q_{6}<0.05$ stays between one and three of eight, the same two Simple contrasts carry it
+for $\lambda\in[0.5,8]$, and no SG-Ter-Mer contrast becomes significant at any $\lambda$
+(its median ratio is unchanged at $1.016$ throughout, its preprocessing term being negligible
+against solver time). The effect is substantial. The median ratios collapse towards parity---in Simple
 from $1.029$ to $1.001$ at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from
 $1.053$ to $1.007$ and from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose
 prototype preprocessing-plus-solver ordering had adjusted values below $0.05$, six keep a
@@ -3002,7 +3012,10 @@ direction favoring the role-blind rule but only two retain within-tolerance nomi
 values below $0.05$: the coefficient-only Simple contrast at $1\%$ ($q_{6}=0.0002$) and the
 augmented Simple contrast at $0.1\%$ ($q_{6}=0.008$). Those two also survive the joint and
 operational-family corrections ($q_{12}=0.0005$ and $0.008$;
-$q_{12}^{\mathrm{blk}}=0.008$ and $0.013$). The augmented SG-Ter-Mer contrasts fall to
+$q_{12}^{\mathrm{blk}}=0.008$ and $0.013$). Both are nonetheless small in median magnitude:
+about $0.2\%$ for Simple coefficient-only at $1\%$ MIPGap and $1.0\%$ for Simple augmented at
+$0.1\%$. They indicate systematic directional differences in this campaign, not large
+operational speedups. The augmented SG-Ter-Mer contrasts fall to
 $q_{6}=0.094$ and $0.051$, and both coefficient-only SG-Ter-Mer contrasts to $q_{6}\ge0.29$.
 The Full augmented direction is unchanged in sign and strength
 ($0.877$, $q_{6}=0.045$ at $0.1\%$), but it rests on the same $27$ eligible pairs and is
@@ -3012,46 +3025,6 @@ most of the magnitude and apparent uniformity of the fast-class role-blind advan
 from metadata reconstruction in the prototype; a smaller, class- and kernel-dependent
 residual coverage effect remains after that stage is removed.
 
-\begin{table}[t]
-\centering
-\caption{Cached-metadata sensitivity: the paired comparison of \cref{tab:flat-control}
-recomputed on
-$T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
-which removes the prototype's metadata-reconstruction stage. Median ratios are SA/Flat on
-the same log-ratio variable; negative $r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are
-the BH value within the six-test tolerance family; the joint $q_{12}$ and operational-family
-sensitivities are quoted in the text. The analysis conditions on the per-instance median
-preprocessing times estimated from the low-contention replication, and its adjusted values do
-not propagate timing-estimation uncertainty. The cached Full-Augmented result at $0.1\%$ uses
-the same $27$ eligible pairs as \cref{tab:flat-control} and is likewise not retained by the
-adversarial signed-rank sensitivity over the four unrecorded instances. Exploratory, like
-\cref{tab:flat-control}.}
-\label{tab:flat-cached}
-\small
-\setlength{\belowcaptionskip}{2pt}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llc r rrr@{}}
-\toprule
-Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ \\
-\midrule
-\multirow{6}{*}{$1\%$}
- & Simple & Aug & 204 & 1.0008 & $-0.124$ & 0.185 \\
- & Simple & Mat & 204 & 1.0019 & $-0.333$ & 0.0002 \\
- & SG-Ter-Mer & Aug & 67 & 1.0074 & $-0.303$ & 0.094 \\
- & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.148$ & 0.291 \\
- & Full & Aug & 31 & 0.9197 & $+0.355$ & 0.173 \\
- & Full & Mat & 32 & 0.9869 & $+0.242$ & 0.286 \\
-\midrule
-\multirow{6}{*}{$0.1\%$}
- & Simple & Aug & 204 & 1.0096 & $-0.259$ & 0.008 \\
- & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 \\
- & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 \\
- & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 \\
- & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 \\
- & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 Because that margin rests on preprocessing calls that the dedicated batches timed once, in a
 fixed order, we re-timed the preprocessing call alone under a replicated, order-randomized
@@ -3231,7 +3204,7 @@ value within the six-test tolerance family of each endpoint.}
 \setlength{\tabcolsep}{2.6pt}
 \begin{tabular}{@{}llcr rrr rrr@{}}
 \toprule
-& & & & \multicolumn{3}{c}{Pre+solve time (operational)} & \multicolumn{3}{c}{Solver time (decomposition)} \\
+& & & & \multicolumn{3}{c}{Prototype pre+solve time} & \multicolumn{3}{c}{Solver time (decomposition)} \\
 \cmidrule(lr){5-7}\cmidrule(lr){8-10}
 Gap & Class & Kernel & $n$ &
 med. $\frac{T_{\rm pre+solve}^{\rm SA}}{T_{\rm pre+solve}^{\rm Flat}}$ & $r_{\mathrm{rb}}$ & $q_{6}$ &
@@ -3272,6 +3245,48 @@ are in Table~S10; the reliability audit is in Table~S9 and
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}
+
+\begin{table}[t]
+\centering
+\caption{Cached-metadata sensitivity: the paired comparison of \cref{tab:flat-control}
+recomputed on
+$T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
+which removes the prototype's metadata-reconstruction stage. Median ratios are SA/Flat on
+the same log-ratio variable; negative $r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are
+the BH-adjusted value within the six-test tolerance family. The joint twelve-test value
+$q_{12}$ and the operational-family sensitivities are reported in the accompanying text and in
+Table~S10. The analysis conditions on the per-instance median
+preprocessing times estimated from the low-contention replication, and its adjusted values do
+not propagate timing-estimation uncertainty. The cached Full-Augmented result at $0.1\%$ uses
+the same $27$ eligible pairs as \cref{tab:flat-control} and is likewise not retained by the
+adversarial signed-rank sensitivity over the four unrecorded instances. Exploratory, like
+\cref{tab:flat-control}.}
+\label{tab:flat-cached}
+\small
+\setlength{\belowcaptionskip}{2pt}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc r rrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0008 & $-0.124$ & 0.185 \\
+ & Simple & Mat & 204 & 1.0019 & $-0.333$ & 0.0002 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0074 & $-0.303$ & 0.094 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.148$ & 0.291 \\
+ & Full & Aug & 31 & 0.9197 & $+0.355$ & 0.173 \\
+ & Full & Mat & 32 & 0.9869 & $+0.242$ & 0.286 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0096 & $-0.259$ & 0.008 \\
+ & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 \\
+ & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 \\
+ & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[t]
 \centering
@@ -3717,10 +3732,12 @@ developed in full in \cref{subsec:stage-attribution}; their lesson is that the o
 depends on what one measures---prototype preprocessing-plus-solver time, where the selective
 implementation pays mainly for reconstructing metadata, against the cached-metadata
 sensitivity, where only diagnosis and factor application are charged, against solver time
-alone, where the effects are small and the
-reliability-adjusted reading can point the other way. They were run only under Gurobi:
-the value of external preprocessing is solver-dependent, and whether the same
-coverage-versus-selectivity ordering persists under CPLEX remains untested. Establishing this
+alone. Removing metadata reconstruction moves the fast-class effects close to parity: six of
+the eight directional orderings remain, but only two small Simple contrasts retain nominal
+adjusted values below $0.05$ under the reported joint and operational-family sensitivities, where the effects are small and the
+reliability-adjusted reading can point the other way. The observed effect of external preprocessing differs between the tested Gurobi and CPLEX
+pipelines, while solver dependence of the Flat-versus-selective coverage ordering remains
+untested because the Flat controls were run only under Gurobi. Establishing this
 bounded result
 required separating four kinds of evidence---algebraic equivalence, original-scale feasibility,
 solver-facing diagnostics, and matched per-solver runtime---which is as much a methodological
@@ -3797,17 +3814,18 @@ path and preprocessing methods used in the paper.
 
 \bmsection*{Supporting Information}
 
-A Supporting Information document accompanies this article with the $0.1\%$-MIPGap Gurobi
-and CPLEX distributional, diagnostic, and performance-profile views (Figures~S1--S4) and ten
-tables. They report hyperparameter sensitivity (S1), the per-variant reliability and
-\PARten{} audit (S2), the coupling- and local-floor checks (S3--S4), uniformly unavailable
-instances and full-pool sensitivity (S5), paired-test attrition (S6), the available
-internal-scaling sweep and verifier audit (S7), activation-audit runtime replicates (S8),
-the direct SA--Flat original-scale reliability audit (S9), and the multiplicity,
-operational-family, bootstrap, preprocessing-plus-solver, Work-unit, and
-own-incumbent-diagnostic
-sensitivities for the direct controls, with their per-contrast attrition (S10). Additional
-processed logs and rebuild scripts are available in the reproducibility repository.
+A Supporting Information document accompanies this article. Section~S1 contains the proofs of
+Propositions~1 and~2. Section~S2 contains the supplementary computational results: the
+$0.1\%$-MIPGap Gurobi and CPLEX distributional, diagnostic, and performance-profile views
+(Figures~S1--S4) and ten tables---hyperparameter sensitivity (Table~S1), the per-variant
+reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
+(Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
+paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit
+(Table~S7), activation-audit runtime replicates (Table~S8), the direct SA--Flat original-scale
+reliability audit (Table~S9), and the multiplicity, operational-family, bootstrap,
+preprocessing-plus-solver, Work-unit, and own-incumbent-diagnostic sensitivities for the
+direct controls, with their per-contrast attrition and timing environment (Table~S10).
+Additional processed logs and rebuild scripts are available in the reproducibility repository.
 
 % \balance is a two-column last-page balancer; it is a no-op in the single-column
 % review layout and is disabled here. Re-enable it only with the "5p" two-column option.

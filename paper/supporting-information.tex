@@ -53,7 +53,7 @@ preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities
 direct comparison, together with its per-contrast attrition and preprocessing-time
 distributions (Table~S10).
 
-\section*{S1. Proofs of the spectral propositions}
+\section*{Section S1. Proofs of the spectral propositions}
 \noindent These are the full proofs of the two propositions stated in Section~3 of the
 main text, moved here to keep the motivation and the method adjacent.
 
@@ -163,6 +163,8 @@ smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
 &=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
 \end{align*}
 \end{proof}
+
+\section*{Section S2. Supplementary computational results}
 
 \medskip
 \noindent Here, \PARten{} (including its ITT/strict/mixed superscripts) denotes the
@@ -917,7 +919,10 @@ med.\ $T_{\rm pre}^{\rm SA}$ (s) & med.\ $T_{\rm pre}^{\rm Flat}$ (s) & med.\ di
  & Full & Matrix-only & 34 & 30 & 30 & 3 & 27 & 0.124 & 0.041 & $+0.083$ \\
 \bottomrule
 \end{tabular}
-\begin{minipage}{0.96\linewidth}\footnotesize
+\end{table}
+\end{landscape}
+
+\noindent\footnotesize
 \emph{Notes.} Both time endpoints use the paired variable
 $d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$; negative values favor Flat. The test, the effect
 size, and the median ratio are computed on this one scale and share its direction
@@ -947,7 +952,7 @@ which neither policy completes. No pair is dropped for a missing time and no exa
 difference occurs; $n$ used applies to both endpoints. In these batches the preprocessing
 calls are timed once each, with the C++ high-resolution wall clock, in the batch's fixed
 (un-randomized) execution order and without repetitions; per-policy IQRs are at most
-$0.003$\,s in every cell.
+$0.003$\,s in every cell. Timing environment for the preprocessing replication: Intel Core i7-13620H ($10$ physical / $16$ logical cores, $0.4$--$4.9$\,GHz, \texttt{powersave} governor), Ubuntu 22.04.5 with Linux 6.8.0, g++ 11.4.0 at \texttt{-std=c++17 -g} (no \texttt{-O} flag), binary \texttt{code/build\_diag/SistemaElectrico}; the pinned protocol binds one worker to a single logical CPU with \texttt{taskset}, the concurrent protocol uses $12$ unpinned workers. The solve batches ran on ClusterUY as described in the main text, so the cached-metadata endpoint is a cross-protocol counterfactual.
 
 \emph{Order-randomized preprocessing replication}
 (\texttt{scripts/preproc\_timing\_replication.py}; $R=20$, seeded order per repetition,
@@ -1003,8 +1008,7 @@ same augmented sample the adversarial location estimates remain directionally fa
 selectivity (median SA/Flat $0.9596$, HL $0.9465$); the matrix-only counterpart moves the
 other way (median $1.0861$, HL $1.0977$, $p=0.34$). The three double timeouts enter as
 operational ties (exact zeros).
-\end{minipage}
-\end{table}
-\end{landscape}
+\normalsize
+
 
 \end{document}
