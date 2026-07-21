@@ -825,14 +825,16 @@ We state the scope of this argument once and plainly: the propositions describe 
 nonsingular blocks under exact SVD scaling, the proxies act on rectangular,
 inequality-based matrices, and we establish no bound relating the proxy scale to the
 ideal spectral factor in \cref{prop:ideal-block-scaling}. The propositions motivate the
-architecture, but the controlled synthetic suite of \cref{subsec:synthetic-benchmark} does
-not test their spectral predictions: it evaluates only the coefficient-and-right-hand-side
-magnitude-range proxy that the implementation itself uses. The suite is therefore an
-implementation-level mechanism check---it validates the shared per-row proxy under
-row-multiplicative imbalance and exercises the common block-relative coupling factor on
-the oversized branch of its collective design case
-(\cref{subsec:synthetic-results})---rather than an empirical validation of the spectral
-surrogacy.
+architecture; whether the architecture moves the quantity they describe is an empirical
+question, and the synthetic matrices are small enough to answer it directly by singular-value
+decomposition rather than through the magnitude-range surrogate the implementation uses.
+\Cref{subsec:spectral-audit} reports that audit. Its verdict is split, and we state both
+halves here because they bear on different claims. The propositions' \emph{qualitative}
+prediction survives: every scaling rule reduces $\kappa_2$ by orders of magnitude wherever
+row-multiplicative imbalance is present. Their use as a rationale for \emph{selectivity} does
+not: the role-blind control matches or beats the augmented structure-aware rule on
+$\kappa_2$ in every pattern, including the coupling patterns the coupling stage was designed
+for. The spectral argument therefore supports scaling, not metadata.
 
 This design rationale also explains why the proposed method is row-based. Positive row scaling
 preserves the original units and domains of all variables; integer and binary variables do
@@ -1577,8 +1579,9 @@ store the augmented global magnitude-range proxy
 \label{eq:synthetic-range-proxy}
 \end{equation}
 not the spectral condition number $\kappa_2(A)$. The synthetic tables, figures, and tests
-below use \cref{eq:synthetic-range-proxy}; no singular-value condition number is computed for
-this grid.
+below use \cref{eq:synthetic-range-proxy}, which is the quantity the implementation itself
+optimizes. Because these matrices are small, we additionally compute $\kappa_2(A)$ exactly
+for the whole grid and compare the two; \cref{subsec:spectral-audit} reports that comparison.
 
 \subsection{Scaling variants}
 \label{subsec:variants}
@@ -2842,6 +2845,80 @@ imbalance---scale separation
 between blocks with ill-conditioned interiors, column imbalance, or rows with identical
 coefficient extremes but different roles---are either untreated by design or not exercised,
 and are natural extensions of the generator.
+
+\subsection{Direct spectral audit of the synthetic grid}
+\label{subsec:spectral-audit}
+
+The propositions of \cref{subsec:ideal-block-scaling,subsec:global-coupling-theory} are stated
+in terms of $\kappa_2(A)=\sigma_{\max}/\sigma_{\min}$, whereas the implementation and the
+synthetic tables above use the magnitude-range proxy of
+\cref{eq:synthetic-range-proxy}. Two questions follow, and both are answerable here because
+the synthetic matrices are small enough to decompose exactly: whether the rules move
+$\kappa_2$ at all, and whether the proxy is a faithful stand-in for it. We exported the
+constraint matrix of every instance and variant in the grid ($5$ patterns $\times$ $3$
+severities $\times$ $20$ seeds $\times$ $6$ variants, $1800$ matrices) and computed the
+singular-value spectrum of each. These matrices are rectangular and mostly rank deficient
+($1570$ of $1800$ exports have a numerically zero smallest singular value, and the count is
+essentially constant across variants, $261$--$265$), so $\kappa_2$ itself is infinite for most
+of the grid and we report instead $\kappa_2^{+}=\sigma_{\max}/\sigma_{\min}^{+}$, using the
+smallest singular value above a relative tolerance of $10^{-12}$. This is the usual
+pseudo-condition number; it is the right quantity here, but it is not literally the
+$\kappa_2$ of the propositions, which assume square nonsingular blocks. The \methodRuizCols{}
+variant is omitted from the table: its exported constraint matrix is identical to
+\methodRuiz{} in all $300$ instances, so the column pass leaves the constraint matrix
+unchanged on this grid and the two cannot be distinguished spectrally.
+\Cref{tab:spectral-audit} gives the medians over the $20$ seeds.
+
+\begin{table}[htbp]
+\caption{Median $\kappa_2^{+}$ of the exported constraint matrix over $20$ seeds, at the most
+severe disturbance level ($S=6$; the None pattern applies no disturbance, so severity is
+inert for it). Every rule improves on Base wherever imbalance is present, but the role-blind
+control Flat matches \methodAug{} on three patterns and beats it on the two
+coupling-dominated ones.}
+\label{tab:spectral-audit}
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Pattern & \methodBase{} & \methodAug{} & \methodMat{} & \methodRuiz{} & Flat \\
+\midrule
+None                 & \num{8.5e3} & \num{7.8e3} & \num{8.5e2} & \num{1.1e4} & \num{7.8e3} \\
+Local                & \num{7.9e11} & \num{8.0e3} & \num{7.2e2} & \num{4.2e4} & \num{8.0e3} \\
+Coupling             & \num{3.1e7} & \num{6.8e4} & \num{8.0e2} & \num{1.1e5} & \num{7.7e3} \\
+Coupling (uniform)   & \num{3.1e6} & \num{2.9e4} & \num{6.6e2} & \num{5.2e4} & \num{7.1e3} \\
+Mixed                & \num{8.0e11} & \num{4.0e5} & \num{7.2e2} & \num{1.7e6} & \num{8.0e3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three readings follow. First, the qualitative prediction of the propositions holds and is
+large: under local or mixed imbalance the unscaled matrices reach $\kappa_2^{+}\approx
+\num{8e11}$, and every scaling rule brings them down by seven to nine orders of magnitude.
+Scaling does what the theory says scaling does. Second, the rules are not interchangeable, but
+the ordering does not follow structural selectivity. \methodMat{} attains the lowest
+$\kappa_2^{+}$ in \emph{every} pattern, between $\num{6.6e2}$ and $\num{8.5e2}$, an order of
+magnitude below every other variant including the undisturbed None row; the matrix-only kernel
+is the spectrally best-behaved rule in this suite regardless of what the metadata says. Third,
+and most consequential for the claims of this paper, \methodAug{} obtains no spectral advantage
+over its role-blind control. Their median ratio $\kappa_2^{+}(\methodAug{})/\kappa_2^{+}
+(Flat)$ at $S=6$ is $1.00$ on None, Local and Coupling~(uniform); on the two patterns
+where the coupling disturbance is the dominant one it is $2.36$ (Coupling) and $10.37$ (Mixed),
+both against \methodAug{}. On the very design case that motivates the coupling stage, treating
+every row as local is spectrally better than using the metadata to treat coupling rows
+selectively. This is an independent confirmation, in a quantity the operational campaigns never
+measure, of the coverage-versus-selectivity result of
+\cref{subsec:added-controls,subsec:stage-attribution}.
+
+The proxy's fidelity is the remaining question, and the answer is that it is a weak ordinal
+surrogate. Across all $1800$ matrices the Spearman correlation between $\log
+\widehat\kappa_{\mathrm{range}}$ and $\log\kappa_2^{+}$ is $0.62$: positive and clearly
+non-null, but far from the near-identity a substitution argument would need. Ranking the
+variants within an instance, the proxy reproduces the $\kappa_2^{+}$ ordering exactly in only
+$108$ of $300$ instances ($36\%$). The one thing it does get right is the winner: in all $192$
+disagreements the variant minimizing the proxy is still the variant minimizing $\kappa_2^{+}$
+(\methodMat{} in every case). We therefore read the magnitude-range proxy as adequate for
+identifying which rule is best conditioned and inadequate for quantitative claims about
+$\kappa_2$, and we make no argument in this paper that rests on the proxy as a numerical
+estimate of the spectral condition number.
 
 Taken together, the four operational scenarios and the controlled synthetic check support a
 limited but useful interpretation. Under Gurobi, the structured rules lower path-specific
