@@ -1040,7 +1040,7 @@ B_i^{b}=\max\Bigl\{\operatorname{IQR}\bigl(T^{\mathrm{cached},b}_{\mathrm{prepro
 \]
 where $\widetilde T$ denotes the median and the interquartile ranges are taken over the $R=20$
 repetitions; the quantities are cached \emph{preprocessing} times, not the
-preprocessing-plus-solver endpoint. Using this descriptive noise screen, the three-way
+preprocessing-plus-solver endpoint. Using this descriptive scale-of-dispersion classification, the three-way
 classification (role-blind-favoured, selective-favoured, tie) is $461/1/150$ under the pinned
 release build, $554/0/58$ under the pinned diagnostic build and $37/0/575$ under the concurrent
 protocol; each row sums to $612$. The band is an ad hoc scale-of-dispersion heuristic based on the larger marginal IQR; it is not
@@ -1106,8 +1106,9 @@ $q_{12}$ & 0.090 & 0.090 & 0.090 & 0.060 & \textbf{0.042} & --- \\
 \noindent\scriptsize The adversarial missing-pair sensitivity was recomputed at every grid
 point on this cached endpoint: its effective nonzero sample remains $n=31$ and
 $p_{\rm adv}=0.433$ at all eleven points, so no point falls below $0.05$ (the corresponding
-value on the prototype endpoint is $0.47$). The unadjusted values are likewise invariant along
-both grids ($p=0.0151$, $p_{\rm block}=0.0151$), because scaling the preprocessing term cannot
+value on the prototype endpoint is $0.47$). For the observed-pair, non-adversarial analysis, the
+unadjusted values are likewise invariant along both grids ($p=0.0151$,
+$p_{\rm block}=0.0151$), because scaling the preprocessing term cannot
 change the paired ranks here---that term is milliseconds against solver times of
 seconds---so only the BH-adjusted values move, and they move because the other contrasts in the
 family do. Because every Full instance is a singleton operational family, the family-level
