@@ -137,38 +137,30 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) reach the solver as flat coefficient matrices,
-although the generator knows which rows belong to each component and which rows couple
-components. We ask whether this pre-export metadata can usefully drive positive row
-scaling---a transformation that multiplies complete constraints by strictly positive factors
-and therefore preserves the mathematical program exactly, while numerical feasibility of
-returned solutions is checked in the original scale. We propose a structure-aware layer that
-applies geometric-mean row normalization in a local--block--coupling order and evaluate it on a
-hydrothermal-dispatch generator across three instance classes, two commercial solvers, and two
-tolerances. The operational family is compared with unscaled, Ruiz-kernel, and solver-internal
-baselines; direct Gurobi role-blind controls apply either the augmented or coefficient-only
-kernel to every row. The structure-aware variants generally lower own-incumbent path-specific
-LP diagnostics relative to the unscaled and Ruiz-kernel formulations. Separately, the synthetic
-exported-range analysis finds no general advantage over full-coverage per-row normalization.
-Under fixed-pool intent-to-treat PAR10 (capped solver-time cost), at least one
-structure-aware variant is below Base in each Gurobi class and tolerance, whereas no robust
-runtime gain appears under CPLEX. In exploratory single-default-seed direct Gurobi controls
-(endpoint hierarchy selected after inspection), the coverage effect is endpoint- and
-class-dependent. Measured as preprocessing-plus-solver time, the implemented role-blind
-(Flat) pipeline has lower observed time in Simple and SG-Ter-Mer at both tolerances---a
-margin driven mainly by implementation-specific preprocessing overhead in Simple and by a
-mixture of preprocessing overhead and solver response in SG-Ter-Mer, rather than by a pure
-effect of scaling more rows---while in the $27$ eligible Full pairs at $0.1\%$ MIPGap the
-selective augmented implementation has lower observed preprocessing-plus-solver time, a
-direction that is not retained by an adversarial signed-rank sensitivity over four
-unrecorded instances. On capped solver time the effects are small
-(medians at most $1.6\%$): the augmented Simple contrast is the only comparison with
-nominal adjusted values below $0.05$ under the reported multiplicity and
-operational-family analyses, the deterministic Work comparison reproduces its direction,
-and the common-pool strict/mixed reliability-adjusted PAR10 ordering instead favors the
-selective rule there. The coefficient-only solver-time contrasts are inconclusive. External
-preprocessing is solver-dependent, and cross-solver persistence of the coverage ordering
-remains untested.
+Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, although
+their generators retain row roles, block ownership, and coupling incidence. We study whether
+this metadata should select which constraints receive positive pre-export row scaling. The
+proposed local--block--coupling layer applies geometric-mean row normalization while
+preserving the MIP exactly; returned solutions are verified on the original constraints. We
+evaluate it on three hydrothermal-dispatch classes, two commercial solvers, and two MIPGap
+tolerances, against unscaled, Ruiz-kernel, solver-internal, and role-blind full-coverage
+controls. The structure-aware variants generally reduce own-incumbent fixed-LP diagnostics,
+but a synthetic mechanism check finds no general exported-range advantage over applying the
+same per-row kernel to every row. Under fixed-pool intent-to-treat PAR10, at least one
+structure-aware variant is below Base in every Gurobi class and tolerance, whereas no robust
+gain appears under CPLEX. Direct exploratory Gurobi controls show that the coverage ordering
+depends on class, kernel, and endpoint. Capped solver-time effects are small: only the
+augmented Simple contrast at $0.1\%$ has nominal adjusted values below $0.05$ across the
+reported multiplicity and operational-family analyses, while reliability-adjusted PAR10
+favors the selective rule there. The current prototype has lower preprocessing-plus-solver
+time under full coverage in the two fast classes, but most of that preprocessing difference
+comes from rebuilding metadata the generator already possesses, and a cached-metadata
+sensitivity retains only two of those eight orderings. In Full, the selective point
+estimate is not retained under an adversarial missing-pair sensitivity. The observed effect
+of external preprocessing differs between the tested Gurobi and CPLEX pipelines, though no
+formal cross-solver interaction is estimated. Overall, metadata-driven selectivity is not
+uniformly superior, and improved numerical diagnostics need not translate into faster MIP
+search.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -1966,7 +1958,11 @@ direct-control data and is therefore exploratory}. We report preprocessing-plus-
 time $T_{\mathrm{pre+solve}}=T_{\mathrm{preproc}}+T_{\mathrm{solver}}$ as the operational
 endpoint---it charges each rule the cost of its own intervention---and capped solver time
 as a decomposition of that endpoint, isolating the subsequent solver response, without
-treating either as a preregistered confirmatory outcome. The name is deliberately narrow:
+treating either as a preregistered confirmatory outcome. Strictly, the observed
+preprocessing-plus-solver time is an \emph{implementation} endpoint: our prototype rebuilds
+structural metadata that the proposed architecture assumes the generator already holds, so a
+cached-metadata sensitivity (\cref{tab:flat-cached}) is required to approximate the intended
+generator-integrated deployment, and we report both. The name is deliberately narrow:
 $T_{\mathrm{pre+solve}}$ excludes model construction, solver model loading, and post-solve
 verification, which are common to both policies, so it is not literally the whole
 pipeline. Here $T_{\mathrm{preproc}}$ is the wall time of the preprocessing call on the
@@ -3069,15 +3065,72 @@ generator already holds. Instrumenting the call into metadata reconstruction, sc
 diagnosis and factor application shows that reconstruction is the dominant term for the
 selective rule, $72$--$89\%$ of its preprocessing time by class and kernel, while it is
 negligible for the role-blind rule, which needs no roles at all
-($\le0.6$\,ms). Charging only the intrinsic work---the cached-metadata counterpart
-$T_{\mathrm{preproc}}^{\mathrm{cached}}=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}$,
-which is what a generator that maintains the taxonomy would pay---collapses the gap from
+($\le0.6$\,ms). Charging only the intrinsic work---an estimated cached-metadata counterpart
+$T_{\mathrm{preproc}}^{\mathrm{cached}}=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}$
+that removes the prototype's metadata-reconstruction stage while retaining diagnosis and
+factor application---collapses the gap from
 roughly $6$--$9\times$ to $1.08$--$1.40\times$ (medians of the paired ratio; e.g.\
 $0.032$ against $0.029$\,s in Simple and $0.020$ against $0.018$\,s in SG-Ter-Mer). It does
 not, however, reverse it: the role-blind kernel remains marginally cheaper in all six
 class--kernel cells, and is cheaper on $408$ of the $612$ instance--kernel records. So most
 of the measured preprocessing penalty is an artifact of the prototype rebuilding metadata
-it was given, but a small residual cost of selectivity survives that correction.
+it was given, but a small descriptive residual cost remains after removing metadata
+reconstruction; its family-level robustness is reported separately below.
+
+Because that reconstruction is precisely what the proposed architecture assumes away, we
+recompute the whole paired comparison on the cached-metadata endpoint
+$T_{\mathrm{pre+solve}}^{\mathrm{cached}}
+=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$
+(\cref{tab:flat-cached}). This sensitivity splices the per-instance cached preprocessing
+times of the replication onto the solver times of the original batches; because the
+replication ran under concurrent load, its preprocessing component is if anything
+overstated, so the sensitivity is conservative towards the role-blind rule. The effect is
+substantial. The median ratios collapse towards parity---in Simple from $1.029$ to $1.003$
+at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from $1.053$ to $1.007$ and
+from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose prototype
+preprocessing-plus-solver ordering had adjusted values below $0.05$, only two retain
+them: the coefficient-only Simple contrast at $1\%$ ($q_{6}<0.001$) and the augmented
+Simple contrast at $0.1\%$ ($q_{6}=0.003$). The augmented SG-Ter-Mer contrasts fall to
+$q_{6}=0.064$ and $0.055$, and both coefficient-only SG-Ter-Mer contrasts to $q_{6}\ge0.2$.
+The Full augmented direction is unchanged in sign and comparable in strength
+($0.877$, $q_{6}=0.052$ at $0.1\%$). Read together with the phase breakdown, the operational
+reading is therefore that the role-blind advantage observed in the fast classes is mostly an
+artifact of what the prototype recomputes, not a property of covering more rows.
+
+\begin{table}[t]
+\centering
+\caption{Cached-metadata sensitivity: the paired comparison of \cref{tab:flat-control}
+recomputed on
+$T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
+which removes the prototype's metadata-reconstruction stage. Median ratios are SA/Flat on
+the same log-ratio variable; negative $r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are
+the BH values within tolerance and jointly. Exploratory, like
+\cref{tab:flat-control}.}
+\label{tab:flat-cached}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc r rrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0026 & $-0.189$ & 0.058 \\
+ & Simple & Mat & 204 & 1.0068 & $-0.502$ & $<0.001$ \\
+ & SG-Ter-Mer & Aug & 67 & 1.0068 & $-0.301$ & 0.064 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0052 & $-0.189$ & 0.215 \\
+ & Full & Aug & 31 & 0.9217 & $+0.351$ & 0.135 \\
+ & Full & Mat & 32 & 0.9907 & $+0.231$ & 0.262 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0100 & $-0.278$ & 0.003 \\
+ & Simple & Mat & 203 & 1.0009 & $-0.072$ & 0.445 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.310$ & 0.055 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0096 & $-0.155$ & 0.407 \\
+ & Full & Aug & 27 & 0.8772 & $+0.519$ & 0.052 \\
+ & Full & Mat & 27 & 0.9805 & $+0.048$ & 0.841 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Because that margin rests on preprocessing calls that the dedicated batches timed once, in a
 fixed order, we re-timed the preprocessing call alone under a replicated, order-randomized
@@ -3132,10 +3185,12 @@ sensitivity} for those pairs---appending them with the adverse sign at above-max
 because multiplicity adjustment does not address missing-data selection---does not retain
 the contrast ($p=0.47$). That construction bounds the signed-rank evidence under adverse
 missing pairs; it is not a universal worst-case bound for the median ratio, the
-Hodges--Lehmann estimate, or the reliability-adjusted aggregate costs. The corresponding
-adversarial location estimates still favor selectivity in direction (median SA/Flat
-$0.960$, Hodges--Lehmann $0.947$), so what the sensitivity removes is the rank-based
-evidence, not the sign of the point estimate. The three double timeouts enter as
+Hodges--Lehmann estimate, or the reliability-adjusted aggregate costs. Because adverse above-maximal ranks do not uniquely determine the missing log-ratio
+magnitudes, we report no universal adversarial median or Hodges--Lehmann estimate; under
+the single imputation actually used---$d_{\mathrm{miss}}=-(\max_i\lvert d_i\rvert
++\varepsilon)$, one adversarial scenario among many---the location estimates still point
+toward selectivity, which shows only that what the sensitivity removes is the rank-based
+evidence rather than the sign of the point estimate. The three double timeouts enter as
 operational ties. At $1\%$ the
 same Full direction is inconclusive. On the capped solver-time
 decomposition---the solver's response to the exported matrix, reported as an exploratory
@@ -3279,8 +3334,10 @@ are in Table~S10; the reliability audit is in Table~S9 and
 
 \begin{table}[t]
 \centering
-\caption{Completed-pair component summaries associated with the comparisons of
-\cref{tab:flat-control}: medians of $\Delta T=T^{\rm SA}-T^{\rm Flat}$, in seconds. These
+\caption{Completed-pair component summaries from the original fixed-order solve batches
+associated with \cref{tab:flat-control}: medians of $\Delta T=T^{\rm SA}-T^{\rm Flat}$, in
+seconds. They are not from the order-randomized replication, whose concurrent load yields
+larger absolute differences. These
 summaries exclude one-sided non-completions that remain in the capped paired analysis, and
 therefore do not decompose the exact inferential pool of every row; nor are the three
 medians an additive decomposition, since the median of a sum is not the sum of medians.
@@ -3292,7 +3349,7 @@ are tens of milliseconds per instance; in Full the solver term dominates and rev
 \begin{tabular}{@{}llc r rr rr@{}}
 \toprule
 Gap & Class & Kernel & $n$ &
-med.\ $\Delta T_{\rm preproc}$ & IQR &
+med.\ $\Delta T_{\rm preproc}$ & IQR($\Delta T_{\rm preproc}$) &
 med.\ $\Delta T_{\rm solver}$ & med.\ $\Delta T_{\rm pre+solve}$ \\
 \midrule
 \multirow{6}{*}{$1\%$}
@@ -3411,7 +3468,9 @@ two role-blind controls (SA-Aug versus Flat-Aug and SA-Mat versus Flat-Mat,
 answer it endpoint by endpoint: in preprocessing-plus-solver time the implemented Flat
 pipeline has the lower observed time in the two fast classes at both tolerances, the Full selectivity direction is conditional on its
 eligible pairs, and on solver time alone only the augmented Simple contrast at $0.1\%$
-remains below $0.05$ after every adjustment, with all matrix-only solver-time contrasts
+remains below the nominal $0.05$ threshold after every reported multiplicity and
+operational-family adjustment applied to the capped solver-time endpoint, with all
+matrix-only solver-time contrasts
 inconclusive. Third,
 whether the solver could have done this itself: the internal-scaling control
 (\cref{subsec:internal-scaling}) gives a class-dependent answer---a tie on the typical

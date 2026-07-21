@@ -72,8 +72,13 @@ def iqr(values):
     return percentile(ordered, 0.75) - percentile(ordered, 0.25)
 
 
-def run_once(exe, instance_text, flags, timeout_s=120.0):
-    """One fresh-process preprocessing call; returns measured seconds or None."""
+def run_once(exe, instance_text, flags, timeout_s=120.0, pin_cpu=None):
+    """One fresh-process preprocessing call; returns measured seconds or None.
+
+    With pin_cpu set, the call is pinned to that logical CPU via taskset, which
+    (together with --workers 1) gives the low-contention protocol used to
+    estimate intrinsic magnitudes rather than to stress-test the sign.
+    """
     script = (
         f"{instance_text}\n\n"
         "configurarSolver --Gurobi --timeout 3600 --mipgap 0.001\n"
@@ -84,9 +89,12 @@ def run_once(exe, instance_text, flags, timeout_s=120.0):
         fh.write(script)
         path = fh.name
     try:
+        command = [str(exe)]
+        if pin_cpu is not None:
+            command = ['taskset', '-c', str(pin_cpu)] + command
         with open(path) as stdin:
             proc = subprocess.run(
-                [str(exe)], stdin=stdin, stdout=subprocess.PIPE,
+                command, stdin=stdin, stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL, timeout=timeout_s, text=True)
         match = PREPROC_RE.search(proc.stdout)
         if not match:
@@ -105,7 +113,7 @@ def run_once(exe, instance_text, flags, timeout_s=120.0):
 
 
 def measure_instance(args):
-    exe, class_name, instance_path, reps, seed = args
+    exe, class_name, instance_path, reps, seed, pin_cpu = args
     instance_text = clean_instance_text(Path(instance_path))
     rng = random.Random(seed)
     rows = []
@@ -119,7 +127,7 @@ def measure_instance(args):
             if rng.random() < 0.5:
                 order.reverse()
             for policy, flags in order:
-                value = run_once(exe, instance_text, flags)
+                value = run_once(exe, instance_text, flags, pin_cpu=pin_cpu)
                 if value is not None:
                     samples[policy].append(value['total'])
                     for key in ('metadata', 'diagnosis', 'apply'):
@@ -180,6 +188,8 @@ def main():
     parser.add_argument('--exe', default=str(ROOT / 'code' / 'build' / 'SistemaElectrico'))
     parser.add_argument('--reps', type=int, default=20)
     parser.add_argument('--workers', type=int, default=8)
+    parser.add_argument('--pin-cpu', type=int, default=None,
+                        help='pin every timed call to this logical CPU (use with --workers 1)')
     parser.add_argument('--seed', type=int, default=20260720)
     parser.add_argument('--classes', nargs='*', default=[c[0] for c in CLASSES])
     parser.add_argument('--out', default=str(
@@ -192,7 +202,8 @@ def main():
         if class_name not in args.classes:
             continue
         for instance in sorted((ROOT / 'data' / 'entradas' / folder).glob('*.txt')):
-            jobs.append((args.exe, class_name, str(instance), args.reps, seed_counter))
+            jobs.append((args.exe, class_name, str(instance), args.reps,
+                         seed_counter, args.pin_cpu))
             seed_counter += 1
 
     print(f'{len(jobs)} instances x {len(CONTRASTS)} contrasts x {args.reps} reps '
