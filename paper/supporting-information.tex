@@ -10,6 +10,8 @@
 \newenvironment{proof}{\par\noindent\textit{Proof.}\ }{\hfill\qedsymbol\par\medskip}
 \providecommand{\qedsymbol}{\ensuremath{\square}}
 \usepackage{xurl}   % breakable paths/URLs (\path)
+% break long paths only at natural separators, not mid-token
+\makeatletter\def\UrlBreaks{\do\/\do\_\do\-\do\.}\makeatother
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[labelfont=bf]{caption}
@@ -1017,15 +1019,18 @@ $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
 \vspace{10pt}
 \subsection*{Section S2.1. Timing, build, and transfer-factor audits}
 
-\noindent\textbf{Table S12: cross-environment transfer-factor grid for the direct SA--Flat
-controls.} Counts of fast-class contrasts crossing the nominal within-tolerance threshold at
-each evaluated grid point. The transfer factors are hypothetical: the
+\noindent\textbf{Table S12: timing, build, and cross-environment transfer-factor audits for the
+direct SA--Flat controls.} Panel~E3 reports the number and identity of fast-class contrasts
+with $q_6<0.05$ over the hypothetical transfer-factor grids; Panel~E4 reports the corresponding
+Full-Augmented sensitivity; Panel~E5 reports the release-build absolute preprocessing times.
+The accompanying text documents the build comparison and the export-invariance audit. The
+transfer factors are hypothetical: the
 workstation-to-ClusterUY transfer was never observed, and the only measured perturbation is
 the change of toolchain on the same machine.
 \label{tab:si-flat-transfer}
 
 \noindent\scriptsize
-\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \path{results-revision/preproc-timing/build_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol; For a descriptive within-instance dispersion comparison, we call record $i$ a \emph{within-dispersion tie} for build $b$ when
+\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \path{results-revision/preproc-timing/build_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol. For a descriptive within-instance dispersion comparison, we call record $i$ a \emph{within-dispersion tie} for build $b$ when
 \[
 \bigl\lvert\widetilde T^{\mathrm{cached},b}_{\mathrm{preproc,SA},i}
 -\widetilde T^{\mathrm{cached},b}_{\mathrm{preproc,Flat},i}\bigr\rvert\le B_i^{b},
@@ -1097,7 +1102,17 @@ Ratio $\rho$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & --- \\
 $q_6$ & 0.045 & 0.045 & 0.045 & 0.045 & 0.036 & --- \\
 $q_{12}$ & 0.090 & 0.090 & 0.090 & 0.060 & \textbf{0.042} & --- \\
 \bottomrule
-\end{tabular}\par\vspace{4pt}\par\vspace{4pt}
+\end{tabular}\par\vspace{2pt}
+\noindent\scriptsize The adversarial missing-pair sensitivity was recomputed at every grid
+point on this cached endpoint: its effective nonzero sample remains $n=31$ and
+$p_{\rm adv}=0.433$ at all eleven points, so no point falls below $0.05$ (the corresponding
+value on the prototype endpoint is $0.47$). The unadjusted values are likewise invariant along
+both grids ($p=0.0151$, $p_{\rm block}=0.0151$), because scaling the preprocessing term cannot
+change the paired ranks here---that term is milliseconds against solver times of
+seconds---so only the BH-adjusted values move, and they move because the other contrasts in the
+family do. Because every Full instance is a singleton operational family, the family-level
+values coincide with the instance-level values at every grid point: $q_{6,\rm block}=q_6$ and
+$q_{12,\rm block}=q_{12}$.\par\vspace{4pt}
 
 \noindent\scriptsize The release-build endpoint (Panel E1) is the implementation-cost
 sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
@@ -1125,8 +1140,8 @@ preprocessing-plus-solver endpoint of the main-text table; it is a ratio of expo
 median log-ratios, not a ratio of marginal median preprocessing times (the quantity computed by
 \path{scripts/cached_transfer_sensitivity.py}). Its values are
 $0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and $0.966$ for Full/Aug, Full/Mat,
-SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat; optimization leaves the full-call
-ratios essentially unchanged ($5.38$--$6.12\times$ against $5.07$--$6.00\times$) and the
+SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat; optimization leaves the prototype
+preprocessing-call ratios essentially unchanged ($5.38$--$6.12\times$ against $5.07$--$6.00\times$) and the
 metadata share at $81$--$83\%$. Exporting the preprocessed model with both builds over all $306$
 instances, both kernels and both coverage policies gives $1204/1224$ byte-identical exports
 (\path{scripts/build_invariance_audit.py}; full record in
@@ -1240,7 +1255,10 @@ identical to the primary convention. Each of the six dedicated CSVs contains bot
 Flat reruns from the same class--tolerance batch, independent of the main campaign.
 Adversarial signed-rank sensitivity for the four unrecorded pairs (Full augmented $0.1\%$,
 pre+solve endpoint): appending instances 045--048 with the adverse sign at above-maximal
-ranks gives $p=0.47$, $r_{\rm rb}=+0.15$ ($n=31$), so the adjusted Full contrast is
+ranks gives $p=0.47$ and $r_{\rm rb}=+0.15$. For this sensitivity the nominal pool contains all
+$34$ instances---the $27$ observed nonzero pairs, the four appended adverse missing pairs and
+the three double timeouts restored as exact-zero operational ties---and the signed-rank
+procedure discards those three zeros, leaving an effective nonzero sample of $n=31$, so the adjusted Full contrast is
 conditional on the $27$ eligible observed pairs. This construction bounds the signed-rank
 evidence under adverse missing pairs; it is not a universal worst-case bound for the median
 ratio, the Hodges--Lehmann estimate, or the reliability-adjusted aggregate costs. On the

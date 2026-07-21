@@ -15,6 +15,8 @@
 \usepackage{mathtools}
 \usepackage{bm}
 \usepackage{xurl}   % breakable paths/URLs (\path)
+% break long paths only at natural separators, not mid-token
+\makeatletter\def\UrlBreaks{\do\/\do\_\do\-\do\.}\makeatother
 \usepackage{threeparttable}
 \usepackage{placeins}    % \FloatBarrier (class does not load it)
 \usepackage{subcaption}  % subfig not active in this class mode; caption is loaded
@@ -2994,13 +2996,13 @@ record---it has the lower per-instance median on $585$ of the $612$ instance--ke
 \path{scripts/preproc_timing_replication.py}; the exact input files, protocol labels and
 columns are listed in Table~S12). These record-level counts
 condition on the $R=20$ per-instance median estimates: they measure the direction of the
-estimated medians and do not propagate within-instance timing uncertainty. To screen that
-noise we classify each record by comparing its paired difference against the dispersion
-measured inside the same instance, calling it a \emph{within-dispersion tie} when
-$\lvert\widetilde T_{\mathrm{SA},i}-\widetilde T_{\mathrm{Flat},i}\rvert\le B_i$, with
-$B_i$ the larger of the two policies' interquartile ranges over the $R=20$ repetitions
-(Table~S12). This is a descriptive noise screen, not a confidence interval, an equivalence
-test, or a domain-calibrated practical-significance margin. The classification gives $461$
+estimated medians and do not propagate within-instance timing uncertainty. For a descriptive
+within-instance dispersion comparison, we classify a record as a \emph{within-dispersion tie}
+when the absolute difference between the two per-instance median cached-preprocessing times
+does not exceed the larger marginal interquartile range over the $R=20$ repetitions
+(Table~S12). This is an ad hoc scale-of-dispersion heuristic, not an uncertainty estimate for
+the paired median difference, a confidence interval, an equivalence test, or a
+domain-calibrated practical-significance margin. The classification gives $461$
 role-blind-favoured records, $1$ selective-favoured record and $150$ ties under the pinned
 release build; $554$, $0$ and $58$ under the pinned diagnostic build; and $37$, $0$ and $575$
 under the concurrent protocol. Its raw lower-median count of $408/612$ is substantially closer
@@ -3040,7 +3042,7 @@ The build matters here, and measurably. Our campaigns were compiled without
 optimization---the executable used in the original solver campaigns was compiled with the same
 \texttt{-std=c++17 -g} flags as the instrumented diagnostic build---so we repeated the pinned microbenchmark with a release build
 ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$) and take it as the implementation-cost sensitivity of
-record. Optimization shrinks every preprocessing time about sixfold and leaves the full-call
+record. Optimization shrinks every preprocessing time about sixfold and leaves the prototype preprocessing-call
 ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it moves the
 cached ratios towards parity, and enough to change one conclusion: under the diagnostic build
 the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the release
