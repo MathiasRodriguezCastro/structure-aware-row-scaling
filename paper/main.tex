@@ -155,8 +155,8 @@ reported multiplicity and operational-family analyses, while reliability-adjuste
 favors the selective rule there. The current prototype has lower preprocessing-plus-solver
 time under full coverage in the two fast classes, but most of that preprocessing difference
 comes from rebuilding metadata the generator already possesses; a cached-metadata
-sensitivity moves the effects toward parity and leaves only two of the eight contrasts with
-within-tolerance nominal adjusted values below $0.05$. In Full, the selective direction is not supported by the adversarial signed-rank
+sensitivity on a release build moves the effects toward parity and leaves one of the eight
+contrasts with a within-tolerance nominal adjusted value below $0.05$. In Full, the selective direction is not supported by the adversarial signed-rank
 sensitivity over the unrecorded pairs. The observed effect
 of external preprocessing differs between the tested Gurobi and CPLEX pipelines, though no
 formal cross-solver interaction is estimated. Overall, metadata-driven selectivity is not
@@ -189,8 +189,9 @@ search.
   direction is conditional on the $27$ eligible pairs.
   \item When the selective rule is charged only for diagnosis and factor application, as in a
   generator that reuses its structural taxonomy, most of that observed Flat timing advantage
-  disappears: six directional orderings remain, but only two contrasts keep within-tolerance
-  nominal adjusted values below $0.05$. On capped solver time the medians
+  disappears: six directional orderings remain, but on a release build only one contrast
+  (Simple, augmented, $0.1\%$; about $0.9\%$ in median) keeps a within-tolerance nominal
+  adjusted value below $0.05$. On capped solver time the medians
   are at most $1.6\%$ and the augmented Simple contrast at $0.1\%$ is the only comparison
   whose nominal adjusted values remain below $0.05$ across the reported multiplicity and
   operational-family analyses; all coefficient-only comparisons remain inconclusive.
@@ -3025,15 +3026,28 @@ have not done; the release-build replication below bounds one component of it. T
 from $1.029$ to $1.001$ at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from
 $1.053$ to $1.007$ and from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose
 prototype preprocessing-plus-solver ordering had adjusted values below $0.05$, six keep a
-direction favoring the role-blind rule but only two retain within-tolerance nominal adjusted
-values below $0.05$: the coefficient-only Simple contrast at $1\%$ ($q_{6}=0.0002$) and the
-augmented Simple contrast at $0.1\%$ ($q_{6}=0.008$). Those two also survive the joint and
-operational-family corrections ($q_{12}=0.0005$ and $0.008$;
-$q_{12}^{\mathrm{blk}}=0.008$ and $0.013$). Both are nonetheless small in median magnitude:
-about $0.2\%$ for Simple coefficient-only at $1\%$ MIPGap and $1.0\%$ for Simple augmented at
-$0.1\%$. They indicate systematic directional differences in this campaign, not large
-operational speedups. The augmented SG-Ter-Mer contrasts fall to
-$q_{6}=0.094$ and $0.051$, and both coefficient-only SG-Ter-Mer contrasts to $q_{6}\ge0.29$.
+direction favoring the role-blind rule but only one retains a within-tolerance nominal
+adjusted value below $0.05$: the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$), which
+also survives the joint and operational-family corrections ($q_{12}=0.021$,
+$q_{12}^{\mathrm{blk}}=0.032$) and is small in median magnitude, about $0.9\%$. It indicates a
+systematic directional difference in this campaign, not a large operational speedup. The
+augmented SG-Ter-Mer contrasts fall to $q_{6}=0.115$ and $0.052$, and every coefficient-only
+fast-class contrast to $q_{6}\ge0.115$.
+
+The build matters here, and measurably. Our campaigns were compiled without optimization---the
+production executable uses the same \texttt{-std=c++17 -g} flags as the instrumented one---so
+we repeated the pinned microbenchmark with a release build
+($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$) and take it as the implementation-cost sensitivity of
+record. Optimization shrinks every preprocessing time about sixfold and leaves the full-call
+ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it does move
+the cached ratios towards parity, and enough to change one conclusion: under the diagnostic
+build the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the
+release build it falls to $q_{6}=0.115$. This is also the one policy-specific transfer factor
+we can measure rather than assume. Taking the toolchain change as a realized perturbation, the
+implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ lies in $[0.94,1.01]$ across the six
+class--kernel cells---well inside the band in which the qualitative conclusion is stable---so
+the asymmetry the sweep warns about is small for the one hardware-or-toolchain change we
+actually performed.
 The Full augmented direction is unchanged in sign and strength
 ($0.877$, $q_{6}=0.045$ at $0.1\%$), but it rests on the same $27$ eligible pairs and is
 likewise not retained by the adversarial signed-rank sensitivity over the four unrecorded
@@ -3268,7 +3282,10 @@ are in Table~S10; the reliability audit is in Table~S9 and
 \caption{Cached-metadata sensitivity: the paired comparison of \cref{tab:flat-control}
 recomputed on
 $T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
-which removes the prototype's metadata-reconstruction stage. Median ratios are SA/Flat on
+which removes the prototype's metadata-reconstruction stage. Preprocessing components come
+from the \emph{release} build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$), which is the
+implementation-cost sensitivity of record; the non-optimized diagnostic build is retained as
+an audit in Table~S11. Median ratios are SA/Flat on
 the same log-ratio variable; negative $r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are
 the BH-adjusted value within the six-test tolerance family. The joint twelve-test value
 $q_{12}$ and the operational-family sensitivities are reported in the accompanying text and in
@@ -3287,20 +3304,20 @@ adversarial signed-rank sensitivity over the four unrecorded instances. Explorat
 Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ \\
 \midrule
 \multirow{6}{*}{$1\%$}
- & Simple & Aug & 204 & 1.0008 & $-0.124$ & 0.185 \\
- & Simple & Mat & 204 & 1.0019 & $-0.333$ & 0.0002 \\
- & SG-Ter-Mer & Aug & 67 & 1.0074 & $-0.303$ & 0.094 \\
- & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.148$ & 0.291 \\
- & Full & Aug & 31 & 0.9197 & $+0.355$ & 0.173 \\
- & Full & Mat & 32 & 0.9869 & $+0.242$ & 0.286 \\
+ & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 \\
+ & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 \\
+ & Full & Aug & 31 & 0.9193 & $+0.355$ & 0.173 \\
+ & Full & Mat & 32 & 0.9866 & $+0.246$ & 0.318 \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
- & Simple & Aug & 204 & 1.0096 & $-0.259$ & 0.008 \\
- & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 \\
- & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 \\
- & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 \\
+ & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 \\
+ & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.052 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 \\
  & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 \\
- & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 \\
+ & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3445,7 +3462,7 @@ two role-blind controls (SA-Aug versus Flat-Aug and SA-Mat versus Flat-Mat,
 answer it endpoint by endpoint. In the prototype preprocessing-plus-solver endpoint, Flat has
 lower observed time in the two fast classes at both tolerances; in the cached-metadata
 sensitivity that better approximates generator-integrated deployment, the effects move close
-to parity and only two fast-class contrasts retain $q_{6}<0.05$. The Full selectivity
+to parity and only one fast-class contrast retains $q_{6}<0.05$. The Full selectivity
 direction is conditional on its eligible pairs under both endpoints, and on solver time alone
 only the augmented Simple contrast at $0.1\%$
 remains below the nominal $0.05$ threshold after every reported multiplicity and
@@ -3752,7 +3769,7 @@ depends on what one measures---prototype preprocessing-plus-solver time, where t
 implementation pays mainly for reconstructing metadata, against the cached-metadata
 sensitivity, where only diagnosis and factor application are charged, against solver time
 alone. Removing metadata reconstruction moves the fast-class effects close to parity: six of
-the eight directional orderings remain, but only two small Simple contrasts retain nominal
+the eight directional orderings remain, but only one small Simple contrast retains nominal
 adjusted values below $0.05$ under the reported joint and operational-family sensitivities, where the effects are small and the
 reliability-adjusted reading can point the other way. The observed effect of external preprocessing differs between the tested Gurobi and CPLEX
 pipelines, while solver dependence of the Flat-versus-selective coverage ordering remains

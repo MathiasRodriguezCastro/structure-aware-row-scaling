@@ -932,7 +932,19 @@ med.\ $T_{\rm pre}^{\rm SA}$ (s) & med.\ $T_{\rm pre}^{\rm Flat}$ (s) & med.\ di
 \end{tabular}
 
 \vspace{7pt}
-\textbf{Panel E: cached-metadata endpoint and hardware-transfer sensitivity}\\[2pt]
+\textbf{Panel E: cached-metadata endpoint (non-optimized diagnostic build) and
+hardware-transfer sensitivity}\\[2pt]
+\noindent\scriptsize The main-text cached table uses the \emph{release} build
+($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$); the values below come from the non-optimized
+diagnostic build and are retained as an audit. Comparing the two gives the only
+policy-specific transfer factor we measure rather than assume: the implied
+$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ is $0.947$, $0.942$, $1.012$, $0.994$, $0.978$
+and $0.966$ for Full/Aug, Full/Mat, SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and
+Simple/Mat respectively. Optimization leaves the full-call ratios essentially unchanged
+($5.38$--$6.12\times$ release against $5.07$--$6.00\times$ diagnostic) and the metadata share
+at $81$--$83\%$, but moves the cached ratios toward parity, which is why the coefficient-only
+Simple contrast at $1\%$ has $q_6=0.0002$ here and $q_6=0.115$ on the release build.\par
+\vspace{3pt}\scriptsize
 \begin{tabular}{@{}lllrrrrr@{}}
 \toprule
 Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ \\
