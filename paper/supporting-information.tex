@@ -6,6 +6,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{newtxtext,newtxmath}
 \usepackage{amsmath}
+\newcommand{\diag}{\operatorname{diag}}
 \newenvironment{proof}{\par\noindent\textit{Proof.}\ }{\hfill\qedsymbol\par\medskip}
 \providecommand{\qedsymbol}{\ensuremath{\square}}
 \usepackage{graphicx}
@@ -50,14 +51,14 @@ accounting (Table~S6);
 the coupling-stage activation audit (Table~S8); (xi) the direct SA--Flat strict/mixed
 reliability audit (Table~S9); and (xii) the multiplicity, operational-family, bootstrap,
 preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities for that
-direct comparison, together with its per-contrast attrition and preprocessing-time
-distributions (Table~S10).
+direct comparison (Table~S10); and (xiii) its per-contrast attrition, measurement
+environment, cached-metadata endpoint and hardware-transfer sensitivity (Table~S11).
 
 \section*{Section S1. Proofs of the spectral propositions}
 \noindent These are the full proofs of the two propositions stated in Section~3 of the
 main text, moved here to keep the motivation and the method adjacent.
 
-\noindent\textbf{Proof of \cref{prop:ideal-block-scaling}.}
+\noindent\textbf{Proof of Proposition~1 (Ideal scalar scaling of block-diagonal matrices).}
 \begin{proof}
 For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
 \begin{equation*}
@@ -106,7 +107,7 @@ and
 The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
 \end{proof}
 
-\noindent\textbf{Proof of \cref{prop:triangular-coupling}.}
+\noindent\textbf{Proof of Proposition~2 (Conditioning of a triangular coupling factor).}
 \begin{proof}
 Let $R=U\Sigma V^\top$ be a singular value decomposition (SVD) of $R$, with $U$ and $V$
 orthogonal. Orthogonal multiplication does not change singular values, and hence
@@ -813,8 +814,10 @@ SA \PARten{} I/S/M & Flat \PARten{} I/S/M \\
 \emph{Notes.} There are no algorithmic or pipeline aborts in these direct batches. Strict
 penalizes every strict original-scale failure; mixed penalizes only a failure that also lacks
 a reliable counterpart on the same instance, as defined in the main text. At Full $0.1\%$,
-instances 045--048 are absent from both policies; assigning the same penalty to both missing
-records changes neither their ordering nor any paired contrast. The key reliability
+instances 045--048 are absent from both policies. Under an equal-penalty imputation for those
+four unrecorded instances the ordering is unchanged and the added pairs are operational ties;
+that assumption does not address selection under unequal missing outcomes, for which the
+adversarial signed-rank sensitivity is reported in the main text and Table~S11. The key reliability
 sensitivity is visible in Simple/Augmented: the small Flat solver-time advantage at $0.1\%$
 reverses under both strict and mixed costs. SG-Ter-Mer/Augmented retains a small descriptive
 Flat advantage because neither policy has a mixed failure.
@@ -828,8 +831,8 @@ Flat advantage because neither policy has a mixed failure.
 \caption{Magnitude, dependence, and attrition sensitivities for the direct SA--Flat
 contrasts (exploratory endpoint hierarchy; see the main text). Panel A reports
 instance-level and operational-family inference for the two
-central $0.1\%$ augmented contrasts on both endpoints (preprocessing-plus-solver
-operational endpoint, capped solver-time decomposition), on the shared paired variable
+central $0.1\%$ augmented contrasts on the prototype preprocessing-plus-solver implementation endpoint and on the
+capped solver-time decomposition, on the shared paired variable
 $d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$, with the Hodges--Lehmann pseudomedian expressed
 as the typical SA/Flat ratio $\exp(-\widehat\theta_{\rm HL})$. Panel B repeats the
 family analysis for Gurobi Work units. Panel C relocates the path-specific diagnostic from
@@ -846,12 +849,12 @@ Class & Endpoint & $n/G$ & med. SA/Flat & HL SA/Flat & family-bootstrap 95\% CI 
 $p_{\rm inst}$ & $q_6$ & $q_{12}$ &
 $p_{\rm block}$ & $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
 \midrule
-Simple & pre+solve & 204/34 & 1.0320 & 1.0359 & [1.0274, 1.0418] &
+Simple & prototype pre+solve & 204/34 & 1.0320 & 1.0359 & [1.0274, 1.0418] &
 $3.3\times10^{-11}$ & $2.0\times10^{-10}$ & $1.3\times10^{-10}$ &
 $5.1\times10^{-8}$ & $3.1\times10^{-7}$ & $2.1\times10^{-7}$ \\
 Simple & solver & 204/34 & 1.0093 & 1.0135 & [1.0019, 1.0212] &
 0.00173 & 0.01038 & 0.02075 & 0.00266 & 0.01595 & 0.03190 \\
-SG-Ter-Mer & pre+solve & 67/34 & 1.0473 & 1.1577 & [1.0170, 1.2065] &
+SG-Ter-Mer & prototype pre+solve & 67/34 & 1.0473 & 1.1577 & [1.0170, 1.2065] &
 0.00031 & 0.00063 & 0.00063 & 0.00056 & 0.00111 & 0.00117 \\
 SG-Ter-Mer & solver & 67/34 & 1.0159 & 1.1229 & [0.9797, 1.1309] &
 0.02616 & 0.05232 & 0.09346 & 0.03320 & 0.06640 & 0.11980 \\
@@ -894,9 +897,17 @@ med. $\rho_{\kappa,\rm SA}^{\rm solver}/\rho_{\kappa,\rm Flat}^{\rm solver}$ \\
  & Full & Matrix-only & 27 & 0.849 \\
 \bottomrule
 \end{tabular}
+\end{table}
+\end{landscape}
 
-\vspace{7pt}
-\textbf{Panel D: per-contrast attrition and preprocessing-time distributions}\\[2pt]
+\begin{landscape}
+\begin{table}[!p]
+\centering
+\caption{Attrition, preprocessing timing, measurement environment, and the cached-metadata and hardware-transfer sensitivities of the direct SA--Flat controls. Panel D gives per-contrast attrition and preprocessing-time summaries from the original fixed-order solve batches; Panel E gives the cached-metadata endpoint and its transfer sensitivity. Preprocessing times are per-instance medians estimated from the replication, and the reported values do not propagate that estimation uncertainty.}
+\label{tab:si-flat-attrition}
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\textbf{Panel D: per-contrast attrition and preprocessing-time summaries}\\[2pt]
 \begin{tabular}{@{}lllrrrrr rrr@{}}
 \toprule
 Gap & Class & Kernel & Nominal & Recorded & Common pool & Double noncompl. & $n$ used &
@@ -919,6 +930,39 @@ med.\ $T_{\rm pre}^{\rm SA}$ (s) & med.\ $T_{\rm pre}^{\rm Flat}$ (s) & med.\ di
  & Full & Matrix-only & 34 & 30 & 30 & 3 & 27 & 0.124 & 0.041 & $+0.083$ \\
 \bottomrule
 \end{tabular}
+
+\vspace{7pt}
+\textbf{Panel E: cached-metadata endpoint and hardware-transfer sensitivity}\\[2pt]
+\begin{tabular}{@{}lllrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Augmented & 204 & 1.0008 & $-0.124$ & 0.1854 & 0.2119 \\
+ & Simple & Matrix-only & 204 & 1.0019 & $-0.333$ & 0.0002 & 0.0005 \\
+ & SG-Ter-Mer & Augmented & 67 & 1.0074 & $-0.303$ & 0.0935 & 0.0748 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.9976 & $-0.148$ & 0.2911 & 0.3882 \\
+ & Full & Augmented & 31 & 0.9197 & $+0.355$ & 0.1730 & 0.1730 \\
+ & Full & Matrix-only & 32 & 0.9869 & $+0.242$ & 0.2864 & 0.3580 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Augmented & 204 & 1.0096 & $-0.259$ & 0.0082 & 0.0082 \\
+ & Simple & Matrix-only & 203 & 0.9983 & $+0.065$ & 0.5063 & 0.4603 \\
+ & SG-Ter-Mer & Augmented & 67 & 1.0159 & $-0.314$ & 0.0507 & 0.0748 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 1.0036 & $-0.116$ & 0.5063 & 0.4603 \\
+ & Full & Augmented & 27 & 0.8771 & $+0.529$ & 0.0452 & 0.0603 \\
+ & Full & Matrix-only & 27 & 0.9804 & $+0.053$ & 0.8223 & 0.8223 \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+\noindent\scriptsize Transfer sensitivity, evaluated on the finite grids below and reported as
+the count of the eight fast-class contrasts with $q_6<0.05$. Common factor
+$\lambda\in\{0.25,0.5,1,2,4,8\}$: $1,2,2,2,3,3$. Policy-specific ratio
+$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ with $\lambda_{\rm Flat}=1$,
+$\rho\in\{0.25,0.5,1,2,4\}$: $3,2,2,5,7$; at $\rho=0.25$ the coefficient-only Simple median
+falls to $0.9975$, reversing that ordering. Reproducible with
+\texttt{scripts/cached\_transfer\_sensitivity.py}.
 \end{table}
 \end{landscape}
 

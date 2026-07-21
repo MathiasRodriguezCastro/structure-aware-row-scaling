@@ -26,7 +26,10 @@ USE_HEXALY ?= 0
 CXX := g++
 .DEFAULT_GOAL := all
 
-CXXFLAGS := -I. -Wall -Wextra -std=c++17 -g
+# OPT: nivel de optimizacion (vacio por defecto = build historico de las campanas).
+# Usar OPT="-O2 -DNDEBUG" para una compilacion release comparable a un despliegue real.
+OPT ?=
+CXXFLAGS := -I. -Wall -Wextra -std=c++17 -g $(OPT)
 LDLIBS   :=
 EXCLUDES :=
 
