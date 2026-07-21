@@ -3024,21 +3024,23 @@ produces, so we verified that directly over every available record: exporting th
 model with both builds for all $306$ instances, both kernels and both coverage policies gives
 $1204$ byte-identical exports out of $1224$
 (\texttt{scripts/build\_invariance\_audit.py}). Every Simple and SG-Ter-Mer record is
-identical, so for the two fast classes---where the cached comparison is decided---the builds
-differ in speed alone, not in row factors, scaled rows, or safeguard decisions. The $20$
-exceptions are five Full instances (029, 035, 045, 047, 048), each differing under all four
-variants, which locates the discrepancy in model construction rather than in scaling: the
-differing entries are the nonlinear-hydro linearization coefficients, and they differ by one
-unit in the last place ($4.7\times10^{-16}$ relative, in $720$ of $47{,}173$ coefficients on
-a representative instance), as expected when optimization changes floating-point contraction.
-Two of the five (029, 035) fall inside the analysed Full pools; for those the release
-preprocessing time corresponds to a model differing from the archived one only at the last
+byte-identical across builds. These are the two fast classes underlying the eight cached
+contrasts summarized in the abstract and the only retained adjusted result; for them the build
+change affects preprocessing time but not the exported model, so the comparison is a clean
+cost substitution. The $20$ exceptions are five Full instances (029, 035, 045, 047, 048), each
+differing under all four variants. The differing entries are the nonlinear-hydro linearization
+coefficients, and they differ by one unit in the last place ($4.7\times10^{-16}$ relative, in
+$720$ of $47{,}173$ coefficients on a representative instance); the audit therefore localizes
+the discrepancy to optimization-dependent floating-point evaluation during model construction
+rather than to a change in the selected scaling factors or safeguard decisions. Two of the
+five (029, 035) fall inside the analysed Full pools, so the Full cached rows recombine a
+release preprocessing time with a solver time recorded on a model that differs at the last
 bit. This build comparison provides one observed
 policy-specific
 \emph{toolchain} perturbation rather than a direct estimate of the workstation-to-ClusterUY
 transfer ratio: the implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ remains in
 $[0.94,1.01]$ across the six class--kernel cells, suggesting limited asymmetry under this
-particular compiler change, while the hardware-transfer asymmetry itself remains unmeasured.
+particular compiler change, while the cross-environment transfer asymmetry itself remains unmeasured.
 
 Because the cached effects sit close to
 one, and because they are a cross-protocol construction, we repeat the common- and
@@ -3057,7 +3059,9 @@ $\lambda_{\rm Flat}=1$, the corresponding counts are one for $\rho\le1$, three a
 and five at $\rho=4$. Additional $q_{6}$ crossings therefore first appear at the evaluated
 point $\rho=2$, but the transition threshold between $1$ and $2$ is not identified by this
 grid. These counts concern within-tolerance $q_{6}$ only and do not imply retention under the
-joint or operational-family adjustments.
+joint or operational-family adjustments. Complete contrast-by-grid values are provided in
+\texttt{results-revision/preproc-timing/cached\_transfer\_sensitivity.csv} in the
+reproducibility package.
 
 The absolute magnitudes matter for how much this is worth
 (\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
@@ -3669,9 +3673,9 @@ value from $q_{6}=0.0002$ in the diagnostic build to $q_{6}=0.115$ in the releas
 therefore use the release build as the implementation-cost sensitivity of record and interpret
 all near-parity cached contrasts cautiously. The full export audit also shows that build
 invariance is not exact everywhere: five Full instances construct last-bit-different
-nonlinear-hydro coefficients under optimization, so for those the release preprocessing time
-is measured on a model that differs from the archived one at the level of floating-point
-rounding. The two fast classes, which decide the cached comparison, are exactly invariant. The prototype preprocessing-plus-solver endpoint
+nonlinear-hydro coefficients under optimization-dependent floating-point evaluation, so for
+those the release preprocessing time is measured on a model that differs from the archived one
+at the level of floating-point rounding. The two fast classes, which decide the cached comparison, are exactly invariant. The prototype preprocessing-plus-solver endpoint
 is built from calls that the dedicated
 batches timed once each in a fixed order; the separate order-randomized replication
 (\cref{subsec:stage-attribution}) confirms the \emph{direction} of the preprocessing gap on
@@ -3842,11 +3846,11 @@ reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
 (Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
 paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit
 (Table~S7), activation-audit runtime replicates (Table~S8), the direct SA--Flat original-scale
-reliability audit (Table~S9), and the multiplicity, operational-family, bootstrap,
-preprocessing-plus-solver, Work-unit, and own-incumbent-diagnostic sensitivities for the
-direct controls (Table~S10), and the per-contrast attrition, timing environment,
-cached-metadata endpoint on the release and diagnostic builds, and hardware-transfer
-sensitivity (Table~S11).
+reliability audit (Table~S9); multiplicity, operational-family, bootstrap,
+preprocessing-plus-solver, Work-unit and own-incumbent-diagnostic sensitivities (Table~S10);
+per-contrast attrition and the cached-metadata endpoint on the release and diagnostic builds
+(Table~S11); and the measurement environment, build comparison and cross-environment
+transfer-factor sensitivity (Table~S12).
 Additional processed logs and rebuild scripts are available in the reproducibility repository.
 
 % \balance is a two-column last-page balancer; it is a no-op in the single-column
