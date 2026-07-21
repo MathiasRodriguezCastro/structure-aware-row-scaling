@@ -19,6 +19,7 @@ Usage:
         --out results-revision/preproc-timing/replicated.csv
 """
 import argparse
+import collections
 import concurrent.futures
 import csv
 import os
@@ -35,6 +36,9 @@ from validar_preprocesamiento import clean_instance_text  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 PREPROC_RE = re.compile(r"\[PREPROC TIME\] variante=(\S+)\s+tiempo_s=([0-9.eE+\-]+)")
+PHASES_RE = re.compile(
+    r"\[PREPROC PHASES\] metadata_s=([0-9.eE+\-]+)\s+"
+    r"diagnostico_s=([0-9.eE+\-]+)\s+aplicacion_s=([0-9.eE+\-]+)")
 
 # Kernel-matched contrasts: (label, selective flags, role-blind flags)
 CONTRASTS = [
@@ -47,6 +51,25 @@ CLASSES = [
     ('SG-Ter-Mer', 'entrada-SG-Ter-Mer'),
     ('Full', 'entrada-modelo-completo'),
 ]
+
+
+def percentile(sorted_values, probability):
+    position = (len(sorted_values) - 1) * probability
+    lower = int(position)
+    upper = min(lower + 1, len(sorted_values) - 1)
+    fraction = position - lower
+    return (sorted_values[lower]
+            + fraction * (sorted_values[upper] - sorted_values[lower]))
+
+
+def iqr(values):
+    """Interquartile range; used for a scale-robust dispersion measure.
+
+    Reported relative to the median instead of the coefficient of variation,
+    which is unstable for short, skewed timings.
+    """
+    ordered = sorted(values)
+    return percentile(ordered, 0.75) - percentile(ordered, 0.25)
 
 
 def run_once(exe, instance_text, flags, timeout_s=120.0):
@@ -66,7 +89,15 @@ def run_once(exe, instance_text, flags, timeout_s=120.0):
                 [str(exe)], stdin=stdin, stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL, timeout=timeout_s, text=True)
         match = PREPROC_RE.search(proc.stdout)
-        return float(match.group(2)) if match else None
+        if not match:
+            return None
+        phases = PHASES_RE.search(proc.stdout)
+        return {
+            'total': float(match.group(2)),
+            'metadata': float(phases.group(1)) if phases else None,
+            'diagnosis': float(phases.group(2)) if phases else None,
+            'apply': float(phases.group(3)) if phases else None,
+        }
     except (subprocess.TimeoutExpired, ValueError):
         return None
     finally:
@@ -80,6 +111,8 @@ def measure_instance(args):
     rows = []
     for kernel, sa_flags, flat_flags in CONTRASTS:
         samples = {'SA': [], 'Flat': []}
+        phase_samples = {'SA': collections.defaultdict(list),
+                         'Flat': collections.defaultdict(list)}
         for _ in range(reps):
             # Randomized within-repetition order: neither policy is always first.
             order = [('SA', sa_flags), ('Flat', flat_flags)]
@@ -88,11 +121,29 @@ def measure_instance(args):
             for policy, flags in order:
                 value = run_once(exe, instance_text, flags)
                 if value is not None:
-                    samples[policy].append(value)
+                    samples[policy].append(value['total'])
+                    for key in ('metadata', 'diagnosis', 'apply'):
+                        if value[key] is not None:
+                            phase_samples[policy][key].append(value[key])
         if not samples['SA'] or not samples['Flat']:
             continue
         median_sa = statistics.median(samples['SA'])
         median_flat = statistics.median(samples['Flat'])
+
+        def phase_median(policy, key):
+            values = phase_samples[policy][key]
+            return f'{statistics.median(values):.6f}' if values else ''
+
+        # Cached-metadata counterpart: what the call would cost if the generator
+        # supplied the row taxonomy instead of the prototype rebuilding it.
+        def cached_median(policy):
+            diag = phase_samples[policy]['diagnosis']
+            app = phase_samples[policy]['apply']
+            if not diag or not app:
+                return ''
+            pairs = [d + a for d, a in zip(diag, app)]
+            return f'{statistics.median(pairs):.6f}'
+
         rows.append({
             'class': class_name,
             'instance': Path(instance_path).name,
@@ -108,6 +159,18 @@ def measure_instance(args):
                      if median_sa > 0 else '',
             'cv_flat': f'{statistics.pstdev(samples["Flat"]) / median_flat:.4f}'
                        if median_flat > 0 else '',
+            'rel_iqr_sa': f'{iqr(samples["SA"]) / median_sa:.4f}'
+                          if median_sa > 0 else '',
+            'rel_iqr_flat': f'{iqr(samples["Flat"]) / median_flat:.4f}'
+                            if median_flat > 0 else '',
+            'meta_sa_s': phase_median('SA', 'metadata'),
+            'meta_flat_s': phase_median('Flat', 'metadata'),
+            'diag_sa_s': phase_median('SA', 'diagnosis'),
+            'diag_flat_s': phase_median('Flat', 'diagnosis'),
+            'apply_sa_s': phase_median('SA', 'apply'),
+            'apply_flat_s': phase_median('Flat', 'apply'),
+            'cached_sa_s': cached_median('SA'),
+            'cached_flat_s': cached_median('Flat'),
         })
     return rows
 
@@ -148,7 +211,10 @@ def main():
 
     fields = ['class', 'instance', 'kernel', 'reps_sa', 'reps_flat',
               'median_sa_s', 'median_flat_s', 'median_diff_s',
-              'min_sa_s', 'min_flat_s', 'cv_sa', 'cv_flat']
+              'min_sa_s', 'min_flat_s', 'cv_sa', 'cv_flat',
+              'rel_iqr_sa', 'rel_iqr_flat',
+              'meta_sa_s', 'meta_flat_s', 'diag_sa_s', 'diag_flat_s',
+              'apply_sa_s', 'apply_flat_s', 'cached_sa_s', 'cached_flat_s']
     with open(out_path, 'w', newline='') as fh:
         writer = csv.DictWriter(fh, fieldnames=fields)
         writer.writeheader()

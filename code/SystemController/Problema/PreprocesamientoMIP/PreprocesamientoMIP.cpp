@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <chrono>
 #include <algorithm>
 #include <cmath>
 #include <cctype>
@@ -85,12 +86,27 @@ void PreprocesamientoMIP::diagnosticar() {
 }
 
 void PreprocesamientoMIP::ejecutar() {
+    // Cronometraje por sub-fase (instrumentación; no altera el resultado). Separa el
+    // coste de RECONSTRUIR la metadata estructural --que un generador que ya la mantiene
+    // podría entregar sin recomputar-- del coste intrínseco de diagnosticar y escalar.
+    using _reloj = std::chrono::steady_clock;
+    double _t_metadata = 0.0, _t_diagnostico = 0.0, _t_aplicacion = 0.0;
+    auto _cronometrar = [](double& acumulador, auto&& fn) {
+        const auto inicio = _reloj::now();
+        fn();
+        acumulador += std::chrono::duration<double>(_reloj::now() - inicio).count();
+    };
+
     indicesGlobales.clear();
     indicesAcoplamiento.clear();
-    if (bloques.empty())    autodetectarBloques();
-    clasificarRestricciones();
-    calcularDiagnosticoPorBloque();
-    calcularDiagnosticoGlobal();
+    _cronometrar(_t_metadata, [&] {
+        if (bloques.empty())    autodetectarBloques();
+        clasificarRestricciones();
+    });
+    _cronometrar(_t_diagnostico, [&] {
+        calcularDiagnosticoPorBloque();
+        calcularDiagnosticoGlobal();
+    });
 
     // Modo plano (control experimental): verificar que NINGUNA fila quede fuera del
     // bloque único (cobertura total) y dejar evidencia en el log.
@@ -120,24 +136,39 @@ void PreprocesamientoMIP::ejecutar() {
 
     if (!cfg.solodiagnostico) {
         if (cfg.aplicarEscalamientoLocal) {
-            aplicarEscalamientoLocal();
-            calcularDiagnosticoPorBloque();
-            calcularDiagnosticoGlobal();
+            _cronometrar(_t_aplicacion, [&] { aplicarEscalamientoLocal(); });
+            _cronometrar(_t_diagnostico, [&] {
+                calcularDiagnosticoPorBloque();
+                calcularDiagnosticoGlobal();
+            });
         }
 
         if (cfg.normalizacionFisica) {
-            aplicarNormalizacionFisicaGlobal();
-            calcularDiagnosticoPorBloque();
-            calcularDiagnosticoGlobal();
+            _cronometrar(_t_aplicacion, [&] { aplicarNormalizacionFisicaGlobal(); });
+            _cronometrar(_t_diagnostico, [&] {
+                calcularDiagnosticoPorBloque();
+                calcularDiagnosticoGlobal();
+            });
         }
 
         if (cfg.aplicarEscalamientoGlobal) {
-            aplicarEscalamientoGlobal();
+            _cronometrar(_t_aplicacion, [&] { aplicarEscalamientoGlobal(); });
         }
 
         // Recalcular diagnóstico post-escalamiento para el reporte
-        calcularDiagnosticoPorBloque();
-        calcularDiagnosticoGlobal();
+        _cronometrar(_t_diagnostico, [&] {
+            calcularDiagnosticoPorBloque();
+            calcularDiagnosticoGlobal();
+        });
+    }
+
+    {
+        std::ostringstream _fases;
+        _fases << std::defaultfloat << std::setprecision(10)
+               << "[PREPROC PHASES] metadata_s=" << _t_metadata
+               << " diagnostico_s=" << _t_diagnostico
+               << " aplicacion_s=" << _t_aplicacion;
+        std::cout << _fases.str() << std::endl;
     }
 
     if (cfg.verbose) {

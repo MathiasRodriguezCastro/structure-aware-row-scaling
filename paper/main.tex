@@ -155,11 +155,13 @@ structure-aware variant is below Base in each Gurobi class and tolerance, wherea
 runtime gain appears under CPLEX. In exploratory single-default-seed direct Gurobi controls
 (endpoint hierarchy selected after inspection), the coverage effect is endpoint- and
 class-dependent. Measured as preprocessing-plus-solver time, the implemented role-blind
-(Flat) pipeline is faster in Simple and SG-Ter-Mer at both tolerances---a margin dominated
-by the selective rule's own preprocessing overhead rather than a pure effect of scaling
-more rows---while in the $27$ eligible Full pairs at $0.1\%$ MIPGap the selective augmented
-implementation is faster end-to-end, a direction that does not survive a worst-case
-sensitivity over four unrecorded instances. On capped solver time the effects are small
+(Flat) pipeline has lower observed time in Simple and SG-Ter-Mer at both tolerances---a
+margin driven mainly by implementation-specific preprocessing overhead in Simple and by a
+mixture of preprocessing overhead and solver response in SG-Ter-Mer, rather than by a pure
+effect of scaling more rows---while in the $27$ eligible Full pairs at $0.1\%$ MIPGap the
+selective augmented implementation has lower observed preprocessing-plus-solver time, a
+direction that is not retained by an adversarial signed-rank sensitivity over four
+unrecorded instances. On capped solver time the effects are small
 (medians at most $1.6\%$): the augmented Simple contrast is the only comparison with
 nominal adjusted values below $0.05$ under the reported multiplicity and
 operational-family analyses, the deterministic Work comparison reproduces its direction,
@@ -187,8 +189,9 @@ remains untested.
   already well-scaled model the selective rule can widen the exported range instead.
   \item In exploratory single-default-seed Gurobi control batches, coverage versus
   selectivity depends on the endpoint. On preprocessing-plus-solver time the implemented
-  role-blind pipeline is faster in Simple and SG-Ter-Mer at both tolerances (a margin
-  driven largely by the selective rule's own preprocessing cost, and worth tens of
+  role-blind pipeline has lower observed time in Simple and SG-Ter-Mer at both tolerances
+  (a margin driven mainly by the current prototype's metadata-processing cost in Simple and
+  by a mixture of that cost and solver response in SG-Ter-Mer, and worth tens of
   milliseconds per instance in absolute terms); the Full selectivity
   direction is conditional on the $27$ eligible pairs. On capped solver time the medians
   are at most $1.6\%$ and the augmented Simple contrast at $0.1\%$ is the only comparison
@@ -1859,7 +1862,7 @@ main-campaign $T_{\mathrm{total}}$ of a structure-aware variant coincides numeri
 its solver time and understates its true preprocessing cost, which the separately
 instrumented dedicated batches measure at $0.02$--$0.13$\,s per call. The Ruiz overhead
 visible in the total-time figures is therefore real and large, whereas the structure-aware
-overhead is invisible at that resolution; only the dedicated batches support end-to-end
+overhead is invisible at that resolution; only the dedicated batches support preprocessing-plus-solver
 statements about the structure-aware and Flat policies, and levels of the two quantities
 are never compared across campaigns.
 
@@ -1978,8 +1981,15 @@ that never solves the MIP: for every instance of all three classes and both kern
 $R=20$ repetitions with the SA/Flat order drawn from a seeded RNG within each repetition
 and each call in a fresh process
 (\texttt{scripts/preproc\_timing\_replication.py}); the per-instance statistic is the median
-over repetitions. \Cref{subsec:stage-attribution} reports the outcome: the direction
-replicates on every instance, while the absolute gap is load-dependent. The deterministic Gurobi Work comparison and the
+over repetitions. Each timed call starts after model construction and excludes process
+startup and input parsing; the two policies of a repetition run sequentially in the
+randomized order, timed with a monotonic steady clock, over $12$ concurrent workers on a
+$16$-core workstation without CPU pinning, so they share machine state but compete with
+unrelated instances (full protocol and per-cell statistics in Table~S10; dispersion is
+summarized by the interquartile range relative to the median, the coefficient of variation
+being unstable for short, skewed timings). \Cref{subsec:stage-attribution} reports the
+outcome: the direction replicates on every instance, while the absolute gap is
+load-dependent. The deterministic Gurobi Work comparison and the
 solver-time decomposition are exploratory; their adjusted values are reported
 descriptively and define no additional confirmatory conclusions. For the time endpoints
 the paired variable is $d_i=\log(T_{\mathrm{Flat},i}/T_{\mathrm{SA},i})$: the Wilcoxon
@@ -2402,7 +2412,7 @@ Dolan--Mor\'e profiles defined in \cref{eq:performance-profile-cost}.
 
 % Result figures are allowed to float across adjacent subsections to avoid large
 % blank pages. Strategic barriers separate the Gurobi and CPLEX result blocks.
-\plotfigure{esc1_gurobi_1pct_boxplot.pdf}{\textwidth}{At $1\%$ MIPGap, the Gurobi total-time speedup distributions place the structure-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. The axis is the \emph{total}-time speedup (\cref{eq:speedup}, $q=\mathrm{total}$), which includes preprocessing; on the easy Simple instances (a few seconds) that overhead dominates and pulls the Ruiz medians well below the solver-time and deterministic-effort parity of \cref{tab:robust-gurobi-1pct-mipgap} and the $\rho^{\mathrm{solver}}_\kappa$ scatter. Values above the parity line indicate acceleration relative to the unscaled model. In all box plots, boxes span the interquartile range (IQR) and whiskers extend to the most extreme observation within $1.5\times$\,IQR; outliers are omitted, since tail behavior is captured by \PARten{} and the performance profiles.}{fig:boxplot-speedup-total-gap1}
+\plotfigure{esc1_gurobi_1pct_boxplot.pdf}{\textwidth}{At $1\%$ MIPGap, the Gurobi total-time speedup distributions place the structure-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. The axis is the logged \emph{total}-time speedup of the main campaign (\cref{eq:speedup}, $q=\mathrm{total}$). Its preprocessing component has whole-second resolution: the Ruiz overhead is visible and pulls those medians well below the solver-time and deterministic-effort parity of \cref{tab:robust-gurobi-1pct-mipgap} and the $\rho^{\mathrm{solver}}_\kappa$ scatter, whereas the subsecond structure-aware overhead is rounded to zero (\cref{subsec:metrics}). The figure should therefore not be read as a precise preprocessing-plus-solver comparison for the structure-aware variants; those come from the instrumented control batches of \cref{subsec:stage-attribution}. Values above the parity line indicate acceleration relative to the unscaled model. In all box plots, boxes span the interquartile range (IQR) and whiskers extend to the most extreme observation within $1.5\times$\,IQR; outliers are omitted, since tail behavior is captured by \PARten{} and the performance profiles.}{fig:boxplot-speedup-total-gap1}
 
 \twoplotfigure{esc1_gurobi_1pct_scatter_rho.pdf}{Static coefficient-range ratio.}{fig:scatter-kappa-speedup-gap1}{esc1_gurobi_1pct_scatter_rhosolver.pdf}{Solver-level conditioning ratio.}{fig:scatter-kappa-solver-speedup-gap1}{At $1\%$ MIPGap, static coefficient-range compression and solver-level conditioning tell different stories. The contrast between panels shows why exported matrix compression alone should not be treated as evidence of easier branch-and-bound search. In panel (a) every static ratio lies below one, so the $\rho_\kappa=1$ reference sits outside the plotted range.}{fig:diagnostic-scatter-gap1}
 
@@ -3043,46 +3053,78 @@ whereas Flat-Mat uses the coefficient-only extremes of \methodMat{}. \Cref{tab:f
 compares each Flat rule directly with its selective counterpart on the same eligible capped-time
 pairs, rather than comparing two separate speedups against Base. Preprocessing-plus-solver
 time is the operational endpoint (\cref{subsec:statistical}; the hierarchy was selected
-after inspecting these data and is exploratory). On that endpoint the outcome is one-sided
-at both tolerances in the two fast classes: the \emph{implemented Flat preprocessing
-pipeline} is faster end-to-end in Simple and SG-Ter-Mer under both kernels, with median
-effects of $2.1$--$5.3\%$ and adjusted values below $0.05$ in all eight contrasts (worst
-$q_{12}^{\mathrm{blk}}=0.031$). This end-to-end difference combines the numerical coverage
-policy with implementation-specific preprocessing overhead and should not be interpreted
-as a pure causal effect of scaling more rows: the selective implementation pays roughly
-three times the Flat scan for role classification, scale diagnosis, and the coupling grid
-search, and on instances that solve in a few seconds that fixed margin is decisive. A
-generator that already maintains the row taxonomy could amortize much of it; no
-cached-metadata rerun is available in these batches.
+after inspecting these data and is exploratory). On that endpoint the observed ordering is
+the same at both tolerances in the two fast classes: the \emph{implemented Flat preprocessing
+pipeline} has lower observed preprocessing-plus-solver time in Simple and SG-Ter-Mer under
+both kernels, with observed median
+effects of $2.1$--$5.3\%$ under the original timing protocol; the nominal adjusted values
+are below $0.05$ in all eight contrasts (worst $q_{12}^{\mathrm{blk}}=0.031$), while the
+separate randomized replication below confirms the direction---but not the magnitude---of
+the preprocessing-cost difference. This difference combines the numerical coverage
+policy with the cost of the current prototype implementation, and should not be interpreted
+as a pure causal effect of scaling more rows. The reason is concrete: our implementation
+\emph{rebuilds} the structural metadata on every call---it re-derives the block map from
+variable-name prefixes and re-classifies every row---rather than reading labels the
+generator already holds. Instrumenting the call into metadata reconstruction, scale
+diagnosis and factor application shows that reconstruction is the dominant term for the
+selective rule, $72$--$89\%$ of its preprocessing time by class and kernel, while it is
+negligible for the role-blind rule, which needs no roles at all
+($\le0.6$\,ms). Charging only the intrinsic work---the cached-metadata counterpart
+$T_{\mathrm{preproc}}^{\mathrm{cached}}=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}$,
+which is what a generator that maintains the taxonomy would pay---collapses the gap from
+roughly $6$--$9\times$ to $1.08$--$1.40\times$ (medians of the paired ratio; e.g.\
+$0.032$ against $0.029$\,s in Simple and $0.020$ against $0.018$\,s in SG-Ter-Mer). It does
+not, however, reverse it: the role-blind kernel remains marginally cheaper in all six
+class--kernel cells, and is cheaper on $408$ of the $612$ instance--kernel records. So most
+of the measured preprocessing penalty is an artifact of the prototype rebuilding metadata
+it was given, but a small residual cost of selectivity survives that correction.
 
 Because that margin rests on preprocessing calls that the dedicated batches timed once, in a
 fixed order, we re-timed the preprocessing call alone under a replicated, order-randomized
 protocol (\cref{subsec:statistical}): $R=20$ repetitions per instance and kernel, order drawn
 from a seeded RNG within each repetition, every call in a fresh process, the MIP never solved,
-over all $306$ instances of the three classes. The ordering is not an artifact of the
-execution order: the selective rule's preprocessing median exceeds the Flat median on
-\emph{every one} of the $306$ instances in both kernels ($204/204$ Simple, $68/68$
-SG-Ter-Mer, $34/34$ Full; paired Wilcoxon $p\le1.2\times10^{-10}$ in each cell). The
-\emph{magnitude}, however, is protocol-dependent. Under the replication's concurrent load the
-median selective-to-Flat ratio is $5.3$--$7.1\times$ (medians $0.34$ versus $0.057$\,s in
-Simple, $0.19$ versus $0.031$\,s in SG-Ter-Mer, $0.54$ versus $0.11$\,s in Full), whereas the
-dedicated batches recorded $2.7$--$3.1\times$ on smaller absolute values; the Flat calls are
-also far noisier in relative terms (median coefficient of variation $0.78$--$1.30$ versus
-$0.23$--$0.32$ for the selective calls), as expected of a shorter measurement. We therefore
-read the direction of the preprocessing gap as established and its absolute size as specific
-to the machine and load under which it is measured.
+over all $306$ instances of the three classes. The direction of the preprocessing-cost
+difference is reproduced under randomized execution order: the selective rule's
+preprocessing median exceeds the Flat median on \emph{every one} of the $306$ instances in
+both kernels ($204/204$ Simple, $68/68$ SG-Ter-Mer, $34/34$ Full), and, aggregating to the
+operational families used elsewhere for dependence, all $34$ Simple families, all $34$
+SG-Ter-Mer families and all $34$ Full singletons have a positive median
+selective-minus-Flat difference in both kernels. The combined preprocessing-plus-solver
+comparisons of \cref{tab:flat-control} remain based on the original fixed-order solve
+batches; this replication validates the preprocessing-overhead direction, not the combined
+endpoint. The \emph{magnitude}, moreover, is protocol-dependent: under the replication's
+concurrent load the median paired selective-to-Flat ratio is $6.1$--$9.1\times$, against
+$2.7$--$3.1\times$ on the smaller absolute values of the dedicated batches (per-cell
+medians, dispersion, and family counts in Table~S10). We therefore read the direction of
+the preprocessing gap as established and its absolute size as specific to the machine and
+load under which it is measured.
 
 The absolute magnitudes matter for how much this is worth
-(\cref{tab:flat-absolute}). In Simple the median paired end-to-end margin is
+(\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
 $0.051$\,s at $1\%$ and $0.067$\,s at $0.1\%$; in SG-Ter-Mer, $0.041$ and $0.070$\,s. In
 other words, the $2$--$5\%$ effects in the fast classes are \emph{tens of milliseconds per
-instance}, and they are decisive only because these runs are themselves short. The
-decomposition also refines the attribution: in Simple the preprocessing term accounts for
-essentially the whole margin ($0.051$ of $0.067$\,s at $0.1\%$), whereas in SG-Ter-Mer the
-solver term contributes about half ($0.038$ of $0.070$\,s), so ``preprocessing-driven'' is
-accurate for Simple but only partly so for SG-Ter-Mer. Full is the opposite regime: the
-preprocessing difference is the same $0.08$\,s, but the solver term is $-13.4$\,s, three
-orders of magnitude larger, which is why its sign reverses. In Full the direction reverses: in the $27$ eligible pairs at $0.1\%$ the
+instance}, and they are decisive only because these runs are themselves short. Full is the
+opposite regime: its median preprocessing difference is the same $0.08$\,s, but its median
+solver difference is $-13.4$\,s, three orders of magnitude larger, which is why its sign
+reverses.
+
+Attribution across the two components needs care, because these are marginal summaries and
+the median of a sum is not the sum of medians. Read as marginal summaries, most of the
+typical Simple difference is associated with preprocessing ($0.051$ against a
+$0.067$\,s total at $0.1\%$) and rather less of the SG-Ter-Mer one ($0.032$ against
+$0.070$\,s). Read additively on the same pool, where means \emph{do} decompose, the picture
+inverts: the mean paired differences at $0.1\%$ are $+0.052$\,s (preprocessing) versus
+$+8.35$\,s (solver) in Simple and $+0.032$ versus $+13.76$\,s in SG-Ter-Mer. The two
+readings disagree because the paired solver differences are heavy-tailed---a handful of
+instances differ by seconds in either direction, while the typical instance differs by
+milliseconds---whereas the preprocessing difference is a small, almost constant positive
+offset. That is precisely why the rank-based paired analysis favors Flat: the consistent
+offset moves the typical instance, while the large solver differences neither cancel nor
+concentrate. A per-instance share is not a useful summary here either: writing
+$s_i=\Delta T_{\mathrm{preproc},i}/\Delta T_{\mathrm{pre+solve},i}$, the two components have
+opposite signs on $40\%$ of Simple and $46\%$ of SG-Ter-Mer pairs, so $s_i$ falls outside
+$[0,1]$ there and its median ($0.35$ and $0.00$) should not be read as a fraction
+explained. In Full the direction reverses: in the $27$ eligible pairs at $0.1\%$ the
 selective augmented implementation has the lower observed time (median ratio $0.878$,
 $q_{12}^{\mathrm{pre+solve}}=0.025$), but the result is conditional on those pairs. Four
 nominal instances (045--048) were never recorded, and an \emph{adversarial signed-rank
@@ -3135,16 +3177,17 @@ $1.3\times10^{10}$, and it is the
 only difference between the two scaled matrices. In SG-Ter-Mer the
 structure-aware decomposition into local and
 coupling roles left a coverage gap over exactly the highest-magnitude rows, and the role-blind
-augmented kernel closes it without metadata; the implemented Flat pipeline is faster
-end-to-end at both tolerances, while the solver-time contrast favors Flat at $0.1\%$ only
+augmented kernel closes it without metadata; the implemented Flat pipeline has the lower
+observed preprocessing-plus-solver time at both tolerances, while the solver-time contrast favors
+Flat at $0.1\%$ only
 nominally. The coefficient-only solver-time contrast remains neutral.
 (On the synthetic benchmark the
 taxonomy leaves no row unclassified, so there is no coverage gap of this kind; the
 differences there trace to the coupling-stage design instead,
 \cref{subsec:synthetic-results}.) In Full the augmented contrast points toward
-selectivity in the $27$ eligible pairs at $0.1\%$, but it does not survive the worst-case
-missing-pair sensitivity, and the solver-time direction clears only the within-tolerance
-adjustment. Exporting its matrices
+selectivity in the $27$ eligible pairs at $0.1\%$, but it is not retained by the adversarial
+signed-rank sensitivity over the unrecorded pairs, and the solver-time direction clears only
+the within-tolerance adjustment. Exporting its matrices
 shows that the distinction is not a different row family: the flat kernel scales exactly the
 same shortage-segment and generation-versus-demand rows as in SG-Ter-Mer, and no rows specific
 to the nonlinear-hydro Full model (verified by differencing the exported constraints on two
@@ -3170,7 +3213,7 @@ effect. In these exploratory controls, the orderings that remain below $0.05$ af
 joint multiplicity and operational-family sensitivities are: on the
 preprocessing-plus-solver endpoint, the implemented Flat pipeline in Simple and SG-Ter-Mer
 (both kernels and tolerances; the Full selectivity direction is conditional on its
-eligible pairs and is not retained by the adversarial signed-rank sensitivity); on the solver-time
+eligible pairs and is not retained by an adversarial signed-rank sensitivity); on the solver-time
 decomposition, only the augmented $0.1\%$ Simple contrast---and its strict/mixed
 reliability-adjusted \PARten{} ordering points in the opposite direction
 (\cref{tab:flat-reliability-body}), so neither result should be read as a generally
@@ -3236,10 +3279,13 @@ are in Table~S10; the reliability audit is in Table~S9 and
 
 \begin{table}[t]
 \centering
-\caption{Absolute paired magnitudes behind the ratios of \cref{tab:flat-control}: medians of
-$\Delta T=T^{\rm SA}-T^{\rm Flat}$ over the jointly completed pairs, in seconds. A positive
-value favors Flat. The end-to-end margins in the two fast classes are tens of milliseconds
-per instance; in Full the solver term dominates and reverses the sign.}
+\caption{Completed-pair component summaries associated with the comparisons of
+\cref{tab:flat-control}: medians of $\Delta T=T^{\rm SA}-T^{\rm Flat}$, in seconds. These
+summaries exclude one-sided non-completions that remain in the capped paired analysis, and
+therefore do not decompose the exact inferential pool of every row; nor are the three
+medians an additive decomposition, since the median of a sum is not the sum of medians.
+A positive value favors Flat. The preprocessing-plus-solver margins in the two fast classes
+are tens of milliseconds per instance; in Full the solver term dominates and reverses the sign.}
 \label{tab:flat-absolute}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -3307,16 +3353,19 @@ fails the strict original-scale criterion on more completed runs ($25$ versus $2
 versus $18$ under the mixed reading), so both reliability-adjusted readings reverse the
 aggregate ordering toward SA-Aug. In SG-Ter-Mer neither policy has a mixed failure and
 Flat-Aug retains a small descriptive advantage under all three readings. In Full the
-selective rule's end-to-end paired advantage does not persist in the aggregate readings:
+selective rule's paired preprocessing-plus-solver advantage does not persist in the aggregate readings:
 SA-Aug is slightly ahead under intent-to-treat, but the mixed reading favors Flat-Aug
 ($5109$ versus $6342$\,s, one rescued failure), a further reason not to read the Full
 direction as established. For the four Matrix-only Simple and SG-Ter-Mer contrasts whose
 preprocessing-plus-solver ordering has adjusted values below $0.05$, the strict and mixed
-common-pool \PARten{} readings do \emph{not} materially change the ordering: the two
+common-pool \PARten{} readings do \emph{not} materially change the ordering. The two
 policies record identical failure counts in each of those cells ($19/18$ in Simple at
-$1\%$, $30/26$ at $0.1\%$, and $1/0$ in SG-Ter-Mer at both tolerances), so the
-reliability-adjusted costs differ by at most a few seconds and no reversal of the kind seen
-in Simple-Augmented occurs; complete values are in Table~S9. No reversal here is a paired
+$1\%$, $30/26$ at $0.1\%$, and $1/0$ in SG-Ter-Mer at both tolerances). The directly
+recomputed strict and mixed values also differ by at most a few seconds---in Simple,
+$3355.1/3178.7$ (SA) against $3355.1/3178.6$ (Flat) at $1\%$ and $5491.9/4787.2$ against
+$5492.1/4787.4$ at $0.1\%$; in SG-Ter-Mer, $1083.7/555.0$ against $1080.8/551.6$ at $1\%$
+and $1085.6/556.5$ against $1082.0/552.8$ at $0.1\%$---and no reversal of the kind seen
+in Simple-Augmented occurs; the full audit is Table~S9. No reversal here is a paired
 test; all use the fixed-pool aggregate convention of \cref{tab:par10-readings}.
 
 \FloatBarrier
@@ -3334,16 +3383,11 @@ at $1\%$; under the mixed reading SG-Ter-Mer is descriptively below at both tole
 (\cref{subsec:original-scale-audit,tab:par10-readings}). Under CPLEX 22.1.2.0 the same external
 scalings yield no robust runtime gain. The evidence thus separates algebraic equivalence,
 path-specific numerical diagnostics, reliability-adjusted aggregate cost, and mixed-integer
-search performance. The exploratory direct SA--Flat controls add a further separation,
-stated in full in \cref{subsec:stage-attribution}: end-to-end, the implemented Flat
-pipeline has the lower observed time in the two fast classes---by tens of milliseconds per
-instance, carried mostly (Simple) or partly (SG-Ter-Mer) by the selective rule's
-implementation-specific preprocessing overhead---while the Full selectivity direction is
-conditional on its eligible pairs; on capped solver time only augmented Simple at $0.1\%$
-remains below $0.05$ after every reported multiplicity and operational-family sensitivity
-applied to the capped solver-time endpoint, while the strict/mixed \PARten{} audit
-reverses that Simple aggregate ordering toward SA-Aug
-(\cref{tab:flat-reliability-body}; Tables~S9--S10).
+search performance. The exploratory direct SA--Flat controls, developed in full in
+\cref{subsec:stage-attribution}, add a further separation: the coverage ordering depends on
+the endpoint, the margins in the fast classes are tens of milliseconds and carry a large
+prototype-implementation component, and the reliability-adjusted reading can invert the
+solver-time ordering (\cref{tab:flat-reliability-body}; Tables~S9--S10).
 
 A first objection is that commercial solvers already scale internally---which is exactly why
 the scaled variants always run against the solver's default internal scaling and presolve
@@ -3364,8 +3408,8 @@ comparison says nothing about the metadata. Second, the choice of \emph{coverage
 whether the row-role selection helps is a metadata question, and it is answered only by the
 two role-blind controls (SA-Aug versus Flat-Aug and SA-Mat versus Flat-Mat,
 \cref{subsec:stage-attribution}). In the reported default-seed campaign, the direct tests
-answer it endpoint by endpoint: end-to-end, the implemented Flat pipeline wins the two
-fast classes at both tolerances, the Full selectivity direction is conditional on its
+answer it endpoint by endpoint: in preprocessing-plus-solver time the implemented Flat
+pipeline has the lower observed time in the two fast classes at both tolerances, the Full selectivity direction is conditional on its
 eligible pairs, and on solver time alone only the augmented Simple contrast at $0.1\%$
 remains below $0.05$ after every adjustment, with all matrix-only solver-time contrasts
 inconclusive. Third,
@@ -3481,10 +3525,15 @@ runtime and may occasionally rescue a near-limit instance at low absolute but
 non-negligible preprocessing cost. For repeated hard instances, that cost may be small
 relative to solver time and may be amortized when structural metadata are cached; on fast
 instances, however, the measured preprocessing overhead is large enough to determine the
-end-to-end ordering (\cref{subsec:stage-attribution})---though in absolute terms that
+preprocessing-plus-solver ordering (\cref{subsec:stage-attribution})---though in absolute terms that
 ordering is decided by tens of milliseconds per instance
 (\cref{tab:flat-absolute}), so it matters for throughput over many short solves rather
-than for any single run. The timeout evidence in this study
+than for any single run. The amortization is not hypothetical: $72$--$89\%$ of the
+selective rule's preprocessing time in our prototype is spent rebuilding metadata the
+generator already has, and charging only the intrinsic diagnosis and application work
+shrinks the gap against the role-blind rule by nearly an order of magnitude. An
+implementation that consumes emitted labels instead of re-deriving them would therefore
+remove most---though, on this testbed, not all---of the measured penalty. The timeout evidence in this study
 is also not stable across campaigns (the SG-Ter-Mer
 \PARten{} advantage rests on a single timeout-rescued instance that the coupling-stage activation-audit and
 internal-scaling campaigns do not reproduce). The completed-run shifted geometric mean is
@@ -3581,10 +3630,10 @@ retains Simple but not SG-Ter-Mer after adjustment; the preprocessing-plus-solve
 endpoints do retain SG-Ter-Mer (Table~S10). The Work replication of both augmented
 $0.1\%$ directions makes pure wall-clock scheduling noise a less likely explanation, but
 it does not eliminate seed- or trajectory-level variability; seed-replicated runs are left
-as future work. The end-to-end endpoint is built from preprocessing calls that the dedicated
+as future work. The preprocessing-plus-solver endpoint is built from calls that the dedicated
 batches timed once each in a fixed order; the separate order-randomized replication
 (\cref{subsec:stage-attribution}) confirms the \emph{direction} of the preprocessing gap on
-all $306$ instances but also shows its absolute size to be load-dependent, so end-to-end
+all $306$ instances but also shows its absolute size to be load-dependent, so those
 magnitudes---though not their sign---remain protocol-specific. The adjusted Full result is
 conditional on
 the $27$ eligible observed pairs: the adversarial signed-rank sensitivity over instances
@@ -3658,8 +3707,8 @@ entirely from local-row normalization. The direct role-blind controls
 (\cref{tab:flat-control}) show that coverage and selectivity cannot be generalized across
 the two kernels or across endpoints. These exploratory single-default-seed controls are
 developed in full in \cref{subsec:stage-attribution}; their lesson is that the ordering
-depends on what one measures---end-to-end, where the selective rule pays for its own
-diagnosis, against solver time alone, where the effects are small and the
+depends on what one measures---preprocessing-plus-solver time, where the selective rule pays
+for its own diagnosis, against solver time alone, where the effects are small and the
 reliability-adjusted reading can point the other way. They were run only under Gurobi:
 the value of external preprocessing is solver-dependent, and whether the same
 coverage-versus-selectivity ordering persists under CPLEX remains untested. Establishing this
@@ -3681,7 +3730,7 @@ that a selective taxonomy can miss important rows. The Full campaign raises---bu
 establish---the complementary hypothesis that blanket normalization can
 overshoot on integrated models. A practical scaling layer should therefore measure both
 coverage policies, exactly as the role-blind control does here, and should time its own
-preprocessing, which on fast instances can decide the end-to-end ordering.
+preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
 
 % Float barrier removed to improve two-column layout.
 

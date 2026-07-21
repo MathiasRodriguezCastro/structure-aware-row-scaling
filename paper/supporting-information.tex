@@ -833,8 +833,33 @@ which neither policy completes. No pair is dropped for a missing time and no exa
 difference occurs; $n$ used applies to both endpoints. In these batches the preprocessing
 calls are timed once each, with the C++ high-resolution wall clock, in the batch's fixed
 (un-randomized) execution order and without repetitions; per-policy IQRs are at most
-$0.003$\,s in every cell. The separate order-randomized replication of the preprocessing
-call alone (\texttt{scripts/preproc\_timing\_replication.py}) is reported in the main text. The batches contain no one-sided aborts, so the $10T_{\max}$ abort sensitivity is
+$0.003$\,s in every cell.
+
+\emph{Order-randomized preprocessing replication}
+(\texttt{scripts/preproc\_timing\_replication.py}; $R=20$, seeded order per repetition,
+fresh process per call, MIP never solved, $12$ concurrent workers on a $16$-core
+workstation without CPU pinning). Per class and kernel, medians of the per-instance median
+call time (selective versus role-blind, seconds), the median paired ratio, the
+cached-metadata counterpart $T_{\rm diagnosis}+T_{\rm application}$, and the relative
+interquartile range (IQR over median), which replaces the coefficient of variation because
+the latter is unstable for short, skewed timings:
+Simple/Aug $0.272$ vs $0.031$ ($8.38\times$; cached $0.032$ vs $0.029$, $1.08\times$;
+relative IQR $0.32$ vs $1.51$);
+Simple/Mat $0.281$ vs $0.031$ ($8.58\times$; cached $0.040$ vs $0.029$, $1.40\times$;
+$0.32$ vs $1.58$);
+SG-Ter-Mer/Aug $0.165$ vs $0.018$ ($9.10\times$; cached $0.020$ vs $0.018$, $1.08\times$;
+$0.20$ vs $1.70$);
+SG-Ter-Mer/Mat $0.167$ vs $0.020$ ($8.54\times$; cached $0.023$ vs $0.019$, $1.24\times$;
+$0.18$ vs $1.83$);
+Full/Aug $0.412$ vs $0.066$ ($6.45\times$; cached $0.072$ vs $0.062$, $1.15\times$;
+$0.21$ vs $1.15$);
+Full/Mat $0.424$ vs $0.072$ ($6.08\times$; cached $0.084$ vs $0.067$, $1.32\times$;
+$0.23$ vs $1.04$).
+The selective median exceeds the role-blind median on all $612$ instance--kernel records
+(paired Wilcoxon $p\le1.2\times10^{-10}$ per cell), and every operational family---$34$ in
+each class---has a positive median difference in both kernels. Metadata reconstruction
+accounts for $72$--$89\%$ of the selective preprocessing time and at most $0.6$\,ms of the
+role-blind time. The batches contain no one-sided aborts, so the $10T_{\max}$ abort sensitivity is
 identical to the primary convention. Each of the six dedicated CSVs contains both SA and
 Flat reruns from the same class--tolerance batch, independent of the main campaign.
 Adversarial signed-rank sensitivity for the four unrecorded pairs (Full augmented $0.1\%$,
