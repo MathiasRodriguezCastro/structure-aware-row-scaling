@@ -1861,9 +1861,9 @@ deterioration.
 
 The direct SA--Flat analysis has its own endpoints and multiplicity structure, and one
 disclosure comes first: \emph{the endpoint hierarchy was selected after inspection of the
-direct-control data and is therefore exploratory}. We report preprocessing-plus-solver
-time $T_{\mathrm{pre+solve}}=T_{\mathrm{preproc}}+T_{\mathrm{solver}}$ as the operational
-endpoint, and capped solver time as its decomposition. The prototype endpoint charges each
+direct-control data and is therefore exploratory}. We report \emph{prototype} preprocessing-plus-solver time
+$T_{\mathrm{pre+solve}}^{\mathrm{prototype}}=T_{\mathrm{preproc}}+T_{\mathrm{solver}}$ as the
+observed implementation endpoint, and capped solver time as its decomposition. The prototype endpoint charges each
 rule the cost of the implementation used in the dedicated batches, including metadata
 reconstruction; a release-build cached-metadata sensitivity (\cref{tab:flat-cached})
 approximates a generator-integrated implementation in which the structural taxonomy is reused.
@@ -3016,7 +3016,13 @@ record. Optimization shrinks every preprocessing time about sixfold and leaves t
 ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it moves the
 cached ratios towards parity, and enough to change one conclusion: under the diagnostic build
 the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the release
-build it falls to $q_{6}=0.115$. This build comparison provides one observed policy-specific
+build it falls to $q_{6}=0.115$. Splicing release preprocessing onto diagnostic-build solver times is only legitimate if
+optimization changes the \emph{cost} of preprocessing without changing the transformation it
+produces, so we verified that directly: exporting the scaled model with both builds on six
+instances spanning the three classes and both kernels, in selective and role-blind mode, gives
+$24/24$ byte-identical exports. The two builds therefore differ in speed alone, not in row
+factors, scaled rows, or safeguard decisions. This build comparison provides one observed
+policy-specific
 \emph{toolchain} perturbation rather than a direct estimate of the workstation-to-ClusterUY
 transfer ratio: the implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ remains in
 $[0.94,1.01]$ across the six class--kernel cells, suggesting limited asymmetry under this
@@ -3225,9 +3231,10 @@ analysis prioritizes successful completion over the small intervention-cost diff
 \item The Full $0.1\%$ rows use the $27$ eligible pairs of the $30$ recorded instances; the
 adjusted augmented contrast is not retained by the adversarial signed-rank sensitivity over
 the four unrecorded instances (\cref{subsec:stage-attribution}).
-\item Attrition, abort convention, batch protocol, joint $q_{12}$, sign-flip, bootstrap and
-adversarial sensitivities, Hodges--Lehmann estimates, and preprocessing-time distributions
-are in Table~S10; the reliability audit is in Table~S9 and
+\item Joint multiplicity, operational-family, bootstrap, Hodges--Lehmann, Work-unit and
+own-incumbent sensitivities are in Table~S10. Attrition, batch timing, preprocessing
+summaries, build comparisons, transfer-factor analyses and adversarial missing-pair
+sensitivities are in Tables~S11--S12. The reliability audit is in Table~S9 and
 \cref{tab:flat-reliability-body}. Reproducible with
 \texttt{scripts/flat\_control\_tests.py}.
 \end{tablenotes}
@@ -3542,7 +3549,7 @@ ordering is decided by tens of milliseconds per instance
 (\cref{tab:flat-absolute}), so it matters for throughput over many short solves rather
 than for any single run. The amortization is not hypothetical: $72$--$89\%$ of the
 selective rule's preprocessing time in our prototype is spent rebuilding metadata the
-generator already has, and charging only the intrinsic diagnosis and application work
+generator already has, and charging only the remaining instrumented diagnosis-and-application work
 shrinks the gap against the role-blind rule by nearly an order of magnitude. This quantity is
 an estimated cached-metadata implementation cost in the measured hardware and toolchain
 environment, not a hardware-independent intrinsic cost. An
@@ -3815,7 +3822,7 @@ path and preprocessing methods used in the paper.
 A Supporting Information document accompanies this article. Section~S1 contains the proofs of
 Propositions~1 and~2. Section~S2 contains the supplementary computational results: the
 $0.1\%$-MIPGap Gurobi and CPLEX distributional, diagnostic, and performance-profile views
-(Figures~S1--S4) and eleven tables---hyperparameter sensitivity (Table~S1), the per-variant
+(Figures~S1--S4) and twelve tables---hyperparameter sensitivity (Table~S1), the per-variant
 reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
 (Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
 paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit

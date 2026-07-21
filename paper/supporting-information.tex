@@ -51,8 +51,9 @@ accounting (Table~S6);
 the coupling-stage activation audit (Table~S8); (xi) the direct SA--Flat strict/mixed
 reliability audit (Table~S9); and (xii) the multiplicity, operational-family, bootstrap,
 preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities for that
-direct comparison (Table~S10); and (xiii) its per-contrast attrition, measurement
-environment, cached-metadata endpoint and hardware-transfer sensitivity (Table~S11).
+direct comparison (Table~S10); (xiii) its per-contrast attrition and cached-metadata endpoint on both builds (Table~S11); and
+(xiv) the measurement environment, build comparison and cross-environment transfer-factor
+sensitivity (Table~S12).
 
 \section*{Section S1. Proofs of the spectral propositions}
 \noindent These are the full proofs of the two propositions stated in Section~3 of the
@@ -985,8 +986,15 @@ $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
 \end{table}
 \end{landscape}
 
+\vspace{10pt}
+\noindent\textbf{Table S12: measurement environment, build comparison, and cross-environment
+transfer-factor sensitivity for the direct SA--Flat controls.} The transfer factors are
+hypothetical: the workstation-to-ClusterUY transfer was never observed, and the only measured
+perturbation is the change of toolchain on the same machine.
+\label{tab:si-flat-transfer}
+
 \noindent\scriptsize
-\textbf{Panel E3: release-build hardware-transfer sensitivity}\\[2pt]
+\textbf{Panel E3: release-build cross-environment transfer-factor sensitivity}\\[2pt]
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
 Grid point & \multicolumn{6}{c}{Fast-class contrasts with $q_6<0.05$ (of eight)} \\
@@ -1002,16 +1010,42 @@ Ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ & $0.25$ & $0.5$ & $1$ & $2$ & 
 \vspace{4pt}
 \noindent\scriptsize The release-build endpoint (Panel E1) is the implementation-cost
 sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
-to show the sensitivity of the cached comparison to compiler optimization. The augmented
-Simple contrast at $0.1\%$ is the single contrast retained at every grid point of Panel E3;
-additional contrasts appear only for $\rho\ge2$, that is, when the selective rule's
-preprocessing is assumed to transfer at least twice as poorly as the role-blind rule's.
-Comparing Panels E1 and E2 gives the implied toolchain ratio
-$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ of $0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and
-$0.966$ for Full/Aug, Full/Mat, SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat;
-optimization leaves the full-call ratios essentially unchanged ($5.38$--$6.12\times$ against
-$5.07$--$6.00\times$) and the metadata share at $81$--$83\%$. Reproducible with
-\texttt{scripts/cached\_transfer\_sensitivity.py}.
+to show the sensitivity of the cached comparison to compiler optimization. Panel E3 reports
+within-tolerance $q_6$ crossings only; these counts do not imply retention under the joint or
+operational-family adjustments. The augmented Simple contrast at $0.1\%$ is the only contrast
+crossing at every evaluated grid point. Additional within-tolerance $q_6$ crossings first
+appear at the evaluated point $\rho=2$; the exact transition threshold between $1$ and $2$ is
+not identified by this grid. The transfer factors are hypothetical: the workstation-to-ClusterUY
+transfer was never observed, and the only measured perturbation is the change of toolchain on
+the same machine. Comparing Panels E1 and E2 gives that implied toolchain ratio, defined as the
+ratio of the two builds' per-cell cached ratios,
+$\rho=\bigl[\operatorname{med}_i(T^{\rm cached}_{{\rm SA},i}/T^{\rm cached}_{{\rm Flat},i})\bigr]_{\rm release}
+\big/\bigl[\operatorname{med}_i(\cdot)\bigr]_{\rm diagnostic}$, where each per-cell ratio is the
+exponentiated median of the per-instance log ratios of cached preprocessing medians (the
+quantity computed by \texttt{scripts/cached\_transfer\_sensitivity.py}). Its values are
+$0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and $0.966$ for Full/Aug, Full/Mat,
+SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat; optimization leaves the full-call
+ratios essentially unchanged ($5.38$--$6.12\times$ against $5.07$--$6.00\times$) and the
+metadata share at $81$--$83\%$. Exporting the scaled model with both builds on six instances
+across the three classes and both kernels gives $24/24$ byte-identical exports, so the builds
+differ in cost and not in the transformation applied.
+
+\vspace{4pt}
+\noindent\scriptsize\textbf{Release-build absolute times} (medians with interquartile range,
+seconds; full call and cached counterpart, selective versus role-blind):
+Simple/Aug $0.0084\,(0.0001)$ vs $0.0014\,(0.0000)$, cached $0.0014\,(0.0000)$ vs
+$0.0013\,(0.0000)$;
+Simple/Mat $0.0086\,(0.0001)$ vs $0.0014\,(0.0000)$, cached $0.0015\,(0.0000)$ vs
+$0.0013\,(0.0000)$;
+SG-Ter-Mer/Aug $0.0053\,(0.0000)$ vs $0.0010\,(0.0000)$, cached $0.0009\,(0.0000)$ vs
+$0.0009\,(0.0000)$;
+SG-Ter-Mer/Mat $0.0054\,(0.0000)$ vs $0.0010\,(0.0000)$, cached $0.0010\,(0.0000)$ vs
+$0.0009\,(0.0000)$;
+Full/Aug $0.0136\,(0.0001)$ vs $0.0024\,(0.0001)$, cached $0.0022\,(0.0000)$ vs
+$0.0022\,(0.0001)$;
+Full/Mat $0.0139\,(0.0001)$ vs $0.0024\,(0.0001)$, cached $0.0025\,(0.0001)$ vs
+$0.0022\,(0.0001)$. The absolute times quoted elsewhere in these notes are from the
+diagnostic build.
 \normalsize
 
 
