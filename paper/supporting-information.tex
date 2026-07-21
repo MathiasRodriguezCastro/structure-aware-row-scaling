@@ -983,6 +983,8 @@ $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
 \bottomrule
 \end{tabular}
 
+\noindent\scriptsize $\dagger$ Approximate cross-build sensitivity; five Full instances exhibit last-bit model-construction differences. See Section~S2.1.\par\vspace{4pt}
+
 \vspace{7pt}
 \textbf{Panel E2: non-optimized diagnostic-build audit}\\[2pt]
 \begin{tabular}{@{}lllrrrrrrr@{}}
@@ -1023,7 +1025,7 @@ the change of toolchain on the same machine.
 \label{tab:si-flat-transfer}
 
 \noindent\scriptsize
-\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \path{results-revision/preproc-timing/build_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol; To screen measurement noise, we call record $i$ a \emph{within-dispersion tie} for build $b$ when
+\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \path{results-revision/preproc-timing/build_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol; For a descriptive within-instance dispersion comparison, we call record $i$ a \emph{within-dispersion tie} for build $b$ when
 \[
 \bigl\lvert\widetilde T^{\mathrm{cached},b}_{\mathrm{preproc,SA},i}
 -\widetilde T^{\mathrm{cached},b}_{\mathrm{preproc,Flat},i}\bigr\rvert\le B_i^{b},
@@ -1036,9 +1038,12 @@ repetitions; the quantities are cached \emph{preprocessing} times, not the
 preprocessing-plus-solver endpoint. Using this descriptive noise screen, the three-way
 classification (role-blind-favoured, selective-favoured, tie) is $461/1/150$ under the pinned
 release build, $554/0/58$ under the pinned diagnostic build and $37/0/575$ under the concurrent
-protocol; each row sums to $612$. The screen is descriptive: it is not a confidence interval,
-an equivalence test or a domain-calibrated practical-significance margin, so records inside the
-band are within-dispersion ties rather than statistically indeterminate. These counts condition
+protocol; each row sums to $612$. The band is an ad hoc scale-of-dispersion heuristic based on the larger marginal IQR; it is not
+an uncertainty estimate for the paired median difference, nor a confidence interval, an
+equivalence test or a domain-calibrated practical-significance margin, so records inside it are
+within-dispersion ties rather than statistically indeterminate. A sharper screen would use the
+per-repetition paired differences $D^{b}_{ir}$ and their $\operatorname{IQR}_r$, which the
+archived summaries do not retain. These counts condition
 on the $R=20$ per-instance median estimates and do not propagate within-instance timing
 uncertainty. The three record-level counts are computed by
 \path{scripts/preproc_timing_replication.py} from the \texttt{cached\_sa\_s} and
@@ -1071,14 +1076,14 @@ Simple/Matrix-only at $1\%$; at $\rho=4$ also by SG-Ter-Mer/Augmented at $1\%$ a
 Simple/Augmented at $1\%$. Panel~E3 is restricted to the eight fast-class contrasts. In the separate Full-Augmented
 $0.1\%$ calculation, $q_6=0.045$ at every evaluated common-factor point and at the
 policy-specific points $\rho\le2$, falling to $0.036$ at $\rho=4$; the joint value $q_{12}$
-remains above $0.05$ except at $\rho=4$, where it is $0.042$ (Panel~E5). None of these nominal
+remains above $0.05$ except at $\rho=4$, where it is $0.042$ (Panel~E4). None of these nominal
 Full crossings is retained by the adversarial missing-pair sensitivity. The $q_{12}=0.042$
 crossing at the extreme evaluated point $\rho=4$ is moreover conditional on a hypothetical
 policy-specific transfer factor, on approximate cross-build Full models, and on the $27$
 observed eligible pairs; it is not treated as evidence of a robust Full coverage ordering. No
 other Full contrast has $q_6<0.05$ anywhere on the grids.\par\vspace{4pt}
 
-\noindent\scriptsize\textbf{Panel E5: Full-Augmented at $0.1\%$ across the transfer grids}
+\noindent\scriptsize\textbf{Panel E4: Full-Augmented at $0.1\%$ across the transfer grids}
 (approximate cross-build row; $n=27$).\\[2pt]
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
@@ -1098,8 +1103,11 @@ $q_{12}$ & 0.090 & 0.090 & 0.090 & 0.060 & \textbf{0.042} & --- \\
 sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
 to show the sensitivity of the cached comparison to compiler optimization. Panel E3 reports
 within-tolerance $q_6$ crossings only; these counts do not imply retention under the joint or
-operational-family adjustments. The augmented Simple contrast at $0.1\%$ is the only contrast
-crossing at every evaluated grid point. Additional within-tolerance $q_6$ crossings first
+operational-family adjustments. Among the eight fast-class contrasts summarized in
+Panel~E3, Simple-Augmented at $0.1\%$ is the only contrast with $q_6<0.05$ at every evaluated
+grid point; the separate approximate Full-Augmented row also has $q_6<0.05$ throughout, but its
+evidence is conditional on the observed eligible pairs and is not retained by the adversarial
+missing-pair sensitivity. Additional within-tolerance $q_6$ crossings first
 appear at the evaluated point $\rho=2$; the exact transition threshold between $1$ and $2$ is
 not identified by this grid. The transfer factors are hypothetical: the workstation-to-ClusterUY
 transfer was never observed, and the only measured perturbation is the change of toolchain on
@@ -1134,7 +1142,7 @@ reproducibility package, regenerated by
 \path{scripts/cached_transfer_sensitivity.py} \texttt{--dump-csv}.
 
 \vspace{4pt}
-\noindent\scriptsize\textbf{Panel E4: release-build absolute preprocessing times}, in milliseconds as
+\noindent\scriptsize\textbf{Panel E5: release-build absolute preprocessing times}, in milliseconds as
 median [IQR]; an IQR below $0.001$\,ms is shown as $<0.001$ rather than rounded to zero. The
 absolute times quoted elsewhere in these notes are from the diagnostic build.\\[3pt]
 \begin{tabular}{@{}llrrrr@{}}

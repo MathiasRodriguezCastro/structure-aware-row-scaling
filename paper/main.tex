@@ -244,7 +244,7 @@ scales, not in claiming that row scaling is new. The generator first scales loca
 rows. It then summarizes the scale of each locally scaled block. Finally, it scales global
 coupling rows with the scales of the blocks they connect. Throughout the paper, this
 local--block--coupling architecture is treated as a \emph{candidate} structure-aware policy
-whose stages, coverage, and solver dependence are evaluated---and partly refuted---empirically.
+whose stages, coverage, and pipeline sensitivity are evaluated---and partly refuted---empirically.
 
 The contribution is not a new equilibration kernel---the per-row factor is a known
 geometric-mean normalization, and the results show that this kernel carries most of the
@@ -361,7 +361,7 @@ evidence. \Cref{sec:discussion} interprets that evidence and answers likely obje
 \label{sec:related-work}
 % -------------------------------------------------------------------------
 
-The literature sets the stage but leaves a specific niche. Hydrothermal-dispatch models provide realistic generated block-structured MIPs with heterogeneous units and global balances; numerical-scaling work explains why coefficient magnitudes matter, but its standard tools operate on the exported matrix; and formulation-quality practice shows that algebraic representation can matter as much as the underlying set. The missing argument is narrower than ``scaling is useful'': when a generator still knows each row's role and each variable's block, that metadata can be used as numerical information before export. The resulting transformation must then be evaluated separately as an algebraic equivalence, a representation change, and a solver-dependent performance intervention.
+The literature sets the stage but leaves a specific niche. Hydrothermal-dispatch models provide realistic generated block-structured MIPs with heterogeneous units and global balances; numerical-scaling work explains why coefficient magnitudes matter, but its standard tools operate on the exported matrix; and formulation-quality practice shows that algebraic representation can matter as much as the underlying set. The missing argument is narrower than ``scaling is useful'': when a generator still knows each row's role and each variable's block, that metadata can be used as numerical information before export. The resulting transformation must then be evaluated separately as an algebraic equivalence, a representation change, and a performance intervention whose observed effect is specific to the tested solver pipeline.
 
 \subsection{Hydrothermal dispatch and MIP formulations}
 
@@ -1321,7 +1321,8 @@ by the original-scale feasibility and integrality tests (with variables mapped b
 original units only for the column-scaling baseline); the numerical
 claim by exported coefficient-range summaries and solver-level conditioning diagnostics; the
 performance claim by matched base--variant speedups, deterministic effort, performance
-profiles, and primal--dual progress; and solver dependence by separate Gurobi and CPLEX
+profiles, and primal--dual progress; and the sensitivity of the observed preprocessing effect
+to the tested solver pipeline through separate Gurobi and CPLEX
 scenarios at two tolerances.
 
 \begin{table*}[t]
@@ -2625,7 +2626,7 @@ effect. \AvgGap{} is the dimensionless callback-horizon average in
 
 \noindent \Cref{tab:robust-cplex-01pct-mipgap} reports the cells; the corresponding
 distributional and profile views (Figure~S4, Supporting Information) remain mixed under the
-stricter tolerance, supporting the solver-dependent interpretation.
+stricter tolerance, reinforcing the observed cross-pipeline contrast.
 
 \begin{table*}[t]
 \centering
@@ -2984,7 +2985,7 @@ that removes the prototype's metadata-reconstruction stage while retaining diagn
 factor application---collapses the gap substantially. In the non-optimized concurrent stress test the median
 paired preprocessing ratio falls from roughly $6$--$9\times$ to $1.08$--$1.40\times$; the
 cleaner pinned diagnostic protocol produces smaller absolute times, and the release-build absolute preprocessing values used in \cref{tab:flat-cached} are reported in
-Panel~E4 of Table~S12. It does
+Panel~E5 of Table~S12. It does
 not, however, reverse the ordering. The cell-level median cached preprocessing time is lower
 for the role-blind rule in all six class--kernel cells under each protocol, although the
 record-level direction is not uniform: under the pinned release build---the sensitivity of
@@ -3138,8 +3139,12 @@ magnitudes, we report no universal adversarial median or Hodges--Lehmann estimat
 the single imputation actually used---$d_{\mathrm{miss}}=-(\max_i\lvert d_i\rvert
 +\varepsilon)$, one adversarial scenario among many---the location estimates still point
 toward selectivity, which shows only that what the sensitivity removes is the rank-based
-evidence rather than the sign of the point estimate. The three double timeouts enter as
-operational ties. At $1\%$ the
+evidence rather than the sign of the point estimate. For this adversarial sensitivity only, we
+restore the three double timeouts as exact-zero operational ties and append the four unrecorded
+instances with adverse above-maximal ranks, so the nominal pool contains all $34$ instances;
+because the signed-rank procedure discards exact zeros, the effective nonzero sample is $n=31$,
+the $27$ observed nonzero pairs plus the four adverse missing pairs. The primary paired
+analysis, by contrast, excludes double non-completions. At $1\%$ the
 same Full direction is inconclusive. On the capped solver-time
 decomposition---the solver's response to the exported matrix, reported as an exploratory
 reading---no $1\%$ contrast remains below $0.05$ after adjustment; at $0.1\%$ the
@@ -3637,8 +3642,8 @@ The study is strongest where the evidence is matched: runtime comparisons use th
 instance, solver, and tolerance for base and variants; numerical diagnostics are reported
 separately from speed; and feasibility and integrality are checked in the original scale. These
 choices keep the argument auditable---a reader can see which evidence supports algebraic
-equivalence, which supports numerical improvement, and which supports solver-dependent
-acceleration.
+equivalence, which supports numerical improvement, and which supports the observed pipeline-specific
+runtime evidence.
 
 The main limitation is domain coverage. The method applies to generated modular MIPs with
 identifiable local blocks and coupling rows, but the evidence comes from one hydrothermal
