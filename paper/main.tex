@@ -1863,20 +1863,18 @@ The direct SA--Flat analysis has its own endpoints and multiplicity structure, a
 disclosure comes first: \emph{the endpoint hierarchy was selected after inspection of the
 direct-control data and is therefore exploratory}. We report preprocessing-plus-solver
 time $T_{\mathrm{pre+solve}}=T_{\mathrm{preproc}}+T_{\mathrm{solver}}$ as the operational
-endpoint---it charges each rule the cost of its own intervention---and capped solver time
-as a decomposition of that endpoint, isolating the subsequent solver response, without
-treating either as a preregistered confirmatory outcome. Strictly, the observed
-preprocessing-plus-solver time is an \emph{implementation} endpoint: our prototype rebuilds
-structural metadata that the proposed architecture assumes the generator already holds, so a
-cached-metadata sensitivity (\cref{tab:flat-cached}) is required to approximate the intended
-generator-integrated deployment, and we report both. The name is deliberately narrow:
+endpoint, and capped solver time as its decomposition. The prototype endpoint charges each
+rule the cost of the implementation used in the dedicated batches, including metadata
+reconstruction; a release-build cached-metadata sensitivity (\cref{tab:flat-cached})
+approximates a generator-integrated implementation in which the structural taxonomy is reused.
+Neither is treated as a preregistered confirmatory outcome, and we report both. The name is deliberately narrow:
 $T_{\mathrm{pre+solve}}$ excludes model construction, solver model loading, and post-solve
 verification, which are common to both policies, so it is not literally the whole
 pipeline. Here $T_{\mathrm{preproc}}$ is the wall time of the preprocessing call on the
 constructed model---row-role classification, scale diagnosis (including the coupling-stage
 grid search where applicable), and in-place application of the factors. In the dedicated
 batches each call was timed once with the C++ high-resolution wall clock, in the batch's
-fixed execution order, without repetition; per-policy medians and IQRs are in Table~S10
+fixed execution order, without repetition; per-policy medians and IQRs are in Table~S11
 (medians $0.02$--$0.13$\,s, IQRs $\le0.003$\,s). Because a single unrandomized measurement
 cannot separate the policy effect from systematic order effects---cache warming, allocator
 state, machine state---we re-timed the preprocessing call alone in a dedicated replication
@@ -1888,7 +1886,7 @@ over repetitions. Each timed call starts after model construction and excludes p
 startup and input parsing; the two policies of a repetition run sequentially in the
 randomized order, timed with a monotonic steady clock, over $12$ concurrent workers on a
 $16$-core workstation without CPU pinning, so they share machine state but compete with
-unrelated instances (full protocol and per-cell statistics in Table~S10; dispersion is
+unrelated instances (full protocol and per-cell statistics in Table~S11; dispersion is
 summarized by the interquartile range relative to the median, the coefficient of variation
 being unstable for short, skewed timings). \Cref{subsec:stage-attribution} reports the
 outcome: the direction replicates on every instance, while the absolute gap is
@@ -1920,7 +1918,7 @@ identifiers span \texttt{instance001}--\texttt{instance096} and pair exactly und
 \texttt{XXX}${}\leftrightarrow{}$\texttt{XXX$+$48} correspondence encoded by the
 generator's scenario numbering, which links the two variants derived from the same
 operating scenario. The Full pool contains $34$ singleton families. Family counts
-and pair-specific attrition after exclusions are reported per contrast in Table~S10. For
+and pair-specific attrition after exclusions are reported per contrast in Table~S11. For
 the two central augmented contrasts, a $2000$-resample percentile bootstrap of whole
 families (seed $12345$) provides a nominal $95\%$ interval for the median log time ratio
 of both endpoints. Table~S10 reports these sensitivities and the parallel Gurobi
@@ -1937,9 +1935,8 @@ effective number of independent replicates is smaller than the nominal $n$ and t
 instance-level $p$-values may understate uncertainty. On the solver-time decomposition
 the family-sign sensitivity leaves only the augmented Simple contrast below $0.05$ after
 adjustment; on the preprocessing-plus-solver endpoint it leaves every Simple and
-SG-Ter-Mer contrast below $0.05$ on the prototype preprocessing-plus-solver endpoint, while
-the augmented Full contrast at $0.1\%$ is conditional on its eligible pairs
-(\cref{subsec:stage-attribution}). We therefore call the
+SG-Ter-Mer contrast below the nominal $0.05$ threshold, while the augmented Full contrast at
+$0.1\%$ remains conditional on its eligible pairs (\cref{subsec:stage-attribution}). We therefore call the
 SG-Ter-Mer solver-time result nominal, read the tests as evidence about scenarios of
 this platform, and lean on effect sizes and cross-class consistency rather than on any single
 $p$-value (\cref{sec:validity}).
@@ -2999,91 +2996,51 @@ $T_{\mathrm{pre+solve}}^{\mathrm{cached}}
 (\cref{tab:flat-cached}). This is a \emph{cross-protocol counterfactual}: it combines
 preprocessing medians measured on the pinned workstation with solver times from the ClusterUY
 batches, so it does not represent an observed single-machine pipeline, and its absolute ratios
-depend on the relative speed of the two environments. Because the cached effects sit close to
-one, we examine sensitivity to a common multiplicative transfer factor,
-$T^{\mathrm{cached}}(\lambda)=T_{\rm solver}+\lambda\,T^{\mathrm{cached}}_{\rm preproc}$.
-This varies the overall weight of preprocessing relative to solver time, but it does not model
-policy-specific hardware or compiler effects: the two rules execute different code, so a change
-of machine or toolchain need not rescale them by the same factor. The qualitative conclusion is stable under a common factor: over the evaluated grid
-$\lambda\in\{0.25,0.5,1,2,4,8\}$ the cached effects remain close to parity and only a small
-minority of fast-class contrasts falls below the nominal adjusted threshold (one to three of
-eight); the same two Simple contrasts are retained over $\lambda\in[0.5,8]$, and no
-SG-Ter-Mer contrast becomes significant at any grid point (its median ratio rounds to
-$1.016$ throughout, its preprocessing term being negligible against solver time).
+depend on the relative speed of the two environments. Of the eight fast-class contrasts whose prototype
+preprocessing-plus-solver ordering had adjusted values below $0.05$, six keep a direction
+favoring the role-blind rule but only one retains a within-tolerance nominal adjusted value
+below $0.05$: the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$), which also survives
+the joint and operational-family corrections ($q_{12}=0.021$, $q_{12}^{\mathrm{blk}}=0.031$)
+and is small in median magnitude, about $0.9\%$. It indicates a systematic directional
+difference in this campaign, not a large operational speedup. The augmented SG-Ter-Mer
+contrasts fall to $q_{6}=0.115$ and $0.052$, and every coefficient-only fast-class contrast
+to $q_{6}\ge0.115$. The directional reversals occur in SG-Ter-Mer coefficient-only at $1\%$
+and Simple coefficient-only at $0.1\%$; the other six continue to point toward the role-blind
+rule.
 
-That common-factor reading is, however, the optimistic one. Allowing the two policies to
-transfer differently---sweeping the ratio
-$\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ with $\lambda_{\rm Flat}=1$---shows the
-conclusion is sensitive to that asymmetry in one direction. For $\rho\in[0.5,2]$ the picture
-is unchanged (two to five of eight fast-class contrasts below the threshold), but at
-$\rho=2$ the augmented SG-Ter-Mer contrasts also cross it and at $\rho=4$ seven of eight do,
-while at $\rho=0.25$ the coefficient-only Simple median falls below one and the ordering
-reverses. In other words, the finding that removing metadata reconstruction moves the effects
-close to parity is robust to how heavily preprocessing is weighted overall, but the exact
-count of retained contrasts depends on an unmeasured policy-specific transfer ratio. Measuring
-that ratio requires running the cached microbenchmark on the solve hardware itself, which we
-have not done; the release-build replication below bounds one component of it. The effect is substantial. The median ratios collapse towards parity---in Simple
-from $1.029$ to $1.001$ at $1\%$ and from $1.032$ to $1.010$ at $0.1\%$, in SG-Ter-Mer from
-$1.053$ to $1.007$ and from $1.047$ to $1.016$---and, of the eight fast-class contrasts whose
-prototype preprocessing-plus-solver ordering had adjusted values below $0.05$, six keep a
-direction favoring the role-blind rule but only one retains a within-tolerance nominal
-adjusted value below $0.05$: the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$), which
-also survives the joint and operational-family corrections ($q_{12}=0.021$,
-$q_{12}^{\mathrm{blk}}=0.032$) and is small in median magnitude, about $0.9\%$. It indicates a
-systematic directional difference in this campaign, not a large operational speedup. The
-augmented SG-Ter-Mer contrasts fall to $q_{6}=0.115$ and $0.052$, and every coefficient-only
-fast-class contrast to $q_{6}\ge0.115$.
-
-The build matters here, and measurably. Our campaigns were compiled without optimization---the
-production executable uses the same \texttt{-std=c++17 -g} flags as the instrumented one---so
-we repeated the pinned microbenchmark with a release build
+The build matters here, and measurably. Our campaigns were compiled without
+optimization---the production executable uses the same \texttt{-std=c++17 -g} flags as the
+instrumented one---so we repeated the pinned microbenchmark with a release build
 ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$) and take it as the implementation-cost sensitivity of
 record. Optimization shrinks every preprocessing time about sixfold and leaves the full-call
-ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it does move
-the cached ratios towards parity, and enough to change one conclusion: under the diagnostic
-build the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the
-release build it falls to $q_{6}=0.115$. This is also the one policy-specific transfer factor
-we can measure rather than assume. Taking the toolchain change as a realized perturbation, the
-implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ lies in $[0.94,1.01]$ across the six
-class--kernel cells---well inside the band in which the qualitative conclusion is stable---so
-the asymmetry the sweep warns about is small for the one hardware-or-toolchain change we
-actually performed.
-The Full augmented direction is unchanged in sign and strength
-($0.877$, $q_{6}=0.045$ at $0.1\%$), but it rests on the same $27$ eligible pairs and is
-likewise not retained by the adversarial signed-rank sensitivity over the four unrecorded
-instances ($p=0.43$). Read together with the phase breakdown, the reading is therefore that
-most of the magnitude and apparent uniformity of the fast-class role-blind advantage comes
-from metadata reconstruction in the prototype; a smaller, class- and kernel-dependent
-residual coverage effect remains after that stage is removed.
+ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it moves the
+cached ratios towards parity, and enough to change one conclusion: under the diagnostic build
+the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the release
+build it falls to $q_{6}=0.115$. This build comparison provides one observed policy-specific
+\emph{toolchain} perturbation rather than a direct estimate of the workstation-to-ClusterUY
+transfer ratio: the implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ remains in
+$[0.94,1.01]$ across the six class--kernel cells, suggesting limited asymmetry under this
+particular compiler change, while the hardware-transfer asymmetry itself remains unmeasured.
 
-
-Because that margin rests on preprocessing calls that the dedicated batches timed once, in a
-fixed order, we re-timed the preprocessing call alone under a replicated, order-randomized
-protocol (\cref{subsec:statistical}): $R=20$ repetitions per instance and kernel, order drawn
-from a seeded RNG within each repetition, every call in a fresh process, the MIP never solved,
-over all $306$ instances of the three classes. The direction of the preprocessing-cost
-difference is reproduced under randomized execution order: the selective rule's
-preprocessing median exceeds the Flat median on \emph{every one} of the $306$ instances in
-both kernels ($204/204$ Simple, $68/68$ SG-Ter-Mer, $34/34$ Full), and, aggregating to the
-operational families used elsewhere for dependence, all $34$ Simple families, all $34$
-SG-Ter-Mer families and all $34$ Full singletons have a positive median
-selective-minus-Flat difference in both kernels. The combined preprocessing-plus-solver
-comparisons of \cref{tab:flat-control} remain based on the original fixed-order solve
-batches; this replication validates the preprocessing-overhead direction, not the combined
-endpoint. Because a concurrent replication is a stress test rather than a clean estimator of
-a millisecond-scale quantity, we repeated it in a low-contention protocol---one worker,
-every call pinned to a single logical CPU, otherwise identical. That protocol is far
-quieter: the relative interquartile range falls to $0.00$--$0.02$ from $0.18$--$1.83$, and
-absolute times fall about fivefold. The direction is unchanged---again $306/306$ instances
-in both kernels---so the sign survives both a loaded and a quiet machine, while the
-magnitude does not: the median paired selective-to-Flat ratio is $5.1$--$6.0\times$ pinned
-against $6.1$--$9.1\times$ under load, and $2.7$--$3.1\times$ on the smaller absolute values
-of the dedicated batches. Pinned medians are $0.049$ against $0.008$\,s in Simple, $0.030$
-against $0.006$\,s in SG-Ter-Mer and $0.077$ against $0.014$\,s in Full (per-cell values,
-dispersion and family counts in Table~S10). We therefore read the direction of the
-preprocessing gap as established, and use the pinned protocol as the cleaner reference
-estimate for this implementation and hardware environment rather than as a universal
-intrinsic size.
+Because the cached effects sit close to
+one, and because they are a cross-protocol construction, we repeat the common- and
+policy-specific transfer sensitivities using the release-build preprocessing measurements that
+define \cref{tab:flat-cached}; the non-optimized diagnostic build is retained separately as a
+build sensitivity in Table~S11. Writing
+$T^{\mathrm{cached}}(\lambda)=T_{\rm solver}+\lambda\,T^{\mathrm{cached}}_{\rm preproc}$,
+a common factor varies the overall weight of preprocessing but does not model policy-specific
+hardware or compiler effects: the two rules execute different code, so a change of machine or
+toolchain need not rescale them by the same factor. Over the finite grid
+$\lambda\in\{0.25,0.5,1,2,4,8\}$ the augmented Simple contrast at $0.1\%$ is retained at every
+point and is the only one below the threshold for $\lambda\le2$, with the coefficient-only
+Simple contrast at $1\%$ joining it at $\lambda\ge4$. Allowing the policies to transfer
+differently---sweeping $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ with $\lambda_{\rm Flat}=1$
+over $\{0.25,0.5,1,2,4\}$---leaves that same single contrast retained for $\rho\le1$, and adds
+two more at $\rho=2$ and four more at $\rho=4$. The qualitative conclusion is therefore stable
+in the direction that matters: the cached effects stay close to parity and one small Simple
+contrast carries them, while a large asymmetric advantage for the role-blind rule would
+require the selective rule's preprocessing to transfer at least twice as poorly as its
+counterpart.
 
 The absolute magnitudes matter for how much this is worth
 (\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
@@ -3286,10 +3243,9 @@ which removes the prototype's metadata-reconstruction stage. Preprocessing compo
 from the \emph{release} build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$), which is the
 implementation-cost sensitivity of record; the non-optimized diagnostic build is retained as
 an audit in Table~S11. Median ratios are SA/Flat on
-the same log-ratio variable; negative $r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are
-the BH-adjusted value within the six-test tolerance family. The joint twelve-test value
-$q_{12}$ and the operational-family sensitivities are reported in the accompanying text and in
-Table~S11. The analysis conditions on the per-instance median
+the common log-ratio variable, and negative $r_{\mathrm{rb}}$ favors Flat. The value $q_6$ is
+BH-adjusted within the six-test tolerance family, whereas $q_{12}$ uses the joint twelve-test
+family. The operational-family adjusted values are reported in Table~S11. The analysis conditions on the per-instance median
 preprocessing times estimated from the low-contention replication, and its adjusted values do
 not propagate timing-estimation uncertainty. The cached Full-Augmented result at $0.1\%$ uses
 the same $27$ eligible pairs as \cref{tab:flat-control} and is likewise not retained by the
@@ -3299,25 +3255,25 @@ adversarial signed-rank sensitivity over the four unrecorded instances. Explorat
 \small
 \setlength{\belowcaptionskip}{2pt}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llc r rrr@{}}
+\begin{tabular}{@{}llc r rrrr@{}}
 \toprule
-Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ \\
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ & $q_{12}$ \\
 \midrule
 \multirow{6}{*}{$1\%$}
- & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 \\
- & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 \\
- & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 \\
- & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 \\
- & Full & Aug & 31 & 0.9193 & $+0.355$ & 0.173 \\
- & Full & Mat & 32 & 0.9866 & $+0.246$ & 0.318 \\
+ & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 & 0.364 \\
+ & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 \\
+ & Full & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 \\
+ & Full & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 \\
 \midrule
 \multirow{6}{*}{$0.1\%$}
- & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 \\
- & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 \\
- & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.052 \\
- & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 \\
- & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 \\
- & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 \\
+ & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 \\
+ & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.052 & 0.092 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 \\
+ & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
+ & Full & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3587,8 +3543,9 @@ ordering is decided by tens of milliseconds per instance
 than for any single run. The amortization is not hypothetical: $72$--$89\%$ of the
 selective rule's preprocessing time in our prototype is spent rebuilding metadata the
 generator already has, and charging only the intrinsic diagnosis and application work
-shrinks the gap against the role-blind rule by nearly an order of magnitude, on the estimated
-cached-metadata implementation cost rather than on any hardware-independent intrinsic cost. An
+shrinks the gap against the role-blind rule by nearly an order of magnitude. This quantity is
+an estimated cached-metadata implementation cost in the measured hardware and toolchain
+environment, not a hardware-independent intrinsic cost. An
 implementation that consumes emitted labels instead of re-deriving them would therefore
 remove most---though, on this testbed, not all---of the measured penalty. The timeout evidence in this study
 is also not stable across campaigns (the SG-Ter-Mer
@@ -3688,7 +3645,12 @@ and Work endpoints do retain SG-Ter-Mer (Table~S10), whereas the cached-metadata
 moves the SG-Ter-Mer comparisons to or above the nominal $0.05$ threshold. The Work replication of both augmented
 $0.1\%$ directions makes pure wall-clock scheduling noise a less likely explanation, but
 it does not eliminate seed- or trajectory-level variability; seed-replicated runs are left
-as future work. The prototype preprocessing-plus-solver endpoint is built from calls that the dedicated
+as future work. The cached-metadata comparison is toolchain-sensitive at the scale of the
+reported effects: compiler optimization changes the Simple coefficient-only $1\%$ adjusted
+value from $q_{6}=0.0002$ in the diagnostic build to $q_{6}=0.115$ in the release build. We
+therefore use the release build as the implementation-cost sensitivity of record and interpret
+all near-parity cached contrasts cautiously. The prototype preprocessing-plus-solver endpoint
+is built from calls that the dedicated
 batches timed once each in a fixed order; the separate order-randomized replication
 (\cref{subsec:stage-attribution}) confirms the \emph{direction} of the preprocessing gap on
 all $306$ instances but also shows its absolute size to be load-dependent, so those

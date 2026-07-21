@@ -828,8 +828,8 @@ Flat advantage because neither policy has a mixed failure.
 \begin{landscape}
 \begin{table}[!p]
 \centering
-\caption{Magnitude, dependence, and attrition sensitivities for the direct SA--Flat
-contrasts (exploratory endpoint hierarchy; see the main text). Panel A reports
+\caption{Magnitude and dependence sensitivities for the direct SA--Flat contrasts
+(exploratory endpoint hierarchy; see the main text). Panel A reports
 instance-level and operational-family inference for the two
 central $0.1\%$ augmented contrasts on the prototype preprocessing-plus-solver implementation endpoint and on the
 capped solver-time decomposition, on the shared paired variable
@@ -837,8 +837,8 @@ $d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$, with the Hodges--Lehmann pseudomedian e
 as the typical SA/Flat ratio $\exp(-\widehat\theta_{\rm HL})$. Panel B repeats the
 family analysis for Gurobi Work units. Panel C relocates the path-specific diagnostic from
 the main timing table because it does not hold the integer solution fixed across policies.
-Panel D gives the per-contrast attrition and preprocessing-time distributions of the main
-flat-control table.}
+Panel B reports the corresponding Gurobi Work-unit sensitivity and Panel C the own-incumbent
+path-specific diagnostic.}
 \label{tab:si-flat-sensitivities}
 \scriptsize
 \setlength{\tabcolsep}{3.0pt}
@@ -903,7 +903,7 @@ med. $\rho_{\kappa,\rm SA}^{\rm solver}/\rho_{\kappa,\rm Flat}^{\rm solver}$ \\
 \begin{landscape}
 \begin{table}[!p]
 \centering
-\caption{Attrition, preprocessing timing, measurement environment, and the cached-metadata and hardware-transfer sensitivities of the direct SA--Flat controls. Panel D gives per-contrast attrition and preprocessing-time summaries from the original fixed-order solve batches; Panel E gives the cached-metadata endpoint and its transfer sensitivity. Preprocessing times are per-instance medians estimated from the replication, and the reported values do not propagate that estimation uncertainty.}
+\caption{Attrition, preprocessing timing, measurement environment, and the cached-metadata and hardware-transfer sensitivities of the direct SA--Flat controls. Panel D reports single-call preprocessing summaries from the original fixed-order solve batches. Panel E uses per-instance median preprocessing times estimated from the replicated low-contention protocols; the uncertainty of those estimated medians is not propagated into the derived inferential quantities.}
 \label{tab:si-flat-attrition}
 \scriptsize
 \setlength{\tabcolsep}{3.0pt}
@@ -979,7 +979,7 @@ falls to $0.9975$, reversing that ordering. Reproducible with
 \end{landscape}
 
 \noindent\footnotesize
-\emph{Notes.} Both time endpoints use the paired variable
+\emph{Notes to Tables~S10--S11.} Both time endpoints use the paired variable
 $d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$; negative values favor Flat. The test, the effect
 size, and the median ratio are computed on this one scale and share its direction
 convention but do not target an identical estimand; the Hodges--Lehmann column is the
