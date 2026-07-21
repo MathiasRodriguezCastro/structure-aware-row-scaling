@@ -1937,8 +1937,9 @@ instance-level $p$-values may understate uncertainty. On the solver-time decompo
 the family-sign sensitivity leaves only the augmented Simple contrast below $0.05$ after
 adjustment; on the \emph{prototype} preprocessing-plus-solver endpoint it leaves every Simple
 and SG-Ter-Mer contrast below the nominal $0.05$ threshold, while on the release-build
-cached-metadata sensitivity only the augmented Simple contrast at $0.1\%$ remains below the
-reported joint and operational-family thresholds and the augmented Full contrast stays
+cached-metadata sensitivity, under its baseline cross-protocol construction, only the
+augmented Simple contrast at $0.1\%$ remains below the reported joint and operational-family
+thresholds and the augmented Full contrast stays
 conditional on its eligible pairs (\cref{subsec:stage-attribution}). We therefore call the
 SG-Ter-Mer solver-time result nominal, read the tests as evidence about scenarios of
 this platform, and lean on effect sizes and cross-class consistency rather than on any single
@@ -2981,20 +2982,32 @@ $T_{\mathrm{preproc}}^{\mathrm{cached}}=T_{\mathrm{diagnosis}}+T_{\mathrm{applic
 that removes the prototype's metadata-reconstruction stage while retaining diagnosis and
 factor application---collapses the gap substantially. In the non-optimized concurrent stress test the median
 paired preprocessing ratio falls from roughly $6$--$9\times$ to $1.08$--$1.40\times$; the
-cleaner pinned diagnostic protocol produces smaller absolute times, and the release-build
-values used in \cref{tab:flat-cached} are reported separately in Table~S12. It does
-not, however, reverse the ordering: the role-blind kernel remains marginally cheaper in all
-six class--kernel cells under every protocol, and under the pinned release build---the
-sensitivity of record---it has the lower cached preprocessing time on $585$ of the $612$
-instance--kernel records ($607/612$ pinned diagnostic, $408/612$ in the noisier concurrent
-protocol; \texttt{results-revision/preproc-timing/}). That
+cleaner pinned diagnostic protocol produces smaller absolute times, and the release-build absolute preprocessing values used in \cref{tab:flat-cached} are reported in
+Panel~E4 of Table~S12. It does
+not, however, reverse the ordering. The cell-level median cached preprocessing time is lower
+for the role-blind rule in all six class--kernel cells under each protocol, although the
+record-level direction is not uniform: under the pinned release build---the sensitivity of
+record---it has the lower per-instance median on $585$ of the $612$ instance--kernel records
+($607/612$ pinned diagnostic, $408/612$ in the noisier concurrent protocol; computed by
+\texttt{scripts/preproc\_timing\_replication.py} from the \texttt{cached\_sa\_s} and
+\texttt{cached\_flat\_s} columns of the corresponding
+\texttt{results-revision/preproc-timing/replicated*.csv}). These record-level counts
+condition on the $R=20$ per-instance median estimates: they measure the direction of the
+estimated medians and do not propagate within-instance timing uncertainty. Comparing each
+difference against the dispersion measured inside the same instance, $461$ of the $585$
+release records exceed that band while $150$ of all $612$ are practical ties; under the
+concurrent protocol $575$ of $612$ are ties, which is why its count is close to a coin
+flip. That
 residual is markedly less uniform than the full preprocessing gap, which held on every
 instance and every family: aggregating to operational families, the role-blind rule has the
-lower median in $20$--$32$ of the $34$ families per cell (median family ratio
-$1.04$--$1.32$), against $34/34$ before the correction. So most of the measured
-preprocessing penalty is an artifact of the prototype rebuilding metadata it was given, and
-a small \emph{descriptive} residual cost remains after removing metadata reconstruction,
-robust at the family level in some cells and not in others.
+lower family median in $20$--$32$ of the $34$ families per cell (median family ratio
+$1.04$--$1.32$), against $34/34$ before the correction, so the direction is more consistent in
+some cells than in others but is not uniform. Most of the measured preprocessing penalty is
+therefore an artifact of the prototype rebuilding metadata it was given, and what remains is a
+small \emph{absolute} descriptive residual---typically tens to hundreds of microseconds---
+although its relative size within the preprocessing call is larger in some cells, where the
+cached ratio still reaches $1.15$--$1.19$. These are descriptive counts, not a family-level
+significance statement.
 
 Because that reconstruction is precisely what the proposed architecture assumes away, we
 recompute the whole paired comparison on the cached-metadata endpoint
@@ -3452,9 +3465,11 @@ whether the row-role selection helps is a metadata question, and it is answered 
 two role-blind controls (SA-Aug versus Flat-Aug and SA-Mat versus Flat-Mat,
 \cref{subsec:stage-attribution}). In the reported default-seed campaign, the direct tests
 answer it endpoint by endpoint. In the prototype preprocessing-plus-solver endpoint, Flat has
-lower observed time in the two fast classes at both tolerances; in the cached-metadata
-sensitivity that better approximates generator-integrated deployment, the effects move close
-to parity and only one fast-class contrast retains $q_{6}<0.05$. The Full selectivity
+lower observed time in the two fast classes at both tolerances; under the baseline cross-protocol construction of the
+cached-metadata sensitivity, which better approximates generator-integrated deployment, the
+effects move close to parity and only one fast-class contrast retains $q_{6}<0.05$; the number
+of within-tolerance crossings changes under the hypothetical transfer-factor stress grids of
+Table~S12. The Full selectivity
 direction is conditional on its eligible pairs under both endpoints, and on solver time alone
 only the augmented Simple contrast at $0.1\%$
 remains below the nominal $0.05$ threshold after every reported multiplicity and
@@ -3770,7 +3785,8 @@ developed in full in \cref{subsec:stage-attribution}; their lesson is that the o
 depends on what one measures---prototype preprocessing-plus-solver time, where the selective
 implementation pays mainly for reconstructing metadata, against the cached-metadata
 sensitivity, where only diagnosis and factor application are charged, against solver time
-alone. Removing metadata reconstruction moves the fast-class effects close to parity: six of
+alone. Under the baseline cross-protocol construction, removing metadata reconstruction moves the
+fast-class effects close to parity: six of
 the eight directional orderings remain, but only one small Simple contrast retains nominal
 adjusted values below $0.05$ under the reported joint and operational-family sensitivities, where the effects are small and the
 reliability-adjusted reading can point the other way. The observed effect of external preprocessing differs between the tested Gurobi and CPLEX
