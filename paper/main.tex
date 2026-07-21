@@ -673,53 +673,8 @@ One minimizer is
 \end{equation}
 \end{proposition}
 
-\begin{proof}
-For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
-\begin{equation*}
-\diag(\alpha_1 I,\ldots,\alpha_B I)D
-=
-\diag(\alpha_1 A_1,\ldots,\alpha_B A_B).
-\end{equation*}
-The singular values of a block-diagonal matrix are the union of the singular values of
-its blocks. Therefore, for every $i$,
-\begin{equation*}
-\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-\ge
-\kappa_2(\alpha_i A_i)
-=
-\kappa_2(A_i).
-\end{equation*}
-Taking the maximum over $i$ gives the lower bound
-\begin{equation*}
-\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-\ge
-\max_i \kappa_2(A_i)
-\end{equation*}
-for every admissible block scaling.
-
-Now choose $\alpha_i=(M_i m_i)^{-1/2}$. Then the largest and smallest singular values of
-$\alpha_i A_i$ are
-\begin{align*}
-\sigma_{\max}(\alpha_i A_i)
-&=\sqrt{\frac{M_i}{m_i}}=\sqrt{\kappa_2(A_i)},\\
-\sigma_{\min}(\alpha_i A_i)
-&=\sqrt{\frac{m_i}{M_i}}=\frac{1}{\sqrt{\kappa_2(A_i)}}.
-\end{align*}
-Because the singular values of the complete block-diagonal matrix are obtained by
-pooling the singular values of its blocks,
-\begin{equation*}
-\sigma_{\max}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-=
-\sqrt{\max_i \kappa_2(A_i)},
-\end{equation*}
-and
-\begin{equation*}
-\sigma_{\min}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
-=
-\frac{1}{\sqrt{\max_i \kappa_2(A_i)}}.
-\end{equation*}
-The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
-\end{proof}
+\noindent The proof, which constructs the optimal scalar per block and evaluates the
+resulting spectrum, is given in Appendix~\ref{app:proofs}.
 
 This proposition is not used as an algorithmic recipe. The generated MIPs considered in
 this paper contain rectangular local matrices, inequalities, bounds, redundant rows, and
@@ -794,62 +749,8 @@ factors preserve singular values, the same formula applies to the factor with $-
 \cref{eq:balance-factorization}.
 \end{proposition}
 
-\begin{proof}
-Let $R=U\Sigma V^\top$ be a singular value decomposition (SVD) of $R$, with $U$ and $V$
-orthogonal. Orthogonal multiplication does not change singular values, and hence
-$T_R$ has the same singular values as
-\begin{equation*}
-\begin{bmatrix}
-V^\top & 0\\
-0 & U^\top
-\end{bmatrix}
-\begin{bmatrix}
-I_n & 0\\
-R & I_m
-\end{bmatrix}
-\begin{bmatrix}
-V & 0\\
-0 & U
-\end{bmatrix}
-=
-\begin{bmatrix}
-I_n & 0\\
-\Sigma & I_m
-\end{bmatrix}.
-\end{equation*}
-For each singular value $\sigma$ of $R$, the nontrivial part reduces to the two-dimensional
-block
-\begin{equation*}
-B_\sigma=
-\begin{bmatrix}
-1 & 0\\
-\sigma & 1
-\end{bmatrix}.
-\end{equation*}
-The squared singular values of $B_\sigma$ are the eigenvalues of
-\begin{equation*}
-B_\sigma^\top B_\sigma=
-\begin{bmatrix}
-1+\sigma^2 & \sigma\\
-\sigma & 1
-\end{bmatrix},
-\end{equation*}
-namely
-\begin{equation*}
-\lambda_{\pm}(\sigma)=
-\frac{\sigma^2+2\pm \sigma\sqrt{\sigma^2+4}}{2}.
-\end{equation*}
-Their product is one, and $\lambda_+(\sigma)$ is increasing for $\sigma\ge0$. Additional
-directions associated with zero singular values of $R$ contribute singular values equal to
-one. Therefore the largest squared singular value of $T_R$ is $\lambda_+(\rho)$ and the
-smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
-\begin{align*}
-\kappa_2(T_R)
-&=\lambda_+(\rho)\\
-&=\frac{\rho^2+2+\rho\sqrt{\rho^2+4}}{2}\\
-&=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
-\end{align*}
-\end{proof}
+\noindent The proof, which bounds the effect of the coupling factor on the extreme
+singular values, is given in Appendix~\ref{app:proofs}.
 
 Applied to \eqref{eq:balance-factorization}, the proposition shows that the balance row
 should not be treated as an ordinary local row. Its numerical effect depends on the
@@ -3072,10 +2973,14 @@ factor application---collapses the gap from
 roughly $6$--$9\times$ to $1.08$--$1.40\times$ (medians of the paired ratio; e.g.\
 $0.032$ against $0.029$\,s in Simple and $0.020$ against $0.018$\,s in SG-Ter-Mer). It does
 not, however, reverse it: the role-blind kernel remains marginally cheaper in all six
-class--kernel cells, and is cheaper on $408$ of the $612$ instance--kernel records. So most
-of the measured preprocessing penalty is an artifact of the prototype rebuilding metadata
-it was given, but a small descriptive residual cost remains after removing metadata
-reconstruction; its family-level robustness is reported separately below.
+class--kernel cells, and is cheaper on $408$ of the $612$ instance--kernel records. That
+residual is markedly less uniform than the full preprocessing gap, which held on every
+instance and every family: aggregating to operational families, the role-blind rule has the
+lower median in $20$--$32$ of the $34$ families per cell (median family ratio
+$1.04$--$1.32$), against $34/34$ before the correction. So most of the measured
+preprocessing penalty is an artifact of the prototype rebuilding metadata it was given, and
+a small \emph{descriptive} residual cost remains after removing metadata reconstruction,
+robust at the family level in some cells and not in others.
 
 Because that reconstruction is precisely what the proposed architecture assumes away, we
 recompute the whole paired comparison on the cached-metadata endpoint
@@ -3171,9 +3076,17 @@ $+8.35$\,s (solver) in Simple and $+0.032$ versus $+13.76$\,s in SG-Ter-Mer. The
 readings disagree because the paired solver differences are heavy-tailed---a handful of
 instances differ by seconds in either direction, while the typical instance differs by
 milliseconds---whereas the preprocessing difference is a small, almost constant positive
-offset. That is precisely why the rank-based paired analysis favors Flat: the consistent
-offset moves the typical instance, while the large solver differences neither cancel nor
-concentrate. A per-instance share is not a useful summary here either: writing
+offset. The component summaries suggest that this nearly constant offset affects many
+near-parity pairs, and a direct sign-and-rank decomposition on the estimand itself
+quantifies how much of the signed-rank result it carries. Going from the solver-time
+variable $d_i^{\mathrm{solver}}$ to $d_i^{\mathrm{pre+solve}}$ at $0.1\%$ flips the sign of
+$41$ of $204$ Simple pairs and $9$ of $67$ SG-Ter-Mer pairs; the count favoring Flat rises
+from $122$ to $163$ and from $36$ to $45$; the rank-biserial effect moves from $-0.253$ to
+$-0.536$ and from $-0.313$ to $-0.507$; and the Hodges--Lehmann ratio moves from $1.0135$
+to $1.0359$ and from $1.1229$ to $1.1577$. So adding preprocessing does not merely shift a
+summary: it converts a large minority of near-parity solver-time pairs into Flat-favoring
+pairs, which is where the strengthening of the rank statistic comes from. A per-instance
+share is not a useful summary here either: writing
 $s_i=\Delta T_{\mathrm{preproc},i}/\Delta T_{\mathrm{pre+solve},i}$, the two components have
 opposite signs on $40\%$ of Simple and $46\%$ of SG-Ter-Mer pairs, so $s_i$ falls outside
 $[0,1]$ there and its median ($0.35$ and $0.00$) should not be read as a fraction
@@ -3319,7 +3232,10 @@ med. $\frac{T_{\rm solver}^{\rm SA}}{T_{\rm solver}^{\rm Flat}}$ & $r_{\mathrm{r
 \begin{tablenotes}[flushleft]\footnotesize
 \item The endpoint hierarchy is exploratory (\cref{subsec:statistical}); adjusted values are
 nominal and define no confirmatory outcome. A one-sided timeout is censored at
-$T_{\max}=3600$\,s.
+$T_{\max}=3600$\,s on the solver term, so the intervention cost is still charged:
+$\widetilde T_{\rm pre+solve}=T_{\rm preproc}+T_{\max}$. Double non-completions are treated
+as operational ties regardless of their preprocessing-time difference, so the signed-rank
+analysis prioritizes successful completion over the small intervention-cost difference.
 \item The Full $0.1\%$ rows use the $27$ eligible pairs of the $30$ recorded instances; the
 adjusted augmented contrast is not retained by the adversarial signed-rank sensitivity over
 the four unrecorded instances (\cref{subsec:stage-attribution}).
@@ -3379,6 +3295,9 @@ readings of \cref{subsec:original-scale-audit}, on the capped solver-time cost
 $c^{(k,\mathrm{solver})}$ (recomputing with the preprocessing-plus-solver cost shifts
 every cell by less than $0.2$\,s and changes no ordering); completed-run failure counts
 $(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$; timeouts are penalized in all three readings.
+The Full \PARten{} pool contains all $30$ recorded instances, including the three double
+timeouts penalized equally for both policies; those pairs carry no signed-rank direction and
+are therefore absent from the $n=27$ inferential pool of \cref{tab:flat-control}.
 The full twelve-contrast audit is Table~S9.}
 \label{tab:flat-reliability-body}
 \small
@@ -3792,6 +3711,118 @@ coverage policies, exactly as the role-blind control does here, and should time 
 preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
 
 % Float barrier removed to improve two-column layout.
+
+
+\appendix
+\section{Proofs of the spectral propositions}
+\label{app:proofs}
+
+\noindent\textbf{Proof of \cref{prop:ideal-block-scaling}.}
+\begin{proof}
+For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
+\begin{equation*}
+\diag(\alpha_1 I,\ldots,\alpha_B I)D
+=
+\diag(\alpha_1 A_1,\ldots,\alpha_B A_B).
+\end{equation*}
+The singular values of a block-diagonal matrix are the union of the singular values of
+its blocks. Therefore, for every $i$,
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\kappa_2(\alpha_i A_i)
+=
+\kappa_2(A_i).
+\end{equation*}
+Taking the maximum over $i$ gives the lower bound
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\max_i \kappa_2(A_i)
+\end{equation*}
+for every admissible block scaling.
+
+Now choose $\alpha_i=(M_i m_i)^{-1/2}$. Then the largest and smallest singular values of
+$\alpha_i A_i$ are
+\begin{align*}
+\sigma_{\max}(\alpha_i A_i)
+&=\sqrt{\frac{M_i}{m_i}}=\sqrt{\kappa_2(A_i)},\\
+\sigma_{\min}(\alpha_i A_i)
+&=\sqrt{\frac{m_i}{M_i}}=\frac{1}{\sqrt{\kappa_2(A_i)}}.
+\end{align*}
+Because the singular values of the complete block-diagonal matrix are obtained by
+pooling the singular values of its blocks,
+\begin{equation*}
+\sigma_{\max}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\sqrt{\max_i \kappa_2(A_i)},
+\end{equation*}
+and
+\begin{equation*}
+\sigma_{\min}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\frac{1}{\sqrt{\max_i \kappa_2(A_i)}}.
+\end{equation*}
+The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
+\end{proof}
+
+\noindent\textbf{Proof of \cref{prop:triangular-coupling}.}
+\begin{proof}
+Let $R=U\Sigma V^\top$ be a singular value decomposition (SVD) of $R$, with $U$ and $V$
+orthogonal. Orthogonal multiplication does not change singular values, and hence
+$T_R$ has the same singular values as
+\begin{equation*}
+\begin{bmatrix}
+V^\top & 0\\
+0 & U^\top
+\end{bmatrix}
+\begin{bmatrix}
+I_n & 0\\
+R & I_m
+\end{bmatrix}
+\begin{bmatrix}
+V & 0\\
+0 & U
+\end{bmatrix}
+=
+\begin{bmatrix}
+I_n & 0\\
+\Sigma & I_m
+\end{bmatrix}.
+\end{equation*}
+For each singular value $\sigma$ of $R$, the nontrivial part reduces to the two-dimensional
+block
+\begin{equation*}
+B_\sigma=
+\begin{bmatrix}
+1 & 0\\
+\sigma & 1
+\end{bmatrix}.
+\end{equation*}
+The squared singular values of $B_\sigma$ are the eigenvalues of
+\begin{equation*}
+B_\sigma^\top B_\sigma=
+\begin{bmatrix}
+1+\sigma^2 & \sigma\\
+\sigma & 1
+\end{bmatrix},
+\end{equation*}
+namely
+\begin{equation*}
+\lambda_{\pm}(\sigma)=
+\frac{\sigma^2+2\pm \sigma\sqrt{\sigma^2+4}}{2}.
+\end{equation*}
+Their product is one, and $\lambda_+(\sigma)$ is increasing for $\sigma\ge0$. Additional
+directions associated with zero singular values of $R$ contribute singular values equal to
+one. Therefore the largest squared singular value of $T_R$ is $\lambda_+(\rho)$ and the
+smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
+\begin{align*}
+\kappa_2(T_R)
+&=\lambda_+(\rho)\\
+&=\frac{\rho^2+2+\rho\sqrt{\rho^2+4}}{2}\\
+&=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
+\end{align*}
+\end{proof}
 
 \bmsection*{Author Contributions}
 
