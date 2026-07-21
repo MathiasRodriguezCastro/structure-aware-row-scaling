@@ -14,6 +14,7 @@
 %     subfig, xcolor, url, ...). Only additive packages are loaded here. ---
 \usepackage{mathtools}
 \usepackage{bm}
+\usepackage{xurl}   % breakable paths/URLs (\path)
 \usepackage{threeparttable}
 \usepackage{placeins}    % \FloatBarrier (class does not load it)
 \usepackage{subcaption}  % subfig not active in this class mode; caption is loaded
@@ -2990,22 +2991,29 @@ record-level direction is not uniform: under the pinned release build---the sens
 record---it has the lower per-instance median on $585$ of the $612$ instance--kernel records
 ($607/612$ pinned diagnostic, $408/612$ in the noisier concurrent protocol; computed by
 \texttt{scripts/preproc\_timing\_replication.py} from the \texttt{cached\_sa\_s} and
-\texttt{cached\_flat\_s} columns of the corresponding
-\texttt{results-revision/preproc-timing/replicated*.csv}). These record-level counts
+\texttt{cached\_flat\_s} columns of, respectively,
+\path{results-revision/preproc-timing/replicated_pinned_release.csv},
+\path{results-revision/preproc-timing/replicated_pinned.csv} and
+\path{results-revision/preproc-timing/replicated.csv}). These record-level counts
 condition on the $R=20$ per-instance median estimates: they measure the direction of the
-estimated medians and do not propagate within-instance timing uncertainty. Comparing each
-difference against the dispersion measured inside the same instance, $461$ of the $585$
-release records exceed that band while $150$ of all $612$ are practical ties; under the
-concurrent protocol $575$ of $612$ are ties, which is why its count is close to a coin
-flip. That
+estimated medians and do not propagate within-instance timing uncertainty. To screen that
+noise we classify each record by comparing its paired difference against the dispersion
+measured inside the same instance, calling it a \emph{within-dispersion tie} when
+$\lvert\widetilde T_{\mathrm{SA},i}-\widetilde T_{\mathrm{Flat},i}\rvert\le B_i$, with
+$B_i$ the larger of the two policies' interquartile ranges over the $R=20$ repetitions
+(Table~S12). This is a descriptive noise screen, not a confidence interval, an equivalence
+test, or a domain-calibrated practical-significance margin. The classification gives $461$
+role-blind-favoured records, $1$ selective-favoured record and $150$ ties under the pinned
+release build; $554$, $0$ and $58$ under the pinned diagnostic build; and $37$, $0$ and $575$
+under the concurrent protocol, whose count is close to a coin flip precisely because almost
+every record there is measurement-indeterminate. That
 residual is markedly less uniform than the full preprocessing gap, which held on every
 instance and every family: aggregating to operational families, the role-blind rule has the
 lower family median in $20$--$32$ of the $34$ families per cell (median family ratio
 $1.04$--$1.32$), against $34/34$ before the correction, so the direction is more consistent in
 some cells than in others but is not uniform. Most of the measured preprocessing penalty is
 therefore an artifact of the prototype rebuilding metadata it was given, and what remains is a
-small \emph{absolute} descriptive residual---typically tens to hundreds of microseconds---
-although its relative size within the preprocessing call is larger in some cells, where the
+small \emph{absolute} descriptive residual---typically tens to hundreds of microseconds---although its relative size within the preprocessing call is larger in some cells, where the
 cached ratio still reaches $1.15$--$1.19$. These are descriptive counts, not a family-level
 significance statement.
 

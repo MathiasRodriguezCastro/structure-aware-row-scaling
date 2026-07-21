@@ -9,6 +9,7 @@
 \newcommand{\diag}{\operatorname{diag}}
 \newenvironment{proof}{\par\noindent\textit{Proof.}\ }{\hfill\qedsymbol\par\medskip}
 \providecommand{\qedsymbol}{\ensuremath{\square}}
+\usepackage{xurl}   % breakable paths/URLs (\path)
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[labelfont=bf]{caption}
@@ -863,7 +864,7 @@ SG-Ter-Mer & solver & 67/34 & 1.0159 & 1.1229 & [0.9797, 1.1309] &
 \vspace{7pt}
 \textbf{Panel A2: prototype preprocessing-plus-solver endpoint, all twelve contrasts}\\[2pt]
 \noindent\scriptsize Adjusted values only; effect directions and median SA/Flat ratios are
-given in the main-text flat-control table.\par\vspace{2pt}
+reported in Table~18 of the main text.\par\vspace{2pt}
 
 \begin{tabular}{@{}lllrrrrr@{}}
 \toprule
@@ -1022,7 +1023,7 @@ the change of toolchain on the same machine.
 \label{tab:si-flat-transfer}
 
 \noindent\scriptsize
-\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \texttt{results-revision/preproc-timing/build\_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol; comparing each difference against the dispersion measured inside the same instance leaves $461$, $554$ and $37$ records respectively outside that band, the remainder being practical ties. These counts condition on the $R=20$ per-instance median estimates and do not propagate within-instance timing uncertainty.\par\vspace{4pt}
+\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \path{results-revision/preproc-timing/build_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol; Screening measurement noise by calling record $i$ a \emph{within-dispersion tie} when $\lvert\widetilde T_{\mathrm{SA},i}-\widetilde T_{\mathrm{Flat},i}\rvert\le B_i$, where $\widetilde T$ denotes the median over the $R=20$ repetitions and $B_i$ is the larger of the two policies' interquartile ranges over those repetitions, the three-way classification (role-blind-favoured, selective-favoured, tie) is $461/1/150$ under the pinned release build, $554/0/58$ under the pinned diagnostic build and $37/0/575$ under the concurrent protocol; each row sums to $612$. This is a descriptive noise screen, not a confidence interval, an equivalence test or a domain-calibrated practical-significance margin. These counts condition on the $R=20$ per-instance median estimates and do not propagate within-instance timing uncertainty.\par\vspace{4pt}
 
 \textbf{Panel E3: release-build cross-environment transfer-factor sensitivity}\\[2pt]
 \begin{tabular}{@{}lrrrrrr@{}}
@@ -1045,7 +1046,7 @@ grid, Simple/Augmented at $0.1\%$ crosses at every point; Simple/Matrix-only at 
 at $\lambda=4$ and $8$. On the policy-specific grid, Simple/Augmented at $0.1\%$ crosses at
 every point; at $\rho=2$ it is joined by SG-Ter-Mer/Augmented at $0.1\%$ and
 Simple/Matrix-only at $1\%$; at $\rho=4$ also by SG-Ter-Mer/Augmented at $1\%$ and
-Simple/Augmented at $1\%$. No Full contrast has $q_6<0.05$ at any evaluated common- or policy-specific transfer-factor grid point; this statement refers to the approximate Full cross-build rows and to the within-tolerance $q_6$ criterion only.\par\vspace{4pt}
+Simple/Augmented at $1\%$. Panel~E3 is restricted to the eight fast-class contrasts and therefore makes no claim about Full. Computed separately over the same grids, the approximate Full-Augmented cross-build row at $0.1\%$ has $q_6=0.045$ at every evaluated point (and $0.036$ at $\rho=4$), but its joint value stays above the threshold throughout ($q_{12}=0.060$--$0.090$, except $0.042$ at $\rho=4$), and it is not retained by the adversarial missing-pair sensitivity at any point. No other Full contrast has $q_6<0.05$ anywhere on the grids.\par\vspace{4pt}
 
 \noindent\scriptsize The release-build endpoint (Panel E1) is the implementation-cost
 sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
@@ -1068,23 +1069,23 @@ T^{\mathrm{cached},b}_{\mathrm{preproc,Flat},i}\bigr)\Bigr],
 The quantities in this definition are cached \emph{preprocessing} times only, not the cached
 preprocessing-plus-solver endpoint of the main-text table; it is a ratio of exponentiated
 median log-ratios, not a ratio of marginal median preprocessing times (the quantity computed by
-\texttt{scripts/cached\_transfer\_sensitivity.py}). Its values are
+\path{scripts/cached_transfer_sensitivity.py}). Its values are
 $0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and $0.966$ for Full/Aug, Full/Mat,
 SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat; optimization leaves the full-call
 ratios essentially unchanged ($5.38$--$6.12\times$ against $5.07$--$6.00\times$) and the
 metadata share at $81$--$83\%$. Exporting the preprocessed model with both builds over all $306$
 instances, both kernels and both coverage policies gives $1204/1224$ byte-identical exports
-(\texttt{scripts/build\_invariance\_audit.py}; full record in
-\texttt{results-revision/preproc-timing/build\_invariance.csv}). All Simple and SG-Ter-Mer
+(\path{scripts/build_invariance_audit.py}; full record in
+\path{results-revision/preproc-timing/build_invariance.csv}). All Simple and SG-Ter-Mer
 records are identical. The $20$ exceptions are five Full instances under all four variants,
 where the nonlinear-hydro linearization coefficients differ by one unit in the last place
 ($4.7\times10^{-16}$ relative); the audit localizes the discrepancy to optimization-dependent
 floating-point evaluation during model construction rather than to a change in the selected
 scaling factors or safeguard decisions. The complete contrast-by-grid values---every contrast, grid
 point, median ratio, $r_{\rm rb}$, $p$, $q_6$ and $q_{12}$---are in
-\texttt{results-revision/preproc-timing/cached\_transfer\_sensitivity.csv} of the
+\path{results-revision/preproc-timing/cached_transfer_sensitivity.csv} of the
 reproducibility package, regenerated by
-\texttt{scripts/cached\_transfer\_sensitivity.py -\/-dump-csv}.
+\path{scripts/cached_transfer_sensitivity.py} \texttt{--dump-csv}.
 
 \vspace{4pt}
 \noindent\scriptsize\textbf{Panel E4: release-build absolute preprocessing times}, in milliseconds as
@@ -1137,10 +1138,10 @@ which neither policy completes. No pair is dropped for a missing time and no exa
 difference occurs; $n$ used applies to both endpoints. In these batches the preprocessing
 calls are timed once each, with the C++ high-resolution wall clock, in the batch's fixed
 (un-randomized) execution order and without repetitions; per-policy IQRs are at most
-$0.003$\,s in every cell. Timing environment for the preprocessing replication: Intel Core i7-13620H ($10$ physical / $16$ logical cores, $0.4$--$4.9$\,GHz, \texttt{powersave} governor), Ubuntu 22.04.5 with Linux 6.8.0, g++ 11.4.0 at \texttt{-std=c++17 -g} (no \texttt{-O} flag), binary \texttt{code/build\_diag/SistemaElectrico}; the pinned protocol binds one worker to a single logical CPU with \texttt{taskset}, the concurrent protocol uses $12$ unpinned workers. The release-build replication uses the same source commit, hardware, operating system, compiler, libraries, timing protocol, seeds, execution order and affinity policy, compiled with \texttt{-std=c++17 -O2 -DNDEBUG} into \texttt{code/build\_release/SistemaElectrico}; the two builds differ only in optimization flags. The solve batches ran on ClusterUY as described in the main text, so the cached-metadata endpoint is a cross-protocol counterfactual.
+$0.003$\,s in every cell. Timing environment for the preprocessing replication: Intel Core i7-13620H ($10$ physical / $16$ logical cores, $0.4$--$4.9$\,GHz, \texttt{powersave} governor), Ubuntu 22.04.5 with Linux 6.8.0, g++ 11.4.0 at \texttt{-std=c++17 -g} (no \texttt{-O} flag), binary \path{code/build_diag/SistemaElectrico}; the pinned protocol binds one worker to a single logical CPU with \texttt{taskset}, the concurrent protocol uses $12$ unpinned workers. The release-build replication uses the same source commit, hardware, operating system, compiler, libraries, timing protocol, seeds, execution order and affinity policy, compiled with \texttt{-std=c++17 -O2 -DNDEBUG} into \path{code/build_release/SistemaElectrico}; the two builds differ only in optimization flags. The solve batches ran on ClusterUY as described in the main text, so the cached-metadata endpoint is a cross-protocol counterfactual.
 
 \emph{Order-randomized preprocessing replication}
-(\texttt{scripts/preproc\_timing\_replication.py}; $R=20$, seeded order per repetition,
+(\path{scripts/preproc_timing_replication.py}; $R=20$, seeded order per repetition,
 fresh process per call, MIP never solved). Two protocols were run: a \emph{concurrent}
 stress test ($12$ workers on a $16$-core workstation, no CPU pinning) and a
 \emph{low-contention} estimate (one worker, every call pinned to one logical CPU via
