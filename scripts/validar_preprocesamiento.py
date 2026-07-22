@@ -259,7 +259,8 @@ def variant_slug(name: str) -> str:
 def build_script(instance: Path, solver: str, timeout: float, mipgap: float,
                  variant: str, csv_path: Path, verificar_original: bool = False,
                  extra_prep: str = "", scaleflag: int | None = None,
-                 cplexscale: int | None = None, cplexpresolve: int | None = None) -> str:
+                 cplexscale: int | None = None, cplexpresolve: int | None = None,
+                 seed: int | None = None) -> str:
     base = clean_instance_text(instance)
     prep = VARIANT_FLAGS[variant]
     # R3: flags extra de hiperparámetros (--banda-identidad, --ventana-coef, --ruiz-iters ...)
@@ -281,6 +282,8 @@ def build_script(instance: Path, solver: str, timeout: float, mipgap: float,
         solver_line += f" --cplexscale {cplexscale}"
     if cplexpresolve is not None:
         solver_line += f" --cplexpresolve {cplexpresolve}"
+    if seed is not None:
+        solver_line += f" --seed {seed}"
     lines = [
         base,
         "",
@@ -297,13 +300,14 @@ def run_case(exe: Path, instance: Path, solver: str, timeout: float, mipgap: flo
              variant: str, csv_path: Path, log_path: Path, force: bool,
              verificar_original: bool = False, extra_prep: str = "",
              scaleflag: int | None = None, cplexscale: int | None = None,
-             cplexpresolve: int | None = None) -> int:
+             cplexpresolve: int | None = None, seed: int | None = None) -> int:
     if not force and csv_path.exists() and post_csv_path(csv_path).exists() and log_path.exists():
         return 0
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     script = build_script(instance, solver, timeout, mipgap, variant, csv_path,
-                          verificar_original, extra_prep, scaleflag, cplexscale, cplexpresolve)
+                          verificar_original, extra_prep, scaleflag, cplexscale, cplexpresolve,
+                          seed)
     # Margen sobre el timeout del solver para el trabajo posterior del binario
     # (postprocesamiento, verificación y medición de κ del solver). Generoso para no
     # cortar antes de que el binario escriba su CSV en instancias grandes.
@@ -1061,6 +1065,11 @@ def main() -> int:
                              "Baseline 'is it just generic scaling?' (R1).")
     parser.add_argument("--cplexscale", type=int, default=None,
                         help="CPLEX Read::Scale (-1,0,1). Se anexa a configurarSolver. Baseline R1.")
+    parser.add_argument("--seed", type=int, default=None,
+                        help="Semilla del solver (Gurobi Seed / CPLEX RandomSeed). Sin el flag se usa "
+                             "la semilla 1 con la que se produjeron los resultados publicados; con él "
+                             "se replica una celda bajo varias semillas para medir la variabilidad "
+                             "corrida-a-corrida del MIP.")
     parser.add_argument("--cplexpresolve", type=int, default=None,
                         help="CPLEX Preprocessing::Presolve (0 off, 1 on). Sondeo R1: ¿el presolve absorbe el escalado?")
     # R3: sweep de hiperparámetros (se anexa a la línea preprocesar de toda variante que escale).
@@ -1084,7 +1093,12 @@ def main() -> int:
     if "base" not in variants and not args.sin_base:
         variants.insert(0, "base")
 
-    out = args.output
+    # El binario se lanza con cwd=code/ (ver run_case), así que una ruta de salida RELATIVA
+    # se resuelve distinto para el binario que para este script: el binario escribiría sus CSV
+    # bajo code/<ruta>, mientras que summarize() los buscaría bajo <ruta> y marcaría cada
+    # corrida como ERROR pese a haber resuelto correctamente. Resolver a absoluto elimina la
+    # ambigüedad: ambos lados apuntan al mismo lugar.
+    out = args.output.resolve()
     result_dir = out / "resultados"
     log_dir = out / "logs"
     rows: list[RunSummary] = []
@@ -1099,7 +1113,8 @@ def main() -> int:
             rc = run_case(exe, instance, args.solver, args.timeout, args.mipgap,
                           variant, csv_path, log_path, args.force, args.verificar_original,
                           extra_prep=args.extra_prep, scaleflag=args.scaleflag,
-                          cplexscale=args.cplexscale, cplexpresolve=args.cplexpresolve)
+                          cplexscale=args.cplexscale, cplexpresolve=args.cplexpresolve,
+                          seed=args.seed)
             summary = summarize(
                 instance,
                 variant,
