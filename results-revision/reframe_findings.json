@@ -1,0 +1,422 @@
+[
+ {
+  "file": "main.tex",
+  "line": 2684,
+  "quote": "contrast visible at a glance: the structure-aware rules hold the lowest shifted geometric\ntimes in every Gurobi cell (\\methodMat{} in Simple and SG-Ter-Mer, \\methodAug{} in Full, at\nboth tolerances), whereas the CPLEX winners are heterogeneous",
+  "category": "superior-policy",
+  "why": "This is the reader's take-home summary of all four operational scenarios, and it asserts a clean structure-aware sweep under Gurobi. The comparison pool in the four scenario tables is Base + SA-Aug + SA-Mat + Ruiz + Ruiz-Cols; the role-blind Flat controls are absent. Under the accepted verdict, Flat matches or beats the selective rule in most contrasts, and only one of eight fast-class cached contrasts retains q6<0.05. A reader stopping here comes away with exactly the superior-policy headline the reframe removes.",
+  "suggested": "Summarizing the four scenarios by their best descriptive variant makes the solver contrast visible at a glance: against the unscaled base and the Ruiz baselines, the structure-aware rules hold the lowest shifted geometric times in every Gurobi cell (\\methodMat{} in Simple and SG-Ter-Mer, \\methodAug{} in Full, at both tolerances), whereas the CPLEX winners are heterogeneous---varying from \\methodAug{} to \\methodBase{} to \\methodRuiz{} by class and tolerance---and must be read together with the paired Wilcoxon tests, which do not support a robust positive structure-aware effect there. These cells do not include the role-blind Flat controls, which are the comparison that isolates the contribution of the metadata: on that contrast (\\cref{subsec:stage-attribution}) full-coverage role-blind scaling matches or outperforms the selective rule in most cells, so this summary should be read as evidence that external scaling helps under Gurobi in this testbed, not that role selectivity does.",
+  "severity": "high",
+  "refined": "Summarizing the four scenarios by their best descriptive variant makes the solver contrast visible at a glance. Among the main-campaign variants---the unscaled base, the two structure-aware rules and the two Ruiz baselines---the structure-aware rules hold the lowest shifted geometric solver times in every Gurobi cell (\\methodMat{} in Simple and SG-Ter-Mer, \\methodAug{} in Full, at both tolerances), whereas the CPLEX winners are heterogeneous---varying from \\methodAug{} to \\methodBase{} to \\methodRuiz{} by class and tolerance---and must be read together with the paired Wilcoxon tests, which do not support a robust positive structure-aware effect there. This pool contains no role-blind control, so it separates scaling rules from the unscaled base but not role selectivity from full coverage. The latter contrast is carried by the dedicated SA--Flat batches of \\cref{subsec:stage-attribution}, where the role-blind rules match or outperform their selective counterparts in most cells; the ordering reported here should therefore not be read as evidence that the metadata is what produces it."
+ },
+ {
+  "file": "main.tex",
+  "line": 2474,
+  "quote": "The paired tests in \\cref{tab:wilcoxon-structured-gurobi}\nsupport the descriptive\nGurobi pattern. The signs are favorable for both structure-aware variants, and after\nBenjamini--Hochberg adjustment both are significant in Simple and SG-Ter-Mer in both Gurobi\nscenarios.",
+  "category": "over-generalization",
+  "why": "These are the paper's only inferentially significant runtime results, and every test is paired against the unscaled base formulation. Significance against Base establishes that scaling the rows helps, not that structure-awareness helps. The stage-attribution analysis shows the local stage---a per-row geometric mean requiring no metadata---recovers essentially all of the runtime effect, and the coupling stage never activates. Presented here with no such caveat, this paragraph reads as inferential validation of the structure-aware method.",
+  "suggested": "The paired tests in \\cref{tab:wilcoxon-structured-gurobi} support the descriptive Gurobi pattern. The signs are favorable for both structure-aware variants, and after Benjamini--Hochberg adjustment both are significant in Simple and SG-Ter-Mer in both Gurobi scenarios. These contrasts are against the unscaled base formulation, so they establish that external row scaling shifts the Gurobi runtime distribution in this testbed; they do not attribute that shift to the metadata. The direct role-blind comparison in \\cref{subsec:stage-attribution} shows the effect is carried by the local stage, which needs no row roles, and that the coupling stage never activates operationally.",
+  "severity": "high",
+  "refined": "The paired tests in \\cref{tab:wilcoxon-structured-gurobi} support the descriptive Gurobi pattern. The signs are favorable for both structure-aware variants, and after Benjamini--Hochberg adjustment both are significant in Simple and SG-Ter-Mer in both Gurobi scenarios. Every contrast in this table is paired against the unscaled base formulation, so what these tests establish inferentially is that external row scaling shifts the Gurobi runtime distribution on this testbed, not that the structural metadata is what produces the shift; the kernel-matched role-blind contrasts that bear on attribution are reported in \\cref{subsec:stage-attribution}, where the local per-row stage---which uses no row roles at all---recovers essentially the whole runtime effect and the coupling stage never activates on operational instances. In Full, neither \\methodAug{} result is significant after adjustment ($q_{\\mathrm{BH}}=0.15$ at $1\\%$ and $0.11$ at $0.1\\%$); the latter changes from the earlier complete-case result once one-sided aborts are retained at the cap. Given the small sample, censoring, and run-to-run variability, Full remains directional rather than inferential evidence. The paired effect sizes range from small or moderate to large ($r_{\\mathrm{rb}}$ from $-0.23$ to $-0.90$), with the strongest paired shifts appearing for \\methodMat{} in SG-Ter-Mer; the evidence is a distributional shift, not a guarantee that every instance accelerates."
+ },
+ {
+  "file": "main.tex",
+  "line": 2434,
+  "quote": "\\caption{Paired Gurobi tests show a distributional runtime shift in favor of the structure-aware variants, especially in Simple and SG-Ter-Mer.}",
+  "category": "over-generalization",
+  "why": "Captions are read standalone and travel into slides and abstracts. As written, the caption names the structure-aware variants as the beneficiaries without naming the comparator, implying a win for the selective rule. The comparator is the unscaled base, and the same shift is obtained by the role-blind full-coverage control.",
+  "suggested": "\\caption{Paired Gurobi tests show a distributional runtime shift for the scaled variants relative to the unscaled base formulation, especially in Simple and SG-Ter-Mer. The comparator here is the base model, not the role-blind Flat control; the contrast that isolates metadata selectivity is reported in \\cref{tab:flat-control}.}",
+  "severity": "high",
+  "refined": "\\caption{Paired Gurobi tests show a distributional runtime shift for both structure-aware variants relative to the unscaled base formulation, especially in Simple and SG-Ter-Mer; the contrast against the role-blind controls, which isolates metadata selectivity, is reported in \\cref{tab:flat-control}.}"
+ },
+ {
+  "file": "main.tex",
+  "line": 3293,
+  "quote": "while the coupling stage's ability to repair a\n\\emph{collective} displacement of the coupling rows is what the controlled synthetic\ncoupling-uniform pattern demonstrates (\\cref{subsec:synthetic-results})",
+  "category": "coupling-validated",
+  "why": "This is the one place in the region that credits the coupling stage with a demonstrated capability, and it is contradicted by the new spectral audit: on 1800 synthetic matrices SA-Aug obtains no conditioning advantage over its role-blind control and in fact loses 2.4x and 10.4x on the two coupling-dominated patterns---the stage's own design case. Combined with zero operational activation, the coupling stage is an unvalidated extension, not a demonstrated repair mechanism. 'demonstrates' is exactly the word the reframe must remove.",
+  "suggested": "while the coupling-uniform pattern of the synthetic grid is the only setting in this study where the coupling stage activates at all. Even there it is not validated as an advantage: the direct spectral audit (\\cref{subsec:spectral-audit}) finds that \\methodAug{} obtains no pseudo-condition-number advantage over its role-blind control on any pattern, and is outperformed on the two coupling-dominated patterns. The coupling architecture is therefore reported as an operationally unvalidated extension of the method rather than as a demonstrated mechanism.",
+  "severity": "high",
+  "refined": "while the coupling stage's repair of a \\emph{collective} displacement of the coupling rows is exercised only in the controlled synthetic grid (\\cref{subsec:synthetic-results}), and there only on the oversized branch of the coupling-uniform pattern. Even in that design case the repair is not an advantage of the metadata: the role-blind control removes the same displacement without it, and the direct spectral audit puts \\methodAug{} at parity with Flat on that pattern and behind it on the two patterns where coupling imbalance dominates (\\cref{subsec:spectral-audit}). The coupling architecture is therefore reported as an operationally unvalidated extension of the method, not as a demonstrated advantage."
+ },
+ {
+  "file": "main.tex",
+  "line": 2981,
+  "quote": "Thus retuning internal scaling does not substitute for external preprocessing in\nSG-Ter-Mer; it does substitute for it on the typical Simple instance, while the Full result\ndepends on tolerance.",
+  "category": "diagnostic-overreach",
+  "why": "The preceding sentences state explicitly that the internal mode is postselected on the same observations and that 'no inferential claim follows from the displayed ratios'; this sentence then draws exactly such a claim ('does not substitute'). It also frames the SG-Ter-Mer advantage as belonging to the structure-aware rule, when that class is precisely where the gain traces to the full-coverage local kernel (the 1800 unscaled shortage rows) and is matched by the role-blind control.",
+  "suggested": "On the postselected descriptive ratios, then, retuning internal scaling does not appear to substitute for external preprocessing in SG-Ter-Mer, appears to substitute for it on the typical Simple instance, and gives a tolerance-dependent reading in Full. Because the internal mode is selected on the same observations, these are descriptive orderings only and no inferential claim follows. They also do not speak to metadata selectivity: the external rules are represented here only by SA-Aug and SA-Mat, and in SG-Ter-Mer the external advantage is attributable to full local-row coverage (\\cref{subsec:stage-attribution}), which the role-blind control also achieves.",
+  "severity": "medium",
+  "refined": "On these postselected descriptive ratios, then, the tuned internal mode does not reproduce the external preprocessing effect in SG-Ter-Mer, reproduces it on the typical Simple instance, and gives a tolerance-dependent reading in Full; because the internal mode is selected on the same observations, these are orderings within this campaign and not inferential conclusions. The comparison is also silent on metadata selectivity: the external side is represented here only by \\methodAug{} and \\methodMat{}, the role-blind Flat controls do not enter the internal sweep, and the operational transformation behind these ratios reduces to the metadata-free local stage (\\cref{subsec:stage-attribution}). Jointly tuning external and internal scaling would require a factorial control and remains future work."
+ },
+ {
+  "file": "main.tex",
+  "line": 2937,
+  "quote": "The control of \\cref{subsec:added-controls} that most directly tests the contribution asks\nwhether the solver's \\emph{own} scaling could reproduce the structure-aware effect.",
+  "category": "confirmatory-framing",
+  "why": "Under the accepted verdict the control that most directly tests the paper's contribution is the role-blind Flat comparison, since the contribution at issue is metadata selectivity rather than external scaling per se. Elevating the internal-scaling baseline to 'most directly tests the contribution' mis-ranks the evidence hierarchy and quietly demotes the control that produces the paper's central negative finding.",
+  "suggested": "A further control from \\cref{subsec:added-controls} asks whether the solver's \\emph{own} scaling could reproduce the effect of the external scaling layer. It tests the value of external preprocessing as such; the control that most directly tests the paper's structural claim---whether row-role metadata is what produces the effect---is the role-blind Flat comparison of \\cref{subsec:stage-attribution}.",
+  "severity": "medium",
+  "refined": "Among the controls of \\cref{subsec:added-controls}, the internal-scaling baseline asks whether the solver's \\emph{own} scaling could reproduce the effect of the external scaling layer. It tests the value of external preprocessing as such, not metadata selectivity; the latter is tested directly by the role-blind Flat controls of \\cref{subsec:stage-attribution}."
+ },
+ {
+  "file": "main.tex",
+  "line": 3243,
+  "quote": "Exporting the scaled matrices identifies the mechanism precisely, and it is not the coupling\ntreatment.",
+  "category": "diagnostic-overreach",
+  "why": "The same paragraph later concedes that 'Our static matrix analysis cannot resolve the runtime mechanism' (line 3285), and notes that the matrix change is qualitatively identical across SG-Ter-Mer and Full while the runtime point estimate changes sign. What the export identifies precisely is where the two rules differ in the exported matrix, not the runtime mechanism. As written the opening sentence over-promises and contradicts the paragraph's own conclusion.",
+  "suggested": "Exporting the scaled matrices identifies precisely where the two rules differ in the exported model, and that difference is not in the coupling treatment.",
+  "severity": "medium",
+  "refined": "Exporting the scaled matrices identifies precisely where the two rules differ in the model handed to the solver---a difference in row coverage, not in the coupling treatment."
+ },
+ {
+  "file": "main.tex",
+  "line": 2379,
+  "quote": "\\Cref{tab:robust-gurobi-01pct-mipgap} confirms that the descriptive\ncompleted-run timing pattern does not hinge on the looser stopping criterion.",
+  "category": "variability-ignored",
+  "why": "'confirms' treats a second tolerance setting within the same single-run campaign as independent replication. With one run per cell and MIP run-to-run variability of the same order as the ~1% effects being reported, the two tolerances are not independent evidence about the stability of a descriptive ordering; the correct word is that the ordering recurs, not that it is confirmed.",
+  "suggested": "\\Cref{tab:robust-gurobi-01pct-mipgap} shows that the same descriptive completed-run timing ordering recurs under the stricter stopping criterion. Because the campaign records one run per cell and run-to-run MIP variability is of the same order as the differences involved (\\cref{sec:limitations}), this recurrence is a consistency check across tolerances rather than a replication that establishes stability.",
+  "severity": "medium",
+  "refined": "\\noindent \\Cref{tab:robust-gurobi-01pct-mipgap} shows that the same descriptive completed-run ordering largely recurs under the stricter tolerance, the exception being Full, where \\methodMat{} loses its edge over the base and \\methodRuizCols{} takes the best median deterministic speedup. Because each cell is a single run and the two tolerances admit different completed-run pools, this recurrence is a consistency check across stopping criteria rather than a replication that establishes stability (\\cref{sec:validity})."
+ },
+ {
+  "file": "main.tex",
+  "line": 2315,
+  "quote": "\\noindent \\Cref{tab:robust-gurobi-1pct-mipgap} shows that \\methodMat{} leads the\ncompleted-run $\\sgm T$ in Simple and SG-Ter-Mer while \\methodAug{} leads Full, with no\ncomparable class-consistent pattern for the Ruiz baselines.",
+  "category": "confirmatory-framing",
+  "why": "The 'leads' framing is drawn from a comparison set that omits the role-blind Flat controls, and the contrast is set up against the Ruiz baselines only, which makes the structure-aware rules look like the class-consistent winners. Since the reader has no signal at this point that a stronger and simpler control exists, the passage builds the superior-policy reading the reframe removes.",
+  "suggested": "\\noindent \\Cref{tab:robust-gurobi-1pct-mipgap} shows that, within this comparison set, \\methodMat{} has the lowest completed-run $\\sgm T$ in Simple and SG-Ter-Mer while \\methodAug{} does in Full, with no comparable class-consistent pattern for the Ruiz baselines. The set does not include the role-blind Flat controls, so these orderings compare scaling kernels rather than testing whether the row-role metadata contributes anything (\\cref{subsec:stage-attribution}).",
+  "severity": "medium",
+  "refined": "\\noindent Within this comparison set, \\Cref{tab:robust-gurobi-1pct-mipgap} places \\methodMat{} at the lowest completed-run $\\sgm T$ in Simple and SG-Ter-Mer and \\methodAug{} at the lowest in Full, with no comparable class-consistent ordering among the Ruiz baselines. All five variants in the table share the row taxonomy and the coupling stage, so this ordering compares per-row \\emph{kernels} under a fixed structural pipeline and is not a test of whether the role metadata contributes anything. That test is carried by the kernel-matched role-blind Flat controls, which were run in dedicated batches rather than in this archived pool and which match or beat the selective rules in most contrasts (\\cref{subsec:variants,subsec:stage-attribution})."
+ },
+ {
+  "file": "main.tex",
+  "line": 2340,
+  "quote": "Since the\nmatrix-only rule uses no right-hand-side information, much of the useful structural scale\ninformation in this testbed is already present in the coefficient matrix.",
+  "category": "variability-ignored",
+  "why": "A mechanistic conclusion about where the useful scale information lives is drawn from single-run descriptive shifted geometric means in which SA-Mat happens to edge out SA-Aug. Given one run per cell and variability of the same order as the differences, and given that the two kernels diverge in sign across classes and tolerances elsewhere in the paper, the inference is stated with more confidence than the design supports.",
+  "suggested": "The matrix-only rule uses no right-hand-side information, yet is descriptively competitive with the augmented rule on these Gurobi cells, which is consistent with much of the useful structural scale information in this testbed already residing in the coefficient matrix. With one run per cell this remains a suggestion rather than an established decomposition, and the two kernels do not order consistently across classes, tolerances and solvers elsewhere in the study.",
+  "severity": "low",
+  "refined": "The matrix-only rule uses no right-hand-side information, yet is descriptively competitive with \\methodAug{} in these cells, which is consistent with much of the useful structural scale information in this testbed already residing in the coefficient matrix. This head-to-head is not itself an ablation of the right-hand side: the two rules also differ in their coupling criterion (\\cref{subsec:strategy-2}), each cell is a single run whose margins are of the order of the run-to-run drift documented in \\cref{sec:validity}, and the two kernels do not order consistently across classes, tolerances and solvers---\\methodAug{} leads Full here. The clean right-hand-side evidence is the local-only ablation pair of \\cref{subsec:stage-attribution}, whose members differ only in whether $b$ enters the per-row extremes."
+ },
+ {
+  "file": "main.tex",
+  "line": 1307,
+  "quote": "The experiments are organized around four reader questions: does scaling preserve the original optimization problem, does it improve the numerical representation, does that change solver behavior, and does the effect survive changes in class, solver, and tolerance?",
+  "category": "confirmatory-framing",
+  "why": "The framing question set presupposes that there is \"the effect\" to survive, and it omits the question the accepted verdict makes central: whether the metadata-selective rule outperforms a role-blind control at all. As stated, the design reads as a confirmatory test of a working method rather than a controlled study of when selectivity helps, hurts, or is irrelevant.",
+  "suggested": "The experiments are organized around five reader questions: does scaling preserve the original optimization problem, does it change the numerical representation, does that change solver behavior, does whatever change is observed depend on using generator metadata rather than treating all rows alike, and does the answer differ across instance class, solver, and tolerance? The fourth question is the one this study is designed around: the role-blind Flat controls, not the unscaled base, carry the decisive contrast.",
+  "severity": "medium",
+  "refined": "The experiments are organized around five reader questions: does scaling preserve the original optimization problem, does it change the numerical representation, does that change solver behavior, does any observed change depend on using generator metadata rather than applying the same kernel to all rows, and does the answer differ across instance class, solver, and tolerance? The fourth question is the one this study turns on. It is carried by the role-blind Flat controls of \\cref{subsec:added-controls,subsec:stage-attribution} rather than by the contrast with the unscaled base; those controls were run under Gurobi only, so the cross-solver persistence of their ordering remains untested."
+ },
+ {
+  "file": "main.tex",
+  "line": 1327,
+  "quote": "performance claim by matched base--variant speedups, deterministic effort, performance\nprofiles, and primal--dual progress; and the sensitivity of the observed preprocessing effect\nto the tested solver pipeline through separate Gurobi and CPLEX\nscenarios at two tolerances.",
+  "category": "superior-policy",
+  "why": "This map of \"which measurement supports which claim\" ties the performance claim exclusively to base-versus-variant contrasts. Under the accepted verdict, a base-versus-variant speedup supports only \"some scaling pass helps\"; it cannot support any claim about the structure-aware rule, because the role-blind Flat controls match or beat it in most contrasts. The decisive SA-versus-Flat endpoint is absent from the argument map.",
+  "suggested": "performance claim by matched base--variant speedups, deterministic effort, performance profiles, and primal--dual progress---which establish only that an external scaling pass changes runtime, not that metadata selectivity is responsible; the attribution of any such change to generator metadata by the direct SA--Flat role-blind contrasts of \\cref{subsec:stage-attribution}; and the sensitivity of the observed preprocessing effect to the tested solver pipeline through separate Gurobi and CPLEX scenarios at two tolerances.",
+  "severity": "medium",
+  "refined": "performance claim by matched base--variant speedups, deterministic effort, performance\nprofiles, and primal--dual progress, which show that an external scaling pass changes solver\nbehavior but cannot attribute that change to the metadata selectivity; whether the\nselectivity is responsible at all by the direct kernel-matched role-blind contrasts\n(\\methodAug{} versus Flat-Aug and \\methodMat{} versus Flat-Mat) and the stage and\ncoupling-activation audits of\n\\cref{subsec:added-controls,subsec:stage-attribution}; and the sensitivity of the observed\npreprocessing effect to the tested solver pipeline through separate Gurobi and CPLEX\nscenarios at two tolerances."
+ },
+ {
+  "file": "main.tex",
+  "line": 1361,
+  "quote": "The class names are application-specific, but the contrast is structural: whether the rule behaves\nconsistently as the generated MIP moves from a simpler modular model to larger or more strongly\ncoupled ones. The conclusions are thus stated at two levels---empirical evidence from hydrothermal\ndispatch, methodological object the use of generator metadata in block-structured engineering\nMIPs.",
+  "category": "over-generalization",
+  "why": "Three instance classes from a single application domain, one generator, one hardware platform and two solvers cannot license a conclusion whose \"methodological object\" is block-structured engineering MIPs in general. The reviewer's single-domain objection (5) applies directly, and the accepted verdict states that the effect of metadata selectivity depends on instance class, kernel, solver, and endpoint.",
+  "suggested": "The class names are application-specific, and the three classes differ structurally---from a simpler modular model to larger and more strongly coupled ones---so they test whether the rule behaves consistently across that range. They remain three classes of one application domain built by one generator, so the conclusions are empirical statements about hydrothermal dispatch instances of this platform. Whether the same behavior appears in other block-structured engineering MIPs is a hypothesis this evidence motivates but does not test.",
+  "severity": "medium",
+  "refined": "The class names are application-specific, but the three classes differ structurally---from a simpler modular model to larger and more strongly coupled ones---so they probe whether the rule behaves consistently across that range. All three, however, are hydrothermal-dispatch classes produced by one generator on one platform, so the conclusions here are empirical statements about these instances. Whether the same behavior carries over to other block-structured engineering MIPs is a hypothesis this evidence motivates but does not test."
+ },
+ {
+  "file": "main.tex",
+  "line": 1614,
+  "quote": "If a tuned internal setting matches the structure-aware runtime on the same\ninstances, the distinctive claim collapses to generic coefficient compression; if it does\nnot, the gain cannot be attributed to a scaling pass the solver could have produced itself.",
+  "category": "superior-policy",
+  "why": "The stated disjunction presupposes both a \"gain\" and a surviving \"distinctive claim\", and it treats the internal-scaling sweep as sufficient to rescue distinctiveness. It is not: the role-blind Flat controls already show that full-coverage scaling with no metadata matches or beats the selective rule, so failing to reproduce the effect with internal scaling still leaves the effect unattributable to structure awareness.",
+  "suggested": "If a tuned internal setting matches the structure-aware runtime on the same instances, whatever runtime change is observed reduces to generic coefficient compression the solver could have produced itself; if it does not, the change requires an external pass, though this control alone says nothing about whether generator metadata is needed for it---that question is settled only by the role-blind Flat contrasts, which show it is largely not.",
+  "severity": "medium",
+  "refined": "If a tuned internal setting matches the structure-aware runtime on the same instances, whatever runtime change is observed reduces to generic coefficient compression the solver could have produced itself; if it does not, the change requires an external pass. This control bears only on whether the pass must be external, not on whether generator metadata is needed to construct it: that question is settled by the role-blind Flat contrasts of \\cref{subsec:stage-attribution}."
+ },
+ {
+  "file": "main.tex",
+  "line": 1633,
+  "quote": "is a parameter of the baselines, not of the proposed rules. Three sensitivity analyses are\nreported. On the Simple class under Gurobi we sweep $u\\in\\{1.5,2,4\\}$ and the coefficient\nwindow over $\\{[10^{-6},10^{6}],[10^{-9},10^{9}],[10^{-12},10^{12}]\\}$: the runtime\nconclusions are insensitive",
+  "category": "safeguard-maturity",
+  "why": "Each sweep varies one constant at a time, on one class under one solver (or on a failing subset, or on synthetic seeds). This supports \"no single constant is knife-edge in the tested cell\"; it does not validate the safeguard cascade as a deployable policy, which is what the paragraph's framing (\"the runtime conclusions are insensitive\") invites the reader to conclude.",
+  "suggested": "is a parameter of the baselines, not of the proposed rules. Three one-factor-at-a-time sensitivity analyses are reported; none validates the safeguard cascade as a policy, since the constants are never varied jointly and each sweep covers a single cell. On the Simple class under Gurobi we sweep $u\\in\\{1.5,2,4\\}$ and the coefficient window over $\\{[10^{-6},10^{6}],[10^{-9},10^{9}],[10^{-12},10^{12}]\\}$: within that class and solver the runtime conclusions do not change",
+  "severity": "medium",
+  "refined": "is a parameter of the baselines, not of the proposed rules. Three sensitivity analyses are reported; each varies one constant at a time within a single cell, so together they bound knife-edge sensitivity to individual constants rather than validate the safeguard cascade as a deployable policy. On the Simple class under Gurobi at the $1\\%$ tolerance we sweep $u\\in\\{1.5,2,4\\}$ and the coefficient window over $\\{[10^{-6},10^{6}],[10^{-9},10^{9}],[10^{-12},10^{12}]\\}$: within that cell the runtime conclusion is unchanged"
+ },
+ {
+  "file": "main.tex",
+  "line": 1858,
+  "quote": "The Benjamini--Hochberg correction is applied within each scenario (solver $\\times$\ntolerance), over the family of all four scaled variants across the three instance classes\n(twelve paired tests); the tables display the two structure-aware variants, while\n$q_{\\mathrm{BH}}$ reflects that full family.",
+  "category": "confirmatory-framing",
+  "why": "Multiplicity is declared only within a scenario. Four scenarios are reported, so the actual base--variant testing surface is forty-eight paired tests, and the endpoint hierarchy was itself chosen after inspecting the data. Reporting $q_{\\mathrm{BH}}$ over twelve tests without stating what is not adjusted for lets a reader treat a surviving $q$ as family-protected when it is protected only within one scenario.",
+  "suggested": "The Benjamini--Hochberg correction is applied within each scenario (solver $\\times$ tolerance), over the family of all four scaled variants across the three instance classes (twelve paired tests); the tables display the two structure-aware variants, while $q_{\\mathrm{BH}}$ reflects that full family. The adjustment is deliberately within-scenario and therefore does not control the error rate over the forty-eight paired tests spanned by the four scenarios, nor over the several endpoints reported. Since the endpoint hierarchy was selected after inspecting the data, all adjusted values in this paper should be read as descriptive screening quantities rather than as confirmatory error-rate guarantees.",
+  "severity": "high",
+  "refined": "The Benjamini--Hochberg correction is applied within each scenario (solver $\\times$ tolerance), over the family of all four scaled variants across the three instance classes (twelve paired tests); the tables display the two structure-aware variants, while $q_{\\mathrm{BH}}$ reflects that twelve-test family. The adjustment is deliberately within-scenario: it does not control the error rate across the four reported scenarios---forty-eight paired tests in total---nor across the several endpoints reported. Because the endpoint hierarchy was fixed only after inspecting the data, the adjusted values reported for these operational contrasts are screening quantities that bound multiplicity within one declared family, not confirmatory error-rate guarantees."
+ },
+ {
+  "file": "main.tex",
+  "line": 1901,
+  "quote": "The deterministic Gurobi Work comparison and the\nsolver-time decomposition are exploratory; their adjusted values are reported\ndescriptively and define no additional confirmatory conclusions.",
+  "category": "confirmatory-framing",
+  "why": "Singling out two endpoints as exploratory implies by contrast that the prototype preprocessing-plus-solver endpoint is confirmatory, contradicting the disclosure sixteen lines earlier that the endpoint hierarchy was selected after data inspection and that neither prototype nor cached endpoint is a preregistered confirmatory outcome. The accepted verdict is that no endpoint in this study is confirmatory.",
+  "suggested": "The deterministic Gurobi Work comparison and the solver-time decomposition are exploratory---as, for the reason disclosed above, is every endpoint in this analysis. All adjusted values throughout are reported descriptively and no contrast in this study is treated as a confirmatory conclusion.",
+  "severity": "medium",
+  "refined": "The deterministic Gurobi Work comparison and the solver-time decomposition are likewise exploratory; their adjusted values are reported descriptively and define no confirmatory outcome."
+ },
+ {
+  "file": "main.tex",
+  "line": 3866,
+  "quote": "No spectral condition number is measured there, so this supports no claim of spectral optimality or a general conditioning advantage of metadata over full coverage.",
+  "category": "coupling-validated",
+  "why": "This is now factually wrong and, worse, it is protective: subsec:spectral-audit DOES measure kappa_2^+ on 1800 synthetic matrices, and the result is negative for the architecture -- SA-Aug ties its role-blind control on three patterns and loses 2.36x and 10.37x on the two coupling-dominated patterns, i.e. on the coupling stage's own design case. Leaving the sentence as 'no spectral evidence exists' lets a reader conclude the spectral question is open when it has been answered against metadata selectivity.",
+  "suggested": "The spectral audit of the same grid (\\cref{subsec:spectral-audit}) settles this directly and against the architecture: every rule cuts the pseudo-condition number by seven to nine orders of magnitude, \\methodMat{} is the best-conditioned rule in every pattern, and \\methodAug{} obtains no spectral advantage over its role-blind control -- a tie on three patterns and losses by factors of $2.36$ and $10.37$ on the two coupling-dominated patterns, which are precisely the design case of the coupling stage. There is therefore no spectral optimality claim and no conditioning advantage of metadata over full coverage; on the coupling patterns the evidence points the other way.",
+  "severity": "high",
+  "refined": "The spectral audit of that same grid (\\cref{subsec:spectral-audit}) measures $\\kappa_2^{+}$ directly, and its verdict is split. Every rule cuts the pseudo-condition number by seven to nine orders of magnitude wherever row-multiplicative imbalance is present, and \\methodMat{} is the best-conditioned rule in every pattern; but \\methodAug{} obtains no advantage over its role-blind control, tying on three patterns and losing by factors of $2.36$ and $10.37$ on the two coupling-dominated ones---the coupling stage's own design case. No claim of spectral optimality is made here, and on those patterns the conditioning evidence runs against metadata selectivity rather than merely failing to support it."
+ },
+ {
+  "file": "main.tex",
+  "line": 3676,
+  "quote": "proposition is correspondingly narrow and concrete: for a Gurobi user running many hard instances of a generated model whose structure is known, the method can reduce aggregate runtime and may occasionally rescue a near-limit instance at low absolute but non-negligible preprocessing cost.",
+  "category": "superior-policy",
+  "why": "This is a deployment recommendation for the structure-aware method, but the evidence attributes the effect to the LOCAL stage, whose per-row geometric-mean kernel needs no metadata at all, and the role-blind Flat control matches or beats the selective rule in most contrasts. The 'occasionally rescue a near-limit instance' rests on a single timeout-rescued SG-Ter-Mer instance that the paper itself says two other campaigns do not reproduce (lines 3692-3695). As written a practitioner would take away 'adopt the structure-aware layer', which the accepted verdict rules out.",
+  "suggested": "proposition is correspondingly narrow: for a Gurobi user running many hard instances of a generated model, the measured aggregate-runtime reduction is delivered by the local per-row normalization stage, which requires no metadata and is available to any flat-matrix pipeline. This study does not show that adding the metadata selection layer improves on that role-blind baseline; the one apparent timeout rescue rests on a single instance that two later campaigns do not reproduce. The defensible recommendation is to apply the per-row kernel and to measure both coverage policies, not to adopt selectivity on the strength of these data.",
+  "severity": "high",
+  "refined": "proposition is correspondingly narrow: for a Gurobi user running many hard instances of a generated model, row scaling can reduce aggregate runtime relative to the unscaled base. These data do not establish that the metadata selection layer is what delivers that reduction: the stage-attribution ablation assigns essentially all of the runtime effect to the local per-row kernel, which requires no metadata and is equally available to a role-blind pipeline, and the role-blind control matches or exceeds the selective rule in most contrasts. What the evidence supports is applying the per-row kernel and measuring both coverage policies on the target model, at a low absolute but non-negligible preprocessing cost."
+ },
+ {
+  "file": "main.tex",
+  "line": 3733,
+  "quote": "That marginal mechanism is tested only on the synthetic benchmark, and transferring it to another operational generator remains open.",
+  "category": "coupling-validated",
+  "why": "This frames the coupling stage's status as 'tested on synthetic, transfer open', which implies the synthetic test was passed. The spectral audit is the sharpest synthetic test available and the coupling stage FAILS it on its own design case (SA-Aug loses 2.36x and 10.37x to role-blind full coverage on the coupling-dominated patterns). The limitation understates how negative the only available evidence for the stage is.",
+  "suggested": "That mechanism is exercised only on the synthetic benchmark, where the evidence is unfavorable rather than merely incomplete: the direct spectral audit finds \\methodAug{} worse than its role-blind control by factors of $2.36$ and $10.37$ on exactly the coupling-dominated patterns the stage was designed for (\\cref{subsec:spectral-audit}), and its distinctive repair on the range proxy is confined to the oversized-uniform branch. The coupling architecture should therefore be read as an unvalidated extension: inert operationally and not shown to help even where it was designed to.",
+  "severity": "high",
+  "refined": "That marginal mechanism is exercised only on the synthetic benchmark, and there the evidence is unfavorable rather than merely incomplete. On the magnitude-range proxy its distinctive repair is confined to the oversized branch of its collective design case, and the direct spectral audit finds \\methodAug{} \\emph{worse} than its role-blind control on exactly the two coupling-dominated patterns the stage was designed for---median $\\kappa_2^{+}$ ratios of $2.36$ and $10.37$ at the most severe disturbance level (\\cref{subsec:spectral-audit}). The coupling architecture should therefore be read as an unvalidated extension: inert on the operational testbed and not shown to help even in its own design case. Both its runtime effect on instances where it would activate and its transfer to another operational generator remain open."
+ },
+ {
+  "file": "main.tex",
+  "line": 3621,
+  "quote": "recovers most of the improvement in Full, although the augmented rule retains an approximately $11\\%$ solver-time advantage there ($78.9$ vs $70.9$\\,s). Most of the benefit therefore does not require the right-hand side, with the largest residual advantage of including it in Full.",
+  "category": "variability-ignored",
+  "why": "An 11% Full-class difference is quoted from single runs as a real residual advantage, but the paper's own limitations section reports that the Full base shifted geometric mean drifts across campaigns from 82.5 to 109.4 s (roughly 30%), and that there is one run per cell with no seed replication. An 11% single-run gap in Full is inside the drift band and cannot support 'retains an advantage' or 'largest residual advantage'.",
+  "suggested": "recovers most of the improvement in Full, where the augmented rule is nominally faster ($78.9$ vs $70.9$\\,s, about $11\\%$). That gap comes from one run per cell in the class whose base $\\sgm$ drifts between $82.5$ and $109.4$\\,s across campaigns, so it is not separable from run-to-run variability and we do not read it as a residual advantage. Most of the benefit does not require the right-hand side, and whether including it helps in Full is undetermined.",
+  "severity": "medium",
+  "refined": "recovers part of it in Full, where the augmented rule is nominally about $11\\%$ faster ($78.9$ vs $70.9$\\,s). That Full figure rests on one run per cell in a class where three or four runs time out per variant, so the two geometric means are taken over different solved subsets and are descriptive only (Table~S8); it is not separable from run-to-run variability and we do not read it as a residual advantage. In the two classes where the pair is well populated the two rules agree to within $2$--$3\\%$, so most of the benefit does not require the right-hand side, while whether including $b$ helps in Full is undetermined."
+ },
+ {
+  "file": "main.tex",
+  "line": 3648,
+  "quote": "The controlled synthetic benchmark closes part of the gap: when the source of imbalance is known by construction, the variants respond as intended at the level of the exported coefficient-and-right-hand-side magnitude-range proxy",
+  "category": "diagnostic-overreach",
+  "why": "'respond as intended' rests entirely on the magnitude-range proxy, which the new spectral audit shows is a weak ordinal surrogate for the spectrum (Spearman 0.62; exact variant ordering in only 108 of 300 instances). It also glosses the fact that the role-blind Flat rule matches or beats every structure-aware variant on that same proxy, so the variants do not respond as the metadata hypothesis intended.",
+  "suggested": "The controlled synthetic benchmark closes part of the gap: when the source of imbalance is known by construction, every rule compresses the exported coefficient-and-right-hand-side magnitude range, but the role-blind full-coverage rule matches or beats every structure-aware variant on that proxy, and the proxy itself is only a weak ordinal surrogate for the spectrum (Spearman $0.62$; exact ordering in $108$ of $300$ instances, \\cref{subsec:spectral-audit}). It is adequate for identifying which rule is best conditioned and not for quantitative claims",
+  "severity": "medium",
+  "refined": "The controlled synthetic benchmark closes part of the gap: when the source of imbalance is known by construction, the per-row kernels remove the injected imbalance at the level of the exported coefficient-and-right-hand-side magnitude-range proxy---with the role-blind full-coverage control matching or beating every structure-aware variant there, and the selective rules paying a coverage cost on the negative control---and with the reliability floor in place original-scale feasibility and objective agreement hold across the grid; the same severe heterogeneous coupling cells expose, with the floor disabled, the numerical-reliability failure mode of the common-factor variants (\\cref{subsec:synthetic-results}). The direct spectral audit both corroborates that qualitative reading in $\\kappa_2^{+}$ and bounds it: the proxy is a weak ordinal surrogate for the spectrum, adequate for identifying which rule is best conditioned and not for quantitative claims (\\cref{subsec:spectral-audit})."
+ },
+ {
+  "file": "main.tex",
+  "line": 3659,
+  "quote": "it should transfer only insofar as it shares the premise of sparse global coupling over local blocks.",
+  "category": "over-generalization",
+  "why": "This names the wrong transfer condition and quietly re-centers the coupling premise. The operationally measured transformation is entirely local-row normalization -- the coupling stage never fires -- so the sparse-global-coupling premise is not what the effect depends on. Stating transfer in terms of that premise implies the coupling architecture is the mechanism being carried to new domains, contrary to the stage-attribution and activation-audit evidence.",
+  "suggested": "it should transfer only insofar as the per-row magnitude heterogeneity that the local stage normalizes is present; the sparse-global-coupling premise, which motivates the coupling stage, was never exercised in these operational runs and so is not part of what this evidence would carry to another domain.",
+  "severity": "medium",
+  "refined": "it should transfer only insofar as the per-row magnitude heterogeneity that the local stage normalizes is present, since that stage carries the measured effect. The premise of sparse global coupling over local blocks delimits the class in which the metadata-selectivity question can be posed at all, but the coupling stage it motivates never activated in these operational runs, so it is not part of what this evidence would carry to another domain."
+ },
+ {
+  "file": "main.tex",
+  "line": 844,
+  "quote": "It is not part of the proposed\nstructure-aware layer because the central claim is that row-role and coupling metadata\nalone already provide useful pre-export numerical information while keeping the\ntransformation algebraically transparent.",
+  "category": "superior-policy",
+  "why": "States the paper's central claim as a positive claim that role and coupling metadata provide useful numerical information. The accepted verdict is the opposite: the central contribution is a controlled study in which metadata selectivity helps, hurts, or is irrelevant depending on class, kernel, solver, and endpoint; the role-blind Flat controls match or beat the selective rule in most contrasts, and coupling metadata contributes nothing operationally because the coupling stage never activates.",
+  "suggested": "It is not part of the proposed structure-aware layer because the question this study is designed to answer is whether row-role and coupling metadata add anything over a role-blind application of the same kernel, holding the transformation algebraically transparent. The answer, reported in \\cref{subsec:stage-attribution,subsec:spectral-audit}, is that it does not do so uniformly: full-coverage role-blind scaling matches or beats the selective rule in most contrasts, and the coupling metadata is never exercised on the operational classes.",
+  "severity": "high",
+  "refined": "It is not part of the proposed structure-aware layer because that layer is the object under study: a row-based, algebraically transparent transformation whose row-role and coupling metadata is what the controlled comparison evaluates. Whether that metadata adds anything over a role-blind application of the same kernel is the study's question, not its premise; the answer (\\cref{subsec:stage-attribution,subsec:spectral-audit}) is that it does not do so uniformly---full-coverage role-blind scaling matches or beats the selective rule in most contrasts, and the coupling metadata is never exercised on the operational classes."
+ },
+ {
+  "file": "main.tex",
+  "line": 801,
+  "quote": "The two propositions establish \\emph{which} numerical distinctions a structure-aware\nrule must preserve, and thereby justify the architecture.",
+  "category": "confirmatory-framing",
+  "why": "\"establish ... must preserve\" and \"justify the architecture\" present the idealized propositions as validating the selective architecture. The direct spectral audit on 1800 synthetic matrices found that the role-blind control matches or beats SA-Aug on kappa_2 in every pattern, losing 2.4x and 10.4x on the coupling-dominated patterns the coupling stage was designed for, so the propositions do not justify selectivity; at most they motivate scaling.",
+  "suggested": "The two propositions describe numerical distinctions that a scaling rule \\emph{could} preserve in the ideal square, nonsingular setting, and they are the stated motivation for the architecture rather than evidence for it.",
+  "severity": "medium",
+  "refined": "The two propositions identify \\emph{which} numerical distinctions a scaling rule can preserve in the ideal square, nonsingular setting, and they motivate the architecture that follows. They suggest three design requirements: local scale imbalance should be reduced before global coupling rows are diagnosed; blocks should be summarized only after their local rows are on a comparable scale; and a coupling row should be scaled relative to the blocks it connects, not only relative to its own raw coefficient norm."
+ },
+ {
+  "file": "main.tex",
+  "line": 806,
+  "quote": "The implemented method realizes exactly these\ndistinctions through coefficient-based proxies",
+  "category": "coupling-validated",
+  "why": "Claims the implemented method realizes the coupling distinction. Operationally it does not: the coupling proxy never exceeds the activation threshold on the real instance classes, so the third distinction (scaling a coupling row relative to the blocks it connects) is never applied in any reported operational run, and the block scales that feed it are computed but unused.",
+  "suggested": "The implemented method encodes these distinctions through coefficient-based proxies: they are cheap to compute from the generated model before export, auditable because they depend only on visible row and block metadata, and they avoid expensive or unstable singular-value information. Whether they are exercised is a separate matter: on the operational classes only the first distinction (local row centring) ever alters the exported matrix, because the coupling stage does not activate (\\cref{subsec:stage-attribution}).",
+  "severity": "medium",
+  "refined": "The implemented method encodes these distinctions through coefficient-based proxies: they are cheap to compute from the generated model before export, auditable because they depend only on visible row and block metadata, and they avoid expensive or unstable singular-value information from the rectangular, redundant, inequality-based matrices that arise in generated MIPs. Encoding a distinction is not the same as exercising it. On the operational classes only the first, local row centring, ever alters the exported matrix: the coupling proxy stays below its activation threshold throughout, so the block scales that feed the coupling stage are computed but never used (\\cref{subsec:stage-attribution}). The coupling stage acts only on the synthetic benchmark (\\cref{subsec:synthetic-results}), and its operational value is therefore untested. The row factor based on the geometric mean of the smallest and largest nonzero magnitudes is a robust coefficient-scale proxy that centers each eligible row without changing variables, bounds, integrality, or the objective."
+ },
+ {
+  "file": "main.tex",
+  "line": 655,
+  "quote": "The role of $\\kappa_2$ is narrower: it provides an idealized matrix argument explaining why local rows and coupling rows should not be scaled in exactly the same way.",
+  "category": "confirmatory-framing",
+  "why": "Presents the spectral diagnostic as explaining why role-differentiated scaling is required. The new spectral audit measured this directly and found no conditioning advantage for the role-differentiated rule over its role-blind control in any pattern, including the coupling-dominated ones, so the diagnostic supports scaling but not differentiation.",
+  "suggested": "The role of $\\kappa_2$ is narrower: it provides an idealized matrix argument for why local rows and coupling rows \\emph{might} warrant different treatment. Whether that distinction buys anything is an empirical question; the direct audit of \\cref{subsec:spectral-audit} finds that every scaling rule improves $\\kappa_2$ by orders of magnitude but that role-differentiation obtains no advantage over role-blind scaling.",
+  "severity": "medium",
+  "refined": "The role of $\\kappa_2$ is narrower still: it provides an idealized matrix argument for why local rows and coupling rows \\emph{might} warrant different treatment. Whether that distinction improves conditioning is an empirical question, and the direct audit of \\cref{subsec:spectral-audit} answers it in the negative: every scaling rule improves $\\kappa_2$ by orders of magnitude, but role-differentiation obtains no conditioning advantage over its role-blind control---and none even on the coupling-dominated patterns it is meant to address."
+ },
+ {
+  "file": "main.tex",
+  "line": 904,
+  "quote": "The augmented rule is not only a row-by-row normalization. It is a three-stage\nstructure-aware procedure that first rescales local rows, then summarizes the resulting\nlocal block scales, and finally uses those block scales to treat coupling rows separately.",
+  "category": "coupling-validated",
+  "why": "Describes the exported transformation as genuinely three-stage. On every operational instance stages two and three leave the exported matrix unchanged (the coupling proxy never crosses the activation threshold), so what the solver actually receives is exactly a row-by-row normalization restricted to role-selected rows -- which is the sentence being denied.",
+  "suggested": "The augmented rule is specified as a three-stage structure-aware procedure that first rescales local rows, then summarizes the resulting local block scales, and finally uses those block scales to treat coupling rows separately. Only the first stage alters the exported matrix on the operational classes: as the activation audit shows (\\cref{subsec:stage-attribution}), the coupling stage never fires there, so on those instances the rule reduces to a row-by-row normalization of the role-selected rows.",
+  "severity": "medium",
+  "refined": "The augmented rule is specified as a three-stage structure-aware procedure that first rescales local rows, then summarizes the resulting local block scales, and finally uses those block scales to treat coupling rows separately. The second stage is a diagnosis rather than a transformation: the block scales are never applied to the blocks, and enter only the coupling proxy. On the operational classes the third stage is inert as well---the activation audit of \\cref{subsec:stage-attribution} records zero activations and byte-identical full and local-only exports on every eligible pair---so what the solver actually receives there is a row-by-row normalization restricted to the role-selected local rows. The coupling stage activates only on the oversized synthetic coupling patterns of \\cref{subsec:synthetic}, and its operational contribution is therefore untested."
+ },
+ {
+  "file": "main.tex",
+  "line": 1236,
+  "quote": "Together with the Flat controls these baselines split the\ncomparison into two clean questions---does the geometric-mean kernel beat a Ruiz kernel\nunder the same selection policy, and does the role-based selection beat full\ncoverage under the same kernel",
+  "category": "confirmatory-framing",
+  "why": "Frames the design as answering two clean confirmatory questions, which reads as if the contrasts were pre-specified and the answers uniform. The endpoint hierarchy was selected after inspecting the data, only one of eight fast-class contrasts survives multiplicity correction under the release build, and the direction of the role-based-versus-full-coverage answer varies by class, kernel, solver, and endpoint.",
+  "suggested": "Together with the Flat controls these baselines separate two questions---whether the geometric-mean kernel differs from a Ruiz kernel under the same selection policy, and whether role-based selection differs from full coverage under the same kernel. Both are answered per class, kernel, solver, and endpoint, and the answers are not uniform in direction; because the endpoint hierarchy was fixed after inspecting the data, these contrasts are exploratory rather than confirmatory.",
+  "severity": "medium",
+  "refined": "Together with the Flat controls these baselines separate two questions---whether the geometric-mean kernel differs from a Ruiz kernel under the same selection policy, and whether role-based selection differs from full coverage under the same kernel; the separate ``could the solver have done this itself'' control is the internal-scaling baseline of \\cref{subsec:internal-scaling}. Both contrasts are answered per class, kernel, solver, and endpoint, the answers are not uniform in direction, and because the endpoint hierarchy was fixed after inspecting the data they are exploratory rather than confirmatory."
+ },
+ {
+  "file": "main.tex",
+  "line": 317,
+  "quote": "Idealized conditioning results make this precise and justify the rule's architecture, without claiming to predict mixed-integer runtime.",
+  "category": "coupling-validated",
+  "why": "The new spectral audit (subsec:spectral-audit) directly refutes \"justify the rule's architecture\": on 1800 synthetic matrices SA-Aug obtains no conditioning advantage over its role-blind control, ties on three patterns and LOSES by 2.4x and 10.4x on exactly the two coupling-dominated patterns the local--block--coupling order was designed for. The idealized propositions therefore motivate the architecture but do not validate it; SA-Mat, not SA-Aug, is the best-conditioned rule in every pattern.",
+  "suggested": "Idealized conditioning results make this reasoning precise and motivate the local--block--coupling order. They do not validate it: the direct spectral audit of \\cref{subsec:spectral-audit} finds that every scaling rule, selective or role-blind, cuts the pseudo-condition number by seven to nine orders of magnitude, that \\methodAug{} obtains no advantage over its role-blind control, and that on the two coupling-dominated patterns---the coupling stage's own design case---it is $2.4\\times$ and $10.4\\times$ worse conditioned. The propositions are thus a design rationale, not evidence of a conditioning advantage for metadata, and they do not predict mixed-integer runtime.",
+  "severity": "high",
+  "refined": "Idealized conditioning results make this reasoning precise and motivate the local--block--coupling order, but they do not validate it. The direct spectral audit of \\cref{subsec:spectral-audit} finds that \\methodAug{} obtains no conditioning advantage over its role-blind control, and is worse conditioned on the two coupling-dominated patterns that the coupling stage was designed for. The propositions are therefore a design rationale rather than evidence of a conditioning advantage for metadata, and they do not predict mixed-integer runtime."
+ },
+ {
+  "file": "main.tex",
+  "line": 244,
+  "quote": "Its novelty lies in the order and source of the scales, not in claiming that row scaling is new. The generator first scales local component rows. It then summarizes the scale of each locally scaled block. Finally, it scales global coupling rows with the scales of the blocks they connect.",
+  "category": "coupling-validated",
+  "why": "The introduction presents the three-stage pipeline as the operative method and locates its novelty in the ordering, but the coupling stage never activates operationally: the coupling proxy is bimodal and essentially never lands in the near-identity band on real instances (\\cref{subsec:coupling-activation}). The stage that most distinguishes the method is inert in every reported operational run, so a reader is told the novelty resides in a component that never fired. The hedge at line 247--249 covers \"partly refuted\" but never discloses inertness.",
+  "suggested": "Its novelty lies in the order and source of the scales, not in claiming that row scaling is new. The generator first scales local component rows. It then summarizes the scale of each locally scaled block. Finally, it scales global coupling rows with the scales of the blocks they connect. This last stage should be read as an architectural extension rather than as part of the tested pipeline: its activation proxy is bimodal on the dispatch instances and essentially never enters the near-identity band, so the coupling stage is inert in every operational run reported here (\\cref{subsec:coupling-activation}) and all operational evidence below concerns the local and block stages only.",
+  "severity": "high",
+  "refined": "Its novelty lies in the order and source of the scales, not in claiming that row scaling is new. The generator first scales local component rows, then summarizes the scale of each locally scaled block. A third stage would scale global coupling rows with the scales of the blocks they connect; its activation proxy, however, is bimodal on the dispatch instances and essentially never enters the near-identity band, so this coupling stage is inert in every operational run reported here (\\cref{subsec:coupling-activation}). It should therefore be read as an architectural extension rather than part of the tested pipeline: all operational evidence below concerns the local and block stages."
+ },
+ {
+  "file": "main.tex",
+  "line": 347,
+  "quote": "The controlled attribution analyses sharpen the result: most of the Gurobi runtime effect flows through per-row normalization, while the direct Flat comparisons make the role-based selection policy class-, kernel-, and endpoint-dependent in the reported Gurobi campaigns.",
+  "category": "superior-policy",
+  "why": "\"Most ... flows through per-row normalization\" understates the ablation, which shows the LOCAL stage---a per-row geometric mean requiring no metadata at all---recovers essentially all of the runtime effect, and it omits the decisive point that this stage is metadata-free. It also omits solver from the dependency list (the verdict is class, kernel, solver, and endpoint) and omits that Flat matches or beats the selective rule in most contrasts, with only one of eight fast-class contrasts retaining $q_6<0.05$ under the release build.",
+  "suggested": "The controlled attribution analyses sharpen the result in the opposite direction to the method's premise: essentially the whole Gurobi runtime effect is recovered by the local stage alone---a per-row geometric mean that uses no metadata---and the direct Flat comparisons show the role-blind, full-coverage kernel matching or beating the selective rule in most contrasts, with only one of eight fast-class contrasts (Simple, augmented, $0.1\\%$) retaining an adjusted value below $0.05$ on the release build. Whether selectivity helps, hurts, or is irrelevant depends on the instance class, the kernel, the solver, and the endpoint.",
+  "severity": "high",
+  "refined": "The controlled attribution analyses sharpen the result against the method's premise: essentially the entire Gurobi runtime effect is recovered by the local stage alone---a per-row geometric mean that uses no generator metadata---and the direct Flat comparisons show the role-blind, full-coverage kernel matching or beating the selective rule in most contrasts, with only one of eight fast-class contrasts (Simple, augmented, $0.1\\%$) retaining an adjusted $q_6<0.05$ on the release build. Whether metadata selectivity helps, hurts, or is irrelevant depends on the instance class, the kernel, the solver, and the endpoint."
+ },
+ {
+  "file": "main.tex",
+  "line": 340,
+  "quote": "The paper makes three claims of different strength: the algebraic claim is exact (positive row scaling preserves the MIP); the numerical claim is empirical (structure-aware scaling lowers own-incumbent path-specific fixed-LP diagnostics in the tested instances); and the performance claim is conditional.",
+  "category": "confirmatory-framing",
+  "why": "This presents a pre-specified hierarchy of claims that the experiments then test, and \\cref{sec:results} opens with \"The results follow the hierarchy of claims\". The endpoint hierarchy was in fact selected after inspecting the data, so the headline comparison is exploratory, not confirmatory. Nothing in the introduction discloses this, and a reader will read the campaign as a pre-registered test of a stated claim triad.",
+  "suggested": "The evidence divides into three strands of different strength. The algebraic strand is exact (positive row scaling preserves the MIP). The remaining two are empirical and, importantly, \\emph{exploratory}: the endpoint hierarchy used to organize them---which diagnostic and which runtime endpoint are read as primary---was fixed after inspecting the campaign data, so the comparisons reported below are hypothesis-generating rather than confirmatory, and no single contrast should be read as a pre-specified test. Within that scope, structure-aware scaling lowers own-incumbent path-specific fixed-LP diagnostics on the tested instances, and the runtime picture is conditional.",
+  "severity": "high",
+  "refined": "The paper organizes its evidence into three strands of different strength: the algebraic strand is exact (positive row scaling preserves the MIP); the numerical strand is empirical (structure-aware scaling lowers own-incumbent path-specific fixed-LP diagnostics in the tested instances); and the performance strand is conditional. This ordering is an expository device, not a preregistration: the endpoint hierarchy organizing the direct coverage-versus-selectivity controls was fixed after inspecting those data and is exploratory (\\cref{subsec:statistical}), so those contrasts are hypothesis-generating, and the study is best read as a controlled comparison of coverage against selectivity rather than as a confirmatory test of a superior policy. Under fixed-pool intent-to-treat PAR10, at least one structure-aware variant is below Base in each Gurobi class and tolerance, while under CPLEX 22.1.2.0 there is no robust gain."
+ },
+ {
+  "file": "main.tex",
+  "line": 328,
+  "quote": "The hydrothermal model thus supplies a realistic stress test for a layer that targets any generated MIP with local components and sparse global coupling.",
+  "category": "over-generalization",
+  "why": "All evidence comes from three instance classes of a single application domain (hydrothermal dispatch), two solvers, one hardware platform, one run per cell. The sentence closes the domain-scope paragraph by asserting the testbed licenses conclusions for \"any generated MIP\" of the structural type, with no statement that external validity beyond this domain is untested.",
+  "suggested": "The hydrothermal model thus supplies a realistic stress test for a layer whose intended target is any generated MIP with local components and sparse global coupling. That intent is not established by the evidence collected here: all operational results come from three instance classes of a single application domain, two commercial solvers, and one hardware platform, so whether the coverage-versus-selectivity findings transfer to other generated block-structured domains remains open.",
+  "severity": "medium",
+  "refined": "The hydrothermal model thus supplies a realistic stress test for a layer whose intended target is any generated MIP with local components and sparse global coupling. Whether the coverage-versus-selectivity findings transfer beyond this domain, however, is not established here: all operational results come from three instance classes of a single application, so their generalization to other block-structured domains remains open."
+ },
+ {
+  "file": "main.tex",
+  "line": 150,
+  "quote": "The structure-aware variants generally reduce own-incumbent fixed-LP diagnostics,",
+  "category": "diagnostic-overreach",
+  "why": "The own-incumbent fixed-LP diagnostic does not in fact hold the LP fixed: it is path-specific, so it is not a clean measure of representation quality. The introduction discloses this at lines 350--352, but the abstract states the reduction flatly and even drops the \"path-specific\" qualifier used elsewhere, so the abstract-only reader takes it as a representation-quality result.",
+  "suggested": "The structure-aware variants generally reduce own-incumbent path-specific fixed-LP diagnostics---a path-dependent readout that does not hold the underlying LP fixed and is therefore not a clean measure of representation quality,",
+  "severity": "medium",
+  "refined": "The structure-aware variants are associated with lower own-incumbent path-specific fixed-LP diagnostics---a readout taken along each variant's own solve path, and so not a clean measure of representation quality---"
+ },
+ {
+  "file": "main.tex",
+  "line": 185,
+  "quote": "Positive, structure-keyed row factors applied in a local--block--coupling order lowered\n  the reported own-incumbent path-specific fixed-LP diagnostic without changing the MIP;",
+  "category": "coupling-validated",
+  "why": "This attributes the diagnostic improvement to the local--block--coupling order, i.e. to the structure keying. The coupling stage never activated on any operational instance, and the stage-attribution ablation shows the metadata-free local stage recovers essentially all of the effect, so the credited mechanism is the per-row kernel, not the ordering or the metadata.",
+  "suggested": "Positive per-row factors lowered the reported own-incumbent path-specific fixed-LP diagnostic without changing the MIP; the stage-attribution ablation traces essentially all of that movement to the metadata-free local stage, and the coupling stage of the local--block--coupling order did not activate on any operational instance;",
+  "severity": "medium",
+  "refined": "Positive per-row factors lowered the reported own-incumbent path-specific fixed-LP diagnostic without changing the MIP; the stage-attribution ablation traces essentially all of that movement to the metadata-free local stage, and the coupling stage of the local--block--coupling order never activated on an operational instance;"
+ },
+ {
+  "file": "main.tex",
+  "line": 146,
+  "quote": "proposed local--block--coupling layer applies geometric-mean row normalization while",
+  "severity": "high",
+  "category": "coupling-validated",
+  "why": "The abstract names the method by its three-stage architecture (local-block-coupling) and presents all three stages as the evaluated object. Objection 2 (accepted) is that the coupling stage never activates on any operational instance: the coupling proxy is bimodal and essentially never lands in the near-identity band, so the stage that most distinguishes the method is inert in every reported operational run. Naming it as part of the evaluated layer, with no disclosure, lets a reader believe a three-stage structure-aware design was tested and worked.",
+  "suggested": "Replace with: \"The layer studied here applies geometric-mean row normalization in a local--block--coupling order while preserving the MIP exactly; on the instances reported the coupling stage never activates, so the operational evidence covers the local and block stages only and the coupling stage remains an operationally unvalidated extension.\"",
+  "refined": "The proposed layer applies geometric-mean row normalization in a local--block--coupling order while preserving the MIP exactly; the coupling stage never activates on the reported instances, so the operational evidence covers the local and block stages only, leaving coupling an unvalidated extension."
+ },
+ {
+  "file": "main.tex",
+  "line": 152,
+  "quote": "Under fixed-pool intent-to-treat PAR10, at least one\nstructure-aware variant is below Base in every Gurobi class and tolerance",
+  "severity": "high",
+  "category": "confirmatory-framing",
+  "why": "Two problems. (a) The endpoint hierarchy was selected after inspecting the data (objection 1, accepted), so this is an exploratory result presented in confirmatory language. (b) \"at least one structure-aware variant\" is a maximum taken over variants within each cell, which is itself a selection with no multiplicity control; the abstract's later text concedes the one favourable cell has a negligible margin that does not replicate at 1%. As written this is the sentence a reader will carry away as the paper's positive headline.",
+  "suggested": "Replace with: \"Under fixed-pool intent-to-treat PAR10 -- an endpoint hierarchy fixed after inspecting the data, so exploratory throughout -- some structure-aware variant falls below Base in each Gurobi class and tolerance, but the identity of that variant changes across cells, the best margin is negligible and does not replicate across tolerances, and no robust gain appears under CPLEX.\"",
+  "refined": "Under fixed-pool intent-to-treat PAR10---an endpoint fixed after inspecting the data, hence exploratory---some structure-aware variant falls below Base in each Gurobi class and tolerance, though not the same variant across cells and with a best margin that is negligible and does not replicate across tolerances; no robust gain appears under CPLEX."
+ },
+ {
+  "file": "main.tex",
+  "line": 157,
+  "quote": "while reliability-adjusted PAR10\nfavors the selective rule there.",
+  "severity": "high",
+  "category": "superior-policy",
+  "why": "This is the single surviving contrast out of eight (Simple/SA-Aug at 0.1%, ~0.9% median), and the abstract closes on it by pointing out an additional reliability-adjusted endpoint that favours the selective rule. Selecting the one favourable endpoint for the one favourable contrast is exactly the confirmatory reading the accepted verdict rules out, and it converts a lone survivor into evidence for a superior policy.",
+  "suggested": "Replace with: \"and that single surviving contrast should be read as one exploratory cell out of eight rather than as evidence for the selective rule; secondary reliability-adjusted readings of the same cell do not add independent support.\"",
+  "refined": "while a secondary reliability-adjusted PAR10 reading of that same cell points the same way without adding independent support."
+ },
+ {
+  "file": "main.tex",
+  "line": 155,
+  "quote": "Capped solver-time effects are small: only the\naugmented Simple contrast at $0.1\\%$ has nominal adjusted values below $0.05$",
+  "severity": "medium",
+  "category": "variability-ignored",
+  "why": "Objection 6 (accepted): MIP run-to-run variability is of the same order as the ~1% effects being claimed, and the design has one run per cell with no seed replication. The abstract quotes adjusted significance thresholds for effects of this magnitude without ever telling the reader that a single unreplicated run underlies each cell, which makes the inferential statements look better supported than the design allows.",
+  "suggested": "Replace with: \"Capped solver-time effects are small and of the same order as this solver's run-to-run variability, which the design (one run per cell, no seed replication) cannot separate from them: only the augmented Simple contrast at $0.1\\%$ has nominal adjusted values below $0.05$\"",
+  "refined": "Capped solver-time effects are small---of the order of this solver's unreplicated run-to-run variability, which the single-run-per-cell design cannot separate from them---and only the augmented Simple contrast at $0.1\\%$ has nominal adjusted values below $0.05$"
+ },
+ {
+  "file": "main.tex",
+  "line": 184,
+  "quote": "Positive, structure-keyed row factors applied in a local--block--coupling order lowered",
+  "severity": "high",
+  "category": "coupling-validated",
+  "why": "Same problem as the abstract, in the block a practitioner reads for takeaways: the coupling stage is presented as an operative part of the applied rule when it never activates on operational instances. The point also rests on the own-incumbent fixed-LP diagnostic, which does not hold the LP fixed; \"reported\" and \"path-specific\" hint at this but do not tell the practitioner the diagnostic cannot be read as representation quality.",
+  "suggested": "Replace with: \"Positive, structure-keyed row factors applied in a local--block order lowered the own-incumbent fixed-LP diagnostic without changing the MIP -- though that diagnostic is path-specific and not a clean measure of representation quality; the coupling stage never activated on any instance tested, so it remains unvalidated in operation, and on an\"",
+  "refined": "Positive, structure-keyed row factors applied in a local--block order lowered the own-incumbent fixed-LP diagnostic without changing the MIP, though that path-specific diagnostic is not a clean measure of representation quality; the coupling stage never activated on any instance tested, so it remains operationally unvalidated. On an already well-scaled model the selective rule can widen the exported range instead."
+ },
+ {
+  "file": "main.tex",
+  "line": 202,
+  "quote": "Under fixed-pool intent-to-treat PAR10, at least one structure-aware variant is below\n  Base in every Gurobi class and tolerance.",
+  "severity": "high",
+  "category": "confirmatory-framing",
+  "why": "This opens the final practitioner point with a best-of-variants statement over an endpoint hierarchy that was chosen after inspecting the data. A practitioner reads it as \"structure-aware scaling beats no scaling under Gurobi everywhere\", which is the superior-policy conclusion the authors have accepted must go; the qualifications that follow (negligible margin, no replication at 1%) do not undo the lead sentence.",
+  "suggested": "Replace with: \"Under fixed-pool intent-to-treat PAR10---an exploratory endpoint chosen after inspecting the data---some structure-aware variant falls below Base in each Gurobi class and tolerance, but not the same variant in each, and the ordering is not stable across tolerances.\"",
+  "refined": "Under fixed-pool intent-to-treat PAR10---an exploratory endpoint selected after inspecting the data---some structure-aware variant falls below Base in each Gurobi class and tolerance, but not the same variant in each, and the ordering does not persist across tolerances."
+ }
+]

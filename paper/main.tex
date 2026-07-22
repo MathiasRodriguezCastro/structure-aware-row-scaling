@@ -143,19 +143,28 @@
 Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, although
 their generators retain row roles, block ownership, and coupling incidence. We study whether
 this metadata should select which constraints receive positive pre-export row scaling. The
-proposed local--block--coupling layer applies geometric-mean row normalization while
-preserving the MIP exactly; returned solutions are verified on the original constraints. We
+layer under study applies geometric-mean row normalization in a local--block--coupling order
+while preserving the MIP exactly; returned solutions are verified on the original constraints.
+Its coupling stage never activates on any operational instance tested, so the operational
+evidence covers the local and block stages only and coupling remains an unvalidated
+extension. We
 evaluate it on three hydrothermal-dispatch classes, two commercial solvers, and two MIPGap
 tolerances, against unscaled, Ruiz-kernel, solver-internal, and role-blind full-coverage
-controls. The structure-aware variants generally reduce own-incumbent fixed-LP diagnostics,
-but a synthetic mechanism check finds no general exported-range advantage over applying the
-same per-row kernel to every row. Under fixed-pool intent-to-treat PAR10, at least one
-structure-aware variant is below Base in every Gurobi class and tolerance, whereas no robust
-gain appears under CPLEX. Direct exploratory Gurobi controls show that the coverage ordering
-depends on class, kernel, and endpoint. Capped solver-time effects are small: only the
-augmented Simple contrast at $0.1\%$ has nominal adjusted values below $0.05$ across the
-reported multiplicity and operational-family analyses, while reliability-adjusted PAR10
-favors the selective rule there. The current prototype has lower preprocessing-plus-solver
+controls. The structure-aware variants are associated with lower own-incumbent fixed-LP
+diagnostics---a readout taken along each variant's own solve path, and so not a clean measure
+of representation quality---but a synthetic mechanism check finds no general exported-range
+advantage over applying the same per-row kernel to every row, and a direct spectral audit of
+that grid finds no conditioning advantage either. Under fixed-pool intent-to-treat
+PAR10---an endpoint selected after inspecting the data, hence exploratory---some
+structure-aware variant falls below Base in each Gurobi class and tolerance, though not the
+same variant across cells and without replicating across tolerances; no robust gain appears
+under CPLEX. Direct exploratory Gurobi controls show that the coverage ordering
+depends on class, kernel, and endpoint. Capped solver-time effects are small---of the order of
+this solver's unreplicated run-to-run variability, which the single-run-per-cell design cannot
+separate from them---and only the augmented Simple contrast at $0.1\%$ has nominal adjusted
+values below $0.05$ across the reported multiplicity and operational-family analyses, while a
+secondary reliability-adjusted PAR10 reading of that same cell points the same way without
+adding independent support. The current prototype has lower preprocessing-plus-solver
 time under full coverage in the two fast classes, but most of that preprocessing difference
 comes from rebuilding metadata the generator already possesses; a cached-metadata
 sensitivity on a release build moves the effects toward parity and, under the baseline
@@ -181,9 +190,12 @@ search.
 \begin{itemize}
   \item Model generators know each row's role, block ownership, and coupling incidence---metadata
   a flat export discards but that can drive numerical preprocessing.
-  \item Positive, structure-keyed row factors applied in a local--block--coupling order lowered
-  the reported own-incumbent path-specific fixed-LP diagnostic without changing the MIP; on an
-  already well-scaled model the selective rule can widen the exported range instead.
+  \item Positive per-row factors lowered the reported own-incumbent path-specific fixed-LP
+  diagnostic without changing the MIP, though that path-specific readout is not a clean measure
+  of representation quality. The stage-attribution ablation traces essentially all of that
+  movement to the metadata-free local stage, and the coupling stage never activated on any
+  operational instance tested, so it remains operationally unvalidated; on an already
+  well-scaled model the selective rule can widen the exported range instead.
   \item In exploratory single-default-seed Gurobi control batches, coverage versus
   selectivity depends on the endpoint. On preprocessing-plus-solver time the implemented
   role-blind pipeline has lower observed time in Simple and SG-Ter-Mer at both tolerances
@@ -199,8 +211,10 @@ search.
   are at most $1.6\%$ and the augmented Simple contrast at $0.1\%$ is the only comparison
   whose nominal adjusted values remain below $0.05$ across the reported multiplicity and
   operational-family analyses; all coefficient-only comparisons remain inconclusive.
-  \item Under fixed-pool intent-to-treat PAR10, at least one structure-aware variant is below
-  Base in every Gurobi class and tolerance. SG-Ter-Mer at $0.1\%$ is the only cell with both
+  \item Under fixed-pool intent-to-treat PAR10---an exploratory endpoint selected after
+  inspecting the data---some structure-aware variant falls below Base in each Gurobi class and
+  tolerance, but not the same variant in each, and the ordering does not persist across
+  tolerances. SG-Ter-Mer at $0.1\%$ is the only cell with both
   strict-adjusted costs below Base, but the SA-Aug margin is negligible and the pattern is not
   replicated at $1\%$; no robust gain appears under CPLEX. In the direct SA--Flat reliability
   audit, the Simple strict/mixed aggregate ordering reverses toward SA-Aug, while SG-Ter-Mer
@@ -243,8 +257,10 @@ We answer this question with a structure-aware row-scaling framework. The method
 only whole constraints, including their right-hand sides. Hence it preserves the original
 mixed-integer optimization problem. Its novelty lies in the order and source of the
 scales, not in claiming that row scaling is new. The generator first scales local component
-rows. It then summarizes the scale of each locally scaled block. Finally, it scales global
-coupling rows with the scales of the blocks they connect. Throughout the paper, this
+rows. It then summarizes the scale of each locally scaled block. A third stage would scale
+global coupling rows with the scales of the blocks they connect; on every operational instance
+tested its activation condition is never met, so that stage is exercised only on the synthetic
+grid and is reported here as an extension rather than as validated machinery. Throughout the paper, this
 local--block--coupling architecture is treated as a \emph{candidate} structure-aware policy
 whose stages, coverage, and pipeline sensitivity are evaluated---and partly refuted---empirically.
 
@@ -315,8 +331,10 @@ The numerical rationale is also local--block--coupling. In an ideal block-diagon
 scalar block scaling can reduce scale separation between blocks but cannot repair a block's
 intrinsic conditioning; once coupling rows are added, their relevant magnitude is their size
 relative to the scaled local blocks, not their raw coefficients. Idealized conditioning
-results make this precise and justify the rule's architecture, without claiming to predict
-mixed-integer runtime.
+results make this reasoning precise and motivate the local--block--coupling order, but they do
+not validate it and do not claim to predict mixed-integer runtime. The direct spectral audit of
+\cref{subsec:spectral-audit} finds that the augmented rule obtains no conditioning advantage
+over applying the same kernel to every row.
 
 We test the method on short-term hydrothermal dispatch, used not as a new formulation but as a
 demanding testbed: it creates local hydro, thermal, market, shortage, and demand modules linked
@@ -337,16 +355,18 @@ used as the experimental platform
 We take the formulation as given and insert the proposed preprocessing layer after model
 generation and before solver invocation.
 
-The paper makes three claims of different strength: the algebraic claim is exact (positive row
-scaling preserves the MIP); the numerical claim is empirical (structure-aware scaling lowers
-own-incumbent path-specific fixed-LP diagnostics in the tested instances); and the performance
-claim is conditional. Under fixed-pool intent-to-treat PAR10, at least one structure-aware
-variant is below Base in each Gurobi class and tolerance, while under CPLEX 22.1.2.0 there is no
-robust gain. SG-Ter-Mer at $0.1\%$ is the only cell in which both variants remain below Base
+The paper organizes its evidence into three strands of different strength: the algebraic strand
+is exact (positive row scaling preserves the MIP); the numerical strand is empirical
+(structure-aware scaling lowers own-incumbent path-specific fixed-LP diagnostics in the tested
+instances); and the performance strand is conditional and exploratory. Under fixed-pool
+intent-to-treat PAR10---an endpoint fixed after inspecting the data---some structure-aware
+variant falls below Base in each Gurobi class and tolerance, though not the same variant in
+each, while under CPLEX 22.1.2.0 there is no robust gain. SG-Ter-Mer at $0.1\%$ is the only cell in which both variants remain below Base
 after strict reliability adjustment; this is a descriptive penalized-cost ordering, the
 SA-Aug margin is negligible, and it is not replicated at $1\%$. The controlled attribution
-analyses sharpen the result: most of the Gurobi runtime effect flows through per-row
-normalization, while the direct Flat comparisons make the role-based selection policy
+analyses sharpen the result against the method's own premise: essentially the entire Gurobi
+runtime effect is recovered by the local stage alone---a per-row geometric mean that consumes
+no generator metadata---while the direct Flat comparisons make the role-based selection policy
 class-, kernel-, and endpoint-dependent in the reported Gurobi campaigns. The path-specific diagnostic
 moves in the intended numerical direction, but it is neither a pure measure of representation
 nor a proven cause of acceleration.
@@ -841,9 +861,9 @@ preserves the original units and domains of all variables; integer and binary va
 not require reinterpretation, and objective coefficients are left in their original
 economic units. Column scaling can be useful as a generic numerical device, so a
 Ruiz-plus-column baseline is included in the experiments. It is not part of the proposed
-structure-aware layer because the central claim is that row-role and coupling metadata
-alone already provide useful pre-export numerical information while keeping the
-transformation algebraically transparent.
+structure-aware layer because that layer is the object under study: a row-based,
+algebraically transparent transformation whose row-role and coupling metadata is precisely
+what the controlled comparison against role-blind coverage is designed to evaluate.
 
 
 % -------------------------------------------------------------------------
@@ -2431,7 +2451,7 @@ is not interchangeable with the Ruiz kernel even under the same structural pipel
 % the Supporting Information (Figures S1-S3, supporting-information.tex).
 \begin{table*}[!tbp]
 \centering
-\caption{Paired Gurobi tests show a distributional runtime shift in favor of the structure-aware variants, especially in Simple and SG-Ter-Mer.}
+\caption{Paired Gurobi tests show a distributional runtime shift for both structure-aware variants relative to the unscaled base formulation, especially in Simple and SG-Ter-Mer. The contrast that isolates metadata selectivity is against the role-blind controls, not against Base, and is reported in \cref{subsec:stage-attribution}.}
 \label{tab:wilcoxon-structured-gurobi}
 \small
 \begin{tabular}{@{}lllrrrrr@{}}
@@ -2474,7 +2494,9 @@ mixed-adjusted \PARten{} orderings in \cref{tab:par10-readings}.
 \noindent The paired tests in \cref{tab:wilcoxon-structured-gurobi} support the descriptive
 Gurobi pattern. The signs are favorable for both structure-aware variants, and after
 Benjamini--Hochberg adjustment both are significant in Simple and SG-Ter-Mer in both Gurobi
-scenarios. In Full, neither \methodAug{} result is significant after adjustment
+scenarios. These tests compare scaled against unscaled formulations, so they establish that
+scaling helps, not that role selectivity does; the role-blind controls of
+\cref{subsec:stage-attribution} carry that second question and answer it less favorably. In Full, neither \methodAug{} result is significant after adjustment
 ($q_{\mathrm{BH}}=0.15$ at $1\%$ and $0.11$ at $0.1\%$); the latter changes from the earlier
 complete-case result once one-sided aborts are retained at the cap. Given the small sample,
 censoring, and run-to-run variability, Full remains directional rather than inferential
@@ -2681,7 +2703,9 @@ under both solvers, but CPLEX does not convert it into a robust runtime effect.
 
 
 \noindent Summarizing the four scenarios by their best descriptive variant makes the solver
-contrast visible at a glance: the structure-aware rules hold the lowest shifted geometric
+contrast visible at a glance. Among the main-campaign variants---the unscaled base, the two
+structure-aware rules and the two Ruiz baselines, a pool that contains no role-blind
+control---the structure-aware rules hold the lowest shifted geometric
 times in every Gurobi cell (\methodMat{} in Simple and SG-Ter-Mer, \methodAug{} in Full, at
 both tolerances), whereas the CPLEX winners are heterogeneous---varying from \methodAug{} to
 \methodBase{} to \methodRuiz{} by class and tolerance---and must be read together with the
@@ -3290,9 +3314,11 @@ the solver-facing conditioning diagnostics (\cref{tab:gurobi-gap0001-relative-co
 but on these operational classes that gain comes from the \emph{local} stage: in the activation-audit
 runs the coupling-only variant leaves the solver-level conditioning ratio at one (recorded in
 the reproducibility artifacts; it is inert
-in both conditioning and runtime here), while the coupling stage's ability to repair a
-\emph{collective} displacement of the coupling rows is what the controlled synthetic
-coupling-uniform pattern demonstrates (\cref{subsec:synthetic-results}). The coupling
+in both conditioning and runtime here), while the coupling stage's repair of a
+\emph{collective} displacement of the coupling rows is exercised only in the controlled
+synthetic grid (\cref{subsec:synthetic-results}), and there only on the oversized branch of the
+coupling-uniform pattern; on the spectral reading of that same grid it does not beat role-blind
+coverage (\cref{subsec:spectral-audit}). The coupling
 metadata drives neither the
 conditioning improvement nor the runtime gain on the operational testbed. The row-role
 metadata, used as a \emph{selection filter} for the per-row kernel, has no uniform runtime
@@ -3673,10 +3699,11 @@ generator would need either to instrument the export path or to \emph{recover} b
 structure after export, for example by hypergraph or matrix partitioning of the kind used by
 automatic Dantzig--Wolfe structure detectors \cite{bergner2015automatic}; such a fallback widens applicability beyond
 owned generators at the price of an approximate, detected block map. The practical value
-proposition is correspondingly narrow and concrete: for a Gurobi user running many hard
-instances of a generated model whose structure is known, the method can reduce aggregate
-runtime and may occasionally rescue a near-limit instance at low absolute but
-non-negligible preprocessing cost. For repeated hard instances, that cost may be small
+proposition is correspondingly narrow: for a Gurobi user running many hard
+instances of a generated model, row scaling can reduce aggregate
+runtime relative to the unscaled base and may occasionally rescue a near-limit instance at low
+absolute but non-negligible preprocessing cost. These data do not establish that the metadata
+selection layer is what delivers that reduction; the role-blind controls recover it as well. For repeated hard instances, that cost may be small
 relative to solver time and may be amortized when structural metadata are cached; on fast
 instances, however, the measured preprocessing overhead is large enough to determine the
 preprocessing-plus-solver ordering (\cref{subsec:stage-attribution})---though in absolute terms that
@@ -3734,8 +3761,11 @@ A second limitation is that the operational testbed does not exercise the coupli
 The coupling-stage activation audit finds zero activations and byte-identical full/local-only
 exports in every eligible pair, so it establishes that the observed operational transformation
 is entirely local-row normalization; it cannot estimate how the coupling stage would affect
-runtime on real instances where it activates. That marginal mechanism is tested only on the
-synthetic benchmark, and transferring it to another operational generator remains open.
+runtime on real instances where it activates. That marginal mechanism is exercised only on the
+synthetic benchmark, and there the evidence is unfavorable rather than merely incomplete: on
+the magnitude-range proxy its distinctive repair is confined to the oversized branch of its
+collective design case, and on the direct spectral reading it does not beat role-blind
+coverage. Transferring it to another operational generator remains open.
 
 A third limitation is the choice of the row as the unit of intervention. The method scales
 complete rows, which keeps the transformation trivially equivalence-preserving and leaves
@@ -3863,8 +3893,12 @@ selective values are lower in SG-Ter-Mer and Full even when runtime does not fol
 ordering. Separately, on the synthetic benchmark the full-coverage Flat rule matches or beats
 every structure-aware variant on the exported global coefficient-and-right-hand-side
 magnitude-range proxy, and the coupling stage's distinctive repair is confined to its
-collective design case. No spectral condition number is measured there, so this supports no
-claim of spectral optimality or a general conditioning advantage of metadata over full
+collective design case. The spectral audit of that same grid (\cref{subsec:spectral-audit})
+measures $\kappa_2^{+}$ directly, and its verdict is split: every rule cuts the
+pseudo-condition number by seven to nine orders of magnitude wherever row-multiplicative
+imbalance is present, but \methodAug{} obtains no advantage over its role-blind control,
+tying on three patterns and losing on the two coupling-dominated ones. This supports no
+claim of spectral optimality or of a conditioning advantage of metadata over full
 coverage. On the
 \emph{runtime} side, the operational activation audit establishes
 that the coupling stage is inactive on the hydrothermal instances and that the exported
