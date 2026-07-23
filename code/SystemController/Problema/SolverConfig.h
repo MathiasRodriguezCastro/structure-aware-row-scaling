@@ -35,6 +35,12 @@ struct SolverConfig {
     /// Escalado interno de CPLEX (IloCplex::Param::Read::Scale): -1 sin escalado,
     /// 0 equilibrado estándar (default), 1 agresivo. SOLVER_PARAM_AUTO ⇒ no se modifica.
     int scaleIndCplex   = SOLVER_PARAM_AUTO;
+    /// Semilla aleatoria del solver (Gurobi GRB_IntParam_Seed / CPLEX Param::RandomSeed).
+    /// SOLVER_PARAM_AUTO ⇒ no se modifica (default del solver, reproducible corrida a corrida).
+    /// Permite estimar la variabilidad corrida-a-corrida del MIP, que es del mismo orden que
+    /// los efectos ~1 % que reporta el paper: sin réplica de semilla no se puede separar el
+    /// efecto del escalado del ruido del solver.
+    int semillaSolver = SOLVER_PARAM_AUTO;
     /// Presolve de CPLEX (IloCplex::Param::Preprocessing::Presolve): 0 off, 1 on (default).
     /// SOLVER_PARAM_AUTO => no se modifica. Sondeo R1: ¿el presolve de CPLEX absorbe el efecto
     /// del escalado externo? (dependencia del solver).

@@ -195,7 +195,12 @@ void ProblemaGurobi::resolverMonolitico() {
 
         // Reproducibilidad: semilla fija y, si el entorno la define (SLURM OMP_NUM_THREADS),
         // número de hilos fijo. Con semilla + hilos fijos Gurobi es determinista.
-        modelo->set(GRB_IntParam_Seed, 1);
+        // El default sigue siendo 1 (la semilla con la que se produjeron todos los resultados
+        // publicados); --seed N la cambia para estimar la variabilidad corrida-a-corrida.
+        modelo->set(GRB_IntParam_Seed,
+                    config.semillaSolver != SolverConfig::SOLVER_PARAM_AUTO
+                        ? config.semillaSolver
+                        : 1);
         if (const char* h = std::getenv("OMP_NUM_THREADS")) {
             try { int nh = std::stoi(h); if (nh > 0) modelo->set(GRB_IntParam_Threads, nh); }
             catch (...) {}

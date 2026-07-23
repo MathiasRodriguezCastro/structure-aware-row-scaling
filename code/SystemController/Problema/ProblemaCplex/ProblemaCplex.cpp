@@ -154,7 +154,12 @@ void ProblemaCplex::resolverMonolitico() {
                             config.presolveIndCplex != 0);
         }
         // Reproducibilidad: semilla fija y, si el entorno lo define, número de hilos fijo.
-        solver.setParam(IloCplex::Param::RandomSeed, 1);
+        // El default sigue siendo 1 (la semilla de todos los resultados publicados);
+        // --seed N la cambia para estimar la variabilidad corrida-a-corrida.
+        solver.setParam(IloCplex::Param::RandomSeed,
+                        config.semillaSolver != SolverConfig::SOLVER_PARAM_AUTO
+                            ? config.semillaSolver
+                            : 1);
         if (const char* h = std::getenv("OMP_NUM_THREADS")) {
             try { int nh = std::stoi(h); if (nh > 0) solver.setParam(IloCplex::Param::Threads, nh); }
             catch (...) {}

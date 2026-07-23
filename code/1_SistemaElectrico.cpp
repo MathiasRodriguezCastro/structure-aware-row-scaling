@@ -732,6 +732,20 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                             }
                             config.scaleFlagGurobi = val;
 
+                        } else if (args[i] == "--seed" || args[i] == "-seed") {
+                            // Réplica de semilla: variabilidad corrida-a-corrida del MIP.
+                            if (i + 1 >= args.size()) {
+                                std::cerr << "\033[31m[error] --seed requiere un valor entero >= 0\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            int val;
+                            try { val = std::stoi(args[++i]); } catch (...) { val = -1; }
+                            if (val < 0) {
+                                std::cerr << "\033[31m[error] --seed debe ser un entero >= 0\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            config.semillaSolver = val;
+
                         } else if (args[i] == "--cplexscale" || args[i] == "-cplexscale") {
                             // Baseline R1: escalado interno de CPLEX (Read::Scale: -1,0,1).
                             if (i + 1 >= args.size()) {
