@@ -430,7 +430,10 @@ the numerical magnitudes passed to the solver. These magnitudes can affect feasi
 tolerances, relaxation stability, presolve transformations, cut generation, basis quality,
 and the numerical behavior of LP relaxations. Practical guidelines for difficult LP and
 MIP models warn that large coefficient ranges and poor scaling can harm solver
-performance even when the mathematical formulation is correct \cite{klotz2013lp,klotz2013mip}.
+performance even when the mathematical formulation is correct \cite{klotz2013lp,klotz2013mip},
+and the dedicated treatment of identifying and correcting ill-conditioning in linear and
+integer programs \cite{klotz2014illconditioning} is the closest published counterpart to the
+solver-facing diagnostic apparatus this paper reports in \cref{subsec:original-scale-audit}.
 
 This paper uses that observation in a restricted way: it does not claim coefficient compression
 is itself an objective, nor that a smaller coefficient range must speed up branch-and-bound. A MIP
@@ -484,10 +487,19 @@ generator metadata before the exported matrix loses it.
 
 The MIP literature also stresses that formulation quality matters: two algebraically
 related formulations can describe the same modeling intention but lead to different
-relaxations, numerics, and search behavior \cite{vielma2015formulation}. The present
-work is adjacent to that tradition but changes a different object. It does not strengthen
-the formulation, add valid inequalities, alter variables, or change the feasible set. It
-changes only the positive row multipliers applied to complete constraints.
+relaxations, numerics, and search behavior \cite{vielma2015formulation}. On this paper's
+own application class, the tight-and-compact tradition is the established answer to
+whether representation changes solver behavior: reformulating the thermal unit-commitment
+problem to tighten its relaxation and shrink its size yields large, repeatable solver-time
+reductions \cite{carrion2006uc,moralesespana2013tight}. That strand changes the
+\emph{algebraic} representation---the variables, the constraints, the feasible polytope---and
+is the natural rival hypothesis to the one studied here. The present work is adjacent to it
+but changes a different object. It does not strengthen the formulation, add valid
+inequalities, alter variables, or change the feasible set; it changes only the positive row
+multipliers applied to complete constraints. The two levers are complementary rather than
+competing, and the results below---in which the numerical lever moves runtime by at most a
+few percent---are consistent with the algebraic lever being the larger one on this class,
+which the tight-formulation literature already documents.
 
 The method is also adjacent to structural decomposition. Like Dantzig--Wolfe, Benders, or
 Lagrangian approaches, it recognizes local blocks and global linking rows. Unlike those
@@ -3889,7 +3901,10 @@ evidence is therefore a finding about the tested pipeline, not a universal state
 
 A related threat is run-to-run performance variability. Each instance--variant--scenario cell
 is measured by a single run under default solver seeds, so the well-documented variability of
-MIP performance is not averaged out. The repeated Base campaigns provide an empirical
+MIP performance \cite{lodi2013variability}---in which a semantically neutral perturbation such
+as a permutation or a seed change routinely shifts per-instance solve time by ten percent or
+more, and which motivates the variability-aware evaluation protocols of modern benchmark
+libraries \cite{gleixner2021miplib}---is not averaged out. The repeated Base campaigns provide an empirical
 cross-campaign drift check, not a statistical bound on seed-level variability: they are
 separate controls, run in different batches and on different eligible subsets, and they
 supply only a handful of observed points. Across the observed campaigns---the main
