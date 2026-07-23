@@ -140,45 +140,29 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, although
-their generators retain row roles, block ownership, and coupling incidence. We study whether
-this metadata should select which constraints receive positive pre-export row scaling. The
-layer under study applies geometric-mean row normalization in a local--block--coupling order
-while preserving the MIP exactly. We verify every returned solution against the original
-unscaled constraints, and under the pre-declared absolute criterion the proposed default
-\emph{degrades} that reliability relative to the unscaled base, failing more often on
-zero-right-hand-side balance rows; we report the strict reading as primary rather than a
-more permissive one introduced afterwards.
-Its coupling stage never activates on any operational instance tested, so the operational
-evidence covers the local and block stages only and coupling remains an unvalidated
-extension. We
-evaluate it on three hydrothermal-dispatch classes, two commercial solvers, and two MIPGap
-tolerances, against unscaled, Ruiz-kernel, solver-internal, and role-blind full-coverage
-controls. The structure-aware variants are associated with lower own-incumbent fixed-LP
-diagnostics---a readout taken along each variant's own solve path, and so not a clean measure
-of representation quality---but a synthetic mechanism check finds no general exported-range
-advantage over applying the same per-row kernel to every row, and a direct spectral audit of
-that grid finds no conditioning advantage either. Under fixed-pool intent-to-treat
-PAR10---an endpoint selected after inspecting the data, hence exploratory---some
-structure-aware variant falls below Base in each Gurobi class and tolerance, though not the
-same variant across cells and without replicating across tolerances; no robust gain appears
-under CPLEX. Direct exploratory Gurobi controls show that the coverage ordering
-depends on class, kernel, and endpoint. Capped solver-time effects are small---of the order of
-this solver's unreplicated run-to-run variability, which the single-run-per-cell design cannot
-separate from them---and only the augmented Simple contrast at $0.1\%$ has nominal adjusted
-values below $0.05$ across the reported multiplicity and operational-family analyses, while a
-secondary reliability-adjusted PAR10 reading of that same cell points the same way without
-adding independent support. The current prototype has lower preprocessing-plus-solver
-time under full coverage in the two fast classes, but most of that preprocessing difference
-comes from rebuilding metadata the generator already possesses; a cached-metadata
-sensitivity on a release build moves the effects toward parity and, under the baseline
-cross-protocol construction, leaves one of the eight fast-class contrasts with a
-within-tolerance nominal adjusted value below $0.05$. In Full, the selective direction is not supported by the adversarial signed-rank
-sensitivity over the unrecorded pairs. The observed effect
-of external preprocessing differs between the tested Gurobi and CPLEX pipelines, though no
-formal cross-solver interaction is estimated. Overall, metadata-driven selectivity is not
-uniformly superior, and improved numerical diagnostics need not translate into faster MIP
-search.
+Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, though
+their generators retain each row's role, block ownership, and coupling incidence. We ask
+whether this metadata should select which constraints receive positive pre-export row scaling.
+The layer studied here applies geometric-mean row normalization in a local--block--coupling
+order, preserves the MIP exactly, and verifies every returned solution against the original
+unscaled constraints. We test it on three hydrothermal-dispatch classes, two commercial
+solvers, and two MIPGap tolerances, against unscaled, Ruiz-kernel, solver-internal, and
+role-blind full-coverage controls, together with a synthetic mechanism grid carrying a direct
+spectral audit.
+
+The result is a controlled negative one. The distinctive coupling stage never activates on any
+operational instance, so it remains an unvalidated extension. The role-blind full-coverage
+control matches or beats the selective rule on the exported-range proxy, on the spectral
+condition number, and on most runtime endpoints, so metadata-driven selectivity is not
+uniformly superior. Runtime effects are of the order of the solver's own unreplicated
+run-to-run variability, which a single-run-per-cell design cannot separate from them; only one
+of twelve contrasts clears multiplicity adjustment, and none under CPLEX. Under the
+pre-declared absolute criterion the proposed default \emph{degrades} original-scale reliability
+relative to the base, concentrated on zero-right-hand-side balance rows, and we report the
+strict reading as primary.
+
+The transferable lesson outlives the method: the rule with the best numerical diagnostic is not
+the fastest, so numerical improvement and solver acceleration must be measured separately.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -192,38 +176,17 @@ search.
 
 \section*{Practitioner Points}
 \begin{itemize}
-  \item Model generators know each row's role, block ownership, and coupling incidence---metadata
-  a flat export discards but that can drive numerical preprocessing.
-  \item Positive per-row factors lowered the reported own-incumbent path-specific fixed-LP
-  diagnostic without changing the MIP, though that path-specific readout is not a clean measure
-  of representation quality. The stage-attribution ablation traces essentially all of that
-  movement to the metadata-free local stage, and the coupling stage never activated on any
-  operational instance tested, so it remains operationally unvalidated; on an already
-  well-scaled model the selective rule can widen the exported range instead.
-  \item In exploratory single-default-seed Gurobi control batches, coverage versus
-  selectivity depends on the endpoint. On preprocessing-plus-solver time the implemented
-  role-blind pipeline has lower observed time in Simple and SG-Ter-Mer at both tolerances
-  (a margin driven mainly by the current prototype's metadata-processing cost in Simple and
-  by a mixture of that cost and solver response in SG-Ter-Mer, and worth tens of
-  milliseconds per instance in absolute terms); the Full selectivity
-  direction is conditional on the $27$ eligible pairs.
-  \item When the selective rule is charged only for diagnosis and factor application, as in a
-  generator that reuses its structural taxonomy, most of that observed Flat timing advantage
-  disappears: six directional orderings remain, but on a release build---under the baseline
-  cross-protocol construction---only one contrast (Simple, augmented, $0.1\%$; about $0.9\%$
-  in median) keeps a within-tolerance nominal adjusted value below $0.05$. On capped solver time the medians
-  are at most $1.6\%$ and the augmented Simple contrast at $0.1\%$ is the only comparison
-  whose nominal adjusted values remain below $0.05$ across the reported multiplicity and
-  operational-family analyses; all coefficient-only comparisons remain inconclusive.
-  \item Under fixed-pool intent-to-treat PAR10---an exploratory endpoint selected after
-  inspecting the data---some structure-aware variant falls below Base in each Gurobi class and
-  tolerance, but not the same variant in each, and the ordering does not persist across
-  tolerances. SG-Ter-Mer at $0.1\%$ is the only cell with both
-  strict-adjusted costs below Base, but the SA-Aug margin is negligible and the pattern is not
-  replicated at $1\%$; no robust gain appears under CPLEX. In the direct SA--Flat reliability
-  audit, the Simple strict/mixed aggregate ordering reverses toward SA-Aug, while SG-Ter-Mer
-  retains only a small descriptive Flat-Aug advantage. Cross-solver persistence of the
-  Flat-versus-selective ordering remains untested.
+  \item Model generators already know each row's role, block, and coupling incidence---metadata a
+  flat matrix export discards but that costs nothing to reuse for numerical preprocessing.
+  \item Prefer full-coverage row scaling to metadata-based selection: applying the same per-row
+  kernel to every constraint matched or beat the selective rule, and the coupling-specific stage
+  never activated on any operational instance tested.
+  \item Time preprocessing separately from the solver---on fast instances the preprocessing cost,
+  not the numerics, decided which rule looked faster, and the runtime gaps were of the order of
+  the solver's own unreplicated run-to-run variability.
+  \item Re-verify every returned solution against the original unscaled constraints---the scaling
+  default we tested degraded that reliability relative to no scaling, concentrated on
+  zero-right-hand-side balance rows.
 \end{itemize}
 
 
@@ -3220,12 +3183,16 @@ $T_{\mathrm{pre+solve}}^{\mathrm{cached}}
 (\cref{tab:flat-cached}). This is a \emph{cross-protocol counterfactual}: it combines
 preprocessing medians measured on the pinned workstation with solver times from the ClusterUY
 batches, so it does not represent an observed single-machine pipeline, and its absolute ratios
-depend on the relative speed of the two environments. Of the eight fast-class contrasts whose prototype
-preprocessing-plus-solver ordering had adjusted values below $0.05$, six keep a direction
-favoring the role-blind rule but only one retains a within-tolerance nominal adjusted value
-below $0.05$: the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$), which also survives
-the joint and operational-family corrections ($q_{12}=0.021$, $q_{12}^{\mathrm{blk}}=0.031$)
-and is small in median magnitude, about $0.9\%$. It indicates a systematic directional
+depend on the relative speed of the two environments. We therefore treat this endpoint as
+descriptive and draw no independent inference from it, for a reason that does not depend on the
+splice: the cached preprocessing term is of order one to two milliseconds against solver times
+of seconds, so scaling it cannot change the paired ranks, and the endpoint reduces numerically
+to capped solver time (\cref{tab:flat-control}). The one contrast that clears every adjustment
+on it---the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$, $q_{12}=0.021$,
+$q_{12}^{\mathrm{blk}}=0.031$, median about $0.9\%$)---is therefore not a separate finding but
+the same capped-solver-time contrast already reported in \cref{tab:flat-control}; on the cached
+endpoint six of the eight fast-class contrasts keep the direction favoring the role-blind rule
+and only that one remains below $0.05$. It indicates a systematic directional
 difference in this campaign, not a large operational speedup. The augmented SG-Ter-Mer
 contrasts fall to $q_{6}=0.115$ and $0.051$, and every coefficient-only fast-class contrast
 to $q_{6}\ge0.115$. The directional reversals occur in SG-Ter-Mer coefficient-only at $1\%$
