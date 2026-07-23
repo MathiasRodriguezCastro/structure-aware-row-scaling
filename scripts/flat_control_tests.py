@@ -388,9 +388,15 @@ def reliability_readings(by_instance, pool, variant):
     }
 
 
+# Directory holding the direct-control batches.  The default reproduces the
+# Gurobi analysis exactly; the CPLEX companion points it at its own batches
+# without touching anything else in this module.
+BATCH_ROOT = 'plano-control'
+
+
 def read_batch(folder):
     path = os.path.join(
-        ROOT, 'results-revision', 'plano-control', folder, 'resumen.csv')
+        ROOT, 'results-revision', BATCH_ROOT, folder, 'resumen.csv')
     with open(path, newline='') as handle:
         rows = list(csv.DictReader(handle))
     by_instance = collections.defaultdict(dict)
