@@ -560,11 +560,19 @@ def analyze(folder, class_name, abort_multiplier):
             'total_p_block': total_p_block,
             'total_effective_blocks': total_effective_blocks,
             'n_work': len(work_differences),
-            'median_work_sa': statistics.median(work_sa),
-            'median_work_flat': statistics.median(work_flat),
+            # Work units are a Gurobi-specific deterministic measure; CPLEX
+            # batches report deterministic ticks instead and leave these empty.
+            # Guard the medians so a solver without Work yields no Work summary
+            # rather than an exception.  Gurobi always populates them, so its
+            # numbers are unaffected.
+            'median_work_sa':
+                statistics.median(work_sa) if work_sa else float('nan'),
+            'median_work_flat':
+                statistics.median(work_flat) if work_flat else float('nan'),
             'median_shifted_work_ratio': statistics.median(
                 (1.0 + sa) / (1.0 + flat)
-                for sa, flat in zip(work_sa, work_flat)),
+                for sa, flat in zip(work_sa, work_flat)) if work_sa
+                else float('nan'),
             'work_W': work_statistic,
             'work_p': work_p,
             'work_r_rb': work_effect,
@@ -573,7 +581,12 @@ def analyze(folder, class_name, abort_multiplier):
             'work_p_block': work_p_block,
             'work_effective_blocks': work_effective_blocks,
             'n_diagnostic': len(diagnostic_ratios),
-            'median_diagnostic_ratio': statistics.median(diagnostic_ratios),
+            # The own-incumbent fixed-LP diagnostic is produced along the Gurobi
+            # path only, so CPLEX batches carry no diagnostic ratios; report it
+            # as unavailable instead of raising.  Gurobi is unaffected.
+            'median_diagnostic_ratio':
+                statistics.median(diagnostic_ratios) if diagnostic_ratios
+                else float('nan'),
             'W': statistic,
             'p': pvalue,
             'p_block': p_block,
