@@ -1,0 +1,31 @@
+Minimum detectable median ratio at 80% power, alpha=0.05, 1500 family-bootstrap replicates.
+MDE is reported as the detectable ratio exp(delta); a class whose MDE is 1.05 cannot resolve effects below ~5%.
+
+gap   class       kernel endpoint n_inst  n_fam  MDE ratio    MDE %
+0.1%  Simple      Aug  solver     204     34     1.0078     0.78
+0.1%  Simple      Aug  total      204     34     1.0075     0.75
+0.1%  Simple      Mat  solver     203     34     1.0064     0.64
+0.1%  Simple      Mat  total      203     34     1.0106     1.06
+0.1%  SG-Ter-Mer  Aug  solver      67     34     1.0319     3.19
+0.1%  SG-Ter-Mer  Aug  total       67     34     1.0235     2.35
+0.1%  SG-Ter-Mer  Mat  solver      67     34     1.0353     3.53
+0.1%  SG-Ter-Mer  Mat  total       67     34     1.0442     4.42
+0.1%  Full        Aug  solver      27     27     1.1359    13.59
+0.1%  Full        Aug  total       27     27     1.1318    13.18
+0.1%  Full        Mat  solver      27     27     1.1984    19.84
+0.1%  Full        Mat  total       27     27     1.2063    20.63
+1%    Simple      Aug  solver     204     34     1.0019     0.19
+1%    Simple      Aug  total      204     34     1.0038     0.38
+1%    Simple      Mat  solver     204     34     1.0014     0.14
+1%    Simple      Mat  total      204     34     1.0024     0.24
+1%    SG-Ter-Mer  Aug  solver      67     34     1.0211     2.11
+1%    SG-Ter-Mer  Aug  total       67     34     1.0284     2.84
+1%    SG-Ter-Mer  Mat  solver      67     34     1.0264     2.64
+1%    SG-Ter-Mer  Mat  total       67     34     1.0460     4.60
+1%    Full        Aug  solver      31     31     1.6913    69.13
+1%    Full        Aug  total       31     31     1.6946    69.46
+1%    Full        Mat  solver      32     32     1.4767    47.67
+1%    Full        Mat  total       32     32     1.4879    48.79
+
+Contrast is SA versus kernel-matched Flat (the coverage question, SC-4).
+Resampling is at the operational-family level, so n_fam (not n_inst) sets the power.
