@@ -2988,6 +2988,28 @@ selectively. This is an independent confirmation, in a quantity the operational 
 measure, of the coverage-versus-selectivity result of
 \cref{subsec:added-controls,subsec:stage-attribution}.
 
+The matrix-only kernel's advantage is the paper's one clearly positive spectral finding, and
+it has a clean cause. It is the kernel, not the coverage: \methodMat{} and \methodAug{} scale
+the \emph{same} role-selected rows, differing only in whether the right-hand side enters the
+per-row extremes, so their gap isolates the kernel. On the undisturbed None pattern
+\methodMat{} reaches $\kappa_2^{+}\approx\num{8.5e2}$ against \methodAug{}'s $\num{7.8e3}$---a
+factor of $9.2$---and this factor is identical at $S=0$, $S=3$ and $S=6$, since None applies no
+disturbance; on disturbed patterns it widens to $\times 11$ (Local), $\times 44$--$85$
+(Coupling), and $\times 550$ (Mixed) at $S=6$. The mechanism is visible in the coefficient-range
+proxy: the matrix-only kernel divides each row by the geometric mean of its coefficient
+extremes, centring $\max_j\lvert\widetilde a_{rj}\rvert / \min_j\lvert\widetilde a_{rj}\rvert$
+about $1$ using coefficients alone, and it does this to every row it covers---so it removes even
+the intrinsic per-row spread that survives on None (median range $\num{2.0e2}\!\to\!\num{1.0e2}$)
+rather than only injected imbalance. The augmented kernel, by contrast, folds $\lvert b_r\rvert$
+into the same extremes, which distorts the centring wherever right-hand-side magnitudes are far
+from the coefficient scale (median range $\num{1.7e5}$ on Mixed, worse than Base per row). The
+matrix-only kernel is therefore the best-conditioned rule here for the same structural reason
+that \cref{subsec:safeguards} identifies it as the residual-safe one: excluding the right-hand
+side keeps every scaled row's coefficient magnitudes symmetric about unity. Because the audit
+covers $S=0$, $S=3$ and $S=6$, the finding is not an artefact of the most severe level; the
+ordering of the five rules is the same at every severity, and \methodMat{} is the lowest in all
+fifteen pattern--severity cells.
+
 The proxy's fidelity is the remaining question, and the answer is that it is a weak ordinal
 surrogate. Across all $1800$ matrices the Spearman correlation between $\log
 \widehat\kappa_{\mathrm{range}}$ and $\log\kappa_2^{+}$ is $0.62$: positive and clearly
