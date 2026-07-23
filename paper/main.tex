@@ -3231,30 +3231,10 @@ transfer ratio: the implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ rem
 $[0.94,1.01]$ across the six class--kernel cells, suggesting limited asymmetry under this
 particular compiler change, while the cross-environment transfer asymmetry itself remains unmeasured.
 
-Because the cached effects sit close to
-one, and because they are a cross-protocol construction, we repeat the common- and
-policy-specific transfer sensitivities using the release-build preprocessing measurements that
-define \cref{tab:flat-cached}; the non-optimized diagnostic build is retained separately as a
-build sensitivity in Table~S11. Writing
-$T^{\mathrm{cached}}(\lambda)=T_{\rm solver}+\lambda\,T^{\mathrm{cached}}_{\rm preproc}$,
-a common factor varies the overall weight of preprocessing but does not model policy-specific
-hardware or compiler effects: the two rules execute different code, so a change of machine or
-toolchain need not rescale them by the same factor. On the evaluated common-factor grid
-$\lambda\in\{0.25,0.5,1,2,4,8\}$, one fast-class contrast has $q_{6}<0.05$ for
-$\lambda\le2$, and two do at the evaluated points $\lambda=4$ and $8$; the augmented Simple
-contrast at $0.1\%$ has $q_{6}<0.05$ at every evaluated grid point. On the policy-specific
-grid $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}\in\{0.25,0.5,1,2,4\}$ with
-$\lambda_{\rm Flat}=1$, the corresponding counts are one for $\rho\le1$, three at $\rho=2$
-and five at $\rho=4$. Additional $q_{6}$ crossings therefore first appear at the evaluated
-point $\rho=2$, but the transition threshold between $1$ and $2$ is not identified by this
-grid. These counts concern within-tolerance $q_{6}$ only and do not imply retention under the
-joint or operational-family adjustments. The $\lambda$ and $\rho$ grids are exploratory
-log-spaced stress ranges, chosen to vary the relative preprocessing contribution by factors of
-two over a deliberately broad interval; they are not confidence regions or calibrated
-estimates of the workstation-to-ClusterUY transfer. The contrasts crossing at each grid point
-are identified in Table~S12. Complete contrast-by-grid values are provided in
-\texttt{results-revision/preproc-timing/cached\_transfer\_sensitivity.csv} in the
-reproducibility package.
+Since the cached endpoint reduces to capped solver time, we do not stress-test it with
+transfer-factor grids; the earlier body versions of that sensitivity are withdrawn with the
+inference they supported, and the raw contrast-by-grid values remain in the reproducibility
+package (\texttt{cached\_transfer\_sensitivity.csv}) for readers who want them.
 
 The absolute magnitudes matter for how much this is worth
 (\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
