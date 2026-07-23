@@ -144,7 +144,11 @@ Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matric
 their generators retain row roles, block ownership, and coupling incidence. We study whether
 this metadata should select which constraints receive positive pre-export row scaling. The
 layer under study applies geometric-mean row normalization in a local--block--coupling order
-while preserving the MIP exactly; returned solutions are verified on the original constraints.
+while preserving the MIP exactly. We verify every returned solution against the original
+unscaled constraints, and under the pre-declared absolute criterion the proposed default
+\emph{degrades} that reliability relative to the unscaled base, failing more often on
+zero-right-hand-side balance rows; we report the strict reading as primary rather than a
+more permissive one introduced afterwards.
 Its coupling stage never activates on any operational instance tested, so the operational
 evidence covers the local and block stages only and coupling remains an unvalidated
 extension. We
@@ -586,6 +590,9 @@ d \\
 D=\diag(A_1,\ldots,A_B).
 \label{eq:compact-dispatch-structure}
 \end{equation}
+Here $\sim$ denotes a row-wise relation that is $\le$, $=$ or $\ge$ depending on the block,
+since the local and coupling rows mix inequalities and equalities; the scaling layer treats
+all three identically, so the specific sense of each row is immaterial to what follows.
 The first block contains local component restrictions. The second block represents an
 aggregate system restriction. The third block contains coupling equations that link local
 component decisions with the aggregate system variable. In the dispatch application,
@@ -940,7 +947,7 @@ proxy. On the operational classes the third stage is inert as well---the activat
 \cref{subsec:stage-attribution} records zero activations and byte-identical full and local-only
 exports on every eligible pair---so what the solver actually receives there is a row-by-row
 normalization restricted to the role-selected local rows. The coupling stage activates only on
-the oversized synthetic coupling patterns of \cref{subsec:synthetic}, and its operational
+the oversized synthetic coupling patterns of \cref{subsec:synthetic-results}, and its operational
 contribution is therefore untested.
 After local scaling, let $\widetilde a_{rj}=d_r\,a_{rj}$ for local rows, where $d_r$ is the
 factor \emph{actually applied}---$d_r=\alpha_r^{A,b}$ when the candidate factor
@@ -3101,7 +3108,7 @@ Class & Variant & Eligible pairs & Stage activated & Coupling rows rescaled & Id
 \end{table*}
 
 For \methodAug{}, the coupling proxy is $\widehat\rho\le10$ on every operational instance
-($\widehat\rho\approx2\times10^{-4}$ in Simple and exactly $1$ in SG-Ter-Mer and Full), so
+($\widehat\rho\approx3\times10^{-4}$ in Simple and exactly $1$ in SG-Ter-Mer and Full), so
 the coupling stage is skipped. For \methodMat{}, every per-row coupling factor lies in the
 near-identity band on the balance rows and is likewise skipped. Coupling-only therefore
 coincides with Base, while full coincides with local-only. The operational effect comes
