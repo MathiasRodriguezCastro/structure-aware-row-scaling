@@ -965,6 +965,11 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
                 if (cmax <= 0.0 || cmin >= 1e300) continue;
                 alpha = 1.0 / sqrt(cmax * cmin);
                 if (cmin * alpha < cfg.epsMinCoef || cmax * alpha > cfg.epsMaxCoef) continue;
+                // Versión CONSERVADORA (opt-in): además del window guard, un piso deja la fila
+                // residual en escala base si el factor la escalaría demasiado, dando la garantía
+                // de fiabilidad que pide la regla coverage-safeguarded (SA-Mat-Coverage). El kernel
+                // matrix-only ya es residual-safe (α·M=√(M/m)≥1); el piso solo acota más.
+                if (cfg.pisoMagnitudFactorLocal > 0.0 && alpha < cfg.pisoMagnitudFactorLocal) continue;
             } else {
                 double filaMax = 0.0, filaMin = 1e300;
                 for (const auto& [coef, _] : terminos) {
