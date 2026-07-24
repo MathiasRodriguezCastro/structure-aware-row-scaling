@@ -235,7 +235,12 @@ The contribution is not a new equilibration kernel---the per-row factor is a kno
 geometric-mean normalization, and the results show that this kernel carries most of the
 effect. The central contribution is instead a controlled study of \emph{coverage versus
 selectivity}: whether restricting a known per-row scaling kernel to the rows a generator's
-role metadata selects helps or hurts, relative to applying it to every row. Concretely, the
+role metadata selects helps or hurts, relative to applying it to every row. The answer we
+reach is that row scaling improves the solver-facing diagnostics and can improve runtime over
+the unscaled base, but structural selectivity does not dominate full coverage; on these
+instances the operational effect comes almost entirely from the local stage, because the
+coupling rows are near-unity balance equations with no scale heterogeneity for the coupling
+stage to correct. Concretely, the
 paper contributes: (i) a controlled, single-default-seed empirical study of that coverage-versus-selectivity
 trade-off---via augmented and coefficient-only role-blind controls run on all three
 classes under Gurobi---showing that an incomplete structural taxonomy can miss numerically
@@ -1036,7 +1041,14 @@ only after the blocks they connect have been put on comparable numerical footing
 The second proposed variant, denoted \methodMat{}, uses the same row--block--coupling
 architecture but excludes $b$ from the diagnosis. The right-hand side is still multiplied
 by the selected row factor to preserve equivalence, but it does not influence factor
-selection.
+selection. This variant is the one we ultimately recommend: excluding the right-hand side
+makes the kernel structurally safe against residual amplification (\cref{subsec:safeguards}) and
+gives it the best-conditioned behaviour in the spectral audit (\cref{subsec:spectral-audit}),
+whereas the augmented rule of the previous subsection is better read as an exploratory probe of
+whether the right-hand side should enter the diagnosis at all---a question the reliability
+evidence (\cref{subsec:original-scale-audit}) answers in the negative, since folding $\lvert
+b_r\rvert$ into the extremes is exactly what degrades original-scale reliability on
+right-hand-side-dominated rows.
 
 For each local row $r$, define the nonzero coefficient extremes
 \begin{equation}
@@ -3691,11 +3703,16 @@ can be posed at all, but the coupling stage it motivates never activated in thes
 runs, so it is not part of what this evidence would carry to another domain.
 
 The coupling-stage null should be read structurally rather than as a general property of the
-stage. It fires only when the coupling proxy $\widehat\rho$ leaves the near-unity band, and in
-this testbed it does not because the only coupling rows are demand and reserve balances whose
-coefficients on the generation variables are near unity: $\widehat\rho\approx3\times10^{-4}$ in
-Simple and exactly $1$ in SG-Ter-Mer and Full. That is a fact about which coupling rows this
-dispatch formulation has, and in particular about its lack of a transmission network. A model
+stage. It fires only when the coupling proxy $\widehat\rho$ leaves the near-identity band, and
+in the operational hydrothermal instances the coupling rows are mainly balance equations whose
+incidence coefficients on the generation variables are close to one---typically $d_i=1$, and
+occasionally $d_i=0.5$ where the binational Salto Grande generation enters the aggregate at
+half weight. The coupling proxy therefore stays in the near-identity regime
+($\widehat\rho\approx3\times10^{-4}$ in Simple and exactly $1$ in SG-Ter-Mer and Full), and the
+coupling stage is not expected to activate: there is simply no coupling-scale heterogeneity for
+it to correct. This must be read as a property of the tested formulation, not as evidence
+against the coupling mechanism in models with genuinely heterogeneous coupling coefficients. In
+particular, it reflects this formulation's lack of a transmission network. A model
 with DC power-flow constraints---the standard next step, present in most operational tools---would
 add coupling rows mixing per-unit susceptances of order $10^{2}$--$10^{3}$, phase angles of order
 $1$, and flow limits of order $10^{2}$--$10^{3}$ against blocks scaled in MW and $\mathrm{hm}^3$;
@@ -3956,9 +3973,19 @@ and is not retained by the adversarial signed-rank sensitivity, so the solver-dy
 a hypothesis). The reported SG-Ter-Mer campaign shows
 that a selective taxonomy can miss important rows. The Full campaign raises---but does not
 establish---the complementary hypothesis that blanket normalization can
-overshoot on integrated models. A practical scaling layer should therefore measure both
-coverage policies, exactly as the role-blind control does here, and should time its own
-preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
+overshoot on integrated models. The practical lesson is therefore not that metadata is useless
+but that it should not be an \emph{exclusive} filter: metadata is useful for organizing the
+scaling pipeline---local rows first, block summaries next, coupling rows last---but a deployable
+rule needs a numerical coverage safeguard for the residual and global rows the taxonomy would
+otherwise leave untouched. The natural form is to keep the structure-aware order, then sweep the
+residual rows with the coefficient-only (matrix-only) kernel, applying it only where a row is
+poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
+original-scale verification. Such a coverage-safeguarded matrix-only rule is the variant we
+would carry forward, in preference to the augmented rule whose use of the right-hand side is
+what degrades original-scale reliability; the augmented rule is better read as an exploratory
+probe of whether the right-hand side should enter the diagnosis at all. A practical layer should
+also measure both coverage policies, exactly as the role-blind control does here, and time its
+own preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
 
 % Float barrier removed to improve two-column layout.
 
