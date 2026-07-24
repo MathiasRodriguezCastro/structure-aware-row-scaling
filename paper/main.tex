@@ -2296,7 +2296,7 @@ solver or pipeline aborts are not in the denominator here (they are penalized in
 \end{threeparttable}
 \end{table*}
 
-\subsection{Scenario 1: Gurobi with 1\% MIPGap}
+\subsection{Gurobi results at both tolerances}
 
 At $1\%$ MIPGap, completed-run timing, deterministic effort, and capped-time
 intent-to-treat comparisons favor the structure-aware variants in several cells. The
@@ -2371,9 +2371,7 @@ Dolan--Mor\'e profiles defined in \cref{eq:performance-profile-cost}.
 
 \plotfigure{esc1_gurobi_1pct_perfil.pdf}{\textwidth}{At $1\%$ MIPGap, fixed-pool Dolan--Mor\'e profiles use the common denominators and $36{,}000$-s individual failure cost of \cref{eq:performance-profile-cost}. Curves farther toward the upper-left indicate variants that more often lie close to the best admissible time.}{fig:profile-gurobi-gap001}
 
-\subsection{Scenario 2: Gurobi with 0.1\% MIPGap}
-
-The stricter Gurobi tolerance tests the descriptive completed-run timing pattern under a
+\smallskip\noindent\textbf{The stricter $0.1\%$ tolerance.} This tests the descriptive completed-run timing pattern under a
 harder stopping criterion, and that pattern largely persists: \methodMat{} again gives the
 best shifted geometric solver time in Simple and SG-Ter-Mer and \methodAug{} is stronger in
 Full, while the Ruiz-type variants remain unstable. This statement is distinct from the
@@ -2588,7 +2586,7 @@ runtime predictor for the proposed rules.
 
 \FloatBarrier
 
-\subsection{Scenario 3: CPLEX with 1\% MIPGap}
+\subsection{CPLEX results at both tolerances}
 
 The CPLEX scenarios provide a negative solver contrast to the Gurobi results. The structured variants remain close to parity and do not reproduce the systematic deterministic gains observed under Gurobi. Some descriptive wall-time improvements appear, especially in Full for \methodMat{}, but the paired tests do not support robust structure-aware acceleration. In fact, some CPLEX signs are unfavorable for the structured variants. The correct interpretation is therefore not that CPLEX improves less than Gurobi, but that the present external scaling layer does not reliably improve CPLEX runtime in this environment. Ruiz is sometimes competitive in Full, but its performance is not stable across classes.
 
@@ -2642,9 +2640,7 @@ fixed-pool profile views.
 
 \twoplotfigure{esc3_cplex_1pct_boxplot.pdf}{Total-time speedup distribution.}{fig:boxplot-speedup-total-cplex1}{esc3_cplex_1pct_perfil.pdf}{Fixed-pool performance profile.}{fig:profile-cplex-gap001}{At $1\%$ MIPGap, the CPLEX distributional view and the common-pool, failure-penalized profile of \cref{eq:performance-profile-cost} break the Gurobi pattern. The plots therefore serve as a solver contrast.}{fig:cplex-gap1-visual-summary}
 
-\subsection{Scenario 4: CPLEX with 0.1\% MIPGap}
-
-The stricter CPLEX setting reinforces the cross-pipeline contrast and makes the negative CPLEX runtime conclusion clearer. The structured variants remain at or near parity in deterministic effort, and the clearest descriptive improvement in shifted geometric solver time comes from Ruiz rather than from the proposed structure-aware rules; the matrix-only rule does lower the shifted geometric time on Full (from $421.6$ to $370.5$\,s), but this is descriptive only, as the paired test on that class is not significant ($p=0.21$). This is a useful negative result: external scaling may improve some numerical diagnostics without becoming a robust runtime accelerator for CPLEX in this environment.
+\smallskip\noindent\textbf{The stricter $0.1\%$ tolerance.} This reinforces the cross-pipeline contrast and makes the negative CPLEX runtime conclusion clearer. The structured variants remain at or near parity in deterministic effort, and the clearest descriptive improvement in shifted geometric solver time comes from Ruiz rather than from the proposed structure-aware rules; the matrix-only rule does lower the shifted geometric time on Full (from $421.6$ to $370.5$\,s), but this is descriptive only, as the paired test on that class is not significant ($p=0.21$). This is a useful negative result: external scaling may improve some numerical diagnostics without becoming a robust runtime accelerator for CPLEX in this environment.
 
 \begin{table*}[t]
 \centering
