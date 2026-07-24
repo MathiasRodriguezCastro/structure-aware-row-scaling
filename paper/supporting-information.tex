@@ -19,10 +19,14 @@
 \usepackage{pdflscape}
 \usepackage{xcolor}
 \usepackage[colorlinks=true,linkcolor=blue!60!black]{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \graphicspath{{figs/}}
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thealgorithm}{S\arabic{algorithm}}
+\providecommand{\argmin}{\operatorname*{arg\,min}}
 \newcommand{\sgm}{\ensuremath{\operatorname{sgm}}}
 \newcommand{\PARten}{\ensuremath{\operatorname{PAR10}}}
 \newcommand{\PARavail}{\ensuremath{\operatorname{PAR10}_{\mathrm{avail}}}}
@@ -1268,6 +1272,49 @@ selectivity (median SA/Flat $0.9596$, HL $0.9465$); the matrix-only counterpart 
 other way (median $1.0861$, HL $1.0977$, $p=0.34$). The three double timeouts enter as
 operational ties (exact zeros).
 \normalsize
+
+
+\section{Algorithmic summary of the augmented rule}
+\label{si:algorithm}
+
+Algorithm~\ref{alg:augmented-scaling} collects the augmented structure-aware row-scaling
+rule end to end. Equation numbers refer to the main text.
+
+\begin{algorithm}[t]
+\caption{Augmented structure-aware row scaling}
+\label{alg:augmented-scaling}
+\begin{algorithmic}[1]
+\Require Matrix $A$, right-hand side $b$, row roles (local/coupling/residual-global), block ownership $\beta(\cdot)$, coupling incidence; optionally $\texttt{useLocalFloor}$ and $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ (default: off, describing the primary \methodAug{} variant)
+\Ensure Scaled matrix $\widetilde A$, scaled right-hand side $\widetilde b$
+\State Initialize row factors $d_r\gets 1$ \Comment{residual-global rows in $\mathcal{R}_{\mathrm{other}}$ keep $d_r=1$ throughout}
+\For{each local block $i\in\mathcal{B}$}
+  \For{each local row $r\in\mathcal{R}_i$}
+    \State Build $\mathcal{S}_r^{A,b}$ from nonzero coefficients and nonzero right-hand side
+    \If{$\mathcal{S}_r^{A,b}\neq\emptyset$}
+      \State Compute $M_r^{A,b}$ and $m_r^{A,b}$ using Eq.~(16) of the main text
+      \State Set $\alpha_r^{A,b}\gets 1/\sqrt{M_r^{A,b}m_r^{A,b}}$
+      \If{the safeguards admit $\alpha_r^{A,b}$ (and, if $\texttt{useLocalFloor}$, $\alpha_r^{A,b}\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$)} \State Update $d_r\gets d_r\alpha_r^{A,b}$ \EndIf
+    \EndIf
+  \EndFor
+\EndFor
+\State Compute the locally scaled coefficients $\widetilde a_{rj}=d_r a_{rj}$
+\State Compute block scales $s_i^{A,b}=\sqrt{M_i^{A,b}m_i^{A,b}}$ using Eq.~(20) of the main text
+\State Compute $\widehat\rho_r^{A,b}$ for every coupling row using Eq.~(22) of the main text; set $\rho\gets\max_r\widehat\rho_r^{A,b}$
+\If{$\rho$ exceeds the coupling threshold}
+  \State Set $\gamma^{A,b}\gets\argmin_{\gamma}\Phi(\gamma)$ over the logarithmic grid $\gamma\in[10^{-6},10^{6}]$ (Eq.~(23) of the main text)
+  \State Clip $\gamma^{A,b}$ to $[10^{-8},10^{8}]$
+  \If{$\gamma^{A,b}$ lies outside the near-identity band (33)}
+    \For{each coupling row $r$}
+      \If{$\gamma^{A,b}$ keeps row $r$ inside the coefficient window (34)
+          \textbf{and} above the reliability floor of the main text}
+        \State Update $d_r\gets d_r\gamma^{A,b}$
+      \EndIf
+    \EndFor
+  \EndIf
+\EndIf
+\State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
+\end{algorithmic}
+\end{algorithm}
 
 
 \end{document}

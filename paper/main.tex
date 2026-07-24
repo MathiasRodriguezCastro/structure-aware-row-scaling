@@ -1267,43 +1267,7 @@ so that bounds, objective interpretation, and integrality remain unchanged.
 
 \subsection{Algorithmic summary}
 
-\Cref{alg:augmented-scaling} collects the augmented rule end to end.
-
-\begin{algorithm}[t]
-\caption{Augmented structure-aware row scaling}
-\label{alg:augmented-scaling}
-\begin{algorithmic}[1]
-\Require Matrix $A$, right-hand side $b$, row roles (local/coupling/residual-global), block ownership $\beta(\cdot)$, coupling incidence; optionally $\texttt{useLocalFloor}$ and $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ (default: off, describing the primary \methodAug{} variant)
-\Ensure Scaled matrix $\widetilde A$, scaled right-hand side $\widetilde b$
-\State Initialize row factors $d_r\gets 1$ \Comment{residual-global rows in $\mathcal{R}_{\mathrm{other}}$ keep $d_r=1$ throughout}
-\For{each local block $i\in\mathcal{B}$}
-  \For{each local row $r\in\mathcal{R}_i$}
-    \State Build $\mathcal{S}_r^{A,b}$ from nonzero coefficients and nonzero right-hand side
-    \If{$\mathcal{S}_r^{A,b}\neq\emptyset$}
-      \State Compute $M_r^{A,b}$ and $m_r^{A,b}$ using \cref{eq:augmented-extremes}
-      \State Set $\alpha_r^{A,b}\gets 1/\sqrt{M_r^{A,b}m_r^{A,b}}$
-      \If{the safeguards admit $\alpha_r^{A,b}$ (and, if $\texttt{useLocalFloor}$, $\alpha_r^{A,b}\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$)} \State Update $d_r\gets d_r\alpha_r^{A,b}$ \EndIf
-    \EndIf
-  \EndFor
-\EndFor
-\State Compute the locally scaled coefficients $\widetilde a_{rj}=d_r a_{rj}$
-\State Compute block scales $s_i^{A,b}=\sqrt{M_i^{A,b}m_i^{A,b}}$ using \cref{eq:augmented-block-scale}
-\State Compute $\widehat\rho_r^{A,b}$ for every coupling row using \cref{eq:augmented-coupling-rho}; set $\rho\gets\max_r\widehat\rho_r^{A,b}$
-\If{$\rho$ exceeds the coupling threshold}
-  \State Set $\gamma^{A,b}\gets\argmin_{\gamma}\Phi(\gamma)$ over the logarithmic grid $\gamma\in[10^{-6},10^{6}]$ (\cref{eq:augmented-coupling-factor})
-  \State Clip $\gamma^{A,b}$ to $[10^{-8},10^{8}]$
-  \If{$\gamma^{A,b}$ lies outside the near-identity band \eqref{eq:near-identity}}
-    \For{each coupling row $r$}
-      \If{$\gamma^{A,b}$ keeps row $r$ inside the coefficient window \eqref{eq:coef-window}
-          \textbf{and} above the reliability floor (\cref{subsec:safeguards})}
-        \State Update $d_r\gets d_r\gamma^{A,b}$
-      \EndIf
-    \EndFor
-  \EndIf
-\EndIf
-\State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
-\end{algorithmic}
-\end{algorithm}
+The augmented rule is collected end to end as Algorithm~S1 in the Supporting Information.
 
 The matrix-only algorithm follows the same local and block stages with the
 coefficient-only set $\{\abs{a_{rj}}:a_{rj}\neq 0\}$ and the representative block scales
