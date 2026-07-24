@@ -30,6 +30,13 @@ struct PreprocesamientoConfig {
                                                ///<  clasificación global/acoplamiento, sin beta de
                                                ///<  bloque y sin etapa de acoplamiento. Mismas
                                                ///<  salvaguardas por fila.
+    bool   cubrirResidual            = false;  ///< Política intermedia (SA-*-Full): aplica el MISMO
+                                               ///<  kernel local por fila (alpha_r=1/sqrt(M_r*m_r))
+                                               ///<  a las filas RESIDUALES-GLOBALES (globales no de
+                                               ///<  acoplamiento, R_other), que la regla selectiva
+                                               ///<  deja en d_r=1. Mantiene la etapa local y la de
+                                               ///<  acoplamiento; sólo extiende la COBERTURA a R_other.
+                                               ///<  Opt-in; sin él, byte-idéntico a la regla selectiva.
     bool   usarEquilibradoRuiz       = false;  ///< Equilibrado iterativo interno por bloque
     bool   escalarColumnasContinuas  = false;  ///< Transformar columnas continuas y recuperar solución
     bool   normalizacionFisica       = false;  ///< Normalizar filas globales por unidades físicas/proxy

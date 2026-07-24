@@ -53,6 +53,13 @@ VARIANT_FLAGS = {
     # improvement comes from the structural metadata vs the scaling kernel itself.
     "estructurado_plano":               "preprocesar --local-estructurado --plano",
     "matricial_plano":                  "preprocesar --local-matricial --plano",
+    # --- R1 / R2 W1 / DA C1: intermediate metadata-driven FULL-coverage policy (SA-*-Full).
+    # Same selective local + coupling stages, but the residual-global rows (R_other) that the
+    # selective rule leaves unscaled receive the SAME per-row local kernel.  This is the third
+    # arm between the selective rule and the role-blind Flat control: it isolates the coverage
+    # gap from the use of metadata.  Route R_other through the kernel while keeping role metadata.
+    "estructurado_full":                "preprocesar --local-estructurado --cubrir-residual",
+    "matricial_full":                   "preprocesar --local-matricial --cubrir-residual",
     # --- R6: SA-Aug con piso de confiabilidad LOCAL (acota d_r >= piso => residuo original
     # <= eps_solver/piso; protege filas con |RHS| dominante, el origen de los fallos de
     # verificacion original-scale de Simple/Full). Opt-in; barrido de piso.

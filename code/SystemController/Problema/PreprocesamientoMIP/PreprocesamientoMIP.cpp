@@ -937,6 +937,54 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
         bloque.filasEscaladas = static_cast<int>(bloque.indicesRestricciones.size());
         bloque.escalado = true;
     }
+
+    // Política intermedia (SA-*-Full, opt-in cfg.cubrirResidual): la regla selectiva deja las filas
+    // RESIDUALES-GLOBALES (globales que NO son de acoplamiento, R_other) en d_r=1. Aquí se les aplica
+    // el MISMO kernel local por fila que a las filas de bloque, extendiendo la COBERTURA a R_other sin
+    // tocar la etapa local ni la de acoplamiento. Réplica EXACTA de las salvaguardas por fila del loop
+    // de bloques (ventana/piso/near-identity), para responder a la objeción R2 W1 / DA C1: separa la
+    // SELECTIVIDAD de la COBERTURA. Sin el flag es byte-idéntico a la regla selectiva.
+    if (cfg.cubrirResidual && cfg.escalamientoLocalPorFila && !cfg.usarEquilibradoRuiz) {
+        set<int> acopl(indicesAcoplamiento.begin(), indicesAcoplamiento.end());
+        int filasResidualEscaladas = 0;
+        for (int idx : indicesGlobales) {
+            if (acopl.count(idx)) continue;   // las de acoplamiento las trata aplicarEscalamientoGlobal
+            Restriccion* r = restricciones[idx];
+            auto terminos = r->getTerminos();
+
+            double alpha;
+            if (cfg.modoMatricial) {
+                double cmin = 1e300, cmax = 0.0;
+                for (const auto& [coef, _] : terminos) {
+                    double ac = std::abs(coef);
+                    if (ac > 0.0) { cmin = std::min(cmin, ac); cmax = std::max(cmax, ac); }
+                }
+                if (cmax <= 0.0 || cmin >= 1e300) continue;
+                alpha = 1.0 / sqrt(cmax * cmin);
+                if (cmin * alpha < cfg.epsMinCoef || cmax * alpha > cfg.epsMaxCoef) continue;
+            } else {
+                double filaMax = 0.0, filaMin = 1e300;
+                for (const auto& [coef, _] : terminos) {
+                    double ac = std::abs(coef);
+                    if (ac > 0.0) { filaMax = max(filaMax, ac); filaMin = min(filaMin, ac); }
+                }
+                double rhs = std::abs(r->getTerminoIndependiente());
+                if (rhs > 0.0) { filaMax = max(filaMax, rhs); filaMin = min(filaMin, rhs); }
+                if (filaMax <= 0.0 || filaMin <= 0.0 || filaMin >= 1e300) continue;
+                alpha = 1.0 / sqrt(filaMax * filaMin);
+                if (cfg.pisoMagnitudFactorLocal > 0.0 && alpha < cfg.pisoMagnitudFactorLocal) continue;
+            }
+            if (alpha > 0.5 && alpha < 2.0) continue;
+
+            for (auto& [coef, _] : terminos) coef *= alpha;
+            r->setTerminos(terminos);
+            r->setTerminoIndependiente(r->getTerminoIndependiente() * alpha);
+            ++filasResidualEscaladas;
+        }
+        if (cfg.verbose)
+            cout << "[PREPROC] cobertura R_other (SA-*-Full): " << filasResidualEscaladas
+                 << " filas residuales-globales escaladas con el kernel local\n";
+    }
 }
 
 // ============================================================

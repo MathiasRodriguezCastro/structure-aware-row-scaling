@@ -975,6 +975,11 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     // Los ajustes de config se imponen tras el parseo (ver bloque
                     // escalamientoPlano abajo), para que --plano gane sin importar el orden.
                     cfg.escalamientoPlano = true;
+                } else if (args[i] == "--cubrir-residual") {
+                    // Política intermedia metadata-driven (SA-*-Full, R1 / R2 W1 / DA C1):
+                    // extiende la cobertura del kernel local a las filas residuales-globales
+                    // (R_other) manteniendo local+acoplamiento. Separa selectividad de cobertura.
+                    cfg.cubrirResidual = true;
                 } else if (args[i] == "--columnas-continuas") {
                     cfg.escalarColumnasContinuas = true;
                     cfg.usarEquilibradoRuiz = true;
