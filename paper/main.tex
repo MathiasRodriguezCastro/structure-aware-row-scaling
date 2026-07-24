@@ -695,18 +695,16 @@ One minimizer is
 \noindent The proof, which constructs the optimal scalar per block and evaluates the
 resulting spectrum, is given in the Supporting Information (Section~S1).
 
-This proposition is not used as an algorithmic recipe. The generated MIPs considered in
-this paper contain rectangular local matrices, inequalities, bounds, redundant rows, and
-integer variables; computing singular-value-based block scalings would not be a practical
-external preprocessing rule for the exported MIP. The proposition instead justifies the
-architecture of the method. First, poor scale separation between blocks should be treated
-differently from poor conditioning inside a block. Second, after local row scaling, each
-block should contribute a representative scale before global coupling rows are processed.
-The implemented rules therefore replace the ideal singular-value quantities
-$(M_i,m_i)$ with coefficient-based proxies that are cheap to compute from the generated
-model. These propositions are design principles, not performance theorems. They should not be read as predictive guarantees for the implemented
-MIP preprocessing rule; they motivate the distinction between local rows, block scales,
-and coupling rows.
+This proposition is not used as an algorithmic recipe: the generated MIPs here contain
+rectangular local matrices, inequalities, bounds, redundant rows, and integer variables, so
+singular-value-based block scalings would not be a practical external preprocessing rule. It
+instead justifies the architecture---poor scale separation between blocks should be treated
+differently from poor conditioning inside a block, and after local row scaling each block
+should contribute a representative scale before coupling rows are processed---and the
+implemented rules replace the ideal quantities $(M_i,m_i)$ with cheap coefficient-based
+proxies. As stated at the outset of this section, these are design principles, not performance
+theorems, and \cref{subsec:spectral-audit} tests them and finds the selectivity they motivate
+obtains no conditioning advantage.
 
 \subsection{Effect of global coupling rows}
 \label{subsec:global-coupling-theory}
