@@ -48,6 +48,11 @@ public:
         double p95ViolacionRestricciones = 0.0;
         double p99ViolacionRestricciones = 0.0;
         double maxViolacionRelativa = 0.0;
+        // Máxima relativa a la ACTIVIDAD de la fila: viol / max{1, |rhs|, Σ_j|a_rj·x_j|}
+        // (refinamiento R5). El denominador RHS-only (1+|rhs|) sub-normaliza las filas de
+        // actividad grande y RHS chico —en particular los balances con RHS cero, donde
+        // se reduce al residuo absoluto—; el denominador por actividad corrige eso.
+        double maxViolacionRelativaActividad = 0.0;
         double objetivoOriginalRecalculado = 0.0;
         int restriccionesMenorIgualVioladas = 0;
         int restriccionesMayorIgualVioladas = 0;

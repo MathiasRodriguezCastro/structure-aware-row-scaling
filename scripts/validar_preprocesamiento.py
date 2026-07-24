@@ -169,10 +169,12 @@ class RunSummary:
     verif_solver_p95_viol: float | None = None
     verif_solver_p99_viol: float | None = None
     verif_solver_max_viol_rel: float | None = None
+    verif_solver_max_viol_relact: float | None = None
     verif_post_avg_viol: float | None = None
     verif_post_p95_viol: float | None = None
     verif_post_p99_viol: float | None = None
     verif_post_max_viol_rel: float | None = None
+    verif_post_max_viol_relact: float | None = None
     verif_solver_max_le: float | None = None
     verif_solver_max_ge: float | None = None
     verif_solver_max_eq: float | None = None
@@ -543,6 +545,10 @@ def parse_log(log_path: Path) -> dict[str, float | str | None]:
         data[f"{prefix}_p95_viol"] = parse_float(m.group(9))
         data[f"{prefix}_p99_viol"] = parse_float(m.group(10))
         data[f"{prefix}_max_viol_rel"] = parse_float(m.group(11))
+        # R5: normalización por actividad max{1,|rhs|,Σ|a·x|}. Capturada aparte para no
+        # renumerar los grupos de arriba; None en binarios que no la emiten.
+        relact = re.search(r"max_viol_relact=([0-9.eE+\-]+)", m.group(0))
+        data[f"{prefix}_max_viol_relact"] = parse_float(relact.group(1)) if relact else None
         data[f"{prefix}_viol_le_count"] = parse_float(m.group(12))
         data[f"{prefix}_viol_ge_count"] = parse_float(m.group(13))
         data[f"{prefix}_viol_eq_count"] = parse_float(m.group(14))

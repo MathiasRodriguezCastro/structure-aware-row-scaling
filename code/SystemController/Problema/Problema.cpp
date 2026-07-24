@@ -423,8 +423,11 @@ Problema::ResultadoVerificacionOriginal Problema::verificarFactibilidadOriginal(
     for (const auto& r : restriccionesOriginales) {
         int faltantesFila = 0;
         double lhs = 0.0;
+        double actividad = 0.0;   // Σ_j |a_rj · x_j| (refinamiento R5)
         for (const auto& [coef, var] : r.terminos) {
-            lhs += coef * valor(var, faltantesFila);
+            double contrib = coef * valor(var, faltantesFila);
+            lhs += contrib;
+            actividad += std::abs(contrib);
         }
         res.variablesFaltantes += faltantesFila;
 
@@ -463,6 +466,12 @@ Problema::ResultadoVerificacionOriginal Problema::verificarFactibilidadOriginal(
         violacionesFilas.push_back(viol);
         res.maxViolacionRelativa = std::max(res.maxViolacionRelativa,
                                             viol / (1.0 + std::abs(r.rhs)));
+        // Refinamiento R5: normalizar por la ACTIVIDAD de la fila, max{1,|rhs|,Σ|a·x|}.
+        // Corrige el sub-normalizado de (1+|rhs|) en filas de actividad grande y RHS chico
+        // (balances con RHS≈0), donde el denominador RHS-only se reduce al residuo absoluto.
+        double denomActividad = std::max(1.0, std::max(std::abs(r.rhs), actividad));
+        res.maxViolacionRelativaActividad = std::max(res.maxViolacionRelativaActividad,
+                                                     viol / denomActividad);
     }
 
     // Promedio y percentiles (p95, p99) de la violación de restricciones sobre TODAS las filas.
@@ -565,6 +574,7 @@ void Problema::imprimirVerificacionFactibilidadOriginal(
               << " p95_viol=" << r.p95ViolacionRestricciones
               << " p99_viol=" << r.p99ViolacionRestricciones
               << " max_viol_rel=" << r.maxViolacionRelativa
+              << " max_viol_relact=" << r.maxViolacionRelativaActividad
               << " viol_le_count=" << r.restriccionesMenorIgualVioladas
               << " viol_ge_count=" << r.restriccionesMayorIgualVioladas
               << " viol_eq_count=" << r.igualdadesVioladas

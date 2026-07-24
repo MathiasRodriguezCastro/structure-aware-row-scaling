@@ -84,7 +84,17 @@ def int_viol(r):
 
 
 def rel_viol(r):
-    return f(r.get('verif_solver_max_viol_rel')) or 0.0
+    # R5: the mixed reading normalizes the row residual by the row ACTIVITY,
+    # max{1,|b_r|,Sum_j|a_rj x_j|}, reported by the binary as
+    # verif_solver_max_viol_relact.  This replaces the RHS-only form (1+|b_r|),
+    # which under-normalizes rows whose activity is large while the right-hand side
+    # is small -- exactly the zero-RHS balance rows on which the failures concentrate.
+    # Fall back to the RHS-only column for CSVs produced before the activity
+    # denominator existed.
+    v = f(r.get('verif_solver_max_viol_relact'))
+    if v is None:
+        v = f(r.get('verif_solver_max_viol_rel'))
+    return v or 0.0
 
 
 def classify(r):
