@@ -29,8 +29,12 @@ import numpy as np
 
 # LP-format term:  [+-] coefficient varname
 TERM = re.compile(r'([+-]?\s*\d*\.?\d+(?:[eE][+-]?\d+)?)?\s*([A-Za-z_][A-Za-z0-9_()\[\].]*)')
+# Trailing (?=\s|$|:) rather than \b so the "s.t." header (which ends in a
+# non-word "."), as written by the internal LP exporter, is recognised too --
+# \b requires a word char and fails after ".". Unchanged for "Subject To"-style
+# headers, and still rejects variable names like "st_1" or "endpoint".
 SECTION = re.compile(r'^\s*(subject to|st|s\.t\.|bounds|binaries|binary|generals|general|'
-                     r'integers|end|maximize|minimize)\b', re.I)
+                     r'integers|end|maximize|minimize)(?=\s|$|:)', re.I)
 
 
 def parse_lp_matrix(path):

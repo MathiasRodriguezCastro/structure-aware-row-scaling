@@ -42,7 +42,7 @@
 // Parámetros del generador
 // ----------------------------------------------------------------------------
 
-enum class PatronDesbalance { None, Local, Coupling, CouplingUniform, Mixed };
+enum class PatronDesbalance { None, Local, Coupling, CouplingUniform, CouplingHeterogeneo, Mixed };
 enum class FamiliaCoeficientes { Uniform, BlockHeterogeneous, Banded };
 
 struct ParametrosSinteticos {

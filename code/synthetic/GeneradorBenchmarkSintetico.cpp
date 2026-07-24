@@ -75,6 +75,7 @@ MetadatosInstancia GeneradorBenchmarkSintetico::generar(Problema& problema) cons
             case PatronDesbalance::Local:           return esLocal;
             case PatronDesbalance::Coupling:        return !esLocal;
             case PatronDesbalance::CouplingUniform: return !esLocal;
+            case PatronDesbalance::CouplingHeterogeneo: return false;  // desbalance en los coef, no un mult. de fila
             case PatronDesbalance::Mixed:           return true;
         }
         return false;
@@ -202,6 +203,17 @@ MetadatosInstancia GeneradorBenchmarkSintetico::generar(Problema& problema) cons
         for (int i = 1; i <= B; ++i) {
             const double mag = magnitudBloque(i, B, params.familiaCoef);
             double coef = draw(0.5, 1.5) * mag;
+            // coupling_heterogeneo: coeficiente de INCIDENCIA d_i heterogéneo POR BLOQUE dentro de
+            // la MISMA fila de acoplamiento, d_i = 10^{ξ_i}, ξ_i ~ U[-S,S] independiente por i. A
+            // diferencia de 'coupling' (θ por fila) y 'coupling_uniform' (θ colectivo), que son
+            // multiplicadores de fila que el escalado por filas puede deshacer, esto mete un rango
+            // de escala DENTRO de la fila que ningún factor de fila único corrige: es el caso de
+            // diseño genuino de la etapa de acoplamiento (coeficientes de coupling de veras
+            // dispares, como susceptancias/límites de una red frente a bloques en MW).
+            if (params.patron == PatronDesbalance::CouplingHeterogeneo && params.severidadS > 0) {
+                double xi = draw(-params.severidadS, params.severidadS);
+                coef *= std::pow(10.0, xi);
+            }
             terminos.emplace_back(coef, "a" + std::to_string(i) + "_x" + std::to_string(jSel));
             sumaCap += coef * kCotaSuperiorContinua;
         }
@@ -227,6 +239,9 @@ bool GeneradorBenchmarkSintetico::parsearPatron(const std::string& s, PatronDesb
     if (s == "coupling_uniform" || s == "coupling-uniform") {
         out = PatronDesbalance::CouplingUniform; return true;
     }
+    if (s == "coupling_heterogeneo" || s == "coupling_heterogeneous" || s == "coupling-heterogeneous") {
+        out = PatronDesbalance::CouplingHeterogeneo; return true;
+    }
     if (s == "mixed")    { out = PatronDesbalance::Mixed;    return true; }
     return false;
 }
@@ -244,6 +259,7 @@ std::string GeneradorBenchmarkSintetico::patronAString(PatronDesbalance p) {
         case PatronDesbalance::Local:           return "local";
         case PatronDesbalance::Coupling:        return "coupling";
         case PatronDesbalance::CouplingUniform: return "coupling_uniform";
+        case PatronDesbalance::CouplingHeterogeneo: return "coupling_heterogeneo";
         case PatronDesbalance::Mixed:           return "mixed";
     }
     return "none";

@@ -156,7 +156,7 @@ void ejecutarBenchmarkSintetico(std::istream& in, const std::vector<std::string>
             PatronDesbalance pd;
             if (!GeneradorBenchmarkSintetico::parsearPatron(s, pd))
                 throw std::runtime_error("benchmarkSintetico - pattern inválido: '" + s +
-                    "'. Válidos: none, local, coupling, mixed.");
+                    "'. Válidos: none, local, coupling, coupling_uniform, coupling_heterogeneo, mixed.");
             cfg.patrones.push_back(pd);
         }
         p.patron = cfg.patrones.front();  // fallback
