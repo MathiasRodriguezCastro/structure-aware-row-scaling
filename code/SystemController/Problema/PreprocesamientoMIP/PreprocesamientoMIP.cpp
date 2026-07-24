@@ -133,6 +133,7 @@ void PreprocesamientoMIP::ejecutar() {
         prob.guardarModeloOriginalParaVerificacion();
         prob.setVerificarModeloOriginalActivo(true);
     }
+    prob.limpiarFactoresFilaDual();   // R6: reiniciar el acumulador de d_r antes de escalar
 
     if (!cfg.solodiagnostico) {
         if (cfg.aplicarEscalamientoLocal) {
@@ -565,6 +566,7 @@ void PreprocesamientoMIP::escalarFila(int idxRestriccion, double factor) {
     }
     r->setTerminos(terminos);
     r->setTerminoIndependiente(r->getTerminoIndependiente() * factor);
+    prob.registrarFactorFilaDual(idxRestriccion, factor);   // R6: d_r exacto
 }
 
 // ‖a_r‖₂ sobre los coeficientes de la fila (excluye el RHS). Estrategia 2: el factor de
@@ -827,6 +829,7 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
                     coef *= alpha;
                 r->setTerminos(terminos);
                 r->setTerminoIndependiente(r->getTerminoIndependiente() * alpha);
+                prob.registrarFactorFilaDual(idx, alpha);   // R6: d_r exacto
 
                 logAlpha += log(alpha);
                 alphaMin = min(alphaMin, alpha);
@@ -979,6 +982,7 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
             for (auto& [coef, _] : terminos) coef *= alpha;
             r->setTerminos(terminos);
             r->setTerminoIndependiente(r->getTerminoIndependiente() * alpha);
+            prob.registrarFactorFilaDual(idx, alpha);   // R6: d_r exacto
             ++filasResidualEscaladas;
         }
         if (cfg.verbose)

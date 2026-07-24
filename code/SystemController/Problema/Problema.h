@@ -115,6 +115,7 @@ protected:
     bool verificarModeloOriginalActivo = false;
     std::vector<VariableOriginal> variablesOriginales;
     std::vector<RestriccionOriginal> restriccionesOriginales;
+    std::map<int, double> factorFilaDual;   ///< R6: factor total d_r por fila (auditoría de duales)
     std::vector<std::string> binariosOriginales;
     std::vector<std::pair<double, std::string>> terminosFuncionObjetivoOriginal;
     double constanteFuncionObjetivoOriginal = 0.0;
@@ -147,6 +148,18 @@ public:
                            const std::string& operador,
                            double terminoIndependiente);
     std::vector<Restriccion*>& getRestricciones();
+
+    // --- Factor de fila para auditoría de duales (R6) ---
+    // El preprocesamiento acumula aquí el factor total d_r con que escala cada fila (por índice),
+    // para desescalar los duales exactamente (pi_original = d_r · pi_scaled, eq. 54). Registrar el
+    // factor al aplicarlo es exacto; reconstruirlo después del coef/RHS es mal-puesto cuando la
+    // fila se escala a valores casi nulos. Se puebla solo si la auditoría está activa.
+    void registrarFactorFilaDual(int idx, double f) {
+        auto it = factorFilaDual.find(idx);
+        factorFilaDual[idx] = (it == factorFilaDual.end() ? 1.0 : it->second) * f;
+    }
+    void limpiarFactoresFilaDual() { factorFilaDual.clear(); }
+    const std::map<int, double>& getFactoresFilaDual() const { return factorFilaDual; }
 
     // --- Binarios ---
     void añadirBinario(const std::string& nombre);

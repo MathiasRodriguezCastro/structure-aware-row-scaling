@@ -11,6 +11,7 @@
 #include <limits>
 #include <regex>
 #include <set>
+#include <map>
 
 namespace {
 
@@ -253,6 +254,86 @@ void ProblemaGurobi::resolverMonolitico() {
                     try { kappaSolver = fijo.get(GRB_DoubleAttr_Kappa); } catch (...) {}
                     if (calcularExacto)
                         try { kappaExact = fijo.get(GRB_DoubleAttr_KappaExact); } catch (...) {}
+
+                    // --- R6: auditoría de duales desescalados (eq. 54) ---
+                    // Reutiliza el LP de enteras FIJADAS (fijo): sus precios sombra son los del
+                    // MIP en el incumbente. Se desescalan a unidades originales por
+                    // pi_original = d_r · pi_scaled, con d_r el factor total de fila recuperado del
+                    // snapshot original (coef escalado / coef original). Solo filas de balance de
+                    // demanda y continuidad de embalse/agua. Opt-in; sin el flag no se ejecuta.
+                    if (config.reportarDuales) {
+                        // Reoptimizar el LP fijo con presolve OFF: el presolve por defecto agrega
+                        // las igualdades de continuidad de embalse (a_vh_din) y quedan sin dual en
+                        // su nombre original. Con presolve off toda fila original conserva su
+                        // precio sombra. κ ya se leyó arriba, así que esto no altera esa medición.
+                        try {
+                            fijo.set(GRB_IntParam_Presolve, 0);
+                            fijo.set(GRB_DoubleParam_TimeLimit, 120.0);
+                            fijo.optimize();
+                        } catch (GRBException&) { /* best-effort */ }
+
+                        // d_r por NOMBRE de fila, tomado del factor EXACTO que el preprocesamiento
+                        // acumuló al escalar (registrarFactorFilaDual), no reconstruido después: la
+                        // reconstrucción post-hoc del coef/RHS es mal-puesta cuando la fila se escala
+                        // a valores casi nulos (validaba la advertencia de R3 W1). El índice→nombre
+                        // sale de la lista de restricciones del modelo.
+                        std::map<std::string, double> dRPorNombre;
+                        {
+                            auto& rest = getRestricciones();
+                            for (const auto& kv : getFactoresFilaDual())
+                                if (kv.first >= 0 && kv.first < (int)rest.size())
+                                    dRPorNombre[rest[kv.first]->getNombre()] = kv.second;
+                        }
+                        auto esFilaDualRelevante = [](const std::string& n) {
+                            // Balance de demanda (= costo marginal del sistema) y continuidad de
+                            // embalse (a_vh_din, la dinámica de volumen = valor del agua), más
+                            // otras filas de balance/agua si el generador las nombra así.
+                            return n.find("demanda")      != std::string::npos
+                                || n.find("balance")      != std::string::npos
+                                || n.find("h_din")        != std::string::npos  // vNh_din: continuidad de embalse
+                                || n.find("continuidad")  != std::string::npos
+                                || n.find("volumen")      != std::string::npos
+                                || n.find("agua")         != std::string::npos;
+                        };
+                        int nc = fijo.get(GRB_IntAttr_NumConstrs);
+                        GRBConstr* cons = fijo.getConstrs();
+                        int emitidas = 0;
+                        for (int k = 0; k < nc; ++k) {
+                            std::string nombre = cons[k].get(GRB_StringAttr_ConstrName);
+                            if (!esFilaDualRelevante(nombre)) continue;
+                            double piEsc = 0.0;
+                            try { piEsc = cons[k].get(GRB_DoubleAttr_Pi); } catch (...) { continue; }
+                            // d_r desde la fila que resolvió el solver (autoritativa). Método
+                            // primario: ratio del RHS (un escalar único, robusto cuando el RHS
+                            // original es no nulo — p.ej. continuidad de embalse con volumen
+                            // inicial). Fallback: ratio de coeficientes de una variable común no
+                            // nula (para filas con RHS=0, p.ej. balances). El escalado por filas
+                            // multiplica RHS y coeficientes por el mismo d_r>0.
+                            // d_r EXACTO registrado por el preprocesamiento (1.0 si la fila no se
+                            // escaló, p.ej. filas de acoplamiento por debajo del umbral).
+                            auto id = dRPorNombre.find(nombre);
+                            double d = (id != dRPorNombre.end()) ? id->second : 1.0;
+                            // d_r EXTREMO (fila escalada a valores casi nulos): el LP queda mal
+                            // condicionado en esa fila y su dual es degenerado, así que el desescale
+                            // no es interpretable aunque d_r sea el factor exacto. Se marca d_r_ok=0
+                            // para excluirlo del análisis (VALIDA la advertencia de R3 W1 sobre
+                            // duales degenerados en LPs de despacho).
+                            bool dOk = std::isfinite(d) && d > 1e-6 && d < 1e6;
+                            std::ostringstream ln;
+                            ln << std::scientific << std::setprecision(10);
+                            ln << "[DUALES] fila=" << nombre
+                               << " pi_scaled=" << piEsc
+                               << " d_r=" << d
+                               << " d_r_ok=" << (dOk ? 1 : 0)
+                               << " pi_original=" << (dOk ? d * piEsc : piEsc);
+                            std::cout << ln.str() << "\n";
+                            ++emitidas;
+                        }
+                        delete[] cons;
+                        std::cout << "[DUALES-RES] filas_reportadas=" << emitidas
+                                  << " snapshot=" << (snapshotOriginalDisponible ? 1 : 0)
+                                  << std::endl;
+                    }
                 }
             } else {
                 try { kappaSolver = modelo->get(GRB_DoubleAttr_Kappa); } catch (...) {}

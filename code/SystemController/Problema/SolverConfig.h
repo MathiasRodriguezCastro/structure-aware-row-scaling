@@ -45,6 +45,13 @@ struct SolverConfig {
     /// SOLVER_PARAM_AUTO => no se modifica. Sondeo R1: ¿el presolve de CPLEX absorbe el efecto
     /// del escalado externo? (dependencia del solver).
     int presolveIndCplex = SOLVER_PARAM_AUTO;
+    /// Auditoría de duales (R6): tras el solve, extrae los precios sombra del LP de enteras
+    /// FIJADAS (el fixedModel que ya se resuelve para κ) y los DESESCALA a unidades originales
+    /// vía eq. (54): pi_original = d_r · pi_scaled, con d_r el factor de fila recuperado del
+    /// snapshot original (coef escalado / coef original). Emite [DUALES] por fila de balance de
+    /// demanda y continuidad de embalse. Opt-in; sin el flag es byte-idéntico (no se extraen ni
+    /// emiten duales). Requiere --verificar-original (para el snapshot) y Gurobi.
+    bool reportarDuales = false;
 };
 
 #endif // SOLVERCONFIG_H

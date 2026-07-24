@@ -732,6 +732,11 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                             }
                             config.scaleFlagGurobi = val;
 
+                        } else if (args[i] == "--reportar-duales") {
+                            // R6: auditoría de duales desescalados (eq. 54). Requiere Gurobi +
+                            // --verificar-original. Opt-in; byte-idéntico sin el flag.
+                            config.reportarDuales = true;
+
                         } else if (args[i] == "--seed" || args[i] == "-seed") {
                             // Réplica de semilla: variabilidad corrida-a-corrida del MIP.
                             if (i + 1 >= args.size()) {
