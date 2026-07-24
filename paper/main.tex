@@ -2967,6 +2967,31 @@ identifying which rule is best conditioned and inadequate for quantitative claim
 $\kappa_2$, and we make no argument in this paper that rests on the proxy as a numerical
 estimate of the spectral condition number.
 
+\subsubsection*{Heterogeneous coupling coefficients}
+The patterns above, and the operational instances, impose imbalance as row multipliers or
+near-unity balances, which is exactly the case a row factor can undo. The coupling stage,
+however, is designed for coupling rows whose \emph{incidence} coefficients are themselves
+heterogeneous---a coupling row whose blocks enter at genuinely different scales, as network
+susceptances or interconnection limits would against blocks in MW. To test it on that case we
+add a \texttt{coupling\_heterogeneo} pattern in which each block $i$ enters a coupling row with
+an independent incidence factor $d_i=10^{\xi_i}$, $\xi_i\sim\mathcal U[-S,S]$, so a single
+coupling row mixes coefficients spanning up to $2S$ orders of magnitude \emph{within} the row.
+This is column-scale heterogeneity inside the row, not a row multiplier, so no single row
+factor can remove it. On a ten-seed grid the median $\kappa_2^{+}$ tells a two-sided story.
+Where the heterogeneity is moderate ($S=3$) the structure-aware rules help decisively---
+\methodMat{} reaches $\num{1.7e5}$ and \methodAug{} $\num{1.9e6}$ against Flat's $\num{2.6e8}$,
+two to three orders of magnitude better---so on genuinely heterogeneous coupling the coupling
+stage is not inert, in contrast to the uniform patterns where the role-blind control won. At
+severe heterogeneity ($S=6$), \methodAug{} still edges Flat ($\num{5.4e10}$ against
+$\num{9.2e10}$) while \methodMat{} does not ($\num{1.4e11}$), and---the more important
+observation---\emph{no} rule comes near the $\sim\!\num{1e3}$ that the row-multiplier patterns
+reach: every variant remains at $\num{1e10}$--$\num{1e11}$. Within-row coefficient spread is a
+column-scale problem, and row scaling, by construction, cannot repair it. The coupling
+mechanism is therefore not refuted---it helps precisely where coupling coefficients are truly
+heterogeneous---but heterogeneous coupling also lies partly outside what any row scaling can
+fix, which is independent evidence for the row-versus-column scoping decision of
+\cref{sec:validity}.
+
 Taken together, the four operational scenarios and the controlled synthetic check support a
 limited but useful interpretation. Under Gurobi, the structured rules lower path-specific
 numerical diagnostics and often reduce completed-run solver time or deterministic effort
