@@ -1,0 +1,45 @@
+Three-arm coverage vs selectivity, capped solver time. Ratio = T_a/T_b on matched pairs.
+SA-Full ~ Flat (ratio ~1, ns) => the coverage gap, not metadata, was the defect.
+
+
+=== Simple 1% (202 instances) ===
+  kernel      contrast              n  med ratio         p         q
+  Augmented   SA-Full/Flat        200     1.0000    0.8778    0.8778
+  Augmented   SA-Full/selective   200     0.9995    0.6359    0.8479
+  Matrix-only SA-Full/Flat        200     1.0008    0.1741    0.5175
+  Matrix-only SA-Full/selective   201     1.0005    0.2588    0.5175
+
+=== Simple 0.1% (23 instances) ===
+  kernel      contrast              n  med ratio         p         q
+  Augmented   SA-Full/Flat         22     0.9989    0.3705    0.7411
+  Augmented   SA-Full/selective    22     0.9972    0.7990    0.7990
+  Matrix-only SA-Full/Flat         22     0.9979    0.2615    0.7411
+  Matrix-only SA-Full/selective    22     1.0000    0.7745    0.7990
+
+=== SG-Ter-Mer 1% (54 instances) ===
+  kernel      contrast              n  med ratio         p         q
+  Augmented   SA-Full/Flat         53     0.9969    0.0449    0.1798
+  Augmented   SA-Full/selective    53     1.0133    0.5210    0.5210
+  Matrix-only SA-Full/Flat         52     0.9970    0.1897    0.2530
+  Matrix-only SA-Full/selective    52     0.9872    0.1131    0.2261
+
+=== SG-Ter-Mer 0.1% (54 instances) ===
+  kernel      contrast              n  med ratio         p         q
+  Augmented   SA-Full/Flat         53     1.0000    0.7133    0.9511
+  Augmented   SA-Full/selective    53     0.9859    0.2071    0.4142
+  Matrix-only SA-Full/Flat         52     0.9981    0.9564    0.9564
+  Matrix-only SA-Full/selective    53     1.0101    0.1335    0.4142
+
+=== Full 1% (1 instances) ===
+  kernel      contrast              n  med ratio         p         q
+  Augmented   SA-Full/Flat          1          -         -         -
+  Augmented   SA-Full/selective     1          -         -         -
+  Matrix-only SA-Full/Flat          1          -         -         -
+  Matrix-only SA-Full/selective     1          -         -         -
+
+=== Full 0.1% (1 instances) ===
+  kernel      contrast              n  med ratio         p         q
+  Augmented   SA-Full/Flat          1          -         -         -
+  Augmented   SA-Full/selective     1          -         -         -
+  Matrix-only SA-Full/Flat          0          -         -         -
+  Matrix-only SA-Full/selective     0          -         -         -
