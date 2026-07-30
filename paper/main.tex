@@ -3582,19 +3582,20 @@ residual-global rows unscaled, or scale every row. The policy between them---kee
 metadata but route the residual-global rows through the same per-row kernel, the
 metadata-driven full-coverage rule (\methodMat{}-Full / \methodAug{}-Full of
 \cref{subsec:strategy-2})---is the one the local--coupling--residual-global taxonomy names but
-the original comparison never ran. We ran it as a third arm on ClusterUY under Gurobi. On the
-cells completed so far---Simple at $1\%$ ($202$ matched instances) and SG-Ter-Mer at both
-tolerances ($54$ each)---the metadata-routed rule \emph{matches} the role-blind rule on capped
-solver time: the paired median $T_{\mathrm{full}}/T_{\mathrm{Flat}}$ is between $0.997$ and
-$1.001$ in every cell and kernel, with no robust difference (Simple $1\%$ augmented $1.0000$,
-$p=0.88$; matrix-only $1.0008$, $p=0.17$; SG-Ter-Mer $0.1\%$ augmented $1.0000$, $p=0.71$).
-Covering the residual rows does not itself move runtime relative to the selective rule
-($T_{\mathrm{full}}/T_{\mathrm{selective}}$ not significant in any cell). This sharpens the
-reading of the coverage result: it is the \emph{coverage gap}---the highest-magnitude rows the
-selective taxonomy declined to scale---not the use of role metadata, that separated the
-selective rule from full coverage. Metadata routes rows; it is not the lever, and it need not
-be an exclusive filter. (Simple $0.1\%$ and the Full class were interrupted by a login-node
-outage and are re-running; the ordering above is what the completed cells show.)
+the original comparison never ran. We ran it as a third arm on ClusterUY under Gurobi, all
+three classes at both tolerances. The metadata-routed rule \emph{matches} the role-blind rule
+on capped solver time in every one of the six cells: the paired median
+$T_{\mathrm{full}}/T_{\mathrm{Flat}}$ lies between $0.997$ and $1.001$ for both kernels, with no
+robust difference (Simple $1\%$ augmented $1.0000$, $p=0.88$; SG-Ter-Mer $0.1\%$ augmented
+$1.0000$, $p=0.71$; Full $1\%$ augmented $0.9995$, $p=0.23$; Full $0.1\%$ augmented $1.0000$,
+$p=0.66$), the lone exception being a $0.3\%$ edge in SG-Ter-Mer at $1\%$ that does not survive
+multiplicity adjustment. Covering the residual rows barely moves runtime relative to the
+selective rule either ($T_{\mathrm{full}}/T_{\mathrm{selective}}$ significant in only one of
+twelve contrasts, a $0.3\%$ speed-up in Simple at $0.1\%$). This sharpens the reading of the
+coverage result: it is the \emph{coverage gap}---the highest-magnitude rows the selective
+taxonomy declined to scale---not the use of role metadata, that separated the selective rule
+from full coverage. Metadata routes rows; it is not the lever, and it need not be an exclusive
+filter.
 
 \FloatBarrier
 
