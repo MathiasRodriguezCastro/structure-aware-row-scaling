@@ -1,0 +1,32 @@
+Within-instance across-seed dispersion of capped solver time (seeds 1..5).
+The noise floor the ~1% retained effects must clear.
+
+class       variant                     n   med relIQR med rel range
+Simple      base                      183       17.30%       33.78%
+Simple      estructurado              180       14.53%       28.52%
+Simple      estructurado_plano        180       14.58%       29.17%
+Simple      estructurado_matricial    181       13.96%       30.11%
+Simple      matricial_plano           183       14.40%       29.43%
+SG-Ter-Mer  base                       68       12.15%       37.40%
+SG-Ter-Mer  estructurado               68       17.09%       45.48%
+SG-Ter-Mer  estructurado_plano         68       18.18%       40.43%
+SG-Ter-Mer  estructurado_matricial     68       14.79%       38.57%
+SG-Ter-Mer  matricial_plano            68       14.68%       32.89%
+
+Read against the retained runtime effects (~0.9% on the Simple augmented contrast): if the
+absolute across-seed dispersion is of the same order, a single-seed absolute time is noisy.
+
+
+Paired contrast under each seed (median T_a/T_b on that seed's matched pairs).
+Stable across seeds => the ~1% effect is real; swinging across 1.0 => noise.
+
+=== Simple ===
+  contrast       seed1 seed2 seed3 seed4 seed5
+  SA-Aug/Flat     1.0015  1.0009  0.9973  1.0017  1.0004
+  SA-Aug/Base     0.9835  0.9850  0.9652  0.9778  0.9616
+
+=== SG-Ter-Mer ===
+  contrast       seed1 seed2 seed3 seed4 seed5
+  SA-Aug/Flat     1.0066  1.0572  1.0921  1.0276  1.0097
+  SA-Aug/Base     0.8390  0.8647  0.8553  0.8816  0.8159
+

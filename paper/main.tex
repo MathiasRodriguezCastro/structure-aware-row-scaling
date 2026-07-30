@@ -154,9 +154,10 @@ The result is a controlled negative one. The distinctive coupling stage never ac
 operational instance, so it remains an unvalidated extension. The role-blind full-coverage
 control matches or beats the selective rule on the exported-range proxy, on the spectral
 condition number, and on most runtime endpoints, so metadata-driven selectivity is not
-uniformly superior. Runtime effects are of the order of the solver's own unreplicated
-run-to-run variability, which a single-run-per-cell design cannot separate from them; only one
-of twelve contrasts clears multiplicity adjustment, and none under CPLEX. Under the
+uniformly superior. Runtime effects are of the order of the solver's own
+run-to-run variability---a five-seed replication puts the within-instance noise floor at
+$13$--$18\%$ and leaves the metadata-versus-coverage contrast inside it in the fast class---and
+only one of twelve contrasts clears multiplicity adjustment, none under CPLEX. Under the
 pre-declared absolute criterion the proposed default \emph{degrades} original-scale reliability
 relative to the base, concentrated on zero-right-hand-side balance rows, and we report the
 strict reading as primary.
@@ -183,7 +184,8 @@ the fastest, so numerical improvement and solver acceleration must be measured s
   never activated on any operational instance tested.
   \item Time preprocessing separately from the solver---on fast instances the preprocessing cost,
   not the numerics, decided which rule looked faster, and the runtime gaps were of the order of
-  the solver's own unreplicated run-to-run variability.
+  the solver's own run-to-run variability (a five-seed replication put the noise floor at
+  $13$--$18\%$).
   \item Re-verify every returned solution against the original unscaled constraints---the scaling
   default we tested degraded that reliability relative to no scaling, concentrated on
   zero-right-hand-side balance rows.
@@ -3880,8 +3882,8 @@ scenario, the internal-scaling baseline, and the coupling-stage activation campa
 (\cref{tab:robust-gurobi-1pct-mipgap,tab:internal-scaling}; Table~S8)---the Simple base
 $\sgm$ spans $3.73$--$4.05$\,s and the SG-Ter-Mer base $14.09$--$14.42$\,s, a difference of
 under $10\%$ that is an order of magnitude smaller than the $1.8$--$2\times$
-structure-aware effects; this contextualizes, but does not estimate, the seed variability
-of the direct SA--Flat contrasts. The deterministic-effort metrics (\Work{} units and ticks) are less sensitive to
+structure-aware effects; this contextualizes the cross-campaign drift, while the five-seed
+replication reported below estimates the seed variability of the direct SA--Flat contrasts. The deterministic-effort metrics (\Work{} units and ticks) are less sensitive to
 hardware scheduling and wall-clock noise, but they can still vary when the solver follows a
 different seed- or parallel-search trajectory.
 The Full class drifts more (base $\sgm$ $82.5$--$109.4$\,s across the same campaigns): with
@@ -3891,19 +3893,34 @@ cross-campaign level comparisons.
 The repeated Base campaigns contextualize the larger Base--SA effects but do not estimate seed
 variability for the smaller direct SA--Flat contrasts. Each dedicated control CSV contains
 both SA and Flat reruns from the same class--tolerance batch, and those batches are independent
-of the main campaign. No seed-replicated
-$\{\mathrm{SA\mbox{-}Aug},\mathrm{Flat\mbox{-}Aug}\}\times
-\{\mathrm{SG\mbox{-}Ter\mbox{-}Mer},\mathrm{Full}\}$ subcampaign is available. The nominal
-SG-Ter-Mer result is therefore scoped to the reported default-seed campaign, and the Full
-direction and magnitude must not be treated as stable. Moreover, the operational scenarios
+of the main campaign. A dedicated five-seed replication now bounds the seed variability of the
+direct contrasts. We reran the two $0.1\%$ contrasts that carry the argument---Simple and
+SG-Ter-Mer, five solver seeds each on the same instances and hardware---and measured both the
+absolute noise floor and the paired contrast under each seed. The absolute floor is large and
+matches the literature: the within-instance across-seed spread of capped solver time has a
+median relative interquartile range of $13$--$18\%$ (full range $28$--$45\%$), so a single-seed
+\emph{absolute} time is indeed noisy at the ten-percent scale of \cite{lodi2013variability}.
+The paired design cancels most of it. The first-order effect---scaling versus no scaling---is
+robust: the median $T_{\mathrm{SA}}/T_{\mathrm{Base}}$ stays below one under every seed in both
+classes ($0.96$--$0.98$ Simple, $0.82$--$0.88$ SG-Ter-Mer), never crossing unity. The direct
+SA--Flat contrast behaves exactly as the noise-floor reading predicts. In the fast Simple class
+it is a seed-stable null: the median $T_{\mathrm{SA}}/T_{\mathrm{Flat}}$ is $1.000\pm0.004$ across
+all five seeds despite the $15\%$ absolute floor, which both confirms that the pairing works and
+shows the Simple SA--Flat difference is inside the seed noise. In SG-Ter-Mer the \emph{direction}
+is seed-stable---the role-blind control is faster under every seed
+($T_{\mathrm{SA}}/T_{\mathrm{Flat}}$ between $1.007$ and $1.092$)---but its \emph{magnitude} swings
+from under one percent to nine percent with the seed, so the SG-Ter-Mer effect is best read as a
+stable-sign, seed-fragile-magnitude advantage for full coverage rather than a precise ratio. The
+Full class is not seed-replicated and its direction and magnitude must still not be treated as
+stable. Moreover, the operational scenarios
 share generator structure and form identifiable Simple and SG-Ter-Mer families; treating all
 rows as independent can overstate precision. On solver time, the block-sign sensitivity
 retains Simple but not SG-Ter-Mer after adjustment; the prototype preprocessing-plus-solver
 and Work endpoints do retain SG-Ter-Mer (Table~S10), whereas the cached-metadata sensitivity
 moves the SG-Ter-Mer comparisons to or above the nominal $0.05$ threshold. The Work replication of both augmented
-$0.1\%$ directions makes pure wall-clock scheduling noise a less likely explanation, but
-it does not eliminate seed- or trajectory-level variability; seed-replicated runs are left
-as future work. The cached-metadata comparison is toolchain-sensitive at the scale of the
+$0.1\%$ directions makes pure wall-clock scheduling noise a less likely explanation, and the
+five-seed replication above now supplies the direct estimate of seed- and trajectory-level
+variability for the two carrying contrasts, leaving only the Full class unreplicated. The cached-metadata comparison is toolchain-sensitive at the scale of the
 reported effects: compiler optimization changes the Simple coefficient-only $1\%$ adjusted
 value from $q_{6}=0.0002$ in the diagnostic build to $q_{6}=0.115$ in the release build. We
 therefore use the release build as the implementation-cost sensitivity of record and interpret
