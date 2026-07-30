@@ -67,10 +67,14 @@ VARIANTS = [
 ]
 
 
-def export_lp(exe, instance_text, flags, target, mipgap, timeout_s=600.0):
+def export_lp(exe, instance_text, flags, target, mipgap, timeout_s=600.0,
+              solver='Gurobi'):
+    # The export is solver-agnostic (preprocessing lives in Problema, grabar just
+    # writes the scaled model), so the license-free CBC backend produces the same
+    # matrix as Gurobi; the highs backend uses it to stay off commercial licenses.
     script = (
         f"{instance_text}\n\n"
-        f"configurarSolver --Gurobi --timeout 3600 --mipgap {mipgap:g}\n"
+        f"configurarSolver --{solver} --timeout 3600 --mipgap {mipgap:g}\n"
         f"preprocesar {flags}\n"
         f"grabar {target}\n"
         "salir\n"
@@ -165,6 +169,86 @@ def basis_matrix(lp_path, row_names, basic_vars, basic_rows):
     return B
 
 
+def reference_basis_highs(base_lp, mipgap, timelimit):
+    """License-free reference basis via HiGHS (highspy): the LP-relaxation optimum.
+
+    HiGHS's integer presolve declares this ill-conditioned family infeasible on the
+    raw dynamic range (bounds span ~1e9), but the LP relaxation solves cleanly to
+    the same objective under every variant, confirming that scaling preserves the
+    optimum.  Its optimal basis is an incumbent-independent reference, which is all
+    the fixed-basis diagnostic needs (one basis held fixed across variants).  The
+    'mip_obj' field therefore carries the LP-relaxation objective and 'mip_gap' is 0.
+    """
+    import highspy as hs
+
+    h = hs.Highs()
+    h.setOptionValue('output_flag', False)
+    h.setOptionValue('time_limit', timelimit)
+    h.setOptionValue('solver', 'simplex')        # we need a basis, not an interior point
+    h.readModel(str(base_lp))
+    lp = h.getLp()
+    for j in range(lp.num_col_):                 # drop integrality -> LP relaxation
+        h.changeColIntegrality(j, hs.HighsVarType.kContinuous)
+    h.run()
+    if h.getModelStatus() != hs.HighsModelStatus.kOptimal:
+        return None
+
+    basis = h.getBasis()
+    lp = h.getLp()
+    cnames = list(lp.col_names_)
+    rnames = list(lp.row_names_)
+    kB = hs.HighsBasisStatus.kBasic
+    basic_vars = [cnames[j] for j in range(lp.num_col_) if basis.col_status[j] == kB]
+    basic_rows = [rnames[i] for i in range(lp.num_row_) if basis.row_status[i] == kB]
+    info = {
+        'mip_obj': h.getObjectiveValue(), 'mip_gap': 0.0,
+        'rows': lp.num_row_, 'cols': lp.num_col_,
+        'basic_structural': len(basic_vars), 'basic_slack': len(basic_rows),
+    }
+    return rnames, basic_vars, basic_rows, info
+
+
+def basis_matrix_highs(lp_path, row_names, basic_vars, basic_rows):
+    """License-free twin of basis_matrix, reading the variant's matrix via HiGHS."""
+    import highspy as hs
+
+    h = hs.Highs()
+    h.setOptionValue('output_flag', False)
+    h.readModel(str(lp_path))
+    lp = h.getLp()
+    rnames = list(lp.row_names_)
+    cnames = list(lp.col_names_)
+    ridx = {n: i for i, n in enumerate(row_names)}
+    if set(rnames) != set(ridx):
+        raise ValueError(f'row set differs in {lp_path}')
+    cidx = {n: j for j, n in enumerate(cnames)}
+
+    am = lp.a_matrix_
+    if am.format_ != hs.MatrixFormat.kColwise:
+        raise ValueError('expected column-wise matrix from readModel')
+    start, index, value = list(am.start_), list(am.index_), list(am.value_)
+
+    rows, cols, vals = [], [], []
+    ncol = 0
+    for name in basic_vars:
+        j = cidx.get(name)
+        if j is None:
+            raise ValueError(f'basic variable {name} missing in {lp_path}')
+        for k in range(start[j], start[j + 1]):
+            rows.append(ridx[rnames[index[k]]])
+            cols.append(ncol)
+            vals.append(value[k])
+        ncol += 1
+    for name in basic_rows:                      # unit slack columns
+        rows.append(ridx[name])
+        cols.append(ncol)
+        vals.append(1.0)
+        ncol += 1
+
+    n = len(row_names)
+    return sp.csc_matrix((vals, (rows, cols)), shape=(n, ncol))
+
+
 def kappa1(B):
     """kappa_1(B) = ||B||_1 ||B^{-1}||_1, with ||B^{-1}||_1 estimated from a sparse LU."""
     n, k = B.shape
@@ -181,7 +265,11 @@ def kappa1(B):
         rmatvec=lambda x: lu.solve(x, 'T'),
         dtype=np.float64,
     )
-    norm_inv = float(spla.onenormest(op))
+    # onenormest is a randomized 1-norm estimator; seed and widen t so the readout
+    # is reproducible (per-instance spread is well under the order-of-magnitude gaps
+    # the diagnostic reports, but a fixed seed makes the CSV byte-stable).
+    np.random.seed(0)
+    norm_inv = float(spla.onenormest(op, t=4))
     return {'kappa1': norm_B * norm_inv, 'singular': 0, 'note': ''}
 
 
@@ -192,43 +280,69 @@ def main():
     ap.add_argument('--exe', default=str(ROOT / 'code' / 'build_release' / 'SistemaElectrico'))
     ap.add_argument('--mipgap', type=float, default=1e-3)
     ap.add_argument('--timelimit', type=float, default=3600.0)
+    ap.add_argument('--backend', choices=('gurobi', 'highs'), default='gurobi',
+                    help='solver for the reference solve/basis. highs is license-free '
+                         '(exports via CBC, solves via highspy); gurobi is the original.')
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
+
+    if args.backend == 'highs':
+        # DummyLp is the pure LP exporter (no solver build), so the six per-instance
+        # exports are near-instant; the reference solve is done by highspy.
+        export_solver, ref_fn, mat_fn = 'DummyLp', reference_basis_highs, basis_matrix_highs
+    else:
+        export_solver, ref_fn, mat_fn = 'Gurobi', reference_basis, basis_matrix
 
     out = Path(args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     fields = ['instance', 'variant', 'kappa1', 'rows', 'basic_structural',
               'basic_slack', 'singular', 'mip_obj', 'mip_gap', 'note']
-    rows_out = []
+    # Incremental + resumable: each instance's rows are flushed as it finishes, and
+    # instances already present in the CSV are skipped.  A long local run over the
+    # full class is then partial-safe and can be re-launched to pick up where it left.
+    done = set()
+    if out.exists():
+        for r in csv.DictReader(open(out)):
+            done.add(r['instance'])
+    fh = open(out, 'a', newline='')
+    w = csv.DictWriter(fh, fieldnames=fields)
+    if not done:
+        w.writeheader()
+        fh.flush()
+    written = 0
 
     for spec in args.instancias:
         inst = Path(spec)
+        if inst.name in done:
+            continue
         text = clean_instance_text(inst)
         work = Path(tempfile.mkdtemp(prefix='fixbasis_'))
         try:
             lps = {}
             for tag, flags in VARIANTS:
                 target = work / f'{tag}.lp'
-                if not export_lp(args.exe, text, flags, str(target), args.mipgap):
+                if not export_lp(args.exe, text, flags, str(target), args.mipgap,
+                                 solver=export_solver):
                     print(f'  {inst.name}: export failed for {tag}', file=sys.stderr)
                     break
                 lps[tag] = target
             if len(lps) != len(VARIANTS):
                 continue
 
-            ref = reference_basis(lps['Base'], args.mipgap, args.timelimit)
+            ref = ref_fn(lps['Base'], args.mipgap, args.timelimit)
             if ref is None:
                 print(f'  {inst.name}: no reference basis', file=sys.stderr)
                 continue
             row_names, basic_vars, basic_rows, info = ref
 
+            inst_rows = []
             for tag, _ in VARIANTS:
                 try:
-                    B = basis_matrix(lps[tag], row_names, basic_vars, basic_rows)
+                    B = mat_fn(lps[tag], row_names, basic_vars, basic_rows)
                     res = kappa1(B)
                 except ValueError as exc:
                     res = {'kappa1': float('nan'), 'singular': 1, 'note': str(exc)[:60]}
-                rows_out.append({
+                inst_rows.append({
                     'instance': inst.name, 'variant': tag,
                     'kappa1': res['kappa1'], 'rows': info['rows'],
                     'basic_structural': info['basic_structural'],
@@ -238,16 +352,16 @@ def main():
                 })
                 print('  %-14s %-9s kappa1=%.4e' % (inst.name, tag, res['kappa1']),
                       file=sys.stderr, flush=True)
+            w.writerows(inst_rows)
+            fh.flush()
+            written += len(inst_rows)
         finally:
             for f in work.glob('*'):
                 f.unlink()
             work.rmdir()
 
-    with open(out, 'w', newline='') as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows_out)
-    print(f'wrote {len(rows_out)} rows to {out}', file=sys.stderr)
+    fh.close()
+    print(f'wrote {written} new rows to {out}', file=sys.stderr)
 
 
 if __name__ == '__main__':
