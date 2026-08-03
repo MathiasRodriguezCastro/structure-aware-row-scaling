@@ -899,10 +899,14 @@ decomposition rather than through the magnitude-range surrogate the implementati
 \Cref{subsec:spectral-audit} reports that audit. Its verdict is split, and we state both
 halves here because they bear on different claims. The propositions' \emph{qualitative}
 prediction survives: every scaling rule reduces $\kappa_2$ by orders of magnitude wherever
-row-multiplicative imbalance is present. Their use as a rationale for \emph{selectivity} does
-not: the role-blind control matches or beats the augmented structure-aware rule on
-$\kappa_2$ in every pattern, including the coupling patterns the coupling stage was designed
-for. The spectral argument therefore supports scaling, not metadata.
+row-multiplicative imbalance is present. Their use as a rationale for the \emph{augmented
+collective} coupling factor does not: the role-blind control matches or beats the augmented
+structure-aware rule on $\kappa_2$ in every pattern, including the coupling patterns the coupling
+stage was designed for. The block metadata itself is not inert, though: a kernel-matched test
+(\cref{subsec:spectral-audit}) isolates an order-of-magnitude $\kappa_2^{+}$ gain for the
+matrix-only structure-aware rule over its role-blind control once the blocks sit at heterogeneous
+scales. The spectral argument therefore supports scaling in general, and the block-relative
+placement of the per-row kernel specifically, but not the augmented collective coupling rescale.
 
 This design rationale also explains why the proposed method is row-based. Positive row scaling
 preserves the original units and domains of all variables; integer and binary variables do
@@ -3074,6 +3078,32 @@ mechanism is therefore not refuted---it helps precisely where coupling coefficie
 heterogeneous---but heterogeneous coupling also lies partly outside what any row scaling can
 fix, which is independent evidence for the row-versus-column scoping decision of
 \cref{sec:validity}.
+
+\subsubsection*{Isolating the metadata: a kernel-matched structure test}
+The comparisons so far leave the block metadata entangled with the kernel, because the
+role-blind control in the grid above is the augmented Flat rule while the best structure-aware
+variant is the coefficient-only \methodMat{}. \Cref{prop:attribution} says how to disentangle
+them: run a role-blind control that uses the \emph{same} coefficient-only kernel as \methodMat{}
+and differs from it only in ignoring the block structure---call it Flat-Mat---so that any gap is,
+by the proposition, attributable to the metadata alone. We ran it on a block-heterogeneous
+coefficient family, in which the blocks sit at genuinely different scales (coefficient exponents
+spread over $[-2,2]$) so that equal absolute magnitudes carry different numerical meaning by
+block---the regime the operational balance rows never reach. There the block metadata helps,
+cleanly and decisively. On the plain coupling pattern at $S=6$ ($30$ seeds) \methodMat{} attains
+a median $\kappa_2^{+}$ of $\num{1.3e3}$ against Flat-Mat's $\num{1.4e4}$, lower on all $30$
+instances by a median factor of $10.2$ ($p=1.9\times10^{-9}$, Wilcoxon on the log ratios).
+Because the two share both kernel and coverage, this order of magnitude is attributable to the
+block metadata alone: scaling the coupling rows relative to the normalized block scales, rather
+than by their own raw norm, is precisely what the role-blind rule cannot do. The gap closes when
+the blocks are homogeneous (\methodMat{} and Flat-Mat tie, median ratio $1.02$, on the uniform
+family), which is exactly why the operational comparison is non-identifying: its blocks and its
+near-unity balance rows do not carry the scale heterogeneity that activates the mechanism. The
+benefit is specific to the block-relative \emph{placement} of the per-row kernel and not to the
+augmented collective factor---\methodAug{} is an order of magnitude \emph{worse} than Flat-Mat
+here ($\times 11$). So the block metadata is not inert: on the numerical diagnostic, in the
+regime designed to exercise it, it buys an order of magnitude that a role-blind rule with the
+same kernel and coverage cannot. What the operational campaigns show is that the tested
+instances do not enter that regime.
 
 Taken together, the four operational scenarios and the controlled synthetic check support a
 limited but useful interpretation. Under Gurobi, the structured rules lower path-specific

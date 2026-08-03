@@ -64,6 +64,16 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.usarEquilibradoRuiz       = false;
         return true;
     }
+    if (nombre == "Flat-Mat") {                // Flat role-blind con kernel matrix-only (sin RHS).
+        cfg.escalamientoPlano         = true;  //   Mismo kernel que SA-Mat, sin la estructura:
+        cfg.aplicarEscalamientoLocal  = true;  //   aisla el efecto de los metadatos (cf. Prop. de
+        cfg.aplicarEscalamientoGlobal = false; //   atribucion).
+        cfg.escalamientoLocalPorFila  = true;
+        cfg.normalizarBloqueTrasFilas = false;
+        cfg.usarEquilibradoRuiz       = false;
+        cfg.modoMatricial             = true;
+        return true;
+    }
     // Sensibilidad del piso de confiabilidad del γ colectivo: "SA-Aug-floor<val>" corre
     // SA-Aug con pisoMagnitudGammaColectivo = <val> ("SA-Aug-floor0" = piso deshabilitado).
     // Solo para el benchmark sintético (la campaña de sensibilidad usa seeds independientes).
