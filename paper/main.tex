@@ -150,14 +150,16 @@ solvers, and two MIPGap tolerances, against unscaled, Ruiz-kernel, solver-intern
 role-blind full-coverage controls, together with a synthetic mechanism grid carrying a direct
 spectral audit.
 
-The result is controlled but \emph{non-identifying}. The distinctive coupling stage---the only
-place an exhaustive role map lets the metadata change the exported matrix---never activates on any
-operational instance, so it remains an unvalidated extension. The one substantial difference
-between the selective rule and the role-blind full-coverage control traces to an incomplete role
-map that left a block of market-shortage rows unscaled, not to the metadata: under equal coverage
-the two coincide (proved for the matrix-only kernel and confirmed byte-for-byte), so these
-instances neither confirm nor refute the value of the metadata and instead show that a per-row
-local kernel, computable from the flat matrix, carries the effect. Runtime effects are of the
+The result is controlled and regime-dependent. On the operational instances it is
+\emph{non-identifying}: the distinctive coupling stage never activates, and the one substantial
+difference between the selective rule and the role-blind full-coverage control traces to an
+incomplete role map that left a block of market-shortage rows unscaled, not to the metadata---under
+equal coverage the two coincide, proved for the matrix-only kernel and confirmed byte-for-byte.
+But where the mechanism is exercised the metadata does help: on a synthetic grid with blocks at
+heterogeneous scales, the matrix-only structure-aware rule attains an order-of-magnitude lower
+condition number than a role-blind rule with the \emph{same} kernel and coverage ($30/30$
+instances, $p<10^{-8}$). The operational campaigns never enter that regime, where a per-row local
+kernel computable from the flat matrix carries the whole effect. Runtime effects are of the
 order of the solver's own
 run-to-run variability---a five-seed replication puts the within-instance noise floor at
 $12$--$18\%$ and leaves the metadata-versus-coverage contrast inside it in the fast class---and
@@ -4187,11 +4189,12 @@ metadata, not a refutation of it.
 Two things follow for a next version of the study. Empirically, the structure-aware and
 role-blind rules must be compared under an \emph{exhaustive} classification and identical
 coverage---every generated row traced to its module or to the coupling set---so that any residual
-difference is, by \cref{prop:attribution}, attributable to the coupling treatment alone; and the
-synthetic benchmark must include instances that actually drive the coupling stage, with coupling
-rows unbalanced relative to already-normalized block scales and equal absolute magnitudes
-carrying different numerical meaning by block, since the operational testbed never enters that
-regime. For deployment in the meantime the safe rule keeps the structure-aware order but
+difference is, by \cref{prop:attribution}, attributable to the coupling treatment alone. The
+synthetic side of this is already encouraging: on blocks placed at heterogeneous scales the
+matrix-only structure-aware rule buys an order of magnitude of conditioning over a kernel-matched
+role-blind rule (\cref{subsec:spectral-audit}), so the mechanism is real; what remains is to
+connect that conditioning gain to runtime and to build an operational testbed whose coupling rows
+enter the same regime, which the present one---with its near-unity balance rows---does not. For deployment in the meantime the safe rule keeps the structure-aware order but
 guarantees coverage: sweep every row with the coefficient-only kernel, applying it only where a
 row is poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
 original-scale verification. This coverage-safeguarded matrix-only rule is the variant we would
