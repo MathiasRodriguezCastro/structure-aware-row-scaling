@@ -76,7 +76,10 @@ def export_lp(exe, instance_text, flags, target, mipgap, timeout_s=600.0,
         f"{instance_text}\n\n"
         f"configurarSolver --{solver} --timeout 3600 --mipgap {mipgap:g}\n"
         f"preprocesar {flags}\n"
-        f"grabar {target}\n"
+        # --noConstante drops the objective constant, which shifts the objective by a
+        # fixed amount but leaves the argmin and its basis untouched; without it the
+        # bare constant is misread as a spurious (nonbasic) variable by some readers.
+        f"grabar {target} --noConstante\n"
         "salir\n"
     )
     with tempfile.NamedTemporaryFile('w', suffix='.txt', delete=False) as fh:
@@ -286,12 +289,14 @@ def main():
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
 
+    # DummyLp is the pure LP exporter (ProblemaLp, no solver build), so the six
+    # per-instance exports are near-instant and identical regardless of which
+    # backend solves; the export is solver-agnostic (scaling lives in Problema).
+    export_solver = 'DummyLp'
     if args.backend == 'highs':
-        # DummyLp is the pure LP exporter (no solver build), so the six per-instance
-        # exports are near-instant; the reference solve is done by highspy.
-        export_solver, ref_fn, mat_fn = 'DummyLp', reference_basis_highs, basis_matrix_highs
+        ref_fn, mat_fn = reference_basis_highs, basis_matrix_highs
     else:
-        export_solver, ref_fn, mat_fn = 'Gurobi', reference_basis, basis_matrix
+        ref_fn, mat_fn = reference_basis, basis_matrix
 
     out = Path(args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)

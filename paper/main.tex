@@ -1749,7 +1749,9 @@ variant fixes to its own incumbent, the ratio \eqref{eq:solver-kappa-ratio} can 
 only the change of representation but also differences in the integer decisions the variants
 reached; it is a diagnostic of the solver-facing numerics along each variant's own solution
 path, not of a single common LP. This is one more reason the diagnostic is read as a partial,
-not a definitive, mediator of runtime, and why the primary runtime evidence is the matched
+not a definitive, mediator of runtime; a fixed-basis control in \cref{subsec:added-controls}
+removes the vertex confound by holding one common basis across variants, and confirms the
+conditioning gain is representational. The primary runtime evidence remains the matched
 timing rather than the conditioning ratio. For CPLEX we also record tree-level KappaStats
 (maximum sampled basis condition number, unstable and ill-conditioned fractions, numerical
 attention score), which sample bases across the actual tree. Parsed
@@ -2451,6 +2453,34 @@ are easy to conflate. Both structure-aware variants drive the solver-level ratio
 while compressing $\rho_\kappa$ much like \methodAug{}), whereas \methodRuizCols{} may compress the
 exported matrix while worsening the solver-level diagnostic in Full---so the geometric-mean kernel
 is not interchangeable with the Ruiz kernel even under the same structural pipeline.
+
+\paragraph{A fixed-basis conditioning check.}
+Because \eqref{eq:solver-kappa-ratio} fixes each variant to its \emph{own} incumbent, a lower
+$\rho_\kappa^{\mathrm{solver}}$ could in principle reflect the integer vertex a variant reached
+rather than its representation. To remove that confound we recompute $\kappa_1$ on one basis
+held common across variants: we solve the base model, pin its integers at the incumbent, take
+the optimal basis of the resulting fixed-integer LP as a reference, and then reassemble exactly
+that basis from each variant's own scaled matrix. Any spread that survives is due to the
+representation alone, evaluated at a single shared vertex. On this common basis the improvement
+over the unscaled base holds in full: in Simple and Full every scaling variant compresses
+$\kappa_1$ by two to three orders of magnitude relative to Base---the median matrix-only ratio
+to Base is $1.2\times10^{-3}$ (Simple, $n=204$) and $3.6\times10^{-4}$ (Full, $n=34$), both with
+$p<10^{-10}$---and in SG-Ter-Mer, whose base is already some four orders better conditioned, the
+compression is smaller but still significant ($0.41$, $p<10^{-12}$). The conditioning gain is
+therefore representational, not an artifact of which vertex each variant's solve reached. The
+check needs no commercial solver: reading the exported matrices and solving the reference LP with
+the open-source HiGHS reproduces the same ordering.
+
+The same control sharpens the coverage-versus-metadata reading. The matrix-only structure-aware
+rule and its role-blind flat counterpart yield \emph{byte-identical} bases wherever the selective
+taxonomy leaves no row uncovered---the matrix-only and flat-matrix $\kappa_1$ agree to every digit
+on all $204/204$ Simple and $34/34$ Full instances---so there the metadata changes
+nothing. Where a genuine coverage gap exists it is full coverage, not the metadata, that helps:
+in SG-Ter-Mer the two differ on all $68$ instances and the flat rule is the better conditioned,
+by a median factor of $47$ in the matrix-only kernel ($p<10^{-13}$) and $23$ in the augmented
+kernel. This is the coverage-over-selectivity ordering of the runtime study, now on the
+conditioning endpoint: metadata routes rows, but on a common basis it is coverage that carries
+the numerical gain.
 
 % The 0.1% Gurobi distributional/diagnostic/profile views mirror the 1% ones and live in
 % the Supporting Information (Figures S1-S3, supporting-information.tex).

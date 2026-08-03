@@ -1,0 +1,69 @@
+########## simple ##########
+Fixed-basis kappa_1 on 204 instances (basis held fixed per instance).
+
+Per-variant kappa_1 (geometric mean over instances):
+  Base       n= 204  geomean=1.150e+15
+  SA-Aug     n= 204  geomean=1.863e+12
+  Flat-Aug   n= 204  geomean=5.888e+12
+  SA-Mat     n= 204  geomean=1.198e+12
+  Flat-Mat   n= 204  geomean=1.198e+12
+  Ruiz       n= 204  geomean=2.655e+12
+
+Paired contrasts (kappa_1 ratio a/b on matched instances):
+  contrast                 n    med ratio    med log10          p
+  SA-Aug / Base          204     0.001596       -2.797   3.17e-35
+  SA-Mat / Base          204     0.001166       -2.933   3.17e-35
+  Ruiz / Base            204     0.003131       -2.504   3.17e-35
+  SA-Aug / Flat-Aug      204       0.2947       -0.531   4.55e-34
+  SA-Mat / Flat-Mat      204            1        0.000          -
+
+Reading: SA-*/Base << 1 (many orders) => scaling improves conditioning with the
+vertex held fixed, so the improvement is representational, not a vertex artifact.
+SA-Mat/Flat-Mat ~ 1 => the matrix-only kernel is metadata-neutral on a fixed basis.
+
+########## sgtm ##########
+Fixed-basis kappa_1 on 68 instances (basis held fixed per instance).
+
+Per-variant kappa_1 (geometric mean over instances):
+  Base       n=  68  geomean=4.402e+11
+  SA-Aug     n=  68  geomean=3.036e+11
+  Flat-Aug   n=  68  geomean=8.645e+09
+  SA-Mat     n=  68  geomean=1.523e+11
+  Flat-Mat   n=  68  geomean=3.261e+09
+  Ruiz       n=  68  geomean=8.524e+11
+
+Paired contrasts (kappa_1 ratio a/b on matched instances):
+  contrast                 n    med ratio    med log10          p
+  SA-Aug / Base           68       0.6346       -0.198   7.45e-09
+  SA-Mat / Base           68       0.4119       -0.386   7.64e-13
+  Ruiz / Base             68        1.755        0.244   3.20e-09
+  SA-Aug / Flat-Aug       68        23.19        1.365   7.64e-13
+  SA-Mat / Flat-Mat       68        46.67        1.669   6.53e-14
+
+Reading: SA-*/Base << 1 (many orders) => scaling improves conditioning with the
+vertex held fixed, so the improvement is representational, not a vertex artifact.
+SA-Mat/Flat-Mat ~ 1 => the matrix-only kernel is metadata-neutral on a fixed basis.
+
+########## full ##########
+Fixed-basis kappa_1 on 34 instances (basis held fixed per instance).
+
+Per-variant kappa_1 (geometric mean over instances):
+  Base       n=  34  geomean=8.046e+15
+  SA-Aug     n=  34  geomean=8.184e+12
+  Flat-Aug   n=  34  geomean=1.287e+13
+  SA-Mat     n=  34  geomean=2.500e+12
+  Flat-Mat   n=  34  geomean=2.500e+12
+  Ruiz       n=  34  geomean=4.844e+12
+
+Paired contrasts (kappa_1 ratio a/b on matched instances):
+  contrast                 n    med ratio    med log10          p
+  SA-Aug / Base           34     0.001282       -2.892   1.16e-10
+  SA-Mat / Base           34    0.0003622       -3.441   1.16e-10
+  Ruiz / Base             34     0.000714       -3.146   1.16e-10
+  SA-Aug / Flat-Aug       34       0.8595       -0.066   8.87e-08
+  SA-Mat / Flat-Mat       34            1        0.000          -
+
+Reading: SA-*/Base << 1 (many orders) => scaling improves conditioning with the
+vertex held fixed, so the improvement is representational, not a vertex artifact.
+SA-Mat/Flat-Mat ~ 1 => the matrix-only kernel is metadata-neutral on a fixed basis.
+
