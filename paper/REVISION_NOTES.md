@@ -49,7 +49,8 @@ Legend: ✅ done · 🔄 campaign running on ClusterUY.
   70.94 vs full rule 71.41; coupling-only 83.69 ≈ base — same attribution). Data in
   `results-revision/r5-ablation/`. The Full 0.1% cell failed in June (Gurobi WLS session
   limit, all-ERROR resumen) and is 🔄 re-running.
-- **NEW: role-blind flat control (🔄 running).** The ablation created the obvious objection:
+- **NEW: role-blind flat control (✅ done — completed and extended; see "Latest pass" below).**
+  The ablation created the obvious objection:
   if the local stage (a per-row geometric-mean kernel computable from the flat matrix)
   carries the runtime effect, is the metadata needed at all? New opt-in `--plano` variant
   applies the same kernel + safeguards to EVERY row with no roles/blocks (single block, no
@@ -97,10 +98,43 @@ Legend: ✅ done · 🔄 campaign running on ClusterUY.
   CITATION.cff/.zenodo.json/README aligned to the new title, manuscript excluded from the
   MIT/CC BY blanket licenses, N3 instructions fixed (XeLaTeX + WileyNJDv5).
 
+## Latest pass — four additional controls (all landed)
+
+These extend the package with the harder controls raised in adversarial review; each is run,
+analyzed, written into the manuscript, and pushed. The released variants remain byte-identical
+without the new flags.
+
+- **Metadata-routed full coverage (SA-*-Full).** The selective-vs-Flat comparison left open
+  whether covering the residual-global rows through the kernel (keeping the metadata) would
+  reach role-blind coverage. New `--cubrir-residual`; three-arm campaign over all three classes
+  at both tolerances (`results-revision/coverage-policy/`, `scripts/coverage_policy_analysis.py`).
+  Result: SA-Full ≈ Flat in all six cells (paired median $T_{\mathrm{full}}/T_{\mathrm{Flat}}$
+  0.997–1.001, ns) — the coverage gap, not the metadata, was the defect. Reported in the
+  "intermediate coverage policy" paragraph.
+- **Seed replication / noise floor.** The ~1% effects are of the order of solver run-to-run
+  variability, which a single run per cell cannot separate. Five-seed replication of the two
+  0.1% carrying contrasts (`results-revision/seed-replication/`, `scripts/seed_noise_floor.py`):
+  within-instance across-seed IQR 13–18%; the paired first-order effect ($T_{\mathrm{SA}}/T_{\mathrm{Base}}$)
+  is seed-stable below one in both classes, and the SA-vs-Flat contrast is a seed-stable null in
+  the fast class. Rewrote the §validity variability paragraph, abstract, and Practitioner Point.
+- **Fixed-basis conditioning control (vertex confound).** The solver-$\kappa$ ratios fix each
+  variant to its own incumbent, so they read the numerics along each variant's own path.
+  `scripts/fixed_basis_diagnostic.py` holds one reference basis common across variants (base
+  fixed-integer LP optimum) and recomputes $\kappa_1$ from each variant's scaled matrix; 306
+  instances, Gurobi backend, plus a license-free HiGHS backend that reproduces it. On the common
+  basis every variant still compresses $\kappa_1$ two–three orders over Base (Simple/Full, $p<10^{-10}$),
+  so the gain is representational, not a vertex artifact; and SA-Mat = Flat-Mat byte-identical
+  wherever the taxonomy leaves no row uncovered (204/204 Simple, 34/34 Full), 47× worse where a
+  real coverage gap exists (SG-Ter-Mer). New paragraph in `subsec:added-controls`.
+- **CPLEX flat-control persistence.** The manuscript had stated the Flat controls were not run
+  under CPLEX. The Simple 1% CPLEX batch (204 instances, four variants) is on disk;
+  `scripts/flat_control_cplex.py` shows the coverage ordering persists (full coverage matches or
+  slightly beats selective; solver-time $T_{\mathrm{SA}}/T_{\mathrm{Flat}}=0.98$, $p<10^{-3}$).
+  The limitation paragraph now reports this, scoped to the one cell that exists.
+
 ## Pending before (first) submission
-- 🔄 plano-control campaign + R5 Full 0.1% rerun (jobs 5580448–53) → integrate into
-  §stage-attribution and finalize the flat-control sentence in the conclusion.
-- Length trim (~15–20%, W4 of the internal review): next editing pass.
+- Length trim (~15–20%, W4 of the internal review): author's editing pass.
 - Author's own full rewrite/review pass over the manuscript.
-- Cover letter for the initial submission (Research Exchange, free-format allowed).
-- Tag v1.1.0 + Zenodo refresh once the campaign data land and the text is final.
+- Cover / point-by-point response letter for the submission (Research Exchange, free-format
+  allowed) — `paper/response/` is still empty.
+- Tag v1.1.0 + Zenodo refresh once the text is final.
