@@ -3328,8 +3328,16 @@ reproduces both augmented $0.1\%$ solver-time directions ($q_{6}^{\mathrm{blk}}=
 $0.006$; Table~S10), making pure wall-clock scheduling noise a less likely explanation; it
 does not eliminate seed- or trajectory-level variability, which would require replicated
 runs. None of the six matrix-only solver-time contrasts is conclusive.
-The Flat controls were not run under CPLEX, so cross-solver persistence of this ordering
-is untested.
+A CPLEX batch of the same Simple $1\%$ controls---$204$ matched instances with all four
+variants solved---tests cross-solver persistence directly, and the ordering holds: full
+coverage matches or slightly beats the selective rule under CPLEX as it does under Gurobi. On
+capped solver time the flat rule is the faster for both kernels (median
+$T_{\mathrm{SA}}/T_{\mathrm{Flat}}=0.98$ for augmented and matrix-only alike, $p<10^{-3}$); on
+the build-inclusive preprocessing-plus-solver endpoint the two are within half a percent
+(augmented $0.998$, $p=0.21$; matrix-only $0.995$, $p=0.013$), because the selective rule's
+metadata routing costs about $0.01$\,s more to compute per instance. This is one cell rather
+than the full grid, so it establishes persistence for Simple at $1\%$ and not beyond, but it
+removes the earlier gap of having no CPLEX evidence on the coverage ordering at all.
 
 Exporting the scaled matrices identifies precisely where the two rules differ in the model
 handed to the solver---a difference in row coverage, not in the coupling treatment. In SG-Ter-Mer the model has $2160$ global rows: $360$ demand-balance
