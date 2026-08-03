@@ -150,11 +150,15 @@ solvers, and two MIPGap tolerances, against unscaled, Ruiz-kernel, solver-intern
 role-blind full-coverage controls, together with a synthetic mechanism grid carrying a direct
 spectral audit.
 
-The result is a controlled negative one. The distinctive coupling stage never activates on any
-operational instance, so it remains an unvalidated extension. The role-blind full-coverage
-control matches or beats the selective rule on the exported-range proxy, on the spectral
-condition number, and on most runtime endpoints, so metadata-driven selectivity is not
-uniformly superior. Runtime effects are of the order of the solver's own
+The result is controlled but \emph{non-identifying}. The distinctive coupling stage---the only
+place an exhaustive role map lets the metadata change the exported matrix---never activates on any
+operational instance, so it remains an unvalidated extension. The one substantial difference
+between the selective rule and the role-blind full-coverage control traces to an incomplete role
+map that left a block of market-shortage rows unscaled, not to the metadata: under equal coverage
+the two coincide (proved for the matrix-only kernel and confirmed byte-for-byte), so these
+instances neither confirm nor refute the value of the metadata and instead show that a per-row
+local kernel, computable from the flat matrix, carries the effect. Runtime effects are of the
+order of the solver's own
 run-to-run variability---a five-seed replication puts the within-instance noise floor at
 $12$--$18\%$ and leaves the metadata-versus-coverage contrast inside it in the fast class---and
 only one of twelve contrasts clears multiplicity adjustment, none under CPLEX. Under the
@@ -179,9 +183,10 @@ the fastest, so numerical improvement and solver acceleration must be measured s
 \begin{itemize}
   \item Model generators already know each row's role, block, and coupling incidence---metadata a
   flat matrix export discards but that costs nothing to reuse for numerical preprocessing.
-  \item Prefer full-coverage row scaling to metadata-based selection: applying the same per-row
-  kernel to every constraint matched or beat the selective rule, and the coupling-specific stage
-  never activated on any operational instance tested.
+  \item Cover every row: the only case where the metadata-selective rule lagged the role-blind
+  one was an incomplete role map that left a block of constraints unscaled---close that gap and
+  the two coincide. The distinctive coupling stage never fired on any operational instance, so
+  these instances do not test the value of the metadata itself.
   \item Time preprocessing separately from the solver---on fast instances the preprocessing cost,
   not the numerics, decided which rule looked faster, and the runtime gaps were of the order of
   the solver's own run-to-run variability (a five-seed replication put the noise floor at
@@ -231,30 +236,41 @@ global coupling rows with the scales of the blocks they connect; on every operat
 tested its activation condition is never met, so that stage is exercised only on the synthetic
 grid and is reported here as an extension rather than as validated machinery. Throughout the paper, this
 local--block--coupling architecture is treated as a \emph{candidate} structure-aware policy
-whose stages, coverage, and pipeline sensitivity are evaluated---and partly refuted---empirically.
+whose stages, coverage, and pipeline sensitivity are evaluated empirically, with the coupling
+stage found to be operationally untested rather than refuted.
 
 The contribution is not a new equilibration kernel---the per-row factor is a known
-geometric-mean normalization, and the results show that this kernel carries most of the
-effect. The central contribution is instead a controlled study of \emph{coverage versus
-selectivity}: whether restricting a known per-row scaling kernel to the rows a generator's
-role metadata selects helps or hurts, relative to applying it to every row. The answer we
-reach is that row scaling improves the solver-facing diagnostics and can improve runtime over
-the unscaled base, but structural selectivity does not dominate full coverage; on these
-instances the operational effect comes almost entirely from the local stage, because the
-coupling rows are near-unity balance equations with no scale heterogeneity for the coupling
-stage to correct. Concretely, the
-paper contributes: (i) a controlled, single-default-seed empirical study of that coverage-versus-selectivity
-trade-off---via augmented and coefficient-only role-blind controls run on all three
-classes under Gurobi---showing that an incomplete structural taxonomy can miss numerically
-dominant rows and that the evidence for a selection policy depends on class and kernel;
-(ii) an algebraically exact, auditable row-scaling
-layer for generated block-structured MIPs, with the returned solutions verified on the
-original, unscaled constraints; (iii) the use of generator metadata as a \emph{selection
-policy} that decides which rows to normalize, with idealized conditioning arguments
-motivating the local--block--coupling order; and
-(iv) an explicit separation of numerical improvement from computational acceleration,
-demonstrating that the two need not coincide. \Cref{fig:overview} summarizes the
-proposed layer at a glance.
+geometric-mean normalization, and the results show that this kernel carries most of the effect.
+Generator metadata is useful only if the structural map is complete. In the modular formulation
+every constraint is generated either by a local component or as a linking relation among
+components, so the role map should be exhaustive: every row belongs to one local block or to the
+coupling set (\cref{eq:role-disjointness}). The central question is therefore whether exhaustive
+generator metadata improves the treatment of the \emph{coupling} rows, relative to a
+kernel-matched, full-coverage role-blind rule that scales every row the same way.
+
+We are deliberate about what the present campaigns can and cannot answer, because the
+implementation used for them did not realize an exhaustive map: it left a block of
+market-shortage constraints unscaled that the role-blind control normalized
+(\cref{subsec:strategy-2}). That coverage gap, together with the fact that the distinctive
+coupling stage never activates on any operational instance, makes the operational comparison
+\emph{non-identifying} for the value of metadata---it varies coverage and metadata at once and
+never exercises the one stage where metadata is structurally decisive. What the campaigns do
+establish is cleaner and still useful: row scaling improves the solver-facing diagnostics and
+can improve runtime over the unscaled base; the per-row local kernel, computable from the flat
+matrix, carries essentially all of that effect on these instances; and, by
+\cref{prop:attribution}, wherever coverage is made equal the structure-aware and role-blind
+matrix-only exports are provably---and empirically---identical, so no operational difference can
+be pinned on the metadata. Concretely, the paper contributes: (i) an exhaustive-map formulation
+of the row taxonomy and an attribution principle (\cref{prop:attribution}) that localizes any
+metadata effect to the coupling rows and dictates the coverage-matched comparison the question
+requires; (ii) an algebraically exact, auditable row-scaling layer for generated
+block-structured MIPs, with the returned solutions verified on the original, unscaled
+constraints; (iii) a controlled empirical study---augmented and coefficient-only role-blind
+controls on all three classes under Gurobi, a fixed-basis conditioning control, and a
+seed-replicated noise floor---showing that row scaling helps, that the local kernel carries it,
+and that these operational instances do not exercise the coupling metadata; and (iv) an explicit
+separation of numerical improvement from computational acceleration. \Cref{fig:overview}
+summarizes the proposed layer at a glance.
 
 \begin{figure}[t]
 \centering
@@ -275,7 +291,7 @@ proposed layer at a glance.
   \node[box, right=2.5cm of scale] (solver) {\textbf{Solver}\\[1pt]\footnotesize flat,
                     algebraically equivalent MIP};
   \node[metabox, below=1.05cm of scale] (meta) {\textbf{Pre-export metadata}\\[1pt]
-                    $\bullet$ row role (local / coupling / residual global)\\
+                    $\bullet$ row role (local / coupling)\\
                     $\bullet$ block ownership\\
                     $\bullet$ coupling incidence};
   % main pipeline
@@ -290,13 +306,12 @@ proposed layer at a glance.
         (solver.north);
 \end{tikzpicture}
 \caption{The proposed layer in one picture. A generator retains each row's role---local to a
-component, coupling between components, or residual global (global but not coupling)---block
-ownership, and coupling incidence before export. A conventional export (dashed) hands the
-solver a flat matrix in which this structure is lost. The structure-aware layer instead uses
-this metadata to assign positive row factors in a local--block--coupling order and exports an
-\emph{algebraically equivalent} flat MIP; residual-global rows are left unchanged by the
-selective policy. The solver still receives a single flat matrix; only its numbers change.
-(The role-blind flat control and the coverage cost of this selectivity are analyzed in
+component or coupling between components---block ownership, and coupling incidence before
+export. A conventional export (dashed) hands the solver a flat matrix in which this structure is
+lost. The structure-aware layer instead uses this metadata to assign positive row factors in a
+local--block--coupling order and exports an \emph{algebraically equivalent} flat MIP. The solver
+still receives a single flat matrix; only its numbers change. (The role-blind flat control, and
+the coverage gap left by an incomplete role map, are analyzed in
 \cref{subsec:stage-attribution}.)}
 \label{fig:overview}
 \end{figure}
@@ -600,31 +615,38 @@ b_1\\ b_2\\ \vdots\\ b_B\\ h
 The matrices $A_i$ encode local restrictions. The matrices $L_i$ encode each block's contribution to the global coupling rows, such as demand balance in the hydrothermal
 testbed.
 
-Row roles and block incidence are separate metadata fields, and the row taxonomy splits
-the complete row set $\mathcal{R}_{\mathrm{all}}$ into three pairwise disjoint classes:
-the local sets $\mathcal{R}_i$, the coupling set $\mathcal{R}_{\mathrm{cpl}}$, and a
-residual set $\mathcal{R}_{\mathrm{other}}$ of rows that are global but not coupling,
+Row roles and block incidence are separate metadata fields. Because every constraint in the
+modular formulation is generated either by a single local component or as a linking relation
+among components, the row-role map should be \emph{exhaustive}: each row belongs to exactly one
+local block or to the coupling set. Formally, a role map
 \begin{equation}
-\mathcal{R}_{\mathrm{all}}
-=\Bigl(\textstyle\bigcup_{i\in\mathcal{B}}\mathcal{R}_i\Bigr)
-\,\dot\cup\,\mathcal{R}_{\mathrm{cpl}}
-\,\dot\cup\,\mathcal{R}_{\mathrm{other}},
+\tau:\mathcal{R}_{\mathrm{all}}\longrightarrow\mathcal{B}\cup\{\mathrm{cpl}\},
 \qquad
-\mathcal{R}_i\cap\mathcal{R}_j=\varnothing\ (i\neq j).
+\mathcal{R}_{\mathrm{all}}
+=\Bigl(\dot{\textstyle\bigcup}_{i\in\mathcal{B}}\mathcal{R}_i\Bigr)
+\,\dot\cup\,\mathcal{R}_{\mathrm{cpl}},
+\qquad
+\mathcal{R}_i\cap\mathcal{R}_j=\varnothing\ (i\neq j),
 \label{eq:role-disjointness}
 \end{equation}
-A coupling row is incident to several blocks through the variables it involves, but it is
-not classified as a local row of any of them and does not enter the local-row normalization
-stage; the implementation enforces this by removing role-classified global and coupling
-rows from every block row set before scaling. The residual class
-$\mathcal{R}_{\mathrm{other}}$ (for example, the market shortage segments of the testbed)
-is a genuine design decision, not an afterthought: a policy must be chosen for it---leave
-it unscaled, normalize it row by row with the same kernel, or diagnose it and normalize
-only on a trigger. The structure-aware rules studied here take the most selective policy
-(leave $\mathcal{R}_{\mathrm{other}}$ unscaled), whereas the role-blind Flat controls in
-\cref{subsec:stage-attribution} realize the opposite extreme (normalize every row); the
-operational comparison between them measures the cost of this choice for each kernel and
-class under Gurobi (\cref{tab:flat-control}).
+sends $\tau(r)=i$ when $r$ is local to block $i$ and $\tau(r)=\mathrm{cpl}$ when it links
+several blocks through the variables it involves; a coupling row is not a local row of any
+block and does not enter the local-row normalization stage. There is no third mathematical
+class. A row that looks ``global but not coupling'' has simply not been traced to the module
+that generates it, so a residual category is a symptom of an incomplete map $\tau$, not a
+structural fact of the formulation.
+
+We flag this because the implementation used for the operational campaigns did \emph{not}
+realize an exhaustive map. One set of rows---the market shortage segments of the SG-Ter-Mer
+testbed, some $1800$ constraints---was left outside both the local blocks and the coupling
+set, even though each is generated by the market/shortage module and carries that module's
+variables, so each should have been assigned to that module's block. The structure-aware
+rules therefore left those rows unscaled, whereas the role-blind Flat control in
+\cref{subsec:stage-attribution} normalized them. That comparison consequently varies two
+things at once---the use of role metadata \emph{and} the set of rows that receive any scaling
+at all---so on its own it cannot attribute a difference to the metadata. We make the confound
+precise, and give the attribution principle that removes it, in
+\cref{prop:attribution}; we return to it when interpreting the SG-Ter-Mer result.
 
 This structure suggests three scaling decisions: scale local rows inside each block; compute representative block scales after local row scaling; and scale global coupling rows with those block scales. The goal is to reduce harmful scale heterogeneity without erasing the modular meaning of the formulation.
 
@@ -807,6 +829,34 @@ product of the two factors (\cref{eq:augmented-coupling-factor} in
 \cref{subsec:strategy-1}). In the implemented variants, $D^{-1}$ and singular values are
 replaced by coefficient-based block proxies, yielding a cheap operational approximation
 to the ideal coupling measure.
+
+The same factorization yields the attribution principle that governs the experimental design.
+
+\begin{proposition}[Attribution under an exhaustive row map]
+\label{prop:attribution}
+Suppose the role map $\tau$ of \eqref{eq:role-disjointness} is exhaustive, and that the
+structure-aware and role-blind policies apply the \emph{same} per-row kernel to every local
+row. Then both policies produce identical scaled local blocks, so any difference between the two
+exported matrices is confined to the coupling rows $\mathcal{R}_{\mathrm{cpl}}$ and is
+attributable exclusively to the block-relative coupling treatment. In particular, if every
+coupling-candidate factor equals one or is rejected by the safeguards, the two exported matrices
+are identical.
+\end{proposition}
+
+\noindent The argument is immediate. Under an exhaustive $\tau$ the two policies scale exactly
+the same rows; on a local row the structure-aware rule reduces to the shared per-row kernel, so
+the two agree row by row off $\mathcal{R}_{\mathrm{cpl}}$; and on a coupling row the only
+structural degree of freedom is the block-relative factor $\gamma$ of
+\eqref{eq:scaled-balance-factorization}, which the flat rule instead reads from the raw
+coefficients. \Cref{prop:attribution} is the lever the experiments need. It says exactly where
+generator metadata \emph{can} matter---the coupling rows---and therefore why the local stage
+alone, computable from the flat matrix, cannot demonstrate the metadata's value; it tells us how
+to read the activation audit, since a run with no coupling activation lands in the
+``every factor equals one'' case where the two exports must coincide; and it fixes the valid
+comparison: to measure the worth of the metadata, the structure-aware and role-blind rules must
+be run under a common, exhaustive coverage, so that the two exports differ, if at all, only on
+the coupling treatment. A comparison in which one rule leaves rows unscaled that the other
+normalizes measures coverage, not metadata.
 
 
 \subsection{From ideal diagnostics to implementable proxies}
@@ -2471,16 +2521,17 @@ therefore representational, not an artifact of which vertex each variant's solve
 check needs no commercial solver: reading the exported matrices and solving the reference LP with
 the open-source HiGHS reproduces the same ordering.
 
-The same control sharpens the coverage-versus-metadata reading. The matrix-only structure-aware
-rule and its role-blind flat counterpart yield \emph{byte-identical} bases wherever the selective
-taxonomy leaves no row uncovered---the matrix-only and flat-matrix $\kappa_1$ agree to every digit
-on all $204/204$ Simple and $34/34$ Full instances---so there the metadata changes
-nothing. Where a genuine coverage gap exists it is full coverage, not the metadata, that helps:
-in SG-Ter-Mer the two differ on all $68$ instances and the flat rule is the better conditioned,
-by a median factor of $47$ in the matrix-only kernel ($p<10^{-13}$) and $23$ in the augmented
-kernel. This is the coverage-over-selectivity ordering of the runtime study, now on the
-conditioning endpoint: metadata routes rows, but on a common basis it is coverage that carries
-the numerical gain.
+The same control makes \cref{prop:attribution} visible on the conditioning endpoint. The
+matrix-only structure-aware rule and its role-blind flat counterpart yield \emph{byte-identical}
+bases wherever the role map covers every row---the matrix-only and flat-matrix $\kappa_1$ agree
+to every digit on all $204/204$ Simple and $34/34$ Full instances---exactly as the attribution
+principle requires when the coupling factors are near-identity. The only class where they differ
+is the one where the map was incomplete: in SG-Ter-Mer the market-shortage rows the
+structure-aware rule left unscaled make the two disagree on all $68$ instances, the flat rule
+being the better conditioned by a median factor of $47$ in the matrix-only kernel
+($p<10^{-13}$) and $23$ in the augmented kernel. That difference is the fingerprint of the
+coverage gap, not of the metadata: on the conditioning endpoint, as on runtime, equal coverage
+erases it, and what remains untested is the block-relative coupling treatment.
 
 % The 0.1% Gurobi distributional/diagnostic/profile views mirror the 1% ones and live in
 % the Supporting Information (Figures S1-S3, supporting-information.tex).
@@ -3364,12 +3415,11 @@ $\max\{\lvert a_{rj}\rvert,\lvert b_r\rvert\}/\min^{+}\{\lvert a_{rj}\rvert,\lve
 over nonzero magnitudes, i.e.\ the ratio of \cref{eq:static-kappa-ratio} extended to include the
 right-hand side---from $3.7\times10^{11}$ to
 $1.3\times10^{10}$, and it is the
-only difference between the two scaled matrices. In SG-Ter-Mer the
-structure-aware decomposition into local and
-coupling roles left a coverage gap over exactly the highest-magnitude rows, and the role-blind
-augmented kernel closes it without metadata; the implemented Flat pipeline has the lower
-observed preprocessing-plus-solver time at both tolerances, while the solver-time contrast favors
-Flat at $0.1\%$ only
+only difference between the two scaled matrices. In SG-Ter-Mer the \emph{incomplete} role map left these highest-magnitude shortage rows
+unassigned to any block, so the structure-aware rule left them unscaled while the role-blind
+kernel reached them; the resulting coverage gap---not a property of the metadata---is what lets
+the implemented Flat pipeline post the lower observed preprocessing-plus-solver time at both
+tolerances, while the solver-time contrast favors Flat at $0.1\%$ only
 nominally. The coefficient-only solver-time contrast remains neutral.
 (On the synthetic benchmark the
 taxonomy leaves no row unclassified, so there is no coverage gap of this kind; the
@@ -3620,26 +3670,32 @@ and $1085.6/556.5$ against $1082.0/552.8$ at $0.1\%$---and no reversal of the ki
 in Simple-Augmented occurs; the full audit is Table~S9. No reversal here is a paired
 test; all use the fixed-pool aggregate convention of \cref{tab:par10-readings}.
 
-\subsubsection*{The intermediate coverage policy}
-The selective rule and the role-blind Flat control are the two extremes of coverage: leave the
-residual-global rows unscaled, or scale every row. The policy between them---keep the role
-metadata but route the residual-global rows through the same per-row kernel, the
-metadata-driven full-coverage rule (\methodMat{}-Full / \methodAug{}-Full of
-\cref{subsec:strategy-2})---is the one the local--coupling--residual-global taxonomy names but
-the original comparison never ran. We ran it as a third arm on ClusterUY under Gurobi, all
-three classes at both tolerances. The metadata-routed rule \emph{matches} the role-blind rule
-on capped solver time in every one of the six cells: the paired median
+\subsubsection*{Restoring exhaustive coverage}
+By \cref{prop:attribution}, the metadata can only show up on the coupling rows, and only once
+both rules cover the same set of rows. The selective rule and the role-blind Flat control did
+not: the selective rule left the market-shortage constraints unscaled---the role map
+\eqref{eq:role-disjointness} was not exhaustive in the implementation---whereas Flat scaled them.
+Routing those rows through the same per-row kernel, an exhaustive-coverage structure-aware rule
+(\methodMat{}-Full / \methodAug{}-Full of \cref{subsec:strategy-2}), closes that gap while
+keeping the role metadata, and is the coverage-matched comparison the attribution principle
+requires. We ran it as a third arm on ClusterUY under Gurobi, all three classes at both
+tolerances. Under equal coverage the metadata-routed rule \emph{matches} the role-blind rule on
+capped solver time in every one of the six cells: the paired median
 $T_{\mathrm{full}}/T_{\mathrm{Flat}}$ lies between $0.997$ and $1.001$ for both kernels, with no
 robust difference (Simple $1\%$ augmented $1.0000$, $p=0.88$; SG-Ter-Mer $0.1\%$ augmented
 $1.0000$, $p=0.71$; Full $1\%$ augmented $0.9995$, $p=0.23$; Full $0.1\%$ augmented $1.0000$,
-$p=0.66$), the lone exception being a $0.3\%$ edge in SG-Ter-Mer at $1\%$ that does not survive
-multiplicity adjustment. Covering the residual rows barely moves runtime relative to the
-selective rule either ($T_{\mathrm{full}}/T_{\mathrm{selective}}$ significant in only one of
-twelve contrasts, a $0.3\%$ speed-up in Simple at $0.1\%$). This sharpens the reading of the
-coverage result: it is the \emph{coverage gap}---the highest-magnitude rows the selective
-taxonomy declined to scale---not the use of role metadata, that separated the selective rule
-from full coverage. Metadata routes rows; it is not the lever, and it need not be an exclusive
-filter.
+$p=0.66$), the lone exception a $0.3\%$ edge in SG-Ter-Mer at $1\%$ that does not survive
+multiplicity adjustment. This is exactly what \cref{prop:attribution} predicts in the regime
+these instances occupy: with the coupling stage inactive, the matrix-only exports become
+byte-identical under equal coverage (\cref{subsec:added-controls}), and even the augmented rule,
+whose block factors need not match the flat kernel's, is statistically indistinguishable. The
+earlier selective-versus-Flat difference was therefore a coverage gap left by an incomplete role
+map, not evidence about the worth of the metadata; closing the gap removes the difference. What
+it does \emph{not} do is exercise the block-relative coupling treatment---the one place
+\cref{prop:attribution} allows metadata to matter, and the one stage that stays dormant on every
+operational instance. In this sense the operational comparison is non-identifying for the
+metadata: it shows that scaling helps, that the local kernel carries it, and that equal coverage
+erases the selective--Flat gap, but it leaves the distinctive mechanism untested.
 
 \FloatBarrier
 
@@ -3878,6 +3934,21 @@ choices keep the argument auditable---a reader can see which evidence supports a
 equivalence, which supports numerical improvement, and which supports the observed pipeline-specific
 runtime evidence.
 
+An incomplete role map in the tested implementation is the limitation that most shapes how the
+coverage results should be read. The implementation did not realize an exhaustive map
+$\tau$ \eqref{eq:role-disjointness}: a block of market-shortage constraints was left outside both
+the local-block and the coupling classes, even though the formulation contains no residual row
+category and each such row is generated by the market/shortage module. The initial
+selective-versus-Flat comparison therefore confounded structural treatment with unequal row
+coverage, and its SG-Ter-Mer difference reflects that coverage gap rather than the metadata. The
+revision responds in three ways: it traces the generating module of the affected rows and records
+it; it closes the gap with the metadata-routed full-coverage rule, whereupon the selective--Flat
+difference disappears (\cref{subsec:added-controls}); and it states the attribution principle
+(\cref{prop:attribution}) that makes the coverage-matched comparison explicit. What the revision
+does not yet do is re-derive a full per-block assignment of every generated row inside the
+generator and re-run the augmented rule on it; that, with synthetic instances that drive the
+dormant coupling stage, is the identified next step.
+
 The main limitation is domain coverage. The method applies to generated modular MIPs with
 identifiable local blocks and coupling rows, but the evidence comes from one hydrothermal
 dispatch platform. That platform supplies a realistic and numerically heterogeneous
@@ -4060,8 +4131,8 @@ fast-class effects close to parity: six of
 the eight directional orderings remain, but only one small Simple contrast retains nominal
 adjusted values below $0.05$ under the reported joint and operational-family sensitivities, where the effects are small and the
 reliability-adjusted reading can point the other way. The observed effect of external preprocessing differs between the tested Gurobi and CPLEX
-pipelines, while solver dependence of the Flat-versus-selective coverage ordering remains
-untested because the Flat controls were run only under Gurobi. Establishing this
+pipelines; the CPLEX flat-control cell we added shows the Flat-versus-selective ordering does not
+even hold its sign across solvers at this one-percent scale (\cref{subsec:stage-attribution}). Establishing this
 bounded result
 required separating four kinds of evidence---algebraic equivalence, original-scale feasibility,
 solver-facing diagnostics, and matched per-solver runtime---which is as much a methodological
@@ -4069,28 +4140,37 @@ takeaway as the scaling rule itself: the rule with the lowest reported numerical
 need not be the rule that solves fastest, and only matched per-solver runtime can distinguish
 the computational ordering.
 
-Future work should test the mechanism beyond hydrothermal dispatch---larger synthetic suites
-and applications in logistics, production planning, and network design would show whether the
-pattern persists as the engineering structure changes---and should trace, inside the solver,
-why the \emph{same} augmented rescaling that closes the SG-Ter-Mer coverage gap points in the
-opposite runtime direction in Full (a direction that is conditional on the eligible pairs
-and is not retained by the adversarial signed-rank sensitivity, so the solver-dynamics reading remains
-a hypothesis). The reported SG-Ter-Mer campaign shows
-that a selective taxonomy can miss important rows. The Full campaign raises---but does not
-establish---the complementary hypothesis that blanket normalization can
-overshoot on integrated models. The practical lesson is therefore not that metadata is useless
-but that it should not be an \emph{exclusive} filter: metadata is useful for organizing the
-scaling pipeline---local rows first, block summaries next, coupling rows last---but a deployable
-rule needs a numerical coverage safeguard for the residual and global rows the taxonomy would
-otherwise leave untouched. The natural form is to keep the structure-aware order, then sweep the
-residual rows with the coefficient-only (matrix-only) kernel, applying it only where a row is
-poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
-original-scale verification. Such a coverage-safeguarded matrix-only rule is the variant we
-would carry forward, in preference to the augmented rule whose use of the right-hand side is
-what degrades original-scale reliability; the augmented rule is better read as an exploratory
-probe of whether the right-hand side should enter the diagnosis at all. A practical layer should
-also measure both coverage policies, exactly as the role-blind control does here, and time its
-own preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
+The present evidence does not establish that generator metadata improves solver performance, but
+neither does it refute that hypothesis, and two facts fix the scope. First, the block-relative
+coupling stage---the one place \cref{prop:attribution} lets the metadata change the exported
+matrix---never activates on any operational instance, so the campaigns never exercise the
+distinctive mechanism. Second, the only substantial structure-aware-versus-Flat matrix
+difference, in SG-Ter-Mer, came from an incomplete role map that left the market-shortage rows
+unassigned, not from the metadata: under equal coverage the two coincide (\cref{prop:attribution},
+confirmed byte-for-byte in the matrix-only kernel). The operational campaigns therefore evaluate
+local geometric-mean normalization and the consequences of unequal coverage far more directly
+than they evaluate block-relative coupling metadata. This is a genuine, if negative,
+methodological result---a metadata pipeline with an incomplete taxonomy can be matched by a
+role-blind rule that simply reaches every row---but it is a non-identifying result about the
+metadata, not a refutation of it.
+
+Two things follow for a next version of the study. Empirically, the structure-aware and
+role-blind rules must be compared under an \emph{exhaustive} classification and identical
+coverage---every generated row traced to its module or to the coupling set---so that any residual
+difference is, by \cref{prop:attribution}, attributable to the coupling treatment alone; and the
+synthetic benchmark must include instances that actually drive the coupling stage, with coupling
+rows unbalanced relative to already-normalized block scales and equal absolute magnitudes
+carrying different numerical meaning by block, since the operational testbed never enters that
+regime. For deployment in the meantime the safe rule keeps the structure-aware order but
+guarantees coverage: sweep every row with the coefficient-only kernel, applying it only where a
+row is poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
+original-scale verification. This coverage-safeguarded matrix-only rule is the variant we would
+carry forward, in preference to the augmented rule whose use of the right-hand side is what
+degrades original-scale reliability; the augmented rule is better read as an exploratory probe of
+whether the right-hand side should enter the diagnosis at all. A practical layer should also time
+its own preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
+Only once the policies are compared under exhaustive, identical coverage can any remaining
+difference be attributed to the use of generator metadata.
 
 % Float barrier removed to improve two-column layout.
 
