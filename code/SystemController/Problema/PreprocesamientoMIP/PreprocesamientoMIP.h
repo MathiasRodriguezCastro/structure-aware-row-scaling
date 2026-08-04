@@ -51,6 +51,14 @@ struct PreprocesamientoConfig {
                                                ///<  variable->escala_de_bloque en el proxy de acoplamiento,
                                                ///<  manteniendo el conjunto de escalas s_i. Si s_i=1 para
                                                ///<  todo bloque, el export es byte-identico (metadata inerte).
+                                               ///<  Con SPRE_PERM_INDEX=k (env) aplica la k-esima permutacion
+                                               ///<  determinista (0 = mapa verdadero) en vez del baraje aleatorio.
+    bool   acoplamientoCiegoL2       = false;  ///< Control Local-GM-Coupling-L2: conserva EXACTAMENTE el
+                                               ///<  kernel local, la cobertura y las salvaguardas de SA-Pre,
+                                               ///<  pero el proxy de acoplamiento usa gamma_r=1/||a_r||_2
+                                               ///<  (s_{b(j)}=1: sin s_i ni beta). Aisla si la maquinaria
+                                               ///<  block-relative aporta algo SOBRE el euclideo ciego,
+                                               ///<  variando SOLO el proxy de acoplamiento.
     bool   usarEquilibradoRuiz       = false;  ///< Equilibrado iterativo interno por bloque
     bool   escalarColumnasContinuas  = false;  ///< Transformar columnas continuas y recuperar solución
     bool   normalizacionFisica       = false;  ///< Normalizar filas globales por unidades físicas/proxy

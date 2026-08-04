@@ -1,0 +1,30 @@
+Local-GM-Coupling-L2 control + 24-permutation rank test
+block_heterogeneous, coupling, S=6, R=2 (SYNTH_BLOCK_RANGE=2), seed 20250803, 30 seeds, kappa2+.
+
+EXPERIMENT 1 -- Local-GM-Coupling-L2 (one-variable control).
+Keeps EXACTLY SA-Pre's local GM kernel, coverage and safeguards; only the coupling
+proxy changes to the blind Euclidean gamma_r = 1/||a_r||_2 (s_{b(j)}=1, no s_i, no beta).
+
+  median kappa2+  SA-Mat            = 1.3338e+03
+  median kappa2+  SA-Pre            = 6.6855e+03
+  median kappa2+  Local-GM-Coup-L2  = 1.3338e+03
+  median kappa2+  Flat-L2           = 4.6809e+02
+
+  Local-GM-Coupling-L2 / SA-Pre = 0.234   (blind BETTER in 30/30)
+  Local-GM-Coupling-L2 / SA-Mat = 1   (byte-identical: SA-Mat's
+      block-relative coupling WAS already 1/||a_r||_2, since s_i degenerates to 1)
+
+  => The blind coupling control MATCHES/BEATS SA-Pre. The block-relative machinery adds nothing.
+
+EXPERIMENT 2 -- SA-Pre under all 24 permutations of the four blocks (rank of the TRUE map).
+Sanity: distinct kappa2+ across the 24 perms per seed: median 24/24 (perm index is live).
+
+  rank of the true map (1 = best/lowest kappa2+): min=8 median=18.0 mean=16.3 max=24 of 24
+  true map is the unique best:            0/30 seeds
+  a PERMUTED map beats the true map:      30/30 seeds
+  median kappa2+ true map      = 6.6855e+03
+  median kappa2+ best permuted = 1.0513e+03  (5.6x better than true)
+
+VERDICT: both closing conditions hold. The blind control equals/beats SA-Pre AND the
+true block map is not systematically superior (median rank 18/24; beaten by a permutation
+in 30/30). Option B is closed; the study is non-identifying -> reframe A.

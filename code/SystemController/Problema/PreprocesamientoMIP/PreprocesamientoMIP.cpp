@@ -6,6 +6,7 @@
 #include <chrono>
 #include <algorithm>
 #include <random>
+#include <cstdlib>
 #include <cmath>
 #include <cctype>
 #include <stdexcept>
@@ -1076,22 +1077,41 @@ void PreprocesamientoMIP::aplicarEscalamientoGlobal() {
         }
         // Auditoria permutacion-beta (aplicada al mapa que USA el export): baraja la asignacion
         // prefijo->escala manteniendo el multiset. Si las escalas son triviales (s_i=1), identico.
-        if (cfg.permutarBloques && escalaBloque.size() > 1) {
-            std::vector<std::string> claves; std::vector<double> valores;
-            for (const auto& kv : escalaBloque) { claves.push_back(kv.first); valores.push_back(kv.second); }
-            std::mt19937 rng(20250803u);
-            std::shuffle(valores.begin(), valores.end(), rng);
-            for (size_t i = 0; i < claves.size(); ++i) escalaBloque[claves[i]] = valores[i];
+        // SPRE_PERM_INDEX=k (env): aplica la k-esima permutacion DETERMINISTA (orden lexicografico
+        // sobre indices; k=0 => mapa verdadero) en vez del baraje aleatorio. Sirve para enumerar las
+        // n! permutaciones de los bloques y ubicar el rango del mapa verdadero por κ2+.
+        if (escalaBloque.size() > 1) {
+            const char* penv = std::getenv("SPRE_PERM_INDEX");
+            if (penv) {
+                long k = strtol(penv, nullptr, 10);
+                std::vector<std::string> claves; std::vector<double> valores;
+                for (const auto& kv : escalaBloque) { claves.push_back(kv.first); valores.push_back(kv.second); }
+                std::vector<int> perm(claves.size());
+                for (size_t i = 0; i < perm.size(); ++i) perm[i] = static_cast<int>(i);
+                for (long c = 0; c < k; ++c)
+                    if (!std::next_permutation(perm.begin(), perm.end())) break;
+                for (size_t i = 0; i < claves.size(); ++i) escalaBloque[claves[i]] = valores[perm[i]];
+            } else if (cfg.permutarBloques) {
+                std::vector<std::string> claves; std::vector<double> valores;
+                for (const auto& kv : escalaBloque) { claves.push_back(kv.first); valores.push_back(kv.second); }
+                std::mt19937 rng(20250803u);
+                std::shuffle(valores.begin(), valores.end(), rng);
+                for (size_t i = 0; i < claves.size(); ++i) escalaBloque[claves[i]] = valores[i];
+            }
         }
 
         int filasEscaladas = 0; double logGamma = 0.0;
         for (int idx : indicesAcoplamiento) {
             double rho2 = 0.0;
             for (const auto& [coef, var] : restricciones[idx]->getTerminos()) {
-                string pref = extraerPrefijoAgente(var);
-                double s = escalaGeneral;
-                auto it = escalaBloque.find(pref);
-                if (it != escalaBloque.end()) s = it->second;
+                // Control Local-GM-Coupling-L2: s_{b(j)}=1 => γ_r = 1/||a_r||_2 (sin s_i ni β).
+                double s = 1.0;
+                if (!cfg.acoplamientoCiegoL2) {
+                    string pref = extraerPrefijoAgente(var);
+                    s = escalaGeneral;
+                    auto it = escalaBloque.find(pref);
+                    if (it != escalaBloque.end()) s = it->second;
+                }
                 if (s > 0.0 && s < 1e300) {
                     double contrib = std::abs(coef) / s;
                     rho2 += contrib * contrib;
