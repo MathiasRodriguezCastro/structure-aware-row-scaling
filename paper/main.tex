@@ -701,11 +701,12 @@ smallest positive singular value. For rectangular matrices, this ratio is used o
 diagnostic over the nonzero singular spectrum; in the square benchmarks below the minimum
 is taken over the full spectrum, so that singularity is reported as an infinite condition
 number. This diagnostic does not characterize the full difficulty of a MIP. A MIP solver also depends on presolve, cuts, branching, primal heuristics, incumbent discovery, feasibility tolerances, and integrality. The role of $\kappa_2$ is narrower still: it provides an idealized matrix argument for why
-local rows and coupling rows \emph{might} warrant different treatment. Whether that distinction
-improves conditioning is an empirical question, and the direct audit of
-\cref{subsec:spectral-audit} answers it in the negative: every scaling rule improves $\kappa_2$
-by orders of magnitude, but role-differentiation obtains no conditioning advantage over its
-role-blind control---and none even on the coupling-dominated patterns it is meant to address.
+local rows and coupling rows \emph{might} warrant different treatment. Whether role differentiation
+improves conditioning is an empirical question, and the spectral audit gives a split answer. Every
+scaling rule improves $\kappa_2$ by orders of magnitude; the augmented collective rule obtains no
+advantage over its role-blind counterpart on the original mechanism grid, whereas the
+kernel-matched heterogeneous-block experiment shows a clear advantage for the matrix-only
+block-relative rule under identical coverage (\cref{subsec:spectral-audit}).
 
 \subsection{Ideal block scaling}
 \label{subsec:ideal-block-scaling}
@@ -747,8 +748,9 @@ differently from poor conditioning inside a block, and after local row scaling e
 should contribute a representative scale before coupling rows are processed---and the
 implemented rules replace the ideal quantities $(M_i,m_i)$ with cheap coefficient-based
 proxies. As stated at the outset of this section, these are design principles, not performance
-theorems, and \cref{subsec:spectral-audit} tests them and finds the selectivity they motivate
-obtains no conditioning advantage.
+theorems. \Cref{subsec:spectral-audit} tests them and finds support for the block-relative
+placement of the matrix-only kernel in heterogeneous-block regimes, but not for the augmented
+collective coupling rescale.
 
 \subsection{Effect of global coupling rows}
 \label{subsec:global-coupling-theory}
@@ -1927,7 +1929,7 @@ direct-control data and is therefore exploratory}. We report \emph{prototype} pr
 $T_{\mathrm{pre+solve}}^{\mathrm{prototype}}=T_{\mathrm{preproc}}+T_{\mathrm{solver}}$ as the
 observed implementation endpoint, and capped solver time as its decomposition. The prototype endpoint charges each
 rule the cost of the implementation used in the dedicated batches, including metadata
-reconstruction; a release-build cached-metadata sensitivity (\cref{tab:flat-cached})
+reconstruction; a release-build cached-metadata sensitivity (Table~S17)
 approximates a generator-integrated implementation in which the structural taxonomy is reused.
 Neither is treated as a preregistered confirmatory outcome, and we report both. The name is deliberately narrow:
 $T_{\mathrm{pre+solve}}$ excludes model construction, solver model loading, and post-solve
@@ -2151,8 +2153,8 @@ $\mathcal I_s$,
 \end{equation}
 For every operational cell $T_{\max}=3600$\,s, including Simple; hence every penalized
 run costs $36{,}000$\,s. The unpenalized cost $t_{iv}$ is \emph{capped solver time}: every
-\PARten{} in this paper, including \cref{tab:par10-readings,tab:flat-reliability-body} and
-Tables~S2 and~S9, uses the solver-time cost $c_{iv}^{(k,\mathrm{solver})}$. The
+\PARten{} in this paper, including \cref{tab:par10-readings} and
+Tables~S2, S9 and~S19, uses the solver-time cost $c_{iv}^{(k,\mathrm{solver})}$. The
 preprocessing-plus-solver counterpart $c_{iv}^{(k,\mathrm{pre+solve})}$ adds the measured
 preprocessing wall time to both branches; in the direct-control batches, which carry the
 preprocessing timer, recomputing all three readings with it shifts every reported cell by
@@ -3195,7 +3197,7 @@ $T_{\mathrm{preproc}}^{\mathrm{cached}}=T_{\mathrm{diagnosis}}+T_{\mathrm{applic
 that removes the prototype's metadata-reconstruction stage while retaining diagnosis and
 factor application---collapses the gap substantially. In the non-optimized concurrent stress test the median
 paired preprocessing ratio falls from roughly $6$--$9\times$ to $1.08$--$1.40\times$; the
-cleaner pinned diagnostic protocol produces smaller absolute times, and the release-build absolute preprocessing values used in \cref{tab:flat-cached} are reported in
+cleaner pinned diagnostic protocol produces smaller absolute times, and the release-build absolute preprocessing values used in Table~S17 are reported in
 Panel~E5 of Table~S12. It does
 not, however, reverse the ordering. The cell-level median cached preprocessing time is lower
 for the role-blind rule in all six class--kernel cells under each protocol, although the
@@ -3230,7 +3232,7 @@ significance statement.
 
 Because that reconstruction is what the proposed architecture assumes away, we also recompute
 the paired comparison on a cached-metadata endpoint $T_{\mathrm{pre+solve}}^{\mathrm{cached}}
-=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$ (\cref{tab:flat-cached}).
+=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$ (Table~S17).
 This is a cross-protocol counterfactual---workstation preprocessing spliced with cluster solver
 times---and we treat it as descriptive only: the cached preprocessing term is one to two
 milliseconds against solver times of seconds, so it cannot change the paired ranks and the
@@ -3255,7 +3257,7 @@ endpoint reduces to capped solver time we do not stress-test it with transfer-fa
 raw values remain in the reproducibility package.
 
 The absolute magnitudes matter for how much this is worth
-(\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
+(Table~S18). In Simple the median paired preprocessing-plus-solver margin is
 $0.051$\,s at $1\%$ and $0.067$\,s at $0.1\%$; in SG-Ter-Mer, $0.041$ and $0.070$\,s. In
 other words, the $2$--$5\%$ effects in the fast classes are \emph{tens of milliseconds per
 instance}, and they are decisive only because these runs are themselves short. Full is the
@@ -3400,7 +3402,7 @@ preprocessing-plus-solver endpoint, the implemented Flat pipeline in Simple and 
 eligible pairs and is not retained by an adversarial signed-rank sensitivity); on the solver-time
 decomposition, only the augmented $0.1\%$ Simple contrast---and its strict/mixed
 reliability-adjusted \PARten{} ordering points in the opposite direction
-(\cref{tab:flat-reliability-body}), so neither result should be read as a generally
+(Table~S19), so neither result should be read as a generally
 superior operational policy (\cref{sec:discussion}). The own-incumbent diagnostic in Table~S10 sharpens the
 dissociation but does not isolate representation: the selective and Flat runs fix different
 integer solutions whenever their solver paths produce different incumbents.
@@ -3414,7 +3416,7 @@ Endpoints: \emph{prototype} preprocessing-plus-solver time
 $T_{\mathrm{pre+solve}}^{\mathrm{prototype}}=T_{\rm preproc}+T_{\rm solver}$, which charges the
 prototype's metadata reconstruction, and capped solver time (decomposition). The
 generator-integrated counterpart is the cached-metadata sensitivity of
-\cref{tab:flat-cached}. The paired variable is $d_i=\log(T_{\mathrm{Flat},i}/T_{\mathrm{SA},i})$;
+Table~S17. The paired variable is $d_i=\log(T_{\mathrm{Flat},i}/T_{\mathrm{SA},i})$;
 median ratios are SA/Flat, negative $r_{\mathrm{rb}}$ favors Flat, and $q_{6}$ is the BH
 value within the six-test tolerance family of each endpoint.}
 \label{tab:flat-control}
@@ -3460,138 +3462,16 @@ the four unrecorded instances (\cref{subsec:stage-attribution}).
 own-incumbent sensitivities are in Table~S10. Attrition, batch timing, preprocessing
 summaries, build comparisons, transfer-factor analyses and adversarial missing-pair
 sensitivities are in Tables~S11--S12. The reliability audit is in Table~S9 and
-\Cref{tab:flat-reliability-body}. Reproducible with
+Table~S19. Reproducible with
 \texttt{scripts/flat\_control\_tests.py}.
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}
 
-\begin{table}[t]
-\centering
-\caption{Cached-metadata sensitivity: the paired comparison of \cref{tab:flat-control}
-recomputed on
-$T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
-which removes the prototype's metadata-reconstruction stage. Preprocessing components come
-from the \emph{release} build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$), which is the
-implementation-cost sensitivity of record; the non-optimized diagnostic build is retained as
-an audit in Table~S11. All Simple and SG-Ter-Mer exported models are byte-identical across
-the diagnostic and release builds. For Full, five instances exhibit last-bit
-model-construction differences across builds, including two that enter the analysed pools;
-the four Full rows (marked $\dagger$) are therefore approximate cross-build timing
-sensitivities, whereas the central fast-class comparison changes preprocessing cost only.
-Median ratios are SA/Flat on
-the common log-ratio variable, and negative $r_{\mathrm{rb}}$ favors Flat. The value $q_6$ is
-BH-adjusted within the six-test tolerance family, whereas $q_{12}$ uses the joint twelve-test
-family. The operational-family adjusted values are reported in Table~S11. The analysis conditions on the per-instance median
-preprocessing times estimated from the low-contention replication, and its adjusted values do
-not propagate timing-estimation uncertainty. The cached Full-Augmented result at $0.1\%$ uses
-the same $27$ eligible pairs as \cref{tab:flat-control} and is likewise not retained by the
-adversarial signed-rank sensitivity over the four unrecorded instances. Exploratory, like
-\cref{tab:flat-control}.}
-\label{tab:flat-cached}
-\small
-\setlength{\belowcaptionskip}{2pt}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llc r rrrr@{}}
-\toprule
-Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ & $q_{12}$ \\
-\midrule
-\multirow{6}{*}{$1\%$}
- & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 & 0.364 \\
- & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 \\
- & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 \\
- & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 \\
- & Full$^\dagger$ & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 \\
- & Full$^\dagger$ & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 \\
-\midrule
-\multirow{6}{*}{$0.1\%$}
- & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 \\
- & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 \\
- & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 \\
- & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 \\
- & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
- & Full$^\dagger$ & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
-\begin{table}[t]
-\centering
-\caption{Completed-pair component summaries from the original fixed-order solve batches
-associated with \cref{tab:flat-control}: medians of $\Delta T=T^{\rm SA}-T^{\rm Flat}$, in
-seconds. They are not from the order-randomized replication, whose concurrent load yields
-larger absolute differences. These
-summaries exclude one-sided non-completions that remain in the capped paired analysis, and
-therefore do not decompose the exact inferential pool of every row; nor are the three
-medians an additive decomposition, since the median of a sum is not the sum of medians.
-A positive value favors Flat. The preprocessing-plus-solver margins in the two fast classes
-are tens of milliseconds per instance; in Full the solver term dominates and reverses the sign.}
-\label{tab:flat-absolute}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llc r rr rr@{}}
-\toprule
-Gap & Class & Kernel & $n$ &
-med.\ $\Delta T_{\rm preproc}$ & IQR($\Delta T_{\rm preproc}$) &
-med.\ $\Delta T_{\rm solver}$ & med.\ $\Delta T_{\rm pre+solve}$ \\
-\midrule
-\multirow{6}{*}{$1\%$}
- & Simple & Aug & 204 & $+0.050$ & 0.0005 & $+0.001$ & $+0.051$ \\
- & Simple & Mat & 204 & $+0.053$ & 0.0006 & $+0.002$ & $+0.054$ \\
- & SG-Ter-Mer & Aug & 67 & $+0.031$ & 0.0007 & $+0.010$ & $+0.041$ \\
- & SG-Ter-Mer & Mat & 67 & $+0.033$ & 0.0009 & $-0.002$ & $+0.030$ \\
- & Full & Aug & 31 & $+0.080$ & 0.0015 & $-11.38$ & $-11.30$ \\
- & Full & Mat & 30 & $+0.084$ & 0.0014 & $-0.16$ & $-0.08$ \\
-\midrule
-\multirow{6}{*}{$0.1\%$}
- & Simple & Aug & 203 & $+0.051$ & 0.0029 & $+0.016$ & $+0.067$ \\
- & Simple & Mat & 203 & $+0.054$ & 0.0027 & $-0.006$ & $+0.049$ \\
- & SG-Ter-Mer & Aug & 67 & $+0.032$ & 0.0002 & $+0.038$ & $+0.070$ \\
- & SG-Ter-Mer & Mat & 67 & $+0.033$ & 0.0004 & $+0.000$ & $+0.033$ \\
- & Full & Aug & 27 & $+0.079$ & 0.0008 & $-13.44$ & $-13.36$ \\
- & Full & Mat & 25 & $+0.083$ & 0.0010 & $-1.09$ & $-1.01$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\centering
-\caption{Common-pool reliability readings for the augmented SA--Flat contrasts at $0.1\%$
-MIPGap (Gurobi). \PARten{} in seconds under the intent-to-treat, strict, and mixed
-readings of \cref{subsec:original-scale-audit}, on the capped solver-time cost
-$c^{(k,\mathrm{solver})}$ (recomputing with the \emph{prototype} preprocessing-plus-solver
-cost from the original solve batches shifts every cell by less than $0.2$\,s and changes no
-ordering); completed-run failure counts
-$(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$; timeouts are penalized in all three readings.
-The Full \PARten{} pool contains all $30$ recorded instances, including the three double
-timeouts penalized equally for both policies; those pairs carry no signed-rank direction and
-are therefore absent from the $n=27$ inferential pool of \cref{tab:flat-control}.
-The full twelve-contrast audit is Table~S9.}
-\label{tab:flat-reliability-body}
-\small
-\setlength{\tabcolsep}{4.5pt}
-\begin{tabular}{@{}llr rrr c@{}}
-\toprule
-Class & Variant & $n$ & {ITT} & {strict} & {mixed} &
-$(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$ \\
-\midrule
-\multirow{2}{*}{Simple}
- & SA-Aug   & 204 & 212 & \bfseries 4090 & \bfseries 3387 & (22, 18) \\
- & Flat-Aug & 204 & \bfseries 30 & 4437 & 3908 & (25, 22) \\
-\addlinespace
-\multirow{2}{*}{SG-Ter-Mer}
- & SA-Aug   & 68 & 556 & 1085 & 556 & (1, 0) \\
- & Flat-Aug & 68 & \bfseries 542 & \bfseries 1071 & \bfseries 542 & (1, 0) \\
-\addlinespace
-\multirow{2}{*}{Full}
- & SA-Aug   & 30 & \bfseries 3951 & 6342 & 6342 & (2, 2) \\
- & Flat-Aug & 30 & 4004 & \bfseries 6291 & \bfseries 5109 & (2, 1) \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 Because the reliability-adjusted audit changes conclusions, its central numbers stay in the
-body (\cref{tab:flat-reliability-body}). In Simple, Flat-Aug wins intent-to-treat \PARten{}
+body (Table~S19). In Simple, Flat-Aug wins intent-to-treat \PARten{}
 ($30$ versus $212$\,s, driven by one SA-side timeout) but fails the strict original-scale
 criterion on more completed runs, so both reliability-adjusted readings reverse the aggregate
 toward SA-Aug. In SG-Ter-Mer neither policy has a mixed failure and Flat-Aug keeps a small
@@ -3649,15 +3529,16 @@ search performance. The exploratory direct SA--Flat controls, developed in full 
 \cref{subsec:stage-attribution}, add a further separation: the coverage ordering depends on
 the endpoint, the margins in the fast classes are tens of milliseconds and carry a large
 prototype-implementation component, and the reliability-adjusted reading can invert the
-solver-time ordering (\cref{tab:flat-reliability-body}; Tables~S9--S10).
+solver-time ordering (Table~S19; Tables~S9--S10).
 
 A first objection is that commercial solvers already scale internally---which is exactly why
 the scaled variants always run against the solver's default internal scaling and presolve
 (the internal-scaling control varies those settings only for the unscaled model). The
 comparison is not external scaling versus a naive solver, but whether a generator can alter
 the solver-facing formulation usefully before the solver's own pipeline begins. The mixed
-Gurobi--CPLEX outcome is informative about external preprocessing; it does not establish
-solver dependence of the Flat-versus-selective ordering, because Flat was run only with Gurobi.
+Gurobi--CPLEX evidence is informative not only about external preprocessing but also about the
+coverage ordering: the dedicated CPLEX Flat-control cell (\cref{subsec:stage-attribution}) shows
+that the Flat-versus-selective direction is not solver-stable at this scale.
 
 A second objection is that any benefit may come from something other than the metadata; the
 controls answer three sub-questions. The \emph{kernel}: the Ruiz baselines swap the
@@ -3671,9 +3552,12 @@ fast-class contrast retaining $q_{6}<0.05$, and on solver time alone only the au
 contrast at $0.1\%$ survives every adjustment, with all matrix-only contrasts inconclusive.
 Whether the \emph{solver} could do this itself: the internal-scaling control
 (\cref{subsec:internal-scaling}) gives a class-dependent answer---a tie on Simple, a descriptive
-shift favoring the external rule in SG-Ter-Mer, and a tolerance-dependent outcome in Full. The metadata's value is therefore
-attributed strictly to the second comparison, not to the Ruiz contrast, which concerns the
-kernel alone.
+shift favoring the external rule in SG-Ter-Mer, and a tolerance-dependent outcome in Full. On the
+operational instances, where the coupling stage remains inactive, metadata enter only through the
+row-selection policy, whose runtime value is class-, kernel-, tolerance-, and solver-dependent.
+This does not exhaust the role of metadata: the kernel-matched heterogeneous-block experiment
+isolates a distinct block-relative coupling effect that improves spectral pseudo-conditioning
+under equal coverage.
 
 A mechanistic caveat must accompany the conditioning evidence. If better conditioning drove
 faster search, the best-conditioned variant would be fastest, but the data do not line up that
@@ -3810,7 +3694,7 @@ relative to solver time and may be amortized when structural metadata are cached
 instances, however, the measured preprocessing overhead is large enough to determine the
 preprocessing-plus-solver ordering (\cref{subsec:stage-attribution})---though in absolute terms that
 ordering is decided by tens of milliseconds per instance
-(\cref{tab:flat-absolute}), so it matters for throughput over many short solves rather
+(Table~S18), so it matters for throughput over many short solves rather
 than for any single run. The amortization is not hypothetical: $72$--$89\%$ of the
 selective rule's preprocessing time in our prototype is spent rebuilding metadata the
 generator already has, and charging only the remaining instrumented diagnosis-and-application work
@@ -4007,100 +3891,52 @@ speedup.
 \label{sec:conclusion}
 % -------------------------------------------------------------------------
 
-Generated MIPs contain useful structure before export---local rows, component
-blocks, and coupling rows---that the solver usually never sees beyond the flat matrix. This paper
-uses that pre-export information to choose positive row scalings that preserve the optimization
-problem but change its numerical representation.
+Generated MIPs carry structure before export---local rows, component blocks, and coupling
+rows---that the solver never sees beyond the flat matrix, and this paper asks when reusing it to
+choose positive, equivalence-preserving row scalings actually helps. The answer is
+regime-dependent. Row scaling lowers the reported own-incumbent conditioning diagnostic, and under
+Gurobi at least one structure-aware variant beats the unscaled base in every class and tolerance,
+whereas under CPLEX 22.1.2.0 there is no robust runtime gain. But the distinctive use of the
+metadata---treating coupling rows relative to the scales of the blocks they connect---helps
+precisely, and only, when those block scales are heterogeneous: a kernel-matched experiment shows
+the matrix-only structure-aware rule improving the spectral pseudo-condition number by a median
+order of magnitude over a role-blind rule with the same kernel and coverage
+(\cref{subsec:spectral-audit}), while the augmented collective rule obtains no such advantage.
 
-The answer is not uniformly affirmative. Structure-aware scaling lowers the reported
-own-incumbent path-specific fixed-LP diagnostic on the tested hydrothermal MIPs. Under fixed-pool
-intent-to-treat \PARten{}, at least one structure-aware variant is below Base in each Gurobi
-class and tolerance, whereas under CPLEX 22.1.2.0 there is no robust gain. SG-Ter-Mer at
-$0.1\%$ is the only cell in which both strict-adjusted costs are below Base; the SA-Aug margin
-is negligible, this is a descriptive aggregate ordering, and it is not replicated at $1\%$.
-The diagnostic shift is a description of solver paths: because each formulation fixes its own
-incumbent, it is neither a controlled representation-only measure nor a proven instance-level
-predictor.
+On the operational hydrothermal instances the mechanism stays dormant. The activation audit
+establishes that the coupling stage never fires and that the exported transformation coincides
+with the local-only rule, so the operational effect is entirely local-row normalization; the
+architecture is still equivalence-preserving, since every factor multiplies a complete constraint
+by a positive scalar. The direct role-blind controls (\cref{tab:flat-control}) then show that the
+coverage-versus-selectivity ordering depends on what one measures---prototype
+preprocessing-plus-solver time, where the selective rule pays mainly to reconstruct metadata,
+versus the cached-metadata endpoint, where removing that reconstruction moves the fast-class
+effects close to parity (only one small Simple contrast keeps an adjusted value below
+$0.05$)---and the added CPLEX flat-control cell shows the ordering does not even hold its sign
+across solvers at this one-percent scale. Establishing this bounded reading required separating
+four kinds of evidence---algebraic equivalence, original-scale feasibility, solver-facing
+diagnostics, and matched per-solver runtime---so the rule with the lowest reported diagnostic need
+not be the one that solves fastest.
 
-The contribution divides along the same line the evidence does. The local--block--coupling
-architecture---scale local rows first, summarize blocks second, scale coupling rows last with
-the scales of the blocks they connect---uses information the generator has but a flat-matrix
-routine may not, and, because each factor multiplies a complete constraint by a strictly
-positive scalar, feasible points, objective values, and integer restrictions are unchanged. On
-the \emph{numerical} side, the structure-aware rules lower the path-specific diagnostic below
-the unscaled and Ruiz-kernel formulations on the operational testbed. The direct Flat batches
-add a different comparison: their own-incumbent diagnostics are equal in Simple, while the
-selective values are lower in SG-Ter-Mer and Full even when runtime does not follow that
-ordering. Separately, on the synthetic benchmark the spectral evidence is split by structural rule. The
-augmented collective rule obtains no advantage over its role-blind counterpart and is worse on
-the coupling-dominated patterns, so the full-coverage Flat rule matches or beats it on both the
-magnitude-range proxy and $\kappa_2^{+}$. The kernel-matched heterogeneous-block experiment
-isolates the opposite result for the matrix-only rule: under identical coverage and the same
-coefficient-only kernel, \methodMat{} reduces $\kappa_2^{+}$ by a median factor of $10.2$
-relative to Flat-Mat once the blocks sit at heterogeneous scales (\cref{subsec:spectral-audit}).
-The evidence therefore supports the block-relative placement of the coefficient-only kernel in
-the regime designed to exercise it---a conditioning gain of the metadata over a same-kernel
-role-blind rule---but not the augmented collective coupling rule, and it makes no claim of
-spectral optimality. On the
-\emph{runtime} side, the operational activation audit establishes
-that the coupling stage is inactive on the hydrothermal instances and that the exported
-transformation coincides with the local-only rule; the operational effect therefore comes
-entirely from local-row normalization. The direct role-blind controls
-(\cref{tab:flat-control}) show that coverage and selectivity cannot be generalized across
-the two kernels or across endpoints. These exploratory single-default-seed controls are
-developed in full in \cref{subsec:stage-attribution}; their lesson is that the ordering
-depends on what one measures---prototype preprocessing-plus-solver time, where the selective
-implementation pays mainly for reconstructing metadata, against the cached-metadata
-sensitivity, where only diagnosis and factor application are charged, against solver time
-alone. Under the baseline cross-protocol construction, removing metadata reconstruction moves the
-fast-class effects close to parity: six of
-the eight directional orderings remain, but only one small Simple contrast retains nominal
-adjusted values below $0.05$ under the reported joint and operational-family sensitivities, where the effects are small and the
-reliability-adjusted reading can point the other way. The observed effect of external preprocessing differs between the tested Gurobi and CPLEX
-pipelines; the CPLEX flat-control cell we added shows the Flat-versus-selective ordering does not
-even hold its sign across solvers at this one-percent scale (\cref{subsec:stage-attribution}). Establishing this
-bounded result
-required separating four kinds of evidence---algebraic equivalence, original-scale feasibility,
-solver-facing diagnostics, and matched per-solver runtime---which is as much a methodological
-takeaway as the scaling rule itself: the rule with the lowest reported numerical diagnostic
-need not be the rule that solves fastest, and only matched per-solver runtime can distinguish
-the computational ordering.
+Two facts fix the scope. The block-relative coupling stage---the one place \cref{prop:attribution}
+lets the metadata change the exported matrix---never activates operationally; and the only
+substantial structure-aware-versus-Flat difference came from an incomplete role map that left the
+market-shortage rows unscaled, not from the metadata, since under equal coverage the matrix-only
+policies coincide byte-for-byte. The operational campaigns therefore evaluate local normalization
+and the consequences of unequal coverage far more than block-relative coupling metadata: a
+non-identifying result about the metadata, not a refutation.
 
-The present evidence does not establish that generator metadata improves solver performance, but
-neither does it refute that hypothesis, and two facts fix the scope. First, the block-relative
-coupling stage---the one place \cref{prop:attribution} lets the metadata change the exported
-matrix---never activates on any operational instance, so the campaigns never exercise the
-distinctive mechanism. Second, the only substantial structure-aware-versus-Flat matrix
-difference, in SG-Ter-Mer, came from an incomplete role map that left the market-shortage rows
-unassigned, not from the metadata: under equal coverage the two coincide (\cref{prop:attribution},
-confirmed byte-for-byte in the matrix-only kernel). The operational campaigns therefore evaluate
-local geometric-mean normalization and the consequences of unequal coverage far more directly
-than they evaluate block-relative coupling metadata. This is a genuine, if negative,
-methodological result---a metadata pipeline with an incomplete taxonomy can be matched by a
-role-blind rule that simply reaches every row---but it is a non-identifying result about the
-metadata, not a refutation of it.
-
-Two things follow for a next version of the study. Empirically, the structure-aware and
-role-blind rules must be compared under an \emph{exhaustive} classification and identical
-coverage---every generated row traced to its module or to the coupling set---so that any residual
-difference is, by \cref{prop:attribution}, attributable to the coupling treatment alone. The
-synthetic side of this is already encouraging: on blocks placed at heterogeneous scales the
-matrix-only structure-aware rule buys an order of magnitude of conditioning over a kernel-matched
-role-blind rule (\cref{subsec:spectral-audit}), so the experiment demonstrates that the mechanism
-can produce a material conditioning gain in a controlled heterogeneous-block regime; what remains
-is to connect that conditioning gain to runtime and to build an operational testbed whose coupling
-rows enter the same regime, which the present one---with its near-unity balance rows---does not. For deployment in the meantime the safe rule keeps the structure-aware order but
-guarantees coverage: sweep every row with the coefficient-only kernel, applying it only where a
-row is poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
-original-scale verification. This coverage-safeguarded matrix-only rule is the variant we would
-carry forward, in preference to the augmented rule, whose use of the right-hand side introduces an
-additional documented original-scale reliability failure mode (the matrix-only rule still requires
-the same original-scale verification); the augmented rule is better read as an exploratory probe of
-whether the right-hand side should enter the diagnosis at all. A practical layer should also time
-its own preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
-Only once the operational policies are compared using a native exhaustive role assignment and
-identical coverage can any remaining difference be attributed to the use of generator metadata;
-the synthetic comparison already meets that bar, which is why it can make the attribution.
+For deployment the preferred candidate is a coverage-safeguarded matrix-only rule: cover every row
+with the coefficient-only kernel, keep the structural treatment for the coupling rows, time the
+preprocessing (which on fast instances can decide the ordering), and reject and re-solve any run
+that fails original-scale verification, under the base formulation or more conservative
+settings---in preference to the augmented rule, whose use of the right-hand side adds a documented
+reliability failure mode. The decisive next experiment is to compare the operational policies
+under a \emph{native exhaustive} role assignment and identical coverage, so that any residual
+difference is attributable to the coupling treatment alone (\cref{prop:attribution}), and to build
+an operational testbed whose coupling rows enter the heterogeneous-block regime the synthetic grid
+already identifies as where the metadata pays. The synthetic comparison already meets that bar;
+the operational one does not yet.
 
 % Float barrier removed to improve two-column layout.
 
@@ -4161,7 +3997,7 @@ path and preprocessing methods used in the paper.
 A Supporting Information document accompanies this article. Section~S1 contains the proofs of
 Propositions~1 and~2. Section~S2 contains the supplementary computational results: the
 $0.1\%$-MIPGap Gurobi and CPLEX distributional, diagnostic, and performance-profile views
-(Figures~S1--S4) and sixteen tables---hyperparameter sensitivity (Table~S1), the per-variant
+(Figures~S1--S4) and nineteen tables---hyperparameter sensitivity (Table~S1), the per-variant
 reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
 (Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
 paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit
@@ -4175,8 +4011,9 @@ the block-heterogeneous family, its per-block scale distribution, the seeds, and
 $\kappa_2^{+}$ distribution on the headline cell (Table~S13); Section~S4 gives the algorithmic
 summary, stating the recommended exhaustive matrix-only rule as Algorithm~S1 and the augmented
 exploratory variant alongside it; and Section~S5 collects the results tables relocated during the
-length revision---the two $0.1\%$-tolerance efficiency tables (Tables~S14--S15) and the
-internal-scaling comparison (Table~S16).
+length revision---the two $0.1\%$-tolerance efficiency tables (Tables~S14--S15), the
+internal-scaling comparison (Table~S16), and the direct SA--Flat cached-metadata, component-timing,
+and common-pool reliability tables (Tables~S17--S19).
 Additional processed logs and rebuild scripts are available in the reproducibility repository.
 
 % \balance is a two-column last-page balancer; it is a no-op in the single-column

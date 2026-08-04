@@ -1510,5 +1510,106 @@ Full & equilibration & 128.45 & 95.24 & 102.03 & 32 & 32 & 1.21 & 1.25 \\
 \end{tabular}
 \end{table*}
 
+\begin{table}[t]
+\centering
+\caption{Cached-metadata sensitivity: the direct SA--Flat comparison of the main text recomputed
+on $T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
+which removes the prototype's metadata-reconstruction stage. Preprocessing components come from the
+\emph{release} build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$). For Full, five instances exhibit
+last-bit model-construction differences across builds; the four Full rows (marked $\dagger$) are
+therefore approximate cross-build timing sensitivities. Median ratios are SA/Flat; negative
+$r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are BH-adjusted within the six- and twelve-test
+families. Exploratory.}
+\label{tab:flat-cached}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc r rrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ & $q_{12}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 & 0.364 \\
+ & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 \\
+ & Full$^\dagger$ & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 \\
+ & Full$^\dagger$ & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 \\
+ & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 \\
+ & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
+ & Full$^\dagger$ & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Completed-pair component summaries from the original fixed-order solve batches of the
+direct SA--Flat comparison: medians of $\Delta T=T^{\rm SA}-T^{\rm Flat}$, in seconds. A positive
+value favors Flat. The preprocessing-plus-solver margins in the two fast classes are tens of
+milliseconds per instance; in Full the solver term dominates and reverses the sign.}
+\label{tab:flat-absolute}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc r rr rr@{}}
+\toprule
+Gap & Class & Kernel & $n$ &
+med.\ $\Delta T_{\rm preproc}$ & IQR($\Delta T_{\rm preproc}$) &
+med.\ $\Delta T_{\rm solver}$ & med.\ $\Delta T_{\rm pre+solve}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & $+0.050$ & 0.0005 & $+0.001$ & $+0.051$ \\
+ & Simple & Mat & 204 & $+0.053$ & 0.0006 & $+0.002$ & $+0.054$ \\
+ & SG-Ter-Mer & Aug & 67 & $+0.031$ & 0.0007 & $+0.010$ & $+0.041$ \\
+ & SG-Ter-Mer & Mat & 67 & $+0.033$ & 0.0009 & $-0.002$ & $+0.030$ \\
+ & Full & Aug & 31 & $+0.080$ & 0.0015 & $-11.38$ & $-11.30$ \\
+ & Full & Mat & 30 & $+0.084$ & 0.0014 & $-0.16$ & $-0.08$ \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 203 & $+0.051$ & 0.0029 & $+0.016$ & $+0.067$ \\
+ & Simple & Mat & 203 & $+0.054$ & 0.0027 & $-0.006$ & $+0.049$ \\
+ & SG-Ter-Mer & Aug & 67 & $+0.032$ & 0.0002 & $+0.038$ & $+0.070$ \\
+ & SG-Ter-Mer & Mat & 67 & $+0.033$ & 0.0004 & $+0.000$ & $+0.033$ \\
+ & Full & Aug & 27 & $+0.079$ & 0.0008 & $-13.44$ & $-13.36$ \\
+ & Full & Mat & 25 & $+0.083$ & 0.0010 & $-1.09$ & $-1.01$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Common-pool reliability readings for the augmented SA--Flat contrasts at $0.1\%$ MIPGap
+(Gurobi). \PARten{} in seconds under the intent-to-treat, strict, and mixed readings of the main
+text, on the capped solver-time cost $c^{(k,\mathrm{solver})}$; completed-run failure counts
+$(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$; timeouts are penalized in all three readings. The Full
+\PARten{} pool contains all $30$ recorded instances, including three double timeouts that carry no
+signed-rank direction. The full twelve-contrast audit is Table~S9.}
+\label{tab:flat-reliability-body}
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}llr rrr c@{}}
+\toprule
+Class & Variant & $n$ & {ITT} & {strict} & {mixed} &
+$(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$ \\
+\midrule
+\multirow{2}{*}{Simple}
+ & SA-Aug   & 204 & 212 & \bfseries 4090 & \bfseries 3387 & (22, 18) \\
+ & Flat-Aug & 204 & \bfseries 30 & 4437 & 3908 & (25, 22) \\
+\addlinespace
+\multirow{2}{*}{SG-Ter-Mer}
+ & SA-Aug   & 68 & 556 & 1085 & 556 & (1, 0) \\
+ & Flat-Aug & 68 & \bfseries 542 & \bfseries 1071 & \bfseries 542 & (1, 0) \\
+\addlinespace
+\multirow{2}{*}{Full}
+ & SA-Aug   & 30 & \bfseries 3951 & 6342 & 6342 & (2, 2) \\
+ & Flat-Aug & 30 & 4004 & \bfseries 6291 & \bfseries 5109 & (2, 1) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 \end{document}
