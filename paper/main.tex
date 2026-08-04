@@ -3105,16 +3105,45 @@ a median $\kappa_2^{+}$ of $\num{1.3e3}$ against Flat-Mat's $\num{1.4e4}$, lower
 instances by a median factor of $10.2$ ($p=1.9\times10^{-9}$, Wilcoxon on the log ratios).
 Because the two share both kernel and coverage, this order of magnitude is attributable to the
 block metadata alone: scaling the coupling rows relative to the normalized block scales, rather
-than by their own raw norm, is precisely what the role-blind rule cannot do. The gap closes when
-the blocks are homogeneous (\methodMat{} and Flat-Mat tie, median ratio $1.02$, on the uniform
-family), which is exactly why the operational comparison is non-identifying: its blocks and its
-near-unity balance rows do not carry the scale heterogeneity that activates the mechanism. The
-benefit is specific to the block-relative \emph{placement} of the per-row kernel and not to the
-augmented collective factor---\methodAug{} is an order of magnitude \emph{worse} than Flat-Mat
-here ($\times 11$). So the block metadata is not inert: on the numerical diagnostic, in the
-regime designed to exercise it, it buys an order of magnitude that a role-blind rule with the
-same kernel and coverage cannot. What the operational campaigns show is that the tested
-instances do not enter that regime.
+than by their own raw norm, is precisely what the role-blind rule cannot do. The size of the gap
+tracks the block-scale heterogeneity and is almost independent of the disturbance severity, as
+\cref{tab:metadata-grid} shows: it is negligible when the blocks are near-homogeneous (exponent
+range $[-1,1]$, median ratio $0.9$--$1.1$ and not significant at either severity), an order of
+magnitude at $[-2,2]$, and two orders at $[-3,3]$, and it holds across all three coupling
+patterns. The near-homogeneous row is the regime the operational balance rows occupy, which is
+exactly why the operational comparison is non-identifying: its blocks do not carry the scale
+heterogeneity that activates the mechanism. The benefit is specific to the block-relative
+\emph{placement} of the per-row kernel and not to the augmented collective factor---\methodAug{}
+is an order of magnitude \emph{worse} than Flat-Mat here ($\times 11$). So the block metadata is
+not inert: on the numerical diagnostic, in the regime designed to exercise it, the experiment
+demonstrates a conditioning gain that a role-blind rule with the same kernel and coverage cannot
+match. What the operational campaigns show is that the tested instances do not enter that regime.
+
+\begin{table}[htbp]
+\caption{Kernel-matched metadata sweep: median $\kappa_2^{+}$ ratio
+$\methodMat{}/\mathrm{Flat\text{-}Mat}$ (both coefficient-only, so the gap is the block metadata
+alone) as the block-scale heterogeneity and the disturbance severity vary, $30$ seeds per cell. A
+ratio below one favors the structure-aware rule. The advantage is negligible when the blocks are
+near-homogeneous, grows by about an order of magnitude per unit of exponent range, and is
+essentially independent of the severity $S$ and of which coupling pattern is used. Every $[-2,2]$
+and $[-3,3]$ cell is significant at $p<10^{-8}$ ($30/30$ instances); no $[-1,1]$ cell is.}
+\label{tab:metadata-grid}
+\centering
+\begin{tabular}{llccc}
+\toprule
+Block range & $S$ & Coupling & Coupling (uniform) & Mixed \\
+\midrule
+\multirow{2}{*}{$[-1,1]$} & 3 & $0.92$ & $1.00$ & $1.15$ \\
+                          & 6 & $0.95$ & $1.01$ & $1.06$ \\
+\addlinespace
+\multirow{2}{*}{$[-2,2]$} & 3 & $0.099$ & $0.111$ & $0.138$ \\
+                          & 6 & $0.098$ & $0.108$ & $0.117$ \\
+\addlinespace
+\multirow{2}{*}{$[-3,3]$} & 3 & $0.0097$ & $0.0111$ & $0.0136$ \\
+                          & 6 & $0.0098$ & $0.0106$ & $0.0114$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Taken together, the four operational scenarios and the controlled synthetic check support a
 limited but useful interpretation. Under Gurobi, the structured rules lower path-specific

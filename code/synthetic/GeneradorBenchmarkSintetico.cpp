@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <random>
 #include <stdexcept>
@@ -16,12 +17,17 @@ const double kBigM                 = 1.0e6;
 const int    kAnchoSoporteLocal    = 3;
 
 // Magnitud base del bloque i (1-indexado) según la familia de coeficientes.
-// BlockHeterogeneous reparte exponentes en [-2, 2] entre bloques → bloques con
+// BlockHeterogeneous reparte exponentes en [-R, R] entre bloques → bloques con
 // escalas muy distintas, donde el escalado generator-aware tiene efecto medible.
+// R = env SYNTH_BLOCK_RANGE (def 2; R=2 es byte-idéntico al set original).
 double magnitudBloque(int bloque1, int numBloques, FamiliaCoeficientes fam) {
     if (fam != FamiliaCoeficientes::BlockHeterogeneous) return 1.0;
     if (numBloques <= 1) return 1.0;
-    double e = -2.0 + 4.0 * (static_cast<double>(bloque1 - 1) / (numBloques - 1));
+    static const double R = []{
+        const char* s = std::getenv("SYNTH_BLOCK_RANGE");
+        return (s && *s) ? std::atof(s) : 2.0;
+    }();
+    double e = -R + 2.0 * R * (static_cast<double>(bloque1 - 1) / (numBloques - 1));
     return std::pow(10.0, e);
 }
 
