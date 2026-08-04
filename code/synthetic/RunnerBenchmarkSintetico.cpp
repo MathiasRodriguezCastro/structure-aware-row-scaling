@@ -64,14 +64,22 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.usarEquilibradoRuiz       = false;
         return true;
     }
-    if (nombre == "Flat-Mat") {                // Flat role-blind con kernel matrix-only (sin RHS).
-        cfg.escalamientoPlano         = true;  //   Mismo kernel que SA-Mat, sin la estructura:
-        cfg.aplicarEscalamientoLocal  = true;  //   aisla el efecto de los metadatos (cf. Prop. de
-        cfg.aplicarEscalamientoGlobal = false; //   atribucion).
-        cfg.escalamientoLocalPorFila  = true;
+    if (nombre == "Flat-Mat" || nombre == "Flat-GM") {  // Flat role-blind, kernel matrix-only (sin RHS).
+        cfg.escalamientoPlano         = true;  //   Media geometrica 1/sqrt(M_r m_r) en TODAS las filas.
+        cfg.aplicarEscalamientoLocal  = true;  //   Mismo kernel que SA-Mat, sin la estructura: aisla el
+        cfg.aplicarEscalamientoGlobal = false; //   efecto de los metadatos (cf. Prop. de atribucion).
+        cfg.escalamientoLocalPorFila  = true;  //   "Flat-GM" es el nombre del manuscrito para esta variante.
         cfg.normalizarBloqueTrasFilas = false;
         cfg.usarEquilibradoRuiz       = false;
         cfg.modoMatricial             = true;
+        return true;
+    }
+    if (nombre == "Role-Hybrid") {             // Metadata de ROL de fila UNICAMENTE (sin s_i ni bloques):
+        cfg.escalamientoLocalPorFila  = true;  //   filas locales -> media geometrica 1/sqrt(M_r m_r);
+        cfg.normalizarBloqueTrasFilas = true;  //   filas de acoplamiento -> euclidea 1/||a_r||_2.
+        cfg.usarEquilibradoRuiz       = false; //   Debe coincidir byte-a-byte con Local-GM-Coupling-L2
+        cfg.modoMatricial             = true;  //   (que fija escalaBloquePrevia, inerte bajo el proxy L2).
+        cfg.acoplamientoCiegoL2       = true;
         return true;
     }
     if (nombre == "Flat-L2") {                 // Control kernel-matched: role-blind con NORMA EUCLIDEA
