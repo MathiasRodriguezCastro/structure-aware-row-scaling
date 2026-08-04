@@ -1,0 +1,17 @@
+Attribution controls (block_heterogeneous, coupling, S=6, R=2, 30 seeds), kappa2+.
+Variants: SA-Mat, Flat-Mat (geometric-mean role-blind), Flat-L2 (Euclidean role-blind,
+kernel-matched to SA-Mat's coupling factor, no s_i/beta), SA-Mat-permB (permuted block map).
+
+  median kappa2+  Base        = 5.3029e+08
+  median kappa2+  SAMat       = 1.3338e+03
+  median kappa2+  FlatMat     = 1.3584e+04
+  median kappa2+  FlatL2      = 4.6809e+02
+  median kappa2+  SAMatpermB  = 1.3338e+03
+
+  FlatMat/SA-Mat median ratio = 10.19
+  FlatL2/SA-Mat median ratio = 0.3508
+  SAMatpermB/SA-Mat median ratio = 1
+
+Conclusion: SA-Mat-permB is byte-identical to SA-Mat (30/30), so s_i=1 and the block
+metadata is inert; Flat-L2 (no metadata) matches/beats SA-Mat. The SA-Mat-vs-Flat-Mat
+gap is the coupling-row NORM (Euclidean vs geometric-mean), not the block metadata.

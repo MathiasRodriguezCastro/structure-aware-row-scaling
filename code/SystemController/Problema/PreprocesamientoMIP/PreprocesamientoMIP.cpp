@@ -5,6 +5,7 @@
 #include <sstream>
 #include <chrono>
 #include <algorithm>
+#include <random>
 #include <cmath>
 #include <cctype>
 #include <stdexcept>
@@ -465,6 +466,18 @@ void PreprocesamientoMIP::calcularDiagnosticoGlobal() {
     if (cantEscalasLocales > 0)
         escalaLocalGeneral = sumaEscalasLocales / cantEscalasLocales;
 
+    // Auditoria SA-Mat-permbeta: permuta la asignacion prefijo->escala manteniendo el conjunto
+    // de escalas s_i. Si s_i=1 para todo bloque (regimen limpio), el export es byte-identico:
+    // confirma que el mapa de bloques es inerte en el proxy de acoplamiento.
+    if (cfg.permutarBloques && escalaLocalPorAgente.size() > 1) {
+        std::vector<std::string> claves;
+        std::vector<double> valores;
+        for (const auto& kv : escalaLocalPorAgente) { claves.push_back(kv.first); valores.push_back(kv.second); }
+        std::mt19937 rng(20250803u);
+        std::shuffle(valores.begin(), valores.end(), rng);
+        for (size_t i = 0; i < claves.size(); ++i) escalaLocalPorAgente[claves[i]] = valores[i];
+    }
+
     double sumaRho2 = 0.0;
     for (int idx : indicesAcoplamiento) {
         double filaRho2 = 0.0;
@@ -783,13 +796,15 @@ void PreprocesamientoMIP::aplicarEscalamientoLocal() {
                     // de la cantidad de coeficientes de la fila y centra la escala sin que el factor
                     // quede dominado por el coeficiente mayor ni por la densidad de la fila (la norma
                     // L2 sí dependía de ambos y descompensaba el rango global).
-                    double cmin = 1e300, cmax = 0.0;
+                    double cmin = 1e300, cmax = 0.0, sumsq = 0.0;
                     for (const auto& [coef, _] : terminos) {
                         double ac = std::abs(coef);
-                        if (ac > 0.0) { cmin = std::min(cmin, ac); cmax = std::max(cmax, ac); }
+                        if (ac > 0.0) { cmin = std::min(cmin, ac); cmax = std::max(cmax, ac); sumsq += ac * ac; }
                     }
                     if (cmax <= 0.0 || cmin >= 1e300) continue;
-                    alpha = 1.0 / sqrt(cmax * cmin);
+                    // Control Flat-L2: norma euclidea en vez de media-geometrica de extremos, mismas
+                    // salvaguardas. Aisla la NORMA de la metadata (SA-Mat usa L2 en acoplamiento).
+                    alpha = cfg.kernelEuclideo ? 1.0 / sqrt(sumsq) : 1.0 / sqrt(cmax * cmin);
                     // Salvaguarda de ventana: no escalar si el factor sacaría algún coeficiente de la
                     // fila fuera de [ε_min, ε_max].
                     if (cmin * alpha < cfg.epsMinCoef || cmax * alpha > cfg.epsMaxCoef)

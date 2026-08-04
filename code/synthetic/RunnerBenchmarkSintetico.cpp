@@ -74,6 +74,25 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.modoMatricial             = true;
         return true;
     }
+    if (nombre == "Flat-L2") {                 // Control kernel-matched: role-blind con NORMA EUCLIDEA
+        cfg.escalamientoPlano         = true;  //   (1/||a_r||_2), el mismo kernel que SA-Mat aplica en
+        cfg.aplicarEscalamientoLocal  = true;  //   las filas de acoplamiento, pero SIN s_i ni beta.
+        cfg.aplicarEscalamientoGlobal = false; //   Aisla la NORMA de la metadata de bloque.
+        cfg.escalamientoLocalPorFila  = true;
+        cfg.normalizarBloqueTrasFilas = false;
+        cfg.usarEquilibradoRuiz       = false;
+        cfg.modoMatricial             = true;
+        cfg.kernelEuclideo            = true;
+        return true;
+    }
+    if (nombre == "SA-Mat-permB") {            // Auditoria: SA-Mat con el mapa de bloques PERMUTADO.
+        cfg.escalamientoLocalPorFila  = true;  //   Mismo conjunto de escalas s_i, asignacion barajada.
+        cfg.normalizarBloqueTrasFilas = true;  //   Si s_i=1, export byte-identico a SA-Mat.
+        cfg.usarEquilibradoRuiz       = false;
+        cfg.modoMatricial             = true;
+        cfg.permutarBloques           = true;
+        return true;
+    }
     // Sensibilidad del piso de confiabilidad del γ colectivo: "SA-Aug-floor<val>" corre
     // SA-Aug con pisoMagnitudGammaColectivo = <val> ("SA-Aug-floor0" = piso deshabilitado).
     // Solo para el benchmark sintético (la campaña de sensibilidad usa seeds independientes).

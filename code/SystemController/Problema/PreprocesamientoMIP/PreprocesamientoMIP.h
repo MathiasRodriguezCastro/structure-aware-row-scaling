@@ -37,6 +37,15 @@ struct PreprocesamientoConfig {
                                                ///<  deja en d_r=1. Mantiene la etapa local y la de
                                                ///<  acoplamiento; sólo extiende la COBERTURA a R_other.
                                                ///<  Opt-in; sin él, byte-idéntico a la regla selectiva.
+    bool   kernelEuclideo            = false;  ///< Control Flat-L2 (kernel-matched al acoplamiento de
+                                               ///<  SA-Mat): reemplaza el kernel de fila alpha_r=1/sqrt(M_r*m_r)
+                                               ///<  por la NORMA EUCLIDEA alpha_r=1/||a_r||_2 (solo coef),
+                                               ///<  con las MISMAS salvaguardas/clip/banda. Aisla el efecto
+                                               ///<  de la NORMA del de la metadata de bloque.
+    bool   permutarBloques           = false;  ///< Auditoria SA-Mat-permbeta: permuta la asignacion
+                                               ///<  variable->escala_de_bloque en el proxy de acoplamiento,
+                                               ///<  manteniendo el conjunto de escalas s_i. Si s_i=1 para
+                                               ///<  todo bloque, el export es byte-identico (metadata inerte).
     bool   usarEquilibradoRuiz       = false;  ///< Equilibrado iterativo interno por bloque
     bool   escalarColumnasContinuas  = false;  ///< Transformar columnas continuas y recuperar solución
     bool   normalizacionFisica       = false;  ///< Normalizar filas globales por unidades físicas/proxy
