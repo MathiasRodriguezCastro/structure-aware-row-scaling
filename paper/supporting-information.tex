@@ -1486,5 +1486,29 @@ Under CPLEX these descriptive minima do not imply a robust positive external-sca
 \end{flushleft}
 \end{table*}
 
+\begin{table*}[t]
+\centering
+\caption{Descriptive postselected Gurobi internal-scaling comparison at $1\%$ MIPGap. Within
+each class, the internal mode with the lowest class-level solver-time $\sgm$ is selected on the
+same data; SA-Aug and SA-Mat use default internal scaling. Ratios are medians of
+$T_{\mathrm{internal}}/T_{\mathrm{SA}}$ under the main paired convention: double non-completions
+are excluded and a one-sided non-completion is assigned $T_{\max}=3600$\,s. This same-sample
+postselection is descriptive, not inferential.}
+\label{tab:internal-scaling}
+\footnotesize
+\setlength{\tabcolsep}{3.8pt}
+\begin{tabular}{@{}llrrrrrrr@{}}
+\toprule
+Class & Selected mode & {$\sgm T_{\mathrm{int}}$} & {$\sgm T_{\mathrm{Aug}}$}
+& {$\sgm T_{\mathrm{Mat}}$} & {$n_{\mathrm{Aug}}$} & {$n_{\mathrm{Mat}}$}
+& {Med. ratio Aug} & {Med. ratio Mat} \\
+\midrule
+Simple & aggressive & 3.79 & 2.13 & 2.17 & 204 & 204 & 0.97 & 0.96 \\
+SG-Ter-Mer & equilibration & 14.66 & 8.28 & 8.64 & 67 & 67 & 1.18 & 1.28 \\
+Full & equilibration & 128.45 & 95.24 & 102.03 & 32 & 32 & 1.21 & 1.25 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
 
 \end{document}

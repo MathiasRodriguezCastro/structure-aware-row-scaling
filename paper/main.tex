@@ -3091,33 +3091,9 @@ Among the controls of \cref{subsec:added-controls}, the internal-scaling baselin
 the solver's \emph{own} scaling could reproduce the effect of the external scaling layer. It
 tests the value of external preprocessing as such, not metadata selectivity; the latter is
 tested directly by the role-blind Flat controls of \cref{subsec:stage-attribution}.
-\Cref{tab:internal-scaling} summarizes the Gurobi comparison; the complete Gurobi and CPLEX
-flag sweep is Table~S7.
-
-\begin{table*}[t]
-\centering
-\caption{Descriptive postselected Gurobi internal-scaling comparison at $1\%$ MIPGap. Within
-each class, the internal mode with the lowest class-level solver-time $\sgm$ is selected on the
-same data; SA-Aug and SA-Mat use default internal scaling. Ratios are medians of
-$T_{\mathrm{internal}}/T_{\mathrm{SA}}$ under the main paired convention: double
-non-completions are excluded and a one-sided non-completion is assigned
-$T_{\max}=3600$\,s. No abort occurs in these six comparisons. This same-sample postselection is
-descriptive, not inferential.}
-\label{tab:internal-scaling}
-\footnotesize
-\setlength{\tabcolsep}{3.8pt}
-\begin{tabular}{@{}llrrrrrrr@{}}
-\toprule
-Class & Selected mode & {$\sgm T_{\mathrm{int}}$} & {$\sgm T_{\mathrm{Aug}}$}
-& {$\sgm T_{\mathrm{Mat}}$} & {$n_{\mathrm{Aug}}$} & {$n_{\mathrm{Mat}}$}
-& {Med. ratio Aug} & {Med. ratio Mat} \\
-\midrule
-Simple & aggressive & 3.79 & 2.13 & 2.17 & 204 & 204 & 0.97 & 0.96 \\
-SG-Ter-Mer & equilibration & 14.66 & 8.28 & 8.64 & 67 & 67 & 1.18 & 1.28 \\
-Full & equilibration & 128.45 & 95.24 & 102.03 & 32 & 32 & 1.21 & 1.25 \\
-\bottomrule
-\end{tabular}
-\end{table*}
+The Gurobi comparison is summarized as Table~S16 in the Supporting Information (the internal
+mode with the lowest class-level solver-time $\sgm$ is postselected on the same data, so it is
+descriptive, not inferential); the complete Gurobi and CPLEX flag sweep is Table~S7.
 
 The displayed paired counts and ratios are reproduced by
 \texttt{scripts/analizar\_revision.py r1pairs} on each class folder.
@@ -3683,33 +3659,19 @@ the solver-facing formulation usefully before the solver's own pipeline begins. 
 Gurobi--CPLEX outcome is informative about external preprocessing; it does not establish
 solver dependence of the Flat-versus-selective ordering, because Flat was run only with Gurobi.
 
-A second objection is that any benefit may come from something other than the generator
-metadata, and it splits into three questions the controls answer separately. First, the
-choice of \emph{kernel}: the Ruiz baselines swap the geometric-mean kernel for max-norm
-equilibration inside the same structural pipeline (\cref{subsec:variants}), so they isolate
-the kernel while holding the selection policy fixed---they do compress coefficient ranges,
-yet their matched runtime is irregular and does not reliably turn that compression into
-speed, so the geometric-mean kernel is not interchangeable with a generic one, but this
-comparison says nothing about the metadata. Second, the choice of \emph{coverage policy}:
-whether the row-role selection helps is a metadata question, and it is answered only by the
-two role-blind controls (SA-Aug versus Flat-Aug and SA-Mat versus Flat-Mat,
-\cref{subsec:stage-attribution}). In the reported default-seed campaign, the direct tests
-answer it endpoint by endpoint. In the prototype preprocessing-plus-solver endpoint, Flat has
-lower observed time in the two fast classes at both tolerances; under the baseline cross-protocol construction of the
-cached-metadata sensitivity, which better approximates generator-integrated deployment, the
-effects move close to parity and only one fast-class contrast retains $q_{6}<0.05$; the number
-of within-tolerance crossings changes under the hypothetical transfer-factor stress grids of
-Table~S12. The Full selectivity
-direction is conditional on its eligible pairs under both endpoints, and on solver time alone
-only the augmented Simple contrast at $0.1\%$
-remains below the nominal $0.05$ threshold after every reported multiplicity and
-operational-family adjustment applied to that endpoint, with all
-matrix-only solver-time contrasts
-inconclusive. Third,
-whether the solver could have done this itself: the internal-scaling control
-(\cref{subsec:internal-scaling}) gives a class-dependent answer---a tie on the typical
-Simple instance, a sizable descriptive paired shift favoring the external rule in
-SG-Ter-Mer, and a tolerance-dependent outcome in Full. The metadata's value is therefore
+A second objection is that any benefit may come from something other than the metadata; the
+controls answer three sub-questions. The \emph{kernel}: the Ruiz baselines swap the
+geometric-mean kernel for max-norm equilibration within the same pipeline
+(\cref{subsec:variants}), and their matched runtime is irregular---the geometric-mean kernel is
+not interchangeable with a generic one, but this says nothing about the metadata. The
+\emph{coverage policy}: whether row-role selection helps is answered only by the role-blind
+controls (\cref{subsec:stage-attribution}); Flat has lower observed prototype time in the two
+fast classes, the cached-metadata endpoint moves the effects close to parity with only one
+fast-class contrast retaining $q_{6}<0.05$, and on solver time alone only the augmented Simple
+contrast at $0.1\%$ survives every adjustment, with all matrix-only contrasts inconclusive.
+Whether the \emph{solver} could do this itself: the internal-scaling control
+(\cref{subsec:internal-scaling}) gives a class-dependent answer---a tie on Simple, a descriptive
+shift favoring the external rule in SG-Ter-Mer, and a tolerance-dependent outcome in Full. The metadata's value is therefore
 attributed strictly to the second comparison, not to the Ruiz contrast, which concerns the
 kernel alone.
 
@@ -3955,7 +3917,7 @@ cross-campaign drift check, not a statistical bound on seed-level variability: t
 separate controls, run in different batches and on different eligible subsets, and they
 supply only a handful of observed points. Across the observed campaigns---the main
 scenario, the internal-scaling baseline, and the coupling-stage activation campaign
-(\cref{tab:robust-gurobi-1pct-mipgap,tab:internal-scaling}; Table~S8)---the Simple base
+(\cref{tab:robust-gurobi-1pct-mipgap}; Tables~S16 and S8)---the Simple base
 $\sgm$ spans $3.73$--$4.05$\,s and the SG-Ter-Mer base $14.09$--$14.42$\,s, a difference of
 under $10\%$ that is an order of magnitude smaller than the $1.8$--$2\times$
 structure-aware effects; this contextualizes the cross-campaign drift, while the five-seed
@@ -4199,7 +4161,7 @@ path and preprocessing methods used in the paper.
 A Supporting Information document accompanies this article. Section~S1 contains the proofs of
 Propositions~1 and~2. Section~S2 contains the supplementary computational results: the
 $0.1\%$-MIPGap Gurobi and CPLEX distributional, diagnostic, and performance-profile views
-(Figures~S1--S4) and thirteen tables---hyperparameter sensitivity (Table~S1), the per-variant
+(Figures~S1--S4) and sixteen tables---hyperparameter sensitivity (Table~S1), the per-variant
 reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
 (Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
 paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit
@@ -4210,9 +4172,11 @@ per-contrast attrition and the cached-metadata endpoint on the release and diagn
 (Table~S11); and the measurement environment, build comparison and cross-environment
 transfer-factor sensitivity (Table~S12). Section~S3 documents the kernel-matched metadata grid---
 the block-heterogeneous family, its per-block scale distribution, the seeds, and the per-variant
-$\kappa_2^{+}$ distribution on the headline cell (Table~S13)---and Section~S4 gives the algorithmic
+$\kappa_2^{+}$ distribution on the headline cell (Table~S13); Section~S4 gives the algorithmic
 summary, stating the recommended exhaustive matrix-only rule as Algorithm~S1 and the augmented
-exploratory variant alongside it.
+exploratory variant alongside it; and Section~S5 collects the results tables relocated during the
+length revision---the two $0.1\%$-tolerance efficiency tables (Tables~S14--S15) and the
+internal-scaling comparison (Table~S16).
 Additional processed logs and rebuild scripts are available in the reproducibility repository.
 
 % \balance is a two-column last-page balancer; it is a no-op in the single-column
