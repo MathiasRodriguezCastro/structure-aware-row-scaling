@@ -142,10 +142,11 @@
 \abstract[Abstract]{%
 Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, though
 their generators retain each row's role, block ownership, and coupling incidence. We ask
-whether this metadata should select which constraints receive positive pre-export row scaling.
-The layer studied here applies geometric-mean row normalization in a local--block--coupling
-order, preserves the MIP exactly, and verifies every returned solution against the original
-unscaled constraints. We test it on three hydrothermal-dispatch classes, two commercial
+whether generator metadata should alter \emph{how} coupling constraints are scaled relative to
+the local blocks they connect, beyond applying the same per-row kernel to every constraint. The
+layer studied here applies geometric-mean row normalization in a local--block--coupling order,
+preserves the MIP exactly, and verifies every returned solution against the original unscaled
+constraints. We test it on three hydrothermal-dispatch classes, two commercial
 solvers, and two MIPGap tolerances, against unscaled, Ruiz-kernel, solver-internal, and
 role-blind full-coverage controls, together with a synthetic mechanism grid carrying a direct
 spectral audit.
@@ -153,20 +154,23 @@ spectral audit.
 The result is controlled and regime-dependent. On the operational instances it is
 \emph{non-identifying}: the distinctive coupling stage never activates, and the one substantial
 difference between the selective rule and the role-blind full-coverage control traces to an
-incomplete role map that left a block of market-shortage rows unscaled, not to the metadata---under
-equal coverage the two coincide, proved for the matrix-only kernel and confirmed byte-for-byte.
-But where the mechanism is exercised the metadata does help: on a synthetic grid with blocks at
-heterogeneous scales, the matrix-only structure-aware rule attains an order-of-magnitude lower
-condition number than a role-blind rule with the \emph{same} kernel and coverage ($30/30$
-instances, $p<10^{-8}$). The operational campaigns never enter that regime, where a per-row local
-kernel computable from the flat matrix carries the whole effect. Runtime effects are of the
+incomplete role map that left a block of market-shortage rows unscaled, not to the metadata. Under
+equal coverage \emph{and an inactive coupling stage} the matrix-only policies coincide, as
+\cref{prop:attribution} predicts and byte-for-byte confirms on the operational instances. When
+heterogeneous block scales activate the block-relative treatment, however, the same-kernel policies
+no longer coincide: on a controlled heterogeneous-block grid the matrix-only structure-aware rule
+attains an order-of-magnitude lower condition number than a role-blind rule with the \emph{same}
+kernel and coverage ($30/30$ instances, $p<10^{-8}$), demonstrating that the mechanism can produce
+a material conditioning gain. The operational campaigns never enter that regime, where a per-row
+local kernel computable from the flat matrix carries the whole effect. Runtime effects are of the
 order of the solver's own
 run-to-run variability---a five-seed replication puts the within-instance noise floor at
 $12$--$18\%$ and leaves the metadata-versus-coverage contrast inside it in the fast class---and
 only one of twelve contrasts clears multiplicity adjustment, none under CPLEX. Under the
-pre-declared absolute criterion the proposed default \emph{degrades} original-scale reliability
-relative to the base, concentrated on zero-right-hand-side balance rows, and we report the
-strict reading as primary.
+pre-declared absolute criterion the augmented rule (SA-Aug) \emph{degrades} original-scale
+reliability relative to Base, with failures concentrated on zero-right-hand-side balance rows,
+and we report the strict reading as primary; the variant we ultimately recommend is the
+matrix-only rule.
 
 The transferable lesson outlives the method: the rule with the best numerical diagnostic is not
 the fastest, so numerical improvement and solver acceleration must be measured separately.
@@ -633,10 +637,12 @@ local block or to the coupling set. Formally, a role map
 \end{equation}
 sends $\tau(r)=i$ when $r$ is local to block $i$ and $\tau(r)=\mathrm{cpl}$ when it links
 several blocks through the variables it involves; a coupling row is not a local row of any
-block and does not enter the local-row normalization stage. There is no third mathematical
-class. A row that looks ``global but not coupling'' has simply not been traced to the module
-that generates it, so a residual category is a symptom of an incomplete map $\tau$, not a
-structural fact of the formulation.
+block and does not enter the local-row normalization stage. We accordingly define the target
+class as generated modular MIPs \emph{equipped with an exhaustive role map}, rather than assuming
+that every conceivable modular MIP admits such a partition without further modeling decisions.
+Within this class there is no third row category: a row that looks ``global but not coupling''
+has simply not been traced to the module that generates it, so a residual class is a symptom of
+an incomplete map $\tau$, not a structural fact of the formulation.
 
 We flag this because the implementation used for the operational campaigns did \emph{not}
 realize an exhaustive map. One set of rows---the market shortage segments of the SG-Ter-Mer
@@ -3012,14 +3018,17 @@ the ordering does not follow structural selectivity. \methodMat{} attains the lo
 $\kappa_2^{+}$ in \emph{every} pattern, between $\num{6.6e2}$ and $\num{8.5e2}$, an order of
 magnitude below every other variant including the undisturbed None row; the matrix-only kernel
 is the spectrally best-behaved rule in this suite regardless of what the metadata says. Third,
-and most consequential for the claims of this paper, \methodAug{} obtains no spectral advantage
-over its role-blind control. Their median ratio $\kappa_2^{+}(\methodAug{})/\kappa_2^{+}
-(Flat)$ at $S=6$ is $1.00$ on None, Local and Coupling~(uniform); on the two patterns
-where the coupling disturbance is the dominant one it is $2.36$ (Coupling) and $10.37$ (Mixed),
-both against \methodAug{}. On the very design case that motivates the coupling stage, treating
-every row as local is spectrally better than using the metadata to treat coupling rows
-selectively. This is an independent confirmation, in a quantity the operational campaigns never
-measure, of the coverage-versus-selectivity result of
+the reading splits by structural rule, and only one half is negative. The \emph{augmented} rule
+obtains no spectral advantage over its role-blind control: the median ratio
+$\kappa_2^{+}(\methodAug{})/\kappa_2^{+}(Flat)$ at $S=6$ is $1.00$ on None, Local and
+Coupling~(uniform), and $2.36$ (Coupling) and $10.37$ (Mixed) against \methodAug{} on the two
+patterns where the coupling disturbance dominates---so the single collective coupling factor is,
+if anything, worse than treating every row as local. The matrix-only rule is a different story,
+made precise by the kernel-matched test below: once the blocks sit at heterogeneous scales,
+\methodMat{} beats a role-blind rule with the \emph{same} kernel and coverage by an order of
+magnitude. The spectral evidence is therefore split by structural rule---against the augmented
+collective factor, and for the block-relative placement of the coefficient-only kernel---and only
+the first half echoes the operational coverage-versus-selectivity result of
 \cref{subsec:added-controls,subsec:stage-attribution}.
 
 The matrix-only kernel's advantage is the paper's one clearly positive spectral finding, and
@@ -3478,10 +3487,12 @@ the reproducibility artifacts; it is inert
 in both conditioning and runtime here), while the coupling stage's repair of a
 \emph{collective} displacement of the coupling rows is exercised only in the controlled
 synthetic grid (\cref{subsec:synthetic-results}), and there only on the oversized branch of the
-coupling-uniform pattern; on the spectral reading of that same grid it does not beat role-blind
-coverage (\cref{subsec:spectral-audit}). The coupling
-metadata drives neither the
-conditioning improvement nor the runtime gain on the operational testbed. The row-role
+coupling-uniform pattern; on the spectral reading of that same grid this augmented collective
+factor does not beat role-blind coverage---though the matrix-only rule's block-relative placement
+of the same kernel does, by an order of magnitude, once the blocks sit at heterogeneous scales
+(\cref{subsec:spectral-audit}). Neither effect fires on the operational testbed, whose balance
+rows are near-unity, so there the coupling metadata drives neither the conditioning improvement
+nor the runtime gain. The row-role
 metadata, used as a \emph{selection filter} for the per-row kernel, has no uniform runtime
 effect. In these exploratory controls, the orderings that remain below $0.05$ after the
 joint multiplicity and operational-family sensitivities are: on the
@@ -3991,11 +4002,15 @@ A second limitation is that the operational testbed does not exercise the coupli
 The coupling-stage activation audit finds zero activations and byte-identical full/local-only
 exports in every eligible pair, so it establishes that the observed operational transformation
 is entirely local-row normalization; it cannot estimate how the coupling stage would affect
-runtime on real instances where it activates. That marginal mechanism is exercised only on the
-synthetic benchmark, and there the evidence is unfavorable rather than merely incomplete: on
-the magnitude-range proxy its distinctive repair is confined to the oversized branch of its
-collective design case, and on the direct spectral reading it does not beat role-blind
-coverage. Transferring it to another operational generator remains open.
+runtime on real instances where it activates. That mechanism is exercised only on the synthetic
+benchmark, where the spectral evidence splits by structural rule. The augmented collective factor
+is unfavorable---its distinctive repair is confined to the oversized branch of its collective
+design case, and it does not beat role-blind coverage on the spectral reading. The matrix-only
+rule is favorable: under identical coverage and the same kernel, its block-relative placement
+lowers the pseudo-condition number by a median factor of $10.2$ over the role-blind control once
+the blocks sit at heterogeneous scales (\cref{subsec:spectral-audit}). This is a numerical gain,
+not a runtime one, it is dormant on the operational testbed, and connecting it to solve time and
+transferring it to another operational generator both remain open.
 
 A third limitation is the choice of the row as the unit of intervention. The method scales
 complete rows, which keeps the transformation trivially equivalence-preserving and leaves
@@ -4138,16 +4153,17 @@ the \emph{numerical} side, the structure-aware rules lower the path-specific dia
 the unscaled and Ruiz-kernel formulations on the operational testbed. The direct Flat batches
 add a different comparison: their own-incumbent diagnostics are equal in Simple, while the
 selective values are lower in SG-Ter-Mer and Full even when runtime does not follow that
-ordering. Separately, on the synthetic benchmark the full-coverage Flat rule matches or beats
-every structure-aware variant on the exported global coefficient-and-right-hand-side
-magnitude-range proxy, and the coupling stage's distinctive repair is confined to its
-collective design case. The spectral audit of that same grid (\cref{subsec:spectral-audit})
-measures $\kappa_2^{+}$ directly, and its verdict is split: every rule cuts the
-pseudo-condition number by seven to nine orders of magnitude wherever row-multiplicative
-imbalance is present, but \methodAug{} obtains no advantage over its role-blind control,
-tying on three patterns and losing on the two coupling-dominated ones. This supports no
-claim of spectral optimality or of a conditioning advantage of metadata over full
-coverage. On the
+ordering. Separately, on the synthetic benchmark the spectral evidence is split by structural rule. The
+augmented collective rule obtains no advantage over its role-blind counterpart and is worse on
+the coupling-dominated patterns, so the full-coverage Flat rule matches or beats it on both the
+magnitude-range proxy and $\kappa_2^{+}$. The kernel-matched heterogeneous-block experiment
+isolates the opposite result for the matrix-only rule: under identical coverage and the same
+coefficient-only kernel, \methodMat{} reduces $\kappa_2^{+}$ by a median factor of $10.2$
+relative to Flat-Mat once the blocks sit at heterogeneous scales (\cref{subsec:spectral-audit}).
+The evidence therefore supports the block-relative placement of the coefficient-only kernel in
+the regime designed to exercise it---a conditioning gain of the metadata over a same-kernel
+role-blind rule---but not the augmented collective coupling rule, and it makes no claim of
+spectral optimality. On the
 \emph{runtime} side, the operational activation audit establishes
 that the coupling stage is inactive on the hydrothermal instances and that the exported
 transformation coincides with the local-only rule; the operational effect therefore comes
@@ -4192,9 +4208,10 @@ coverage---every generated row traced to its module or to the coupling set---so 
 difference is, by \cref{prop:attribution}, attributable to the coupling treatment alone. The
 synthetic side of this is already encouraging: on blocks placed at heterogeneous scales the
 matrix-only structure-aware rule buys an order of magnitude of conditioning over a kernel-matched
-role-blind rule (\cref{subsec:spectral-audit}), so the mechanism is real; what remains is to
-connect that conditioning gain to runtime and to build an operational testbed whose coupling rows
-enter the same regime, which the present one---with its near-unity balance rows---does not. For deployment in the meantime the safe rule keeps the structure-aware order but
+role-blind rule (\cref{subsec:spectral-audit}), so the experiment demonstrates that the mechanism
+can produce a material conditioning gain in a controlled heterogeneous-block regime; what remains
+is to connect that conditioning gain to runtime and to build an operational testbed whose coupling
+rows enter the same regime, which the present one---with its near-unity balance rows---does not. For deployment in the meantime the safe rule keeps the structure-aware order but
 guarantees coverage: sweep every row with the coefficient-only kernel, applying it only where a
 row is poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
 original-scale verification. This coverage-safeguarded matrix-only rule is the variant we would
