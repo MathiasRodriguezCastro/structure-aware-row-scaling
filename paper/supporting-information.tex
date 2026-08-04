@@ -1,5 +1,5 @@
 % Supporting Information for
-% "Coverage versus Selectivity in Pre-Export Row Scaling for Generated Mixed-Integer Programs"
+% "When Does Generator Metadata Help? A Controlled Study of Structure-Aware Row Scaling for Generated Mixed-Integer Programs"
 % Build: xelatex supporting-information (or pdflatex; no Wiley class needed)
 \documentclass[11pt]{article}
 \usepackage[a4paper,margin=2.5cm]{geometry}
@@ -37,7 +37,7 @@
 
 \begin{center}
 {\large\bfseries Supporting Information}\\[0.5em]
-\emph{Coverage versus Selectivity in Pre-Export Row Scaling for Generated Mixed-Integer Programs}\\[0.3em]
+\emph{When Does Generator Metadata Help? A Controlled Study of Structure-Aware Row Scaling for Generated Mixed-Integer Programs}\\[0.3em]
 Mathias Rodr\'iguez Castro
 \end{center}
 
@@ -60,7 +60,10 @@ reliability audit (Table~S9); and (xii) the multiplicity, operational-family, bo
 preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities for that
 direct comparison (Table~S10); (xiii) its per-contrast attrition and cached-metadata endpoint on both builds (Table~S11); and
 (xiv) the measurement environment, build comparison and cross-environment transfer-factor
-sensitivity (Table~S12).
+sensitivity (Table~S12); and (xv) the full traceability of the kernel-matched metadata grid---
+the block-heterogeneous family, its per-block scale distribution, the seeds, the per-variant
+$\kappa_2^{+}$ distribution on the headline cell, and the reproduction command (Section~S3,
+Table~S13).
 
 \section*{Section S1. Proofs of the spectral propositions}
 \noindent These are the full proofs of the two propositions stated in Section~3 of the
@@ -1273,6 +1276,66 @@ other way (median $1.0861$, HL $1.0977$, $p=0.34$). The three double timeouts en
 operational ties (exact zeros).
 \normalsize
 
+
+\section*{Section S3. Traceability of the kernel-matched metadata grid}
+\noindent This section documents the experiment behind the kernel-matched metadata grid of the
+main text (the comparison of the matrix-only structure-aware rule \methodMat{} against a
+same-kernel role-blind control), so the paper's central positive finding is fully reproducible.
+
+\paragraph{Instance family.} Every cell uses the block-heterogeneous coefficient family on
+$B=4$ blocks, each with $6$ continuous and $2$ binary variables, $8$ local rows and $3$ coupling
+rows. Block $i$ ($1$-indexed) carries a base magnitude $10^{e_i}$ with the exponents spread
+uniformly over $[-R,R]$, $e_i=-R+2R\,(i-1)/(B-1)$, so that equal absolute coefficients denote
+different physical scales across blocks. The block-scale range $R$ is the row variable of the
+grid and is set through the \texttt{SYNTH\_BLOCK\_RANGE} environment variable (default $2$, which
+reproduces the original block-heterogeneous set byte-for-byte). At $R=2$ the four block magnitudes
+are $10^{-2},10^{-2/3},10^{2/3},10^{2}$; at $R=3$ they are $10^{-3},10^{-1},10^{1},10^{3}$. The
+coupling disturbance of severity $S$ is applied on top of this, as in the main synthetic grid.
+
+\paragraph{Seeds and variants.} Each cell draws $30$ instances from consecutive seeds starting at
+$20250803$. The variants are Base, the matrix-only structure-aware rule \methodMat{}, and its
+kernel-matched role-blind control Flat-Mat (the flat rule run with the coefficient-only kernel,
+added to the synthetic runner for this test); \methodAug{}, Flat and Ruiz are included on the
+headline cell for reference. The exported constraint matrix of every variant is read back and
+decomposed with \texttt{scripts/spectral\_audit.py}, and the reported statistic is the paired
+ratio $\kappa_2^{+}(\methodMat{})/\kappa_2^{+}(\text{Flat-Mat})$; because the two rules share both
+kernel and coverage, the ratio isolates the block metadata.
+
+\paragraph{Headline cell.} Table~S13 gives the per-variant $\kappa_2^{+}$ distribution on the
+headline cell (coupling pattern, $R=2$, $S=6$, $30$ seeds). The matrix-only structure-aware rule
+is lower than its role-blind twin on all $30$ instances; the homogeneous control is the $[-1,1]$
+row of the metadata grid in the main text, where the two coincide within noise.
+
+\begin{table}[htbp]
+\caption{Per-variant $\kappa_2^{+}$ on the headline cell of the kernel-matched grid (coupling
+pattern, block-scale range $[-2,2]$, $S=6$, $30$ seeds): median, interquartile range, and full
+range. The paired \methodMat{}/Flat-Mat ratio has median $0.098$ ($30/30$ instances, Wilcoxon
+$p=1.9\times10^{-9}$).}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Variant & Median $\kappa_2^{+}$ & IQR & Range \\
+\midrule
+Base       & $5.3\times10^{8}$ & $[2.4\times10^{7},\,3.2\times10^{9}]$  & $[4.2\times10^{5},\,2.2\times10^{11}]$ \\
+\methodMat{} & $1.3\times10^{3}$ & $[1.2\times10^{3},\,1.7\times10^{3}]$  & $[8.7\times10^{2},\,1.7\times10^{4}]$ \\
+Flat-Mat   & $1.4\times10^{4}$ & $[1.1\times10^{4},\,1.9\times10^{4}]$  & $[6.2\times10^{3},\,2.1\times10^{5}]$ \\
+\methodAug{} & $2.1\times10^{5}$ & $[4.3\times10^{4},\,6.1\times10^{5}]$  & $[1.2\times10^{4},\,1.1\times10^{7}]$ \\
+Flat       & $2.4\times10^{4}$ & $[1.8\times10^{4},\,3.1\times10^{4}]$  & $[8.5\times10^{3},\,3.4\times10^{5}]$ \\
+Ruiz       & $3.9\times10^{5}$ & $[8.3\times10^{4},\,9.2\times10^{5}]$  & $[2.6\times10^{4},\,1.3\times10^{7}]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Reproduction.} The full $18$-cell sweep and the per-instance $\kappa_2^{+}$ values are
+archived under \texttt{results-revision/spectral-heterogeneous/} (\texttt{metadata\_grid.csv} for
+the sweep, \texttt{coupling\_blockhet\_spectral.csv} for the headline cell). One cell is produced
+by setting \texttt{SYNTH\_BLOCK\_RANGE=2} and piping to the solver the command
+\texttt{benchmarkSintetico -{}-coef-family block\_heterogeneous -{}-volcar-lp <dir>} followed by
+the parameter lines \texttt{DummyLp}, seed \texttt{20250803}, $30$ instances, $4$ blocks,
+\texttt{6 2}, \texttt{8 3}, pattern \texttt{coupling}, severity \texttt{6}, variant list
+\texttt{Base,SA-Aug,SA-Mat,Flat,Flat-Mat,Ruiz}, and an output path; then
+\texttt{scripts/spectral\_audit.py -{}-lp-dir <dir>} reads the exported matrices. The whole grid
+is driven by \texttt{scripts/synth\_metadata\_grid.py}.
 
 \section{Algorithmic summary of the augmented rule}
 \label{si:algorithm}
