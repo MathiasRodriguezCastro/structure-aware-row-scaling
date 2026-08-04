@@ -988,16 +988,12 @@ The scaled row is
 \alpha_r^{A,b}a_r^\top x\le \alpha_r^{A,b}b_r.
 \end{equation}
 
-The augmented rule is specified as a three-stage structure-aware procedure that first rescales
-local rows, then summarizes the resulting local block scales, and finally uses those block
-scales to treat coupling rows separately. The second stage is a diagnosis rather than a
-transformation: the block scales are never applied to the blocks, and enter only the coupling
-proxy. On the operational classes the third stage is inert as well---the activation audit of
-\cref{subsec:stage-attribution} records zero activations and byte-identical full and local-only
-exports on every eligible pair---so what the solver actually receives there is a row-by-row
-normalization restricted to the role-selected local rows. The coupling stage activates only on
-the oversized synthetic coupling patterns of \cref{subsec:synthetic-results}, and its operational
-contribution is therefore untested.
+The rule is a three-stage procedure: rescale local rows, summarize the resulting block scales
+(a diagnosis---the scales are never applied to the blocks, only to the coupling proxy), and scale
+coupling rows against those block scales. On the operational classes the third stage is inert
+(\cref{subsec:stage-attribution} records zero activations), so the solver there receives a
+row-by-row normalization of the role-selected local rows; the coupling stage activates only on the
+oversized synthetic patterns of \cref{subsec:synthetic-results}.
 After local scaling, let $\widetilde a_{rj}=d_r\,a_{rj}$ for local rows, where $d_r$ is the
 factor \emph{actually applied}---$d_r=\alpha_r^{A,b}$ when the candidate factor
 $\alpha_r^{A,b}=1/\sqrt{M_r^{A,b}m_r^{A,b}}$ passes the safeguards of
@@ -1064,47 +1060,20 @@ post-local-normalization coefficient spread of block $i$,
 \bar M=\max_i\sqrt{\kappa_i},\qquad \bar m=\min_i\tfrac{1}{\sqrt{\kappa_i}}.
 \label{eq:augmented-diagonal-spread}
 \end{equation}
-These are the proxy extrema each block \emph{would} present if it were virtually expressed
-relative to its representative scale $s_i^{A,b}$: dividing block $i$'s coefficients by
-$s_i^{A,b}=\sqrt{M_i^{A,b}m_i^{A,b}}$ maps its extremes $M_i^{A,b},m_i^{A,b}$ to
-$\sqrt{\kappa_i},1/\sqrt{\kappa_i}$. This normalization is virtual---the algorithm does not
-apply $1/s_i^{A,b}$ to the blocks---and enters only the conditioning surrogate for the
-diagonal factor $\widetilde D$; the block scales $s_i^{A,b}$ themselves are used only in the
-coupling proxy $\widehat\rho_r$ of \cref{eq:augmented-coupling-rho}.
-The minimizer is found on the fixed logarithmic grid
-$\gamma=10^{k/10}$, $k=-60,\ldots,60$ ($121$ log-uniform points spanning
-$[10^{-6},10^{6}]$). The stage is skipped as a whole when the effective coupling is
-declared moderate, using the same threshold $\rho\le 10$ in every experiment (this is a
-per-instance test---on the operational classes it holds throughout, whereas on the
-synthetic coupling patterns it fails for the oversized instances, which is precisely where
-the stage activates)---or when the minimizer falls inside the
-near-identity band $(1/u,u)=(0.5,2)$ of the safeguards. After these block-level tests,
-each coupling row is additionally subject to the per-row coefficient-window and
-reliability-floor safeguards of \cref{subsec:safeguards}, which may veto the factor on
-individual rows; the final transformation is therefore a row-selective diagonal scaling
-with entries in $\{1,\gamma^{A,b}\}$, not necessarily a uniform scaling of the whole
-coupling block. Since $\rho=\max_r\widehat\rho_r$ is taken over all coupling rows, the row
-that determines $\gamma^{A,b}$ may itself be vetoed by the floor, so $\gamma^{A,b}$ is a
-\emph{single-pass candidate} rather than the minimizer of the surrogate for the final
-exported transformation; a fixed-point refinement that re-stabilizes the admissible set is a
-natural improvement we did not pursue, the stage being inactive on all operational classes.
-The grid search resolves explicitly the trade-off
-exposed by \cref{eq:scaled-balance-factorization}: decreasing $\gamma$ improves the
-triangular factor but degrades the diagonal one. In the ideal spectral reading
-($\rho=\norm{LD^{-1}}_2$ and $\kappa_B$ from the singular values of $\widetilde D$),
-submultiplicativity of $\kappa_2$ over that factorization gives $\kappa_2$ of the scaled
-balance block at most $\kappa_T(\gamma\rho)\,\kappa_B(\gamma)=\Phi(\gamma)$, so minimizing
-$\Phi$ minimizes this ideal-scale bound; on the exported rectangular matrices $\Phi$ is
-evaluated from cheap coefficient proxies as a surrogate, no formal bound to the true
-$\kappa_2$ is claimed (\cref{subsec:ideal-to-proxies}), and when the per-row safeguards
-veto the factor on some rows the factorization-based surrogate motivates the
-\emph{candidate} but does not describe the exported, row-selective transformation. The released implementation evaluates
-these proxies from coefficient summaries of the generated model; the exact evaluation order is
-documented in the reproducibility repository.
-This sequence is the
-main structural feature of the proposed method: local physical scales are used first,
-block scales are estimated after local normalization, and global coupling rows are scaled
-only after the blocks they connect have been put on comparable numerical footing.
+Here $\kappa_i=M_i^{A,b}/m_i^{A,b}$ is block $i$'s post-normalization coefficient spread, and
+$\bar M,\bar m$ are the extrema each block would present under a \emph{virtual} normalization by
+$s_i^{A,b}$ that enters only the diagonal surrogate---the blocks themselves are never scaled.
+Minimizing $\Phi$ over a fixed logarithmic grid ($121$ points in $[10^{-6},10^{6}]$) resolves the
+trade-off of \cref{eq:scaled-balance-factorization}: a smaller $\gamma$ improves the triangular
+coupling factor and worsens the diagonal one, and by submultiplicativity $\Phi$ bounds the
+ideal-scale $\kappa_2$ of the balance block; on the exported rectangular matrices it is only a
+coefficient-proxy surrogate, with no formal bound claimed (\cref{subsec:ideal-to-proxies}). The
+stage is skipped when the coupling is moderate ($\rho\le 10$, a per-instance test that holds
+throughout the operational classes) or when $\gamma^{A,b}$ lies in the near-identity band
+$(0.5,2)$; surviving coupling rows are subject to the per-row safeguards of
+\cref{subsec:safeguards}, so the exported map has entries in $\{1,\gamma^{A,b}\}$ and, since
+$\rho=\max_r\widehat\rho_r$ may be set by a row the floor later vetoes, $\gamma^{A,b}$ is a
+single-pass candidate rather than the minimizer for the final matrix.
 
 \subsection{Matrix-only structure-aware scaling}
 \label{subsec:strategy-2}
@@ -2434,43 +2403,8 @@ consistently across classes, tolerances and solvers---\methodAug{} leads Full he
 right-hand-side evidence is the local-only ablation pair of \cref{subsec:stage-attribution},
 whose members differ only in whether $b$ enters the per-row extremes.
 
-\begin{table*}[t]
-\centering
-\footnotesize
-\caption{At $0.1\%$ MIPGap, completed-run Gurobi efficiency metrics retain the same
-descriptive pattern; fixed-pool \PARten{} is reported in \cref{tab:par10-readings}.}
-\label{tab:robust-gurobi-01pct-mipgap}
-\begin{tabular}{@{}ll S[table-format=3.0] S[table-format=3.2] S[table-format=1.2] S[table-format=1.3] @{}}
-\toprule
-Class & Variant & {$n$} & {$\sgm T$} & {med. sp.$^{\det}$} & {\AvgGap{}} \\
-\midrule
-Simple & \methodBase & 195 & 8.28 & 1.00 & \textbf{0.176} \\
- & \methodAug & 195 & 5.65 & \textbf{1.11} & 0.180 \\
- & \methodMat & 198 & \textbf{5.44} & 1.10 & 0.182 \\
- & \methodRuiz & 199 & 14.12 & 0.88 & 0.261 \\
- & \methodRuizCols & 195 & 12.55 & 1.02 & 0.199 \\
-\addlinespace
-Full & \methodBase & 31 & 305.30 & 1.00 & 0.027 \\
- & \methodAug & 30 & \textbf{226.90} & 1.26 & 0.028 \\
- & \methodMat & 31 & 306.39 & 1.12 & 0.025 \\
- & \methodRuiz & 30 & 341.56 & 0.87 & 0.027 \\
- & \methodRuizCols & 31 & 267.10 & \textbf{1.62} & \textbf{0.022} \\
-\addlinespace
-SG-Ter-Mer & \methodBase & 62 & 14.49 & 1.00 & 0.642 \\
- & \methodAug & 63 & 8.99 & 1.32 & 0.473 \\
- & \methodMat & 65 & \textbf{7.97} & \textbf{1.35} & \textbf{0.439} \\
- & \methodRuiz & 65 & 14.27 & 1.05 & 0.633 \\
- & \methodRuizCols & 62 & 19.16 & 0.78 & 0.625 \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-\emph{Notes.} Bold values mark the best descriptive value within each class and metric;
-lower is better for $\sgm T$ and \AvgGap{}, whereas higher is better for med.
-sp.$^{\det}$. \AvgGap{} is complementary to time and has no direct duration penalty.
-\end{flushleft}
-\end{table*}
-
-\noindent \noindent \Cref{tab:robust-gurobi-01pct-mipgap} shows that the same descriptive completed-run
+\noindent The $0.1\%$-MIPGap completed-run efficiency metrics are reported as Table~S14 in the
+Supporting Information; they show that the same descriptive completed-run
 ordering largely recurs under the stricter tolerance, the exception being Full, where
 \methodMat{} loses its edge over the base and \methodRuizCols{} takes the best median
 deterministic speedup. Because each cell is a single run and the two tolerances admit different
@@ -2720,43 +2654,8 @@ fixed-pool profile views.
 
 \smallskip\noindent\textbf{The stricter $0.1\%$ tolerance.} This reinforces the cross-pipeline contrast and makes the negative CPLEX runtime conclusion clearer. The structured variants remain at or near parity in deterministic effort, and the clearest descriptive improvement in shifted geometric solver time comes from Ruiz rather than from the proposed structure-aware rules; the matrix-only rule does lower the shifted geometric time on Full (from $421.6$ to $370.5$\,s), but this is descriptive only, as the paired test on that class is not significant ($p=0.21$). This is a useful negative result: external scaling may improve some numerical diagnostics without becoming a robust runtime accelerator for CPLEX in this environment.
 
-\begin{table*}[t]
-\centering
-\footnotesize
-\caption{At $0.1\%$ MIPGap, CPLEX remains close to parity for the structure-aware variants, reinforcing the contrast with the Gurobi results in the tested pipelines.}
-\label{tab:robust-cplex-01pct-mipgap}
-\begin{tabular}{@{}ll S[table-format=3.0] S[table-format=3.2] S[table-format=1.2] r @{}}
-\toprule
-Class & Variant & {$n$} & {$\sgm T$} & {med. sp.$^{\det}$} & {\AvgGap{}} \\
-\midrule
-Simple & \methodBase & 204 & 5.14 & 1.00 & $1.2\times10^{-12}$ \\
- & \methodAug & 204 & 4.20 & 1.02 & $6.5\times10^{-13}$ \\
- & \methodMat & 204 & 4.48 & 1.01 & $5.6\times10^{-13}$ \\
- & \methodRuiz & 204 & \textbf{4.13} & 1.00 & $\mathbf{1.0\times10^{-15}}$ \\
- & \methodRuizCols & 204 & 5.28 & 0.94 & $7.7\times10^{-13}$ \\
-\addlinespace
-Full & \methodBase & 33 & 421.59 & 1.00 & $2.7\times10^{-8}$ \\
- & \methodAug & 34 & 422.62 & 1.07 & $2.7\times10^{-8}$ \\
- & \methodMat & 33 & 370.45 & 1.05 & $2.3\times10^{-8}$ \\
- & \methodRuiz & 34 & \textbf{285.10} & \textbf{1.28} & $\mathbf{1.9\times10^{-8}}$ \\
- & \methodRuizCols & 33 & 377.41 & 0.96 & $5.2\times10^{-8}$ \\
-\addlinespace
-SG-Ter-Mer & \methodBase & 68 & 2.82 & 1.00 & $1.1\times10^{-10}$ \\
- & \methodAug & 68 & 2.84 & 1.01 & $\mathbf{1.0\times10^{-10}}$ \\
- & \methodMat & 68 & 2.84 & 1.00 & $1.1\times10^{-10}$ \\
- & \methodRuiz & 68 & \textbf{2.61} & \textbf{1.02} & $1.1\times10^{-10}$ \\
- & \methodRuizCols & 68 & 4.02 & 0.85 & $1.3\times10^{-10}$ \\
-\bottomrule
-\end{tabular}
-\begin{flushleft}\footnotesize
-\emph{Notes.} Bold values mark the best descriptive value within each class and metric.
-Under CPLEX, these descriptive minima do not imply a robust positive external-scaling
-effect. \AvgGap{} is the dimensionless callback-horizon average in
-\cref{eq:time-averaged-gap} and does not itself penalize duration.
-\end{flushleft}
-\end{table*}
-
-\noindent \Cref{tab:robust-cplex-01pct-mipgap} reports the cells; the corresponding
+\noindent The $0.1\%$-MIPGap CPLEX cells are reported as Table~S15 in the Supporting
+Information; the corresponding
 distributional and profile views (Figure~S4, Supporting Information) remain mixed under the
 stricter tolerance, reinforcing the observed cross-pipeline contrast.
 
@@ -3353,65 +3252,31 @@ small \emph{absolute} descriptive residual---typically tens to hundreds of micro
 cached ratio still reaches $1.15$--$1.19$. These are descriptive counts, not a family-level
 significance statement.
 
-Because that reconstruction is precisely what the proposed architecture assumes away, we
-recompute the whole paired comparison on the cached-metadata endpoint
-$T_{\mathrm{pre+solve}}^{\mathrm{cached}}
-=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$
-(\cref{tab:flat-cached}). This is a \emph{cross-protocol counterfactual}: it combines
-preprocessing medians measured on the pinned workstation with solver times from the ClusterUY
-batches, so it does not represent an observed single-machine pipeline, and its absolute ratios
-depend on the relative speed of the two environments. We therefore treat this endpoint as
-descriptive and draw no independent inference from it, for a reason that does not depend on the
-splice: the cached preprocessing term is of order one to two milliseconds against solver times
-of seconds, so scaling it cannot change the paired ranks, and the endpoint reduces numerically
-to capped solver time (\cref{tab:flat-control}). The one contrast that clears every adjustment
-on it---the augmented Simple contrast at $0.1\%$ ($q_{6}=0.010$, $q_{12}=0.021$,
-$q_{12}^{\mathrm{blk}}=0.031$, median about $0.9\%$)---is therefore not a separate finding but
-the same capped-solver-time contrast already reported in \cref{tab:flat-control}; on the cached
-endpoint six of the eight fast-class contrasts keep the direction favoring the role-blind rule
-and only that one remains below $0.05$. It indicates a systematic directional
-difference in this campaign, not a large operational speedup. The augmented SG-Ter-Mer
-contrasts fall to $q_{6}=0.115$ and $0.051$, and every coefficient-only fast-class contrast
-to $q_{6}\ge0.115$. The directional reversals occur in SG-Ter-Mer coefficient-only at $1\%$
-and Simple coefficient-only at $0.1\%$; the other six continue to point toward the role-blind
-rule.
+Because that reconstruction is what the proposed architecture assumes away, we also recompute
+the paired comparison on a cached-metadata endpoint $T_{\mathrm{pre+solve}}^{\mathrm{cached}}
+=T_{\mathrm{diagnosis}}+T_{\mathrm{application}}+T_{\mathrm{solver}}$ (\cref{tab:flat-cached}).
+This is a cross-protocol counterfactual---workstation preprocessing spliced with cluster solver
+times---and we treat it as descriptive only: the cached preprocessing term is one to two
+milliseconds against solver times of seconds, so it cannot change the paired ranks and the
+endpoint reduces numerically to capped solver time. Its one adjusted-significant contrast (the
+augmented Simple contrast at $0.1\%$, median about $0.9\%$) is the same one already reported in
+\cref{tab:flat-control}, and six of the eight fast-class contrasts keep the direction favoring
+the role-blind rule.
 
-The build matters here, and measurably. Our campaigns were compiled without
-optimization---the executable used in the original solver campaigns was compiled with the same
-\texttt{-std=c++17 -g} flags as the instrumented diagnostic build---so we repeated the pinned microbenchmark with a release build
-($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$) and take it as the implementation-cost sensitivity of
-record. Optimization shrinks every preprocessing time about sixfold and leaves the prototype preprocessing-call
-ratio essentially unchanged ($5.4$--$6.1\times$ against $5.1$--$6.0\times$), but it moves the
-cached ratios towards parity, and enough to change one conclusion: under the diagnostic build
-the coefficient-only Simple contrast at $1\%$ had $q_{6}=0.0002$, whereas under the release
-build it falls to $q_{6}=0.115$. Splicing release preprocessing onto diagnostic-build solver times is only legitimate if
-optimization changes the \emph{cost} of preprocessing without changing the transformation it
-produces, so we verified that directly over every available record: exporting the preprocessed
-model with both builds for all $306$ instances, both kernels and both coverage policies gives
-$1204$ byte-identical exports out of $1224$
-(\texttt{scripts/build\_invariance\_audit.py}). Every Simple and SG-Ter-Mer record is
-byte-identical across builds. These are the two fast classes underlying the eight cached
-contrasts summarized in the abstract and the only retained adjusted result; for them the build
-change affects preprocessing time but not the exported model, so the comparison is a clean
-cost substitution. The $20$ exceptions are five Full instances (029, 035, 045, 047, 048), each
-differing under all four variants. The differing entries are the nonlinear-hydro linearization
-coefficients, and they differ by one unit in the last place ($4.7\times10^{-16}$ relative, in
-$720$ of $47{,}173$ coefficients on a representative instance); the audit therefore localizes
-the discrepancy to optimization-dependent floating-point evaluation during model construction
-rather than to a change in the selected scaling factors or safeguard decisions. Two of the
-five (029, 035) fall inside the analysed Full pools, so the Full cached rows recombine a
-release preprocessing time with a solver time recorded on a model that differs at the last
-bit. This build comparison provides one observed
-policy-specific
-\emph{toolchain} perturbation rather than a direct estimate of the workstation-to-ClusterUY
-transfer ratio: the implied ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ remains in
-$[0.94,1.01]$ across the six class--kernel cells, suggesting limited asymmetry under this
-particular compiler change, while the cross-environment transfer asymmetry itself remains unmeasured.
-
-Since the cached endpoint reduces to capped solver time, we do not stress-test it with
-transfer-factor grids; the earlier body versions of that sensitivity are withdrawn with the
-inference they supported, and the raw contrast-by-grid values remain in the reproducibility
-package (\texttt{cached\_transfer\_sensitivity.csv}) for readers who want them.
+The build matters, and measurably. The campaigns were compiled without optimization, so we
+repeated the pinned microbenchmark with a release build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$) and
+take it as the implementation-cost sensitivity of record: optimization shrinks every
+preprocessing time about sixfold, leaves the prototype's preprocessing-call ratio essentially
+unchanged, and moves the cached ratios toward parity---enough to change one conclusion (the
+coefficient-only Simple contrast at $1\%$ goes from $q_{6}=0.0002$ to $0.115$). Splicing release
+preprocessing onto diagnostic-build solver times is legitimate only if optimization changes the
+\emph{cost} of preprocessing but not its output, which we verified: $1204$ of $1224$ exports are
+byte-identical across builds (\texttt{scripts/build\_invariance\_audit.py}), every Simple and
+SG-Ter-Mer record among them; the $20$ exceptions are last-place floating-point differences
+($4.7\times10^{-16}$ relative) in the nonlinear-hydro coefficients of five Full instances---
+optimization-dependent model construction, not a change in the selected factors. Since the cached
+endpoint reduces to capped solver time we do not stress-test it with transfer-factor grids; those
+raw values remain in the reproducibility package.
 
 The absolute magnitudes matter for how much this is worth
 (\cref{tab:flat-absolute}). In Simple the median paired preprocessing-plus-solver margin is
@@ -3749,27 +3614,18 @@ $(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$ \\
 \end{tabular}
 \end{table}
 
-Because the reliability-adjusted audit changes conclusions, its central numbers belong in
-the body (\cref{tab:flat-reliability-body}). In Simple, Flat-Aug wins
-intent-to-treat \PARten{} ($30$ versus $212$\,s, driven by one SA-side timeout), but it also
-fails the strict original-scale criterion on more completed runs ($25$ versus $22$; $22$
-versus $18$ under the mixed reading), so both reliability-adjusted readings reverse the
-aggregate ordering toward SA-Aug. In SG-Ter-Mer neither policy has a mixed failure and
-Flat-Aug retains a small descriptive advantage under all three readings. In Full the
-selective rule's paired preprocessing-plus-solver advantage does not persist in the aggregate readings:
-SA-Aug is slightly ahead under intent-to-treat, but the mixed reading favors Flat-Aug
-($5109$ versus $6342$\,s, one rescued failure), a further reason not to read the Full
-direction as established. For the four Matrix-only Simple and SG-Ter-Mer contrasts whose
-preprocessing-plus-solver ordering has adjusted values below $0.05$, the strict and mixed
-common-pool \PARten{} readings do \emph{not} materially change the ordering. The two
-policies record identical failure counts in each of those cells ($19/18$ in Simple at
-$1\%$, $30/26$ at $0.1\%$, and $1/0$ in SG-Ter-Mer at both tolerances). The directly
-recomputed strict and mixed values also differ by at most a few seconds---in Simple,
-$3355.1/3178.7$ (SA) against $3355.1/3178.6$ (Flat) at $1\%$ and $5491.9/4787.2$ against
-$5492.1/4787.4$ at $0.1\%$; in SG-Ter-Mer, $1083.7/555.0$ against $1080.8/551.6$ at $1\%$
-and $1085.6/556.5$ against $1082.0/552.8$ at $0.1\%$---and no reversal of the kind seen
-in Simple-Augmented occurs; the full audit is Table~S9. No reversal here is a paired
-test; all use the fixed-pool aggregate convention of \cref{tab:par10-readings}.
+Because the reliability-adjusted audit changes conclusions, its central numbers stay in the
+body (\cref{tab:flat-reliability-body}). In Simple, Flat-Aug wins intent-to-treat \PARten{}
+($30$ versus $212$\,s, driven by one SA-side timeout) but fails the strict original-scale
+criterion on more completed runs, so both reliability-adjusted readings reverse the aggregate
+toward SA-Aug. In SG-Ter-Mer neither policy has a mixed failure and Flat-Aug keeps a small
+descriptive edge; in Full the selective rule's paired advantage does not persist (the mixed
+reading favors Flat-Aug), a further reason not to read the Full direction as established. For
+the four matrix-only fast-class contrasts whose preprocessing-plus-solver ordering is
+adjusted-significant, the strict and mixed \PARten{} readings change no ordering---identical
+failure counts and values within a few seconds---so no Simple-Augmented-style reversal occurs;
+the full twelve-contrast audit is Table~S9, under the fixed-pool convention of
+\cref{tab:par10-readings}.
 
 \subsubsection*{Restoring exhaustive coverage}
 By \cref{prop:attribution}, the metadata can only show up on the coupling rows, and only once
