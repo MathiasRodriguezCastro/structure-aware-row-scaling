@@ -110,6 +110,15 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.permutarBloques           = true;
         return true;
     }
+    if (nombre == "Local-GM-Coupling-L2") {    // Control de una sola variable: kernel local, cobertura y
+        cfg.escalamientoLocalPorFila  = true;  //   salvaguardas EXACTAS de SA-Pre, pero el proxy de
+        cfg.normalizarBloqueTrasFilas = true;  //   acoplamiento usa γ_r=1/||a_r||_2 (sin s_i ni β).
+        cfg.usarEquilibradoRuiz       = false; //   Aisla si la maquinaria block-relative aporta algo
+        cfg.modoMatricial             = true;  //   SOBRE el euclideo ciego (varia SOLO el acoplamiento).
+        cfg.escalaBloquePrevia        = true;
+        cfg.acoplamientoCiegoL2       = true;
+        return true;
+    }
     // Sensibilidad del piso de confiabilidad del γ colectivo: "SA-Aug-floor<val>" corre
     // SA-Aug con pisoMagnitudGammaColectivo = <val> ("SA-Aug-floor0" = piso deshabilitado).
     // Solo para el benchmark sintético (la campaña de sensibilidad usa seeds independientes).
