@@ -1306,11 +1306,16 @@ headline cell (coupling pattern, $R=2$, $S=6$, $30$ seeds). The matrix-only stru
 is lower than its role-blind twin on all $30$ instances; the homogeneous control is the $[-1,1]$
 row of the metadata grid in the main text, where the two coincide within noise.
 
+% The transfer-factor audits above are presented as ``Table S12'' by a manual heading
+% (they are typeset as panels, not as a float), so the table counter---which only counts
+% real environments---is one short here; bump it so this genuine float is numbered S13.
+\addtocounter{table}{1}
 \begin{table}[htbp]
 \caption{Per-variant $\kappa_2^{+}$ on the headline cell of the kernel-matched grid (coupling
 pattern, block-scale range $[-2,2]$, $S=6$, $30$ seeds): median, interquartile range, and full
 range. The paired \methodMat{}/Flat-Mat ratio has median $0.098$ ($30/30$ instances, Wilcoxon
 $p=1.9\times10^{-9}$).}
+\label{tab:si-metadata-headline}
 \centering
 \begin{tabular}{lccc}
 \toprule
@@ -1372,31 +1377,31 @@ removes the confound that non-exhaustive map introduced.
 \EndFor
 \State Compute the locally scaled coefficients $\widetilde a_{rj}=d_r a_{rj}$
 \State Compute block scales $s_i^{A}=\sqrt{M_i^{A}m_i^{A}}$ from the block coefficient extremes
-\State Compute $\widehat\rho_r^{A}$ for every coupling row (its coefficients against the incident block scales $s_i^{A}$); set $\rho\gets\max_r\widehat\rho_r^{A}$
-\If{$\rho$ exceeds the coupling threshold}
-  \State Set $\gamma^{A}\gets\argmin_{\gamma}\Phi(\gamma)$ over the logarithmic grid $\gamma\in[10^{-6},10^{6}]$; clip $\gamma^{A}$ to $[10^{-8},10^{8}]$
-  \If{$\gamma^{A}$ lies outside the near-identity band}
-    \For{each coupling row $r$}
-      \If{$\gamma^{A}$ keeps row $r$ inside the coefficient window \textbf{and} above the reliability floor}
-        \State Update $d_r\gets d_r\gamma^{A}$
-      \EndIf
-    \EndFor
+\For{each coupling row $r\in\mathcal{R}_{\mathrm{cpl}}$} \Comment{per-row coupling factor (Section~4.3)}
+  \State Compute the coupling proxy $\widehat\rho_r^{A}=\bigl(\sum_j(\lvert a_{rj}\rvert/s_{\beta(j)}^{A})^2\bigr)^{1/2}$
+  \If{$\widehat\rho_r^{A}>0$}
+    \State Set $\gamma_r^{A}\gets 1/\widehat\rho_r^{A}$; clip $\gamma_r^{A}$ to $[10^{-8},10^{8}]$
+    \If{$\gamma_r^{A}$ lies outside the near-identity band \textbf{and} passes the coefficient-window and reliability safeguards}
+      \State Update $d_r\gets d_r\gamma_r^{A}$
+    \EndIf
   \EndIf
-\EndIf
+\EndFor
 \State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
 \end{algorithmic}
 \end{algorithm}
 
-\paragraph{Augmented exploratory variant (SA-Aug).} The augmented rule of the comparison is
-obtained from Algorithm~\ref{alg:matrix-scaling} by a single change: the per-row set
-$\mathcal{S}_r^{A}$ and the block extremes $M_i,m_i$ are formed from the nonzero coefficients
-\emph{and} the nonzero right-hand side, i.e.\ their $A,b$ counterparts (Eqs.~(16), (20), (22) of
-the main text), with an optional local reliability floor $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$
-gating the local update. Folding $|b_r|$ into the extremes is what distinguishes SA-Aug; it is the
-variant that, under the strict absolute criterion, carries the additional documented original-scale
-reliability failure mode on zero-right-hand-side balance rows, and it obtains no spectral advantage
-over its role-blind control. We therefore report it as exploratory and recommend the matrix-only
-rule above.
+\paragraph{Augmented exploratory variant (SA-Aug).} The augmented rule of the comparison differs
+from Algorithm~\ref{alg:matrix-scaling} in two independent ways, not one. First, the per-row set
+$\mathcal{S}_r$ and the block extremes $M_i,m_i$ fold in the nonzero right-hand side as well as the
+coefficients (their $A,b$ counterparts, Eqs.~(16), (20), (22) of the main text), and an optional
+local reliability floor $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ may gate the local update.
+Second, and independently, the per-row coupling factors $\gamma_r^{A}=1/\widehat\rho_r^{A}$ are
+replaced by a single \emph{collective} factor $\gamma^{A,b}=\argmin_{\gamma}\Phi(\gamma)$ chosen by
+grid search over $\gamma\in[10^{-6},10^{6}]$ and applied to every coupling row whose proxy exceeds
+the threshold. Folding $|b_r|$ into the extremes is what carries the additional documented
+original-scale reliability failure mode on zero-right-hand-side balance rows; the collective
+coupling factor is the coarser treatment that obtains no spectral advantage over its role-blind
+control. We therefore report SA-Aug as exploratory and recommend the matrix-only rule above.
 
 
 \end{document}

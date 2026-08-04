@@ -266,9 +266,11 @@ never exercises the one stage where metadata is structurally decisive. What the 
 establish is cleaner and still useful: row scaling improves the solver-facing diagnostics and
 can improve runtime over the unscaled base; the per-row local kernel, computable from the flat
 matrix, carries essentially all of that effect on these instances; and, by
-\cref{prop:attribution}, wherever coverage is made equal the structure-aware and role-blind
-matrix-only exports are provably---and empirically---identical, so no operational difference can
-be pinned on the metadata. Concretely, the paper contributes: (i) an exhaustive-map formulation
+\cref{prop:attribution}, under equal coverage \emph{and} the inactive coupling stage of the
+operational instances the structure-aware and role-blind matrix-only exports are provably---and
+empirically---identical there, so no operational difference can be pinned on the metadata (once the
+coupling stage activates, as it does on the heterogeneous-block synthetic grid, the two no longer
+coincide). Concretely, the paper contributes: (i) an exhaustive-map formulation
 of the row taxonomy and an attribution principle (\cref{prop:attribution}) that localizes any
 metadata effect to the coupling rows and dictates the coverage-matched comparison the question
 requires; (ii) an algebraically exact, auditable row-scaling layer for generated
@@ -331,7 +333,10 @@ relative to the scaled local blocks, not their raw coefficients. Idealized condi
 results make this reasoning precise and motivate the local--block--coupling order, but they do
 not validate it and do not claim to predict mixed-integer runtime. The direct spectral audit of
 \cref{subsec:spectral-audit} finds that the augmented rule obtains no conditioning advantage
-over applying the same kernel to every row.
+over applying the same kernel to every row. By contrast, the kernel-matched heterogeneous-block
+audit shows that the matrix-only block-relative rule can outperform its role-blind counterpart by
+one to two orders of magnitude in spectral pseudo-conditioning: the spectral evidence is split by
+rule, and it is positive for the recommended matrix-only variant.
 
 We test the method on short-term hydrothermal dispatch, used not as a new formulation but as a
 demanding testbed: it creates local hydro, thermal, market, shortage, and demand modules linked
@@ -4338,7 +4343,7 @@ path and preprocessing methods used in the paper.
 A Supporting Information document accompanies this article. Section~S1 contains the proofs of
 Propositions~1 and~2. Section~S2 contains the supplementary computational results: the
 $0.1\%$-MIPGap Gurobi and CPLEX distributional, diagnostic, and performance-profile views
-(Figures~S1--S4) and twelve tables---hyperparameter sensitivity (Table~S1), the per-variant
+(Figures~S1--S4) and thirteen tables---hyperparameter sensitivity (Table~S1), the per-variant
 reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
 (Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
 paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit
@@ -4347,7 +4352,11 @@ reliability audit (Table~S9); multiplicity, operational-family, bootstrap,
 preprocessing-plus-solver, Work-unit and own-incumbent-diagnostic sensitivities (Table~S10);
 per-contrast attrition and the cached-metadata endpoint on the release and diagnostic builds
 (Table~S11); and the measurement environment, build comparison and cross-environment
-transfer-factor sensitivity (Table~S12).
+transfer-factor sensitivity (Table~S12). Section~S3 documents the kernel-matched metadata grid---
+the block-heterogeneous family, its per-block scale distribution, the seeds, and the per-variant
+$\kappa_2^{+}$ distribution on the headline cell (Table~S13)---and Section~S4 gives the algorithmic
+summary, stating the recommended exhaustive matrix-only rule as Algorithm~S1 and the augmented
+exploratory variant alongside it.
 Additional processed logs and rebuild scripts are available in the reproducibility repository.
 
 % \balance is a two-column last-page balancer; it is a no-op in the single-column
