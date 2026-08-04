@@ -159,9 +159,9 @@ equal coverage \emph{and an inactive coupling stage} the matrix-only policies co
 \cref{prop:attribution} predicts and byte-for-byte confirms on the operational instances. When
 heterogeneous block scales activate the block-relative treatment, however, the same-kernel policies
 no longer coincide: on a controlled heterogeneous-block grid the matrix-only structure-aware rule
-attains an order-of-magnitude lower condition number than a role-blind rule with the \emph{same}
-kernel and coverage ($30/30$ instances, $p<10^{-8}$), demonstrating that the mechanism can produce
-a material conditioning gain. The operational campaigns never enter that regime, where a per-row
+attains an order-of-magnitude lower spectral pseudo-condition number than a role-blind rule with
+the \emph{same} kernel and coverage ($30/30$ instances, $p<10^{-8}$), demonstrating that the
+mechanism can produce a material conditioning gain. The operational campaigns never enter that regime, where a per-row
 local kernel computable from the flat matrix carries the whole effect. Runtime effects are of the
 order of the solver's own
 run-to-run variability---a five-seed replication puts the within-instance noise floor at
@@ -189,17 +189,19 @@ the fastest, so numerical improvement and solver acceleration must be measured s
 \begin{itemize}
   \item Model generators already know each row's role, block, and coupling incidence---metadata a
   flat matrix export discards but that costs nothing to reuse for numerical preprocessing.
-  \item Cover every row: the only case where the metadata-selective rule lagged the role-blind
-  one was an incomplete role map that left a block of constraints unscaled---close that gap and
-  the two coincide. The distinctive coupling stage never fired on any operational instance, so
-  these instances do not test the value of the metadata itself.
+  \item Metadata matters in the appropriate regime: under identical coverage and the same
+  coefficient-only kernel, block-relative scaling reduced the spectral pseudo-condition number by
+  one to two orders of magnitude as the block-scale heterogeneity increased.
+  \item Cover every row: closing the incomplete-role-map gap makes the matrix-only structure-aware
+  and role-blind exports coincide on the operational instances, because their coupling stages
+  remain inactive there---so those instances do not test the value of the metadata itself.
   \item Time preprocessing separately from the solver---on fast instances the preprocessing cost,
   not the numerics, decided which rule looked faster, and the runtime gaps were of the order of
   the solver's own run-to-run variability (a five-seed replication put the noise floor at
   $12$--$18\%$).
-  \item Re-verify every returned solution against the original unscaled constraints---the scaling
-  default we tested degraded that reliability relative to no scaling, concentrated on
-  zero-right-hand-side balance rows.
+  \item Re-verify every returned solution against the original unscaled constraints: SA-Aug
+  degraded original-scale reliability relative to Base under the strict absolute criterion, and the
+  recommended matrix-only rule must also remain subject to original-scale verification.
 \end{itemize}
 
 
@@ -1343,7 +1345,9 @@ so that bounds, objective interpretation, and integrality remain unchanged.
 
 \subsection{Algorithmic summary}
 
-The augmented rule is collected end to end as Algorithm~S1 in the Supporting Information.
+The recommended exhaustive matrix-only rule is collected end to end as Algorithm~S1 in the
+Supporting Information; the augmented exploratory variant differs only by folding the right-hand
+side into the per-row and per-block magnitude extremes.
 
 The matrix-only algorithm follows the same local and block stages with the
 coefficient-only set $\{\abs{a_{rj}}:a_{rj}\neq 0\}$ and the representative block scales
@@ -4015,7 +4019,9 @@ selective-versus-Flat comparison therefore confounded structural treatment with 
 coverage, and its SG-Ter-Mer difference reflects that coverage gap rather than the metadata. The
 revision responds in three ways: it traces the generating module of the affected rows and records
 it; it closes the gap with the metadata-routed full-coverage rule, whereupon the selective--Flat
-difference disappears (\cref{subsec:added-controls}); and it states the attribution principle
+difference disappears (\cref{subsec:added-controls})---though this coverage-restored control
+equalizes only the \emph{set} of scaled rows and is not equivalent to reconstructing a native
+exhaustive block assignment inside the generator; and it states the attribution principle
 (\cref{prop:attribution}) that makes the coverage-matched comparison explicit. What the revision
 does not yet do is re-derive a full per-block assignment of every generated row inside the
 generator and re-run the augmented rule on it; that, with synthetic instances that drive the
@@ -4244,12 +4250,14 @@ rows enter the same regime, which the present one---with its near-unity balance 
 guarantees coverage: sweep every row with the coefficient-only kernel, applying it only where a
 row is poorly scaled and reverting a row to base scale whenever the safeguarded solution fails
 original-scale verification. This coverage-safeguarded matrix-only rule is the variant we would
-carry forward, in preference to the augmented rule whose use of the right-hand side is what
-degrades original-scale reliability; the augmented rule is better read as an exploratory probe of
+carry forward, in preference to the augmented rule, whose use of the right-hand side introduces an
+additional documented original-scale reliability failure mode (the matrix-only rule still requires
+the same original-scale verification); the augmented rule is better read as an exploratory probe of
 whether the right-hand side should enter the diagnosis at all. A practical layer should also time
 its own preprocessing, which on fast instances can decide the preprocessing-plus-solver ordering.
-Only once the policies are compared under exhaustive, identical coverage can any remaining
-difference be attributed to the use of generator metadata.
+Only once the operational policies are compared using a native exhaustive role assignment and
+identical coverage can any remaining difference be attributed to the use of generator metadata;
+the synthetic comparison already meets that bar, which is why it can make the attribution.
 
 % Float barrier removed to improve two-column layout.
 

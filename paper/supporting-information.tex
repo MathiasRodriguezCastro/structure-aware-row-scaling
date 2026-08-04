@@ -1337,40 +1337,48 @@ the parameter lines \texttt{DummyLp}, seed \texttt{20250803}, $30$ instances, $4
 \texttt{scripts/spectral\_audit.py -{}-lp-dir <dir>} reads the exported matrices. The whole grid
 is driven by \texttt{scripts/synth\_metadata\_grid.py}.
 
-\section{Algorithmic summary of the augmented rule}
+\section*{Section S4. Algorithmic summary}
 \label{si:algorithm}
 
-Algorithm~\ref{alg:augmented-scaling} collects the augmented structure-aware row-scaling
-rule end to end. Equation numbers refer to the main text.
+The recommended rule is the exhaustive matrix-only structure-aware scaling of
+Algorithm~\ref{alg:matrix-scaling}; the augmented variant studied for comparison differs only in
+folding the right-hand side into the magnitude extremes, as noted after it. Equation numbers refer
+to the main text.
+
+Both assume an \emph{exhaustive} role map---every row is either local to one block or a coupling
+row, $\mathcal{R}_{\mathrm{all}}=\bigl(\dot{\textstyle\bigcup}_{i\in\mathcal{B}}\mathcal{R}_i\bigr)
+\;\dot\cup\;\mathcal{R}_{\mathrm{cpl}}$, with no residual category. The archived operational
+campaigns used a non-exhaustive implementation in which a block of market-shortage rows remained
+unassigned and therefore unscaled; Algorithm~\ref{alg:matrix-scaling} instead states the
+exhaustive rule that defines the target method, and the coverage-restored control of the main text
+removes the confound that non-exhaustive map introduced.
 
 \begin{algorithm}[t]
-\caption{Augmented structure-aware row scaling}
-\label{alg:augmented-scaling}
+\caption{Exhaustive matrix-only structure-aware row scaling (recommended rule)}
+\label{alg:matrix-scaling}
 \begin{algorithmic}[1]
-\Require Matrix $A$, right-hand side $b$, row roles (local/coupling/residual-global), block ownership $\beta(\cdot)$, coupling incidence; optionally $\texttt{useLocalFloor}$ and $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ (default: off, describing the primary \methodAug{} variant)
+\Require Matrix $A$, right-hand side $b$, exhaustive row roles (local/coupling), block ownership $\beta(\cdot)$, coupling incidence
 \Ensure Scaled matrix $\widetilde A$, scaled right-hand side $\widetilde b$
-\State Initialize row factors $d_r\gets 1$ \Comment{residual-global rows in $\mathcal{R}_{\mathrm{other}}$ keep $d_r=1$ throughout}
+\State Initialize row factors $d_r\gets 1$ for every row
 \For{each local block $i\in\mathcal{B}$}
   \For{each local row $r\in\mathcal{R}_i$}
-    \State Build $\mathcal{S}_r^{A,b}$ from nonzero coefficients and nonzero right-hand side
-    \If{$\mathcal{S}_r^{A,b}\neq\emptyset$}
-      \State Compute $M_r^{A,b}$ and $m_r^{A,b}$ using Eq.~(16) of the main text
-      \State Set $\alpha_r^{A,b}\gets 1/\sqrt{M_r^{A,b}m_r^{A,b}}$
-      \If{the safeguards admit $\alpha_r^{A,b}$ (and, if $\texttt{useLocalFloor}$, $\alpha_r^{A,b}\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$)} \State Update $d_r\gets d_r\alpha_r^{A,b}$ \EndIf
+    \State Build $\mathcal{S}_r^{A}$ from the nonzero coefficients of row $r$ (the right-hand side is excluded)
+    \If{$\mathcal{S}_r^{A}\neq\emptyset$}
+      \State Compute $M_r^{A}=\max\mathcal{S}_r^{A}$ and $m_r^{A}=\min\mathcal{S}_r^{A}$
+      \State Set $\alpha_r^{A}\gets 1/\sqrt{M_r^{A}m_r^{A}}$
+      \If{the safeguards admit $\alpha_r^{A}$} \State Update $d_r\gets d_r\alpha_r^{A}$ \EndIf
     \EndIf
   \EndFor
 \EndFor
 \State Compute the locally scaled coefficients $\widetilde a_{rj}=d_r a_{rj}$
-\State Compute block scales $s_i^{A,b}=\sqrt{M_i^{A,b}m_i^{A,b}}$ using Eq.~(20) of the main text
-\State Compute $\widehat\rho_r^{A,b}$ for every coupling row using Eq.~(22) of the main text; set $\rho\gets\max_r\widehat\rho_r^{A,b}$
+\State Compute block scales $s_i^{A}=\sqrt{M_i^{A}m_i^{A}}$ from the block coefficient extremes
+\State Compute $\widehat\rho_r^{A}$ for every coupling row (its coefficients against the incident block scales $s_i^{A}$); set $\rho\gets\max_r\widehat\rho_r^{A}$
 \If{$\rho$ exceeds the coupling threshold}
-  \State Set $\gamma^{A,b}\gets\argmin_{\gamma}\Phi(\gamma)$ over the logarithmic grid $\gamma\in[10^{-6},10^{6}]$ (Eq.~(23) of the main text)
-  \State Clip $\gamma^{A,b}$ to $[10^{-8},10^{8}]$
-  \If{$\gamma^{A,b}$ lies outside the near-identity band (33)}
+  \State Set $\gamma^{A}\gets\argmin_{\gamma}\Phi(\gamma)$ over the logarithmic grid $\gamma\in[10^{-6},10^{6}]$; clip $\gamma^{A}$ to $[10^{-8},10^{8}]$
+  \If{$\gamma^{A}$ lies outside the near-identity band}
     \For{each coupling row $r$}
-      \If{$\gamma^{A,b}$ keeps row $r$ inside the coefficient window (34)
-          \textbf{and} above the reliability floor of the main text}
-        \State Update $d_r\gets d_r\gamma^{A,b}$
+      \If{$\gamma^{A}$ keeps row $r$ inside the coefficient window \textbf{and} above the reliability floor}
+        \State Update $d_r\gets d_r\gamma^{A}$
       \EndIf
     \EndFor
   \EndIf
@@ -1378,6 +1386,17 @@ rule end to end. Equation numbers refer to the main text.
 \State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
 \end{algorithmic}
 \end{algorithm}
+
+\paragraph{Augmented exploratory variant (SA-Aug).} The augmented rule of the comparison is
+obtained from Algorithm~\ref{alg:matrix-scaling} by a single change: the per-row set
+$\mathcal{S}_r^{A}$ and the block extremes $M_i,m_i$ are formed from the nonzero coefficients
+\emph{and} the nonzero right-hand side, i.e.\ their $A,b$ counterparts (Eqs.~(16), (20), (22) of
+the main text), with an optional local reliability floor $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$
+gating the local update. Folding $|b_r|$ into the extremes is what distinguishes SA-Aug; it is the
+variant that, under the strict absolute criterion, carries the additional documented original-scale
+reliability failure mode on zero-right-hand-side balance rows, and it obtains no spectral advantage
+over its role-blind control. We therefore report it as exploratory and recommend the matrix-only
+rule above.
 
 
 \end{document}
