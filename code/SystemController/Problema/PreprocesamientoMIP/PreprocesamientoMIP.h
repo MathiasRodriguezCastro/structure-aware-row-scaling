@@ -42,6 +42,11 @@ struct PreprocesamientoConfig {
                                                ///<  por la NORMA EUCLIDEA alpha_r=1/||a_r||_2 (solo coef),
                                                ///<  con las MISMAS salvaguardas/clip/banda. Aisla el efecto
                                                ///<  de la NORMA del de la metadata de bloque.
+    bool   escalaBloquePrevia        = false;  ///< Opcion B (SA-Pre): usa s_i^pre = median_r sqrt(M_r*m_r)
+                                               ///<  calculada ANTES del kernel local (conserva la escala
+                                               ///<  original del bloque, en vez de s_i=1 tras centrar los
+                                               ///<  extremos). Rompe la degeneracion; el factor sigue
+                                               ///<  siendo un unico gamma_r por fila de acoplamiento.
     bool   permutarBloques           = false;  ///< Auditoria SA-Mat-permbeta: permuta la asignacion
                                                ///<  variable->escala_de_bloque en el proxy de acoplamiento,
                                                ///<  manteniendo el conjunto de escalas s_i. Si s_i=1 para
@@ -226,6 +231,10 @@ private:
 
     // Índices de restricciones globales que acoplan agentes
     std::vector<int> indicesAcoplamiento;
+
+    // Opcion B (SA-Pre): s_i^pre = median_r sqrt(M_r*m_r) por bloque, calculada ANTES del
+    // kernel local (prefijoVariable -> s_i^pre). Vacio si escalaBloquePrevia esta desactivado.
+    std::map<std::string, double> escalaPreviaBloque;
 
     // ----------------------------------------------------------------
     // Internos

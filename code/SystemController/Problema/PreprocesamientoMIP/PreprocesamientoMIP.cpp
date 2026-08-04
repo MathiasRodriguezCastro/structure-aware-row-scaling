@@ -28,6 +28,10 @@ void PreprocesamientoMIP::registrarBloque(const string& nombre,
                                           const vector<string>& prefijos) {
     DiagnosticoBloque bloque;
     bloque.nombre = nombre;
+    // Cablear el prefijo de variable del bloque para que la etapa de acoplamiento pueda
+    // asociar cada columna con la escala de SU bloque (antes quedaba vacio y el proxy caia
+    // siempre a la escala general -> el mapa de bloques era inerte en el banco sintetico).
+    if (!prefijos.empty()) bloque.prefijoVariable = prefijos[0];
 
     auto& restricciones = prob.getRestricciones();
     for (int i = 0; i < (int)restricciones.size(); ++i) {
@@ -370,22 +374,42 @@ void PreprocesamientoMIP::calcularDiagnosticoPorBloque() {
         bloque.normaMax = 0.0;
         bloque.normaMin = 1e300;
 
+        std::vector<double> escalasFila;   // Opcion B: sqrt(M_r*m_r) por fila (coef, ORIGINAL)
+
         for (int idx : bloque.indicesRestricciones) {
             const auto& terminos = restricciones[idx]->getTerminos();
             double rhs = std::abs(restricciones[idx]->getTerminoIndependiente());
 
+            double filaMax = 0.0, filaMin = 1e300;
             for (const auto& [coef, _] : terminos) {
                 double ac = std::abs(coef);
                 if (ac > 0.0) {
                     bloque.normaMax = max(bloque.normaMax, ac);
                     bloque.normaMin = min(bloque.normaMin, ac);
+                    filaMax = max(filaMax, ac);
+                    filaMin = min(filaMin, ac);
                 }
             }
+            if (filaMax > 0.0 && filaMin < 1e300)
+                escalasFila.push_back(sqrt(filaMax * filaMin));
             // Incluir RHS en el rango
             if (rhs > 0.0) {
                 bloque.normaMax = max(bloque.normaMax, rhs);
                 bloque.normaMin = min(bloque.normaMin, rhs);
             }
+        }
+
+        // Opcion B: s_i^pre = mediana de sqrt(M_r*m_r) sobre las filas locales (escala del bloque
+        // ANTES del kernel local, que centra los extremos en uno). Robusta a filas atipicas.
+        // OJO: esta funcion se llama varias veces (incluso tras el escalado local); solo guardamos
+        // en la PRIMERA (matriz original), no sobreescribir con la version post-escalado (~1).
+        if (!escalasFila.empty() && !bloque.prefijoVariable.empty()
+            && escalaPreviaBloque.count(bloque.prefijoVariable) == 0) {
+            std::sort(escalasFila.begin(), escalasFila.end());
+            size_t n = escalasFila.size();
+            double med = (n % 2) ? escalasFila[n/2]
+                                 : 0.5 * (escalasFila[n/2 - 1] + escalasFila[n/2]);
+            escalaPreviaBloque[bloque.prefijoVariable] = med;
         }
 
         if (bloque.normaMin < 1e300 && bloque.normaMin > 0.0)
@@ -465,18 +489,6 @@ void PreprocesamientoMIP::calcularDiagnosticoGlobal() {
     }
     if (cantEscalasLocales > 0)
         escalaLocalGeneral = sumaEscalasLocales / cantEscalasLocales;
-
-    // Auditoria SA-Mat-permbeta: permuta la asignacion prefijo->escala manteniendo el conjunto
-    // de escalas s_i. Si s_i=1 para todo bloque (regimen limpio), el export es byte-identico:
-    // confirma que el mapa de bloques es inerte en el proxy de acoplamiento.
-    if (cfg.permutarBloques && escalaLocalPorAgente.size() > 1) {
-        std::vector<std::string> claves;
-        std::vector<double> valores;
-        for (const auto& kv : escalaLocalPorAgente) { claves.push_back(kv.first); valores.push_back(kv.second); }
-        std::mt19937 rng(20250803u);
-        std::shuffle(valores.begin(), valores.end(), rng);
-        for (size_t i = 0; i < claves.size(); ++i) escalaLocalPorAgente[claves[i]] = valores[i];
-    }
 
     double sumaRho2 = 0.0;
     for (int idx : indicesAcoplamiento) {
@@ -1053,6 +1065,24 @@ void PreprocesamientoMIP::aplicarEscalamientoGlobal() {
             sumaEscala += s; ++cantEscala;
         }
         double escalaGeneral = (cantEscala > 0) ? sumaEscala / cantEscala : 1.0;
+
+        // Opcion B (SA-Pre): reemplazar la escala degenerada s_i=1 por s_i^pre (escala del bloque
+        // ANTES del kernel local), de modo que la metadata de bloque deje de ser inerte.
+        if (cfg.escalaBloquePrevia && !escalaPreviaBloque.empty()) {
+            escalaBloque = escalaPreviaBloque;
+            double suma = 0.0; int cant = 0;
+            for (const auto& kv : escalaBloque) { suma += kv.second; ++cant; }
+            escalaGeneral = (cant > 0) ? suma / cant : 1.0;
+        }
+        // Auditoria permutacion-beta (aplicada al mapa que USA el export): baraja la asignacion
+        // prefijo->escala manteniendo el multiset. Si las escalas son triviales (s_i=1), identico.
+        if (cfg.permutarBloques && escalaBloque.size() > 1) {
+            std::vector<std::string> claves; std::vector<double> valores;
+            for (const auto& kv : escalaBloque) { claves.push_back(kv.first); valores.push_back(kv.second); }
+            std::mt19937 rng(20250803u);
+            std::shuffle(valores.begin(), valores.end(), rng);
+            for (size_t i = 0; i < claves.size(); ++i) escalaBloque[claves[i]] = valores[i];
+        }
 
         int filasEscaladas = 0; double logGamma = 0.0;
         for (int idx : indicesAcoplamiento) {

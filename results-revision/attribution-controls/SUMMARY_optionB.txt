@@ -1,0 +1,20 @@
+Option B (s_i^pre = median_r sqrt(M_r*m_r), block scale BEFORE local kernel).
+block_heterogeneous, coupling, S=6, R=2, 30 seeds, kappa2+.
+
+Prerequisite fix: registrarBloque now sets prefijoVariable, so the block map is actually
+connected in the synthetic (it was empty before -> coupling used a single escalaGeneral;
+SA-Mat/Flat-Mat/SA-Aug remain byte-identical, verified).
+
+  median kappa2+  Base        = 5.3029e+08
+  median kappa2+  SAMat       = 1.3338e+03
+  median kappa2+  SAPre       = 6.6855e+03
+  median kappa2+  SAPrepermB  = 1.0837e+03
+  median kappa2+  FlatL2      = 4.6809e+02
+  median kappa2+  FlatMat     = 1.3584e+04
+
+  SA-Pre / Flat-L2       = 12.2  (>1: metadata does NOT beat pure Euclidean)
+  SA-Pre / SA-Pre-permB  = 5.48  (>1: the CORRECT map is WORSE than permuted)
+
+Verdict: Option B fails. Flat-L2 (no metadata) is best; connecting the block map via
+s_i^pre makes SA-Pre worse than SA-Mat and worse than a permuted map. A single per-row
+factor cannot fix the internal per-block spread. -> Reframe A.
