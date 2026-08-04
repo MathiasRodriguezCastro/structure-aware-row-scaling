@@ -93,6 +93,23 @@ bool mapearVariante(const std::string& nombre, bool& esBase,
         cfg.permutarBloques           = true;
         return true;
     }
+    if (nombre == "SA-Pre") {                  // Opcion B: SA-Mat con s_i^pre (escala de bloque previa).
+        cfg.escalamientoLocalPorFila  = true;
+        cfg.normalizarBloqueTrasFilas = true;
+        cfg.usarEquilibradoRuiz       = false;
+        cfg.modoMatricial             = true;
+        cfg.escalaBloquePrevia        = true;
+        return true;
+    }
+    if (nombre == "SA-Pre-permB") {            // Opcion B + permutacion: prueba causal de la metadata.
+        cfg.escalamientoLocalPorFila  = true;
+        cfg.normalizarBloqueTrasFilas = true;
+        cfg.usarEquilibradoRuiz       = false;
+        cfg.modoMatricial             = true;
+        cfg.escalaBloquePrevia        = true;
+        cfg.permutarBloques           = true;
+        return true;
+    }
     // Sensibilidad del piso de confiabilidad del γ colectivo: "SA-Aug-floor<val>" corre
     // SA-Aug con pisoMagnitudGammaColectivo = <val> ("SA-Aug-floor0" = piso deshabilitado).
     // Solo para el benchmark sintético (la campaña de sensibilidad usa seeds independientes).
