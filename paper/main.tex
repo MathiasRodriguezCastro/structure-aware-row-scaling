@@ -3149,6 +3149,26 @@ Block range & $S$ & Coupling & Coupling (uniform) & Mixed \\
 \end{tabular}
 \end{table}
 
+\paragraph{Why the advantage grows by an order of magnitude per unit of range.}
+A stylized model reproduces the slope of \cref{tab:metadata-grid} in closed form. Take $B$ blocks,
+each a single variable with one local row of magnitude $10^{e_i}$, and one coupling row whose
+coefficient on block $i$ is $10^{e_i}$ (the incidence inherits the block scale), with the exponents
+$e_i$ spread over $[-R,R]$. After the local stage each local row is normalized to unit magnitude,
+leaving the identity $I_B$. The role-blind rule scales the coupling row by its own geometric mean,
+$1/\sqrt{10^{R}\cdot 10^{-R}}=1$, so it stays $v=(10^{e_1},\dots,10^{e_B})$ with
+$\lVert v\rVert_\infty=10^{R}$; the matrix $[\,I_B;\,v^{\top}]$ has $A^{\top}A=I+vv^{\top}$, whose
+eigenvalues are $1$ (multiplicity $B-1$) and $1+\lVert v\rVert^{2}$, so
+$\kappa_2^{+}=\sqrt{1+\sum_i 10^{2e_i}}\approx 10^{R}$. The block-relative rule instead divides the
+coupling coefficient on block $i$ by its block scale $s_i=10^{e_i}$, giving $v=(1,\dots,1)$ and
+$\kappa_2^{+}=\sqrt{1+B}$, independent of $R$. Their ratio is therefore
+$\kappa_2^{+}(\methodMat{})/\kappa_2^{+}(\mathrm{Flat\text{-}Mat})\approx\sqrt{1+B}\,\cdot 10^{-R}$
+---one order of magnitude per unit of exponent range, the slope of \cref{tab:metadata-grid} (the
+constant offset is the near-identity threshold that keeps the coupling stage dormant at the
+smallest range, where the two rules still coincide). This is exactly the mechanism
+\cref{prop:attribution} isolates: a per-row geometric mean centers the coupling row but leaves its
+internal $10^{2R}$ spread intact, whereas placing each coefficient against its block scale collapses
+that spread.
+
 Taken together, the four operational scenarios and the controlled synthetic check support a
 limited but useful interpretation. Under Gurobi, the structured rules lower path-specific
 numerical diagnostics and often reduce completed-run solver time or deterministic effort
