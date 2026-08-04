@@ -53,6 +53,14 @@ VARIANT_FLAGS = {
     # improvement comes from the structural metadata vs the scaling kernel itself.
     "estructurado_plano":               "preprocesar --local-estructurado --plano",
     "matricial_plano":                  "preprocesar --local-matricial --plano",
+    # --- Final attribution variants (Base / Flat-GM / Flat-L2 / Role-Hybrid) --------------
+    # Same coverage/bands/clip/safeguards as the structured variants; they differ only in the
+    # per-row kernel and (for Role-Hybrid) in the coupling proxy. matricial_plano == Flat-GM.
+    #   Flat-L2   : role-blind Euclidean kernel 1/||a_r||_2 on ALL rows (no roles/blocks).
+    #   Role-Hybrid: role metadata ONLY -- local rows geomean, coupling rows Euclidean
+    #                (blind 1/||a_r||_2, no s_i/beta); coincides with Local-GM-Coupling-L2.
+    "matricial_plano_l2":               "preprocesar --local-matricial --plano --kernel-euclideo",
+    "role_hybrid":                      "preprocesar --local-matricial --acoplamiento-l2",
     # --- R1 / R2 W1 / DA C1: intermediate metadata-driven FULL-coverage policy (SA-*-Full).
     # Same selective local + coupling stages, but the residual-global rows (R_other) that the
     # selective rule leaves unscaled receive the SAME per-row local kernel.  This is the third

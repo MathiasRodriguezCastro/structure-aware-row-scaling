@@ -990,6 +990,14 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     cfg.usarEquilibradoRuiz = true;
                 } else if (args[i] == "--normalizacion-fisica") {
                     cfg.normalizacionFisica = true;
+                } else if (args[i] == "--kernel-euclideo") {
+                    // Kernel euclideo por fila (1/||a_r||_2) en vez de media geometrica.
+                    // Flat-L2 = --plano --local-matricial --kernel-euclideo.
+                    cfg.kernelEuclideo = true;
+                } else if (args[i] == "--acoplamiento-l2") {
+                    // Proxy de acoplamiento ciego gamma_r=1/||a_r||_2 (sin s_i ni beta).
+                    // Role-Hybrid = --local-matricial --acoplamiento-l2 (local GM + acopl L2).
+                    cfg.acoplamientoCiegoL2 = true;
                 } else if (args[i] == "--verificar-original") {
                     cfg.verificarModeloOriginal = true;
                 } else if (args[i] == "--global" && i + 1 < args.size()) {
@@ -1049,9 +1057,15 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     // Control plano: alineado con las variantes del driver de validación
                     // (el sufijo _solo_local NO aplica: plano no es una etapa de la
                     // arquitectura, es el kernel sin metadata).
-                    _slug_preproc = cfg.modoMatricial ? "matricial_plano" : "estructurado_plano";
+                    // Flat-GM = matricial_plano; Flat-L2 = matricial_plano + kernel euclideo.
+                    _slug_preproc = cfg.modoMatricial
+                        ? (cfg.kernelEuclideo ? "matricial_plano_l2" : "matricial_plano")
+                        : "estructurado_plano";
                 } else if (cfg.usarEquilibradoRuiz) {
                     _slug_preproc = cfg.escalarColumnasContinuas ? "ruiz_columnas" : "ruiz";
+                } else if (cfg.acoplamientoCiegoL2) {
+                    // Role-Hybrid: kernel local por rol (GM local + L2 en acoplamiento).
+                    _slug_preproc = "role_hybrid";
                 } else if (cfg.modoMatricial) {
                     _slug_preproc = "estructurado_matricial";
                 } else if (cfg.escalamientoLocalPorFila) {
