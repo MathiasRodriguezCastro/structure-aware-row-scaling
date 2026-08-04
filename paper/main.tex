@@ -276,10 +276,8 @@ metadata effect to the coupling rows and dictates the coverage-matched compariso
 requires; (ii) an algebraically exact, auditable row-scaling layer for generated
 block-structured MIPs, with the returned solutions verified on the original, unscaled
 constraints; (iii) a controlled empirical study---augmented and coefficient-only role-blind
-controls on all three classes under Gurobi, a fixed-basis conditioning control, and a
-seed-replicated noise floor---showing that row scaling helps, that the local kernel carries it,
-and that these operational instances do not exercise the coupling metadata; and (iv) an explicit
-separation of numerical improvement from computational acceleration. \Cref{fig:overview}
+controls on all three classes under Gurobi and a fixed-basis conditioning control; and (iv) an
+explicit separation of numerical improvement from computational acceleration. \Cref{fig:overview}
 summarizes the proposed layer at a glance.
 
 \begin{figure}[t]
@@ -1446,36 +1444,8 @@ for CPLEX.
 \noindent The four scenarios in \cref{tab:solver-scenarios} vary two dimensions separately: the stopping tolerance and the solver pipeline. Scenarios 1--2 test Gurobi at two MIPGap values; scenarios 3--4 repeat the comparison under CPLEX and serve as a solver contrast.
 
 
-\begin{table*}[t]
-\centering
-\caption{The computational environment fixes solver versions, time limits, and default presolve settings for all comparisons.}
-\label{tab:computational-environment}
-\begin{threeparttable}
-\small
-\begin{tabular}{@{}ll@{}}
-\toprule
-Item & Configuration \\
-\midrule
-Cluster & ClusterUY, partition \texttt{ute} \\
-Processor & Intel Xeon Gold 6138 \\
-Threads & 16 \\
-Memory limit & 12 GB \\
-Time limit & 1 hour per solve \\
-Gurobi version & 13.0.1~\cite{gurobi_manual} \\
-CPLEX version & 22.1.2.0~\cite{cplex_manual} \\
-Presolve & solver default, enabled \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}[flushleft]\footnotesize
-\item Solver-internal scaling and presolve were left at their default enabled settings
-unless otherwise stated. CPLEX 22.1.2.0 is the version available in the ClusterUY
-environment used for the long runs; conclusions involving CPLEX should therefore be
-interpreted as solver-version and environment specific.
-\end{tablenotes}
-\end{threeparttable}
-\end{table*}
 
-\noindent The configuration in \cref{tab:computational-environment} matters because the proposed preprocessing is tested on top of each solver's default numerical pipeline. The CPLEX conclusions below are therefore statements about this version and ClusterUY environment, not claims about all CPLEX releases or parameter choices.
+\noindent The configuration in Table~S20 matters because the proposed preprocessing is tested on top of each solver's default numerical pipeline. The CPLEX conclusions below are therefore statements about this version and ClusterUY environment, not claims about all CPLEX releases or parameter choices.
 
 
 
@@ -3997,7 +3967,7 @@ path and preprocessing methods used in the paper.
 A Supporting Information document accompanies this article. Section~S1 contains the proofs of
 Propositions~1 and~2. Section~S2 contains the supplementary computational results: the
 $0.1\%$-MIPGap Gurobi and CPLEX distributional, diagnostic, and performance-profile views
-(Figures~S1--S4) and nineteen tables---hyperparameter sensitivity (Table~S1), the per-variant
+(Figures~S1--S4) and twenty tables---hyperparameter sensitivity (Table~S1), the per-variant
 reliability and \PARten{} audit (Table~S2), the coupling- and local-floor checks
 (Tables~S3--S4), uniformly unavailable instances and full-pool sensitivity (Table~S5),
 paired-test attrition (Table~S6), the available internal-scaling sweep and verifier audit
@@ -4013,7 +3983,7 @@ summary, stating the recommended exhaustive matrix-only rule as Algorithm~S1 and
 exploratory variant alongside it; and Section~S5 collects the results tables relocated during the
 length revision---the two $0.1\%$-tolerance efficiency tables (Tables~S14--S15), the
 internal-scaling comparison (Table~S16), and the direct SA--Flat cached-metadata, component-timing,
-and common-pool reliability tables (Tables~S17--S19).
+and common-pool reliability tables (Tables~S17--S19), and the computational environment (Table~S20).
 Additional processed logs and rebuild scripts are available in the reproducibility repository.
 
 % \balance is a two-column last-page balancer; it is a no-op in the single-column

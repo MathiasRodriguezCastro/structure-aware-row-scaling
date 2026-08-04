@@ -1611,5 +1611,35 @@ $(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$ \\
 \end{tabular}
 \end{table}
 
+\begin{table*}[t]
+\centering
+\caption{The computational environment fixes solver versions, time limits, and default presolve
+settings for all comparisons.}
+\label{tab:computational-environment}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Item & Configuration \\
+\midrule
+Cluster & ClusterUY, partition \texttt{ute} \\
+Processor & Intel Xeon Gold 6138 \\
+Threads & 16 \\
+Memory limit & 12 GB \\
+Time limit & 1 hour per solve \\
+Gurobi version & 13.0.1 \\
+CPLEX version & 22.1.2.0 \\
+Presolve & solver default, enabled \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Solver-internal scaling and presolve were left at their default enabled settings
+unless otherwise stated. CPLEX 22.1.2.0 is the version available in the ClusterUY
+environment used for the long runs; conclusions involving CPLEX should therefore be
+interpreted as solver-version and environment specific.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
 
 \end{document}

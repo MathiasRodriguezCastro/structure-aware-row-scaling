@@ -1,6 +1,6 @@
 # Length-revision move log
 
-Baseline: commit `108d35e` (main 55 pp, SI 21 pp). **Now: main 50 pp, SI 24 pp**, both compile
+Baseline: commit `108d35e` (main 55 pp, SI 21 pp). **Now: main 49 pp, SI 24 pp**, both compile
 with 0 undefined references (343 source lines removed from the main text). Marked-changes version:
 `paper/main_diff.pdf` (latexdiff vs the baseline; deletions struck through, additions underlined).
 
@@ -32,10 +32,11 @@ Nothing deleted; every moved table is referenced from the body by its new number
 | Cached-metadata sensitivity | `tab:flat-cached` | **S17** | 4 refs → "Table S17" |
 | Component-timing summaries | `tab:flat-absolute` | **S18** | 2 refs → "Table S18" |
 | Common-pool reliability | `tab:flat-reliability-body` | **S19** | 5 refs (incl. one compound) → "Table S19" |
+| Computational environment | `tab:computational-environment` | **S20** | 1 ref → "Table S20" (final conservative pass) |
 
 SI preamble additions: `siunitx` (+ the main's `\sisetup`) and the
 `\methodBase/\methodRuiz/\methodRuizCols/\AvgGap` macros. SI contents paragraph in the main text
-updated to "nineteen tables" and to announce Sections S3–S5. Removing S17–S19 clears the two
+updated to "twenty tables" and to announce Sections S3–S5. Removing S17–S19 clears the two
 implementation-cost tables that were burying "Restoring exhaustive coverage", so the central R1
 result now follows the flat-control table with only a short reliability paragraph between them.
 
@@ -52,9 +53,14 @@ result now follows the flat-control table with only a short reliability paragrap
 ## Deleted outright
 None. All detail was moved to the SI or condensed.
 
-## Optional further trimming (not required for correctness)
-- move `tab:computational-environment` and `tab:gurobi-conditioning-correlations` (4 refs, one
-  compound) if a few more lines are wanted;
-- dedup the residual "non-identifying / noise-floor" mentions across intro/limitations to one each.
-These were left because the paper already reads continuously at 50 pp and further cuts touch the
-arc; do them as a final voice pass with a compile check after each.
+## Final conservative pass
+- `tab:computational-environment` moved to Table S20; `tab:gurobi-conditioning-correlations`
+  **kept in the body** (it directly supports the numerical-vs-runtime separation).
+- One redundant "non-identifying" restatement and the "noise floor" mention removed from the
+  contributions list only. The abstract, the Practitioner Points, the §6.7 close, and the
+  Limitations development were left untouched.
+
+## Stopping point
+The paper reads continuously at 49 pp with the arc and all guardrails intact; no further reduction
+was attempted, since additional cuts would touch the abstract or the Limitations/Discussion
+development.
