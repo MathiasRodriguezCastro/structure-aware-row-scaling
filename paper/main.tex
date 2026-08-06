@@ -140,40 +140,38 @@
 \corres{Mathias Rodr\'iguez Castro, Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay. \email{mathiasr@fing.edu.uy} (ORCID: 0009-0002-7235-7677)}
 
 \abstract[Abstract]{%
-Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, though
-their generators retain each row's role, block ownership, and coupling incidence. We ask
-whether generator metadata should alter \emph{how} coupling constraints are scaled relative to
-the local blocks they connect, beyond applying the same per-row kernel to every constraint. The
-layer studied here applies geometric-mean row normalization in a local--block--coupling order,
-preserves the MIP exactly, and verifies every returned solution against the original unscaled
-constraints. We test it on three hydrothermal-dispatch classes, two commercial
-solvers, and two MIPGap tolerances, against unscaled, Ruiz-kernel, solver-internal, and
-role-blind full-coverage controls, together with a synthetic mechanism grid carrying a direct
-spectral audit.
+Generated mixed-integer programs (MIPs) reach solvers as flat coefficient matrices, though their
+generators retain each row's role, block ownership, and coupling incidence---and solver-internal
+scaling then operates on that flat representation. We study an external, equivalence-preserving
+row-scaling layer that uses local rows, block scales, and coupling incidence before export,
+applying geometric-mean row normalization in a local--block--coupling order and verifying every
+returned solution against the original unscaled constraints. We test it on three
+hydrothermal-dispatch classes, two commercial solvers, and two MIPGap tolerances, against
+unscaled, Ruiz-kernel, solver-internal, and role-blind full-coverage controls, together with a
+synthetic mechanism grid carrying a direct spectral audit.
 
-The result is controlled and regime-dependent. On the operational instances it is
-\emph{non-identifying}: the distinctive coupling stage never activates, and the one substantial
-difference between the selective rule and the role-blind full-coverage control traces to an
-incomplete role map that left a block of market-shortage rows unscaled, not to the metadata. Under
-equal coverage \emph{and an inactive coupling stage} the matrix-only policies coincide, as
-\cref{prop:attribution} predicts and byte-for-byte confirms on the operational instances. When
-heterogeneous block scales activate the block-relative treatment, however, the same-kernel policies
-no longer coincide: on a controlled heterogeneous-block grid the matrix-only structure-aware rule
-attains an order-of-magnitude lower spectral pseudo-condition number than a role-blind rule with
-the \emph{same} kernel and coverage ($30/30$ instances, $p<10^{-8}$), demonstrating that the
-mechanism can produce a material conditioning gain. The operational campaigns never enter that regime, where a per-row
-local kernel computable from the flat matrix carries the whole effect. Runtime effects are of the
-order of the solver's own
-run-to-run variability---a five-seed replication puts the within-instance noise floor at
-$12$--$18\%$ and leaves the metadata-versus-coverage contrast inside it in the fast class---and
-only one of twelve contrasts clears multiplicity adjustment, none under CPLEX. Under the
-pre-declared absolute criterion the augmented rule (SA-Aug) \emph{degrades} original-scale
-reliability relative to Base, with failures concentrated on zero-right-hand-side balance rows,
-and we report the strict reading as primary; the variant we ultimately recommend is the
-matrix-only rule.
+On the operational instances the external layer improves the solver-facing numerical diagnostics
+and, under Gurobi, often improves completed-run solver time or deterministic effort beyond the
+solver's own default internal scaling, which remains enabled throughout. Because the operational
+balance rows are already commensurate with the blocks they connect, the distinctive coupling stage
+stays inactive, so this operational gain comes primarily from the local-row normalization---a
+per-row kernel computable from the flat matrix---rather than from the coupling-specific use of
+metadata. The operational comparison is in this precise sense \emph{non-identifying} for the value
+of metadata: it occupies the inactive-coupling regime.
 
-The transferable lesson outlives the method: the rule with the best numerical diagnostic is not
-the fastest, so numerical improvement and solver acceleration must be measured separately.
+The metadata-specific advantage is isolated where the mechanism is designed to act. On a controlled
+heterogeneous-block grid, under an \emph{identical} kernel and identical row coverage, the
+matrix-only structure-aware rule lowers the spectral pseudo-condition number by one to two orders
+of magnitude relative to a role-blind rule ($30/30$ instances, $p<10^{-8}$), a difference
+attributable to scaling coupling rows relative to the connected block scales. This conditioning
+gain does not translate into a universal runtime gain: the Gurobi improvements are class- and
+tolerance-dependent, CPLEX shows no robust benefit, and original-scale verification remains
+necessary---most pointedly for the augmented right-hand-side rule (SA-Aug), which degrades
+reliability on zero-right-hand-side balance rows and is why we recommend the matrix-only rule.
+External scaling, metadata-specific conditioning, and solver acceleration are three distinct
+questions, and the study's design keeps them separate: the operational instances establish the
+practical value of the external pass, and the heterogeneous-block grid identifies when metadata
+adds a numerical capability a flat rule cannot.
 }
 
 \keywords{Numerical scaling, mixed-integer programming, generated formulations, block-structured optimization, engineering optimization, hydrothermal dispatch}
@@ -187,21 +185,27 @@ the fastest, so numerical improvement and solver acceleration must be measured s
 
 \section*{Practitioner Points}
 \begin{itemize}
-  \item Model generators already know each row's role, block, and coupling incidence---metadata a
-  flat matrix export discards but that costs nothing to reuse for numerical preprocessing.
-  \item Metadata matters in the appropriate regime: under identical coverage and the same
-  coefficient-only kernel, block-relative scaling reduced the spectral pseudo-condition number by
-  one to two orders of magnitude as the block-scale heterogeneity increased.
-  \item Cover every row: closing the incomplete-role-map gap makes the matrix-only structure-aware
-  and role-blind exports coincide on the operational instances, because their coupling stages
-  remain inactive there---so those instances do not test the value of the metadata itself.
-  \item Time preprocessing separately from the solver---on fast instances the preprocessing cost,
-  not the numerics, decided which rule looked faster, and the runtime gaps were of the order of
-  the solver's own run-to-run variability (a five-seed replication put the noise floor at
-  $12$--$18\%$).
-  \item Re-verify every returned solution against the original unscaled constraints: SA-Aug
-  degraded original-scale reliability relative to Base under the strict absolute criterion, and the
-  recommended matrix-only rule must also remain subject to original-scale verification.
+  \item An external, structure-aware preprocessing pass can add numerical and computational value
+  even when the commercial solver's own scaling and presolve remain enabled: under Gurobi it
+  improved solver-facing diagnostics and, in several class--tolerance cells, completed-run time or
+  deterministic effort beyond the default internal pipeline.
+  \item Generator metadata matters specifically when coupling rows are misaligned with
+  heterogeneous block scales: under identical coverage and the same coefficient-only kernel,
+  block-relative scaling reduced the spectral pseudo-condition number by one to two orders of
+  magnitude as the block-scale heterogeneity increased.
+  \item No activation on already balanced coupling rows is the expected and desirable behavior, not
+  a method failure: on the operational instances the coupling stage stays inactive because the
+  balance rows are already commensurate with the connected blocks, so the structure-aware and
+  role-blind exports coincide there.
+  \item Equal kernel and equal coverage are prerequisites for attributing any effect to
+  metadata---otherwise a kernel or coverage difference is mistaken for a metadata effect.
+  \item Prefer the matrix-only rule and re-verify every returned solution against the original
+  unscaled constraints: the augmented right-hand-side rule (SA-Aug) degraded original-scale
+  reliability relative to Base, and even the recommended rule must remain subject to
+  original-scale verification.
+  \item Measure conditioning improvement and runtime improvement separately: a better numerical
+  diagnostic did not imply a faster solve, and on fast instances the preprocessing cost itself,
+  not the numerics, decided which rule looked faster.
 \end{itemize}
 
 
@@ -235,17 +239,19 @@ solver's pipeline starts.
 
 The resulting question is simple: can generator-level block information guide positive row scalings that improve the solver-facing representation without changing the MIP? The question is not whether positive row scaling is valid. Multiplying a complete constraint by a strictly positive scalar preserves the feasible set. The question is whether the scaling factors should depend on information that the generator still has: local rows, component blocks, and coupling rows. In this sense, the paper treats pre-export metadata as numerical information rather than only as modeling bookkeeping.
 
-We answer this question with a structure-aware row-scaling framework. The method scales
-only whole constraints, including their right-hand sides. Hence it preserves the original
-mixed-integer optimization problem. Its novelty lies in the order and source of the
-scales, not in claiming that row scaling is new. The generator first scales local component
-rows. It then summarizes the scale of each locally scaled block. A third stage would scale
-global coupling rows with the scales of the blocks they connect; on every operational instance
-tested its activation condition is never met, so that stage is exercised only on the synthetic
-grid and is reported here as an extension rather than as validated machinery. Throughout the paper, this
-local--block--coupling architecture is treated as a \emph{candidate} structure-aware policy
-whose stages, coverage, and pipeline sensitivity are evaluated empirically, with the coupling
-stage found to be operationally untested rather than refuted.
+We answer this question with a structure-aware row-scaling framework. The method scales only
+whole constraints, including their right-hand sides, so it preserves the original mixed-integer
+optimization problem exactly; its novelty lies in the order and source of the scales, not in the
+per-row kernel. The generator first scales local component rows, then summarizes the scale of each
+locally scaled block, and finally scales the global coupling rows relative to the blocks they
+connect. This third stage is the only one that consumes the block metadata, and it acts only when
+the coupling rows are misaligned with heterogeneous block scales. On the operational instances that
+condition is not met---the balance rows already sit at scales commensurate with the connected
+blocks---so the coupling stage stays inactive by design; we exercise it on a controlled synthetic
+grid built to reach the regime where it is decisive. The local--block--coupling architecture is
+thus evaluated in two complementary regimes: an operational one, where the coupling stage is
+inactive and a per-row local kernel carries the effect, and a synthetic one, where heterogeneous
+block scales activate the metadata-specific treatment.
 
 The contribution is not a new equilibration kernel---the per-row factor is a known
 geometric-mean normalization, and the results show that this kernel carries most of the effect.
@@ -256,29 +262,31 @@ coupling set (\cref{eq:role-disjointness}). The central question is therefore wh
 generator metadata improves the treatment of the \emph{coupling} rows, relative to a
 kernel-matched, full-coverage role-blind rule that scales every row the same way.
 
-We are deliberate about what the present campaigns can and cannot answer, because the
-implementation used for them did not realize an exhaustive map: it left a block of
-market-shortage constraints unscaled that the role-blind control normalized
-(\cref{subsec:strategy-2}). That coverage gap, together with the fact that the distinctive
-coupling stage never activates on any operational instance, makes the operational comparison
-\emph{non-identifying} for the value of metadata---it varies coverage and metadata at once and
-never exercises the one stage where metadata is structurally decisive. What the campaigns do
-establish is cleaner and still useful: row scaling improves the solver-facing diagnostics and
-can improve runtime over the unscaled base; the per-row local kernel, computable from the flat
-matrix, carries essentially all of that effect on these instances; and, by
-\cref{prop:attribution}, under equal coverage \emph{and} the inactive coupling stage of the
-operational instances the structure-aware and role-blind matrix-only exports are provably---and
-empirically---identical there, so no operational difference can be pinned on the metadata (once the
-coupling stage activates, as it does on the heterogeneous-block synthetic grid, the two no longer
-coincide). Concretely, the paper contributes: (i) an exhaustive-map formulation
-of the row taxonomy and an attribution principle (\cref{prop:attribution}) that localizes any
-metadata effect to the coupling rows and dictates the coverage-matched comparison the question
-requires; (ii) an algebraically exact, auditable row-scaling layer for generated
-block-structured MIPs, with the returned solutions verified on the original, unscaled
-constraints; (iii) a controlled empirical study---augmented and coefficient-only role-blind
-controls on all three classes under Gurobi and a fixed-basis conditioning control; and (iv) an
-explicit separation of numerical improvement from computational acceleration. \Cref{fig:overview}
-summarizes the proposed layer at a glance.
+Two questions follow, and the study keeps them apart. First, does the external pass add value
+beyond the solver's own internal scaling? On the operational instances the answer is favorable
+under Gurobi: row scaling improves the solver-facing diagnostics and, in several class--tolerance
+cells, completed-run time or deterministic effort, with the solver's scaling and presolve left
+enabled. Second, is that operational gain attributable to the metadata? Here the operational
+comparison is \emph{non-identifying}: the coupling stage never activates, and by
+\cref{prop:attribution} an equal-kernel, equal-coverage structure-aware and role-blind export
+coincide once the coupling stage is inactive, so the effect that is present is carried by the
+per-row local kernel, which consumes no metadata. The operational study therefore identifies the
+value of external local normalization, while the controlled synthetic study supplies the
+active-regime test needed to isolate the additional metadata effect: once heterogeneous block
+scales activate the coupling stage, the two policies no longer coincide. (The archived operational
+campaigns further used an implementation whose role map was not exhaustive, leaving a block of
+market-shortage rows unscaled; the coverage-restored control of \cref{subsec:strategy-2} removes
+that confound.) Concretely, the paper contributes: (i) an equivalence-preserving, generator-level
+row-scaling framework for block-structured MIPs, evaluated against the solver's own internal
+scaling rather than only against an unscaled base; (ii) an attribution principle
+(\cref{prop:attribution}) that, under matched kernel and coverage, localizes any metadata effect to
+the coupling rows and dictates the comparison the question requires; (iii) operational evidence
+that external scaling can improve Gurobi numerical and computational behavior even with internal
+scaling active; (iv) a controlled heterogeneous-block experiment, under identical kernel and
+coverage, demonstrating a metadata-specific spectral conditioning advantage of one to two orders of
+magnitude; and (v) original-scale verification together with a Gurobi--CPLEX contrast showing that
+conditioning and runtime are separate outcomes. \Cref{fig:overview} summarizes the proposed layer
+at a glance.
 
 \begin{figure}[t]
 \centering
@@ -357,28 +365,23 @@ used as the experimental platform
 We take the formulation as given and insert the proposed preprocessing layer after model
 generation and before solver invocation.
 
-The paper organizes its evidence into three strands of different strength: the algebraic strand
-is exact (positive row scaling preserves the MIP); the numerical strand is empirical
-(structure-aware scaling lowers own-incumbent path-specific fixed-LP diagnostics in the tested
-instances); and the performance strand is conditional and exploratory. Under fixed-pool
-intent-to-treat PAR10---an endpoint fixed after inspecting the data---some structure-aware
-variant falls below Base in each Gurobi class and tolerance, though not the same variant in
-each, while under CPLEX 22.1.2.0 there is no robust gain. SG-Ter-Mer at $0.1\%$ is the only cell in which both variants remain below Base
-after strict reliability adjustment; this is a descriptive penalized-cost ordering, the
-SA-Aug margin is negligible, and it is not replicated at $1\%$. The controlled attribution
-analyses sharpen the result against the method's own premise: essentially the entire Gurobi
-runtime effect is recovered by the local stage alone---a per-row geometric mean that consumes
-no generator metadata---while the direct Flat comparisons make the role-based selection policy
-class-, kernel-, and endpoint-dependent in the reported Gurobi campaigns. The path-specific diagnostic
-moves in the intended numerical direction, but it is neither a pure measure of representation
-nor a proven cause of acceleration.
+The paper organizes its evidence into three strands of different strength. The algebraic strand is
+exact: positive row scaling preserves the MIP. The numerical strand is empirical: structure-aware
+scaling lowers the solver-facing fixed-LP diagnostics on the tested instances and, on the synthetic
+grid, the spectral pseudo-condition number. The performance strand is conditional: the Gurobi
+runtime gains are real but class- and tolerance-dependent and are not robustly reproduced under
+CPLEX, and the controlled attribution analyses show the operational runtime effect is recovered by
+the local stage alone. The path-specific diagnostic moves in the intended numerical direction, but
+it is neither a pure measure of representation nor a proven cause of acceleration---which is exactly
+why the paper measures numerical improvement and solver acceleration separately.
 
 The rest of the paper follows this chain of evidence. \Cref{sec:related-work} identifies
 the research niche. \Cref{sec:model} defines the generated model structure and testbed.
 \Cref{sec:scaling} gives the scaling method. \Cref{sec:experimental-design} explains how
 the experiments test the claims. \Cref{sec:results} reports numerical and runtime
-evidence. \Cref{sec:discussion} interprets that evidence and answers likely objections.
-\Cref{sec:validity} states the main limitations and reproducibility implications, and
+evidence. \Cref{sec:discussion} synthesizes that evidence around external preprocessing, when
+metadata adds numerical value, and the separation of conditioning from runtime.
+\Cref{sec:validity} states the scope and reproducibility implications, and
 \cref{sec:conclusion} summarizes the contribution.
 
 \section{Related work}
@@ -1994,18 +1997,19 @@ nonconfirmatory unclustered checks are reported with Table~S6.
 \section{Computational results}
 \label{sec:results}
 
-The results follow the hierarchy of claims. We first report path-specific numerical
-diagnostics, without treating them as pure measures of representation. We then ask whether
-Gurobi shows lower matched runtime or deterministic effort, and use CPLEX as a contrast for
+The results follow the hierarchy of claims. We first confirm original-scale equivalence and
+report the path-specific numerical diagnostics, without treating them as pure measures of
+representation. We then ask whether Gurobi shows lower matched runtime or deterministic effort
+with its own internal scaling and presolve left enabled, and use CPLEX as a solver contrast for
 the external-preprocessing effect.
 
-The order matters because numerical improvement and algorithmic acceleration are related but
-not identical outcomes---a conditioning table alone would imply too much, a timing table alone
-too little---so the numerical and algorithmic evidence must be read together. The main pattern
-is clear but bounded: under Gurobi, the structure-aware variants lower the reported
-path-specific conditioning diagnostic and often reduce completed-run time or deterministic
-effort; under CPLEX 22.1.2.0, the same
-external scalings do not produce a robust runtime gain.
+The main pattern is favorable but bounded. Under Gurobi, the structure-aware variants lower the
+reported path-specific conditioning diagnostic and, in several class--tolerance cells, reduce
+completed-run time or deterministic effort beyond the default internal-scaling pipeline; under
+CPLEX 22.1.2.0 the same external scalings do not produce a robust runtime gain. Numerical
+improvement and algorithmic acceleration are related but not identical outcomes---a conditioning
+table alone would imply too much, a timing table alone too little---so the two are reported
+together and their claims kept separate.
 
 \subsection{Original-scale numerical verification across the operational campaigns}
 \label{subsec:original-scale-audit}
@@ -3479,7 +3483,9 @@ it does \emph{not} do is exercise the block-relative coupling treatment---the on
 \cref{prop:attribution} allows metadata to matter, and the one stage that stays dormant on every
 operational instance. In this sense the operational comparison is non-identifying for the
 metadata: it shows that scaling helps, that the local kernel carries it, and that equal coverage
-erases the selective--Flat gap, but it leaves the distinctive mechanism untested.
+erases the selective--Flat gap, while the distinctive mechanism is exercised on the synthetic grid
+(\cref{subsec:synthetic-results,subsec:spectral-audit}), where heterogeneous block scales activate
+it.
 
 \FloatBarrier
 
@@ -3487,160 +3493,133 @@ erases the selective--Flat gap, but it leaves the distinctive mechanism untested
 \label{sec:discussion}
 % -------------------------------------------------------------------------
 
-The experiments support a bounded claim. Structure-aware positive row scaling lowers the
-reported own-incumbent path-specific fixed-LP diagnostic. Under fixed-pool intent-to-treat
-\PARten{}, at least one variant is below Base in each Gurobi class and tolerance. SG-Ter-Mer
-at $0.1\%$ is the only cell in which both strict-adjusted costs remain below Base, but the
-SA-Aug margin is negligible, the comparison is descriptive, and the pattern is not replicated
-at $1\%$; under the mixed reading SG-Ter-Mer is descriptively below at both tolerances
-(\cref{subsec:original-scale-audit,tab:par10-readings}). Under CPLEX 22.1.2.0 the same external
-scalings yield no robust runtime gain. The evidence thus separates algebraic equivalence,
-path-specific numerical diagnostics, reliability-adjusted aggregate cost, and mixed-integer
-search performance. The exploratory direct SA--Flat controls, developed in full in
-\cref{subsec:stage-attribution}, add a further separation: the coverage ordering depends on
-the endpoint, the margins in the fast classes are tens of milliseconds and carry a large
-prototype-implementation component, and the reliability-adjusted reading can invert the
-solver-time ordering (Table~S19; Tables~S9--S10).
+\subsection{External preprocessing beyond solver-internal scaling}
+\label{subsec:disc-external}
 
-A first objection is that commercial solvers already scale internally---which is exactly why
-the scaled variants always run against the solver's default internal scaling and presolve
-(the internal-scaling control varies those settings only for the unscaled model). The
-comparison is not external scaling versus a naive solver, but whether a generator can alter
-the solver-facing formulation usefully before the solver's own pipeline begins. The mixed
-Gurobi--CPLEX evidence is informative not only about external preprocessing but also about the
-coverage ordering: the dedicated CPLEX Flat-control cell (\cref{subsec:stage-attribution}) shows
-that the Flat-versus-selective direction is not solver-stable at this scale.
+The experiments support a bounded but genuinely positive operational claim. Structure-aware
+positive row scaling lowers the reported own-incumbent path-specific fixed-LP diagnostic, and
+under fixed-pool intent-to-treat \PARten{} at least one variant falls below Base in each Gurobi
+class and tolerance. This is measured against a solver whose own scaling and presolve are left
+enabled throughout: the scaled variants always run on top of Gurobi's default internal pipeline,
+and the internal-scaling control varies those settings only for the unscaled model. The comparison
+is therefore not external scaling versus a naive solver, but whether a generator can usefully alter
+the solver-facing formulation before the solver's pipeline begins.
 
-A second objection is that any benefit may come from something other than the metadata; the
-controls answer three sub-questions. The \emph{kernel}: the Ruiz baselines swap the
-geometric-mean kernel for max-norm equilibration within the same pipeline
-(\cref{subsec:variants}), and their matched runtime is irregular---the geometric-mean kernel is
-not interchangeable with a generic one, but this says nothing about the metadata. The
-\emph{coverage policy}: whether row-role selection helps is answered only by the role-blind
-controls (\cref{subsec:stage-attribution}); Flat has lower observed prototype time in the two
-fast classes, the cached-metadata endpoint moves the effects close to parity with only one
-fast-class contrast retaining $q_{6}<0.05$, and on solver time alone only the augmented Simple
-contrast at $0.1\%$ survives every adjustment, with all matrix-only contrasts inconclusive.
-Whether the \emph{solver} could do this itself: the internal-scaling control
-(\cref{subsec:internal-scaling}) gives a class-dependent answer---a tie on Simple, a descriptive
-shift favoring the external rule in SG-Ter-Mer, and a tolerance-dependent outcome in Full. On the
-operational instances, where the coupling stage remains inactive, metadata enter only through the
-row-selection policy, whose runtime value is class-, kernel-, tolerance-, and solver-dependent.
-This does not exhaust the role of metadata: the kernel-matched heterogeneous-block experiment
-isolates a distinct block-relative coupling effect that improves spectral pseudo-conditioning
-under equal coverage.
+The internal-scaling control (\cref{subsec:internal-scaling}) gives a class-dependent answer to
+whether the solver can reproduce the external effect on its own: a tie on Simple, a descriptive
+shift favoring the external rule in SG-Ter-Mer, and a tolerance-dependent outcome in Full---no
+universal dominance over the internal modes is claimed. The evidence is also solver-scoped: under
+CPLEX 22.1.2.0 the same external scalings yield no robust runtime gain, and the dedicated CPLEX
+Flat-control cell (\cref{subsec:stage-attribution}) shows the coverage ordering is not
+solver-stable at this scale. The role-blind Flat controls (\cref{tab:flat-control}) add a
+caveat within Gurobi as well: the coverage ordering depends on the endpoint, the fast-class margins
+are tens of milliseconds and carry a large prototype-implementation component, and on solver time
+alone only the augmented Simple contrast at $0.1\%$ survives every multiplicity adjustment, with
+the matrix-only contrasts inconclusive (Tables~S9--S10, S19). SG-Ter-Mer at $0.1\%$ is the one cell
+in which both strict-adjusted costs remain below Base, though the SA-Aug margin is negligible, the
+comparison is descriptive, and the pattern is not replicated at $1\%$; under the mixed reading
+SG-Ter-Mer is descriptively below at both tolerances
+(\cref{subsec:original-scale-audit,tab:par10-readings}). The operational gain is thus real and
+favorable under Gurobi, and conditional---class-, tolerance-, and solver-dependent.
 
-A mechanistic caveat must accompany the conditioning evidence. If better conditioning drove
-faster search, the best-conditioned variant would be fastest, but the data do not line up that
-way: the augmented rule improves solver-level conditioning more than the matrix-only rule, yet
-the matrix-only rule wins runtime more often in Simple and SG-Ter-Mer, and the association
-between the conditioning ratio and speedup is weak (a small Spearman correlation explaining a
-few percent of variance). The honest reading is that conditioning is at best a partial
-mediator: the path-specific diagnostic shift is real, but it is not a pure measure of
-representation and the runtime effect is plausibly routed through mechanisms it does not
-capture---which presolve
-reductions fire, or how many simplex bound-flips and node relaxations the scaled model induces.
-This reading has precedent: large-scale LP experiments find the runtime effect of scaling
-irregular even where conditioning improves \cite{elble2012scaling}, and the conditioning of
-the LP relaxations is known to evolve along the branch-and-cut tree in ways a static snapshot
-of the exported matrix cannot summarize \cite{miltenberger2018numerics}.
-We therefore treat the own-incumbent fixed-LP quantity as a pooled description of solver paths, not
-as evidence of a purer representation or a proven cause of speedup. The role-blind controls
-(\cref{tab:flat-control}) make the dissociation sharpest: the selective rule has a lower
-diagnostic in SG-Ter-Mer and Full, yet that diagnostic compares different integer solutions
-whenever the two runs find different incumbents. It is therefore a representation-plus-path
-diagnostic, not a controlled common-incumbent comparison. The augmented solver-time
-comparison favors Flat in the two $0.1\%$ Simple/SG cells (the latter nominal) and points
-toward selectivity in Full within tolerance, while the matrix-only solver-time contrasts
-are all inconclusive. The structure-aware rules do lower the
-solver-level conditioning ratios below the Ruiz and unscaled baselines; but that gain flows
-through the local stage, whose kernel is itself role-blind, and the synthetic benchmark
-bounds the claim exactly: there the full-coverage flat kernel matches or beats every
-structure-aware variant on the global coefficient-and-right-hand-side magnitude-range proxy.
-This is the expected oracle-like behavior for complete-row multiplier injections when no
-safeguard or near-identity band binds; it is not a statement about spectral optimality. The
-coupling stage's distinctive repair is
-confined to the oversized branch of its collective design case
-(\cref{subsec:synthetic-results}). The coupling metadata make the collective-factor
-intervention \emph{possible}; the benchmark validates that intervention only for oversized
-uniform coupling displacement, and it does not establish a general conditioning advantage
-of metadata over full-coverage per-row scaling. The metadata's operational contribution is a
-candidate \emph{selection} policy---where to apply the kernel---whose runtime value is
-supported only in the kernel-, class-, tolerance-, and solver-scoped contrasts of
-\cref{tab:flat-control}.
+\subsection{When metadata adds numerical value}
+\label{subsec:disc-metadata}
 
-A third objection is that the right-hand side may be unnecessary, and the clean evidence
-comes from the local-only right-hand-side ablation pair in the coupling-stage activation
-audit, whose members differ \emph{only} in
-whether $b$ enters the per-row extremes: the coefficient-only version remains close in
-Simple and SG-Ter-Mer ($2.06$ vs $2.01$\,s and $8.83$ vs $8.58$\,s, within $2$--$3\%$) and
-recovers part of it in Full, where the augmented rule is nominally about $11\%$ faster ($78.9$
-vs $70.9$\,s). That Full figure rests on one run per cell in a class where three or four runs
-time out per variant, so the two geometric means are taken over different solved subsets and
-are descriptive only (Table~S8); it is not separable from run-to-run variability and we do not
-read it as a residual advantage. In the two classes where the pair is well populated the two
-rules agree to within $2$--$3\%$, so most of the benefit does not require the right-hand side,
-while whether including $b$ helps in Full is undetermined. The head-to-head
-\methodAug{}--\methodMat{} comparison is consistent with this but confounds the right-hand
-side with the coupling criterion (\cref{subsec:strategy-2}), so we do not read it as an
-ablation. Other generated models may differ, but the present gains largely do not require
-$b$ in the diagnosis.
+The attribution principle (\cref{prop:attribution}) separates the two possible sources of any
+effect. The per-row local kernel needs no metadata---it reads only each row's own
+coefficients---so under a matched kernel and matched coverage the only place metadata can change the
+export is the coupling treatment: scaling coupling rows relative to the connected block scales
+rather than by their own raw norm. (The Ruiz baselines confirm the geometric-mean kernel is not
+interchangeable with a generic max-norm equilibration, \cref{subsec:variants}, but that speaks to
+the kernel, not the metadata.) The operational instances do not reach the active regime. Their
+coupling rows are mainly balance equations whose incidence coefficients on the generation variables
+are close to one---typically $d_i=1$, occasionally $d_i=0.5$ where the binational Salto Grande
+generation enters the aggregate at half weight---so the coupling proxy stays in the near-identity
+band ($\widehat\rho\approx3\times10^{-4}$ in Simple and exactly $1$ in SG-Ter-Mer and Full) and the
+coupling stage does not activate. The operational activation audit (\cref{subsec:added-controls})
+confirms this: full exports reduce to local-row normalization, and the real instances serve as an
+inactive-regime control.
 
-A fourth objection comes from CPLEX: several transformations improve static or solver-level
-diagnostics, yet paired runtime evidence stays neutral to unfavorable. This does not weaken the
-numerical claim; it limits the performance claim. A commercial MIP run is not a linear-algebra
-experiment---presolve, internal scaling, relaxation bases, cuts, incumbents, branching,
-heuristics, and tolerances all stand between the exported matrix and the runtime---so external
-scaling may improve one stage while the binding bottleneck lies elsewhere. We probed the most
-natural such candidate---that CPLEX's presolve neutralizes the external scaling---by re-running the
-Simple class under CPLEX with presolve disabled. In that class the per-instance effect stayed
-essentially neutral in both regimes (median paired speedup $\approx 1.00$, with the
-structure-aware variant faster on about half of the $204$ instances). Thus presolve does not
-explain the Simple-class neutrality. No corresponding no-presolve run is available for
-SG-Ter-Mer or Full, so presolve remains an untested contributor to their CPLEX results.
+This inactivity is the intended behavior, not a shortfall: a structure-aware rule should not
+intervene merely because metadata are available; it should intervene only when the structural scale
+mismatch is present. The controlled heterogeneous-block grid supplies exactly that mismatch, and
+there the same-kernel, same-coverage policies separate cleanly. The matrix-only block-relative rule
+lowers the spectral pseudo-condition number by about one order of magnitude at exponent range
+$[-2,2]$ and two orders at $[-3,3]$ ($30/30$ instances, $p<10^{-8}$; \cref{tab:metadata-grid}), the
+advantage growing with heterogeneity and negligible when the blocks are near-homogeneous---the
+regime the operational rows occupy. Because kernel and coverage are held fixed, this growth is
+attributable to the block-relative use of metadata alone. The same grid bounds the claim: on the
+global coefficient-and-right-hand-side magnitude-range proxy a full-coverage flat kernel matches or
+beats every structure-aware variant, the oracle-like behavior expected of complete-row multiplier
+injections when no safeguard binds, so the metadata advantage is specific to spectral
+pseudo-conditioning under heterogeneous coupling, not a general dominance on every diagnostic. With
+the reliability floor in place, original-scale feasibility and objective agreement hold across the
+grid; the severe heterogeneous cells are also where, with the floor disabled, the common-factor
+variants expose their reliability failure mode (\cref{subsec:synthetic-results}).
 
-The methodological lesson: numerical preprocessing for MIPs should be judged on four separable
-layers---algebraic equivalence, numerical diagnostics, matched runtime, and solver
-contrast---and never on one coefficient-range statistic or one runtime table. The study reports
-all four layers and keeps their claims separate.
+The operational coupling null must therefore be read as a property of the tested formulation, not as
+evidence against the coupling mechanism. It reflects this dispatch model's lack of a transmission
+network. A model with DC power-flow constraints---the standard next step, present in most
+operational tools---would add coupling rows mixing per-unit susceptances of order
+$10^{2}$--$10^{3}$, phase angles of order $1$, and flow limits of order $10^{2}$--$10^{3}$ against
+blocks scaled in MW and $\mathrm{hm}^3$; inter-area reserve sharing and interconnection limits do
+the same. In any of these $\widehat\rho$ would plausibly leave the near-unity regime and the stage
+would activate. The null reported here is thus evidence about dispatch formulations whose coupling
+rows are near-unity balances, and extending the study to network- or reserve-coupled models is the
+step that would most raise the ceiling of this line of work.
 
-The controlled synthetic benchmark closes part of the gap: when the source of imbalance is known
-by construction, the per-row kernels remove the injected imbalance at the level of the exported
-coefficient-and-right-hand-side magnitude-range proxy---with the role-blind full-coverage
-control matching or beating every structure-aware variant there---and with the
-reliability floor in place original-scale feasibility and objective agreement hold across the
-grid; the same severe heterogeneous coupling cells expose, with the floor disabled, the
-numerical-reliability failure mode of the common-factor variants
-(\cref{subsec:synthetic-results}). It does not close the performance gap---the synthetic instances solve in
-milliseconds---so runtime claims still come from operational instances. The operational
-coupling-stage activation audit (\cref{subsec:added-controls}) establishes that the coupling
-treatment is inactive on these real data and that full exports reduce to local-row
-normalization. Other domains (logistics, production planning, network
-design) would further test whether the mechanism persists as the generator structure changes; it should transfer only insofar as the per-row magnitude heterogeneity that the local stage
-normalizes is present, since that stage carries the measured effect. The premise of sparse
-global coupling over local blocks delimits the class in which the metadata-selectivity question
-can be posed at all, but the coupling stage it motivates never activated in these operational
-runs, so it is not part of what this evidence would carry to another domain.
+\subsection{Conditioning versus runtime}
+\label{subsec:disc-conditioning}
 
-The coupling-stage null should be read structurally rather than as a general property of the
-stage. It fires only when the coupling proxy $\widehat\rho$ leaves the near-identity band, and
-in the operational hydrothermal instances the coupling rows are mainly balance equations whose
-incidence coefficients on the generation variables are close to one---typically $d_i=1$, and
-occasionally $d_i=0.5$ where the binational Salto Grande generation enters the aggregate at
-half weight. The coupling proxy therefore stays in the near-identity regime
-($\widehat\rho\approx3\times10^{-4}$ in Simple and exactly $1$ in SG-Ter-Mer and Full), and the
-coupling stage is not expected to activate: there is simply no coupling-scale heterogeneity for
-it to correct. This must be read as a property of the tested formulation, not as evidence
-against the coupling mechanism in models with genuinely heterogeneous coupling coefficients. In
-particular, it reflects this formulation's lack of a transmission network. A model
-with DC power-flow constraints---the standard next step, present in most operational tools---would
-add coupling rows mixing per-unit susceptances of order $10^{2}$--$10^{3}$, phase angles of order
-$1$, and flow limits of order $10^{2}$--$10^{3}$ against blocks scaled in MW and $\mathrm{hm}^3$;
-inter-area reserve sharing and interconnection limits do the same. In any of these
-$\widehat\rho$ would plausibly leave the near-unity regime and the stage would activate. The null
-reported here is therefore evidence about dispatch formulations whose coupling rows are
-near-unity balances, and is not evidence about block-coupled MIPs with network or reserve
-coupling; testing those is the single change that would most raise this paper's ceiling.
+Better conditioning is a numerical result, not a theorem of faster branch-and-bound. If it drove
+search speed, the best-conditioned variant would be the fastest, but the data do not line up that
+way: the augmented rule improves solver-level conditioning more than the matrix-only rule, yet the
+matrix-only rule wins runtime more often in Simple and SG-Ter-Mer, and the association between the
+conditioning ratio and speedup is weak (a small Spearman correlation explaining a few percent of
+variance). A commercial MIP run is not a linear-algebra experiment: presolve reductions, relaxation
+bases, cuts, incumbents, branching, heuristics, seeds, and tolerances all stand between the exported
+matrix and the runtime, so external scaling can improve one stage while the binding bottleneck lies
+elsewhere. This has precedent---large-scale LP experiments find the runtime effect of scaling
+irregular even where conditioning improves \cite{elble2012scaling}, and the conditioning of the LP
+relaxations evolves along the branch-and-cut tree in ways a static snapshot cannot summarize
+\cite{miltenberger2018numerics}. We therefore treat the own-incumbent fixed-LP quantity as a pooled
+description of solver paths---a representation-plus-path diagnostic, since it compares different
+integer solutions whenever two runs find different incumbents (\cref{tab:flat-control})---not as a
+pure measure of representation or a proven cause of speedup.
+
+The CPLEX evidence sharpens the same separation: several transformations improve static or
+solver-level diagnostics, yet paired CPLEX runtime stays neutral to unfavorable. This does not
+weaken the numerical claim; it limits the performance claim. We probed the most natural
+mechanism---that CPLEX presolve neutralizes the external scaling---by re-running Simple under CPLEX
+with presolve disabled; the per-instance effect stayed essentially neutral (median paired speedup
+$\approx1.00$, structure-aware faster on about half of the $204$ instances), so presolve does not
+explain the Simple-class neutrality, while no no-presolve run is available for SG-Ter-Mer or Full.
+The methodological lesson is that numerical preprocessing for MIPs must be judged on four separable
+layers---algebraic equivalence, numerical diagnostics, matched runtime, and solver contrast---and
+never on one coefficient-range statistic or one runtime table; this study reports all four and keeps
+their claims separate.
+
+\subsection{Reliability and the recommended variant}
+\label{subsec:disc-reliability}
+
+The augmented rule (SA-Aug) folds the right-hand side into the per-row and per-block extremes, and
+that is where reliability is at risk. Under the pre-declared absolute criterion SA-Aug degrades
+original-scale reliability relative to Base, with failures concentrated on zero-right-hand-side
+balance rows, where a large $|b_r|$ plays no stabilizing role yet still enters the extremes. The
+clean evidence that the right-hand side is largely unnecessary comes from the local-only ablation
+pair, whose members differ \emph{only} in whether $b$ enters the per-row extremes: the
+coefficient-only version stays within $2$--$3\%$ in the two well-populated classes ($2.06$ vs
+$2.01$\,s in Simple, $8.83$ vs $8.58$\,s in SG-Ter-Mer) and recovers part of the difference in Full,
+where the augmented rule is nominally about $11\%$ faster ($78.9$ vs $70.9$\,s). That Full figure
+rests on one run per cell in a class with three or four timeouts per variant, so its two geometric
+means are taken over different solved subsets and are descriptive only (Table~S8); we do not read it
+as a residual advantage. The head-to-head \methodAug{}--\methodMat{} comparison is consistent but
+confounds the right-hand side with the coupling criterion (\cref{subsec:strategy-2}), so we do not
+read it as an ablation. The matrix-only rule therefore has both the cleaner numerical
+rationale---it never lets a right-hand-side magnitude drive a coefficient scale---and the cleaner
+reliability profile, and it is the variant we recommend. In every case the returned solution must be
+verified on the original unscaled constraints, and runtime must be treated as a separate empirical
+criterion at deployment.
 
 \subsection{Deployability and downstream effects}
 \label{subsec:deployability}
@@ -3708,22 +3687,19 @@ choices keep the argument auditable---a reader can see which evidence supports a
 equivalence, which supports numerical improvement, and which supports the observed pipeline-specific
 runtime evidence.
 
-An incomplete role map in the tested implementation is the limitation that most shapes how the
-coverage results should be read. The implementation did not realize an exhaustive map
+An incomplete role map in the tested implementation is the scope limitation that most shapes how the
+coverage results should be read. That implementation did not realize an exhaustive map
 $\tau$ \eqref{eq:role-disjointness}: a block of market-shortage constraints was left outside both
 the local-block and the coupling classes, even though the formulation contains no residual row
-category and each such row is generated by the market/shortage module. The initial
-selective-versus-Flat comparison therefore confounded structural treatment with unequal row
-coverage, and its SG-Ter-Mer difference reflects that coverage gap rather than the metadata. The
-revision responds in three ways: it traces the generating module of the affected rows and records
-it; it closes the gap with the metadata-routed full-coverage rule, whereupon the selective--Flat
-difference disappears (\cref{subsec:added-controls})---though this coverage-restored control
-equalizes only the \emph{set} of scaled rows and is not equivalent to reconstructing a native
-exhaustive block assignment inside the generator; and it states the attribution principle
-(\cref{prop:attribution}) that makes the coverage-matched comparison explicit. What the revision
-does not yet do is re-derive a full per-block assignment of every generated row inside the
-generator and re-run the augmented rule on it; that, with synthetic instances that drive the
-dormant coupling stage, is the identified next step.
+category and each such row is generated by the market/shortage module. The selective-versus-Flat
+comparison therefore confounds structural treatment with unequal row coverage, and its SG-Ter-Mer
+difference reflects that coverage gap rather than the metadata. The coverage-restored full-coverage
+rule removes the confound---once every row is covered the selective--Flat difference disappears
+(\cref{subsec:added-controls})---but it equalizes only the \emph{set} of scaled rows and is not
+equivalent to reconstructing a native exhaustive block assignment inside the generator, and the
+attribution principle (\cref{prop:attribution}) makes the coverage-matched comparison explicit. A
+native per-block assignment of every generated row, together with operational instances that drive
+the coupling stage into its active regime, remains the natural next step.
 
 The main limitation is domain coverage. The method applies to generated modular MIPs with
 identifiable local blocks and coupling rows, but the evidence comes from one hydrothermal
@@ -3864,50 +3840,47 @@ speedup.
 
 Generated MIPs carry structure before export---local rows, component blocks, and coupling
 rows---that the solver never sees beyond the flat matrix, and this paper asks when reusing it to
-choose positive, equivalence-preserving row scalings actually helps. The answer is
-regime-dependent. Row scaling lowers the reported own-incumbent conditioning diagnostic, and under
-Gurobi at least one structure-aware variant beats the unscaled base in every class and tolerance,
-whereas under CPLEX 22.1.2.0 there is no robust runtime gain. But the distinctive use of the
-metadata---treating coupling rows relative to the scales of the blocks they connect---helps
-precisely, and only, when those block scales are heterogeneous: a kernel-matched experiment shows
-the matrix-only structure-aware rule improving the spectral pseudo-condition number by a median
-order of magnitude over a role-blind rule with the same kernel and coverage
-(\cref{subsec:spectral-audit}), while the augmented collective rule obtains no such advantage.
+choose positive, equivalence-preserving row scalings actually helps. Four questions organize the
+answer.
 
-On the operational hydrothermal instances the mechanism stays dormant. The activation audit
-establishes that the coupling stage never fires and that the exported transformation coincides
-with the local-only rule, so the operational effect is entirely local-row normalization; the
-architecture is still equivalence-preserving, since every factor multiplies a complete constraint
-by a positive scalar. The direct role-blind controls (\cref{tab:flat-control}) then show that the
-coverage-versus-selectivity ordering depends on what one measures---prototype
-preprocessing-plus-solver time, where the selective rule pays mainly to reconstruct metadata,
-versus the cached-metadata endpoint, where removing that reconstruction moves the fast-class
-effects close to parity (only one small Simple contrast keeps an adjusted value below
-$0.05$)---and the added CPLEX flat-control cell shows the ordering does not even hold its sign
-across solvers at this one-percent scale. Establishing this bounded reading required separating
-four kinds of evidence---algebraic equivalence, original-scale feasibility, solver-facing
-diagnostics, and matched per-solver runtime---so the rule with the lowest reported diagnostic need
-not be the one that solves fastest.
+\emph{Does external scaling help the operational application?} Under Gurobi, yes: external
+generator-level row scaling improves the solver-facing numerical diagnostics and, in several
+class--tolerance cells, completed-run time or deterministic effort beyond the default
+internal-scaling pipeline, which stays enabled throughout. The result is class- and
+tolerance-dependent and is not robustly reproduced under CPLEX 22.1.2.0.
 
-Two facts fix the scope. The block-relative coupling stage---the one place \cref{prop:attribution}
-lets the metadata change the exported matrix---never activates operationally; and the only
-substantial structure-aware-versus-Flat difference came from an incomplete role map that left the
-market-shortage rows unscaled, not from the metadata, since under equal coverage the matrix-only
-policies coincide byte-for-byte. The operational campaigns therefore evaluate local normalization
-and the consequences of unequal coverage far more than block-relative coupling metadata: a
-non-identifying result about the metadata, not a refutation.
+\emph{Is that operational runtime gain attributable to the metadata?} Not to the distinctive
+coupling mechanism. The operational coupling rows are already balanced, so by
+\cref{prop:attribution} the structure-aware and role-blind matrix-only exports coincide
+byte-for-byte there, and the measured effect comes primarily from local-row normalization---a
+per-row kernel that consumes no metadata. The operational comparison is in this precise sense
+non-identifying for the value of metadata, not a refutation of it.
 
-For deployment the preferred candidate is a coverage-safeguarded matrix-only rule: cover every row
+\emph{Does the metadata itself provide an additional numerical advantage?} Yes, when the blocks
+connected by the coupling rows occupy heterogeneous scales. Under an identical kernel and identical
+coverage, a controlled heterogeneous-block experiment isolates a spectral pseudo-conditioning
+improvement of one to two orders of magnitude for the matrix-only rule over a role-blind rule
+(\cref{tab:metadata-grid}), attributable to block metadata alone, while the augmented collective
+rule obtains no such advantage.
+
+\emph{Does better conditioning guarantee a faster MIP solution?} No. Conditioning is a distinct
+numerical contribution whose runtime consequence must be evaluated separately for each solver
+pipeline; establishing this bounded reading required separating four kinds of evidence---algebraic
+equivalence, original-scale feasibility, solver-facing diagnostics, and matched per-solver runtime.
+For deployment the preferred rule is a coverage-safeguarded matrix-only scaling: cover every row
 with the coefficient-only kernel, keep the structural treatment for the coupling rows, time the
 preprocessing (which on fast instances can decide the ordering), and reject and re-solve any run
-that fails original-scale verification, under the base formulation or more conservative
-settings---in preference to the augmented rule, whose use of the right-hand side adds a documented
-reliability failure mode. The decisive next experiment is to compare the operational policies
-under a \emph{native exhaustive} role assignment and identical coverage, so that any residual
-difference is attributable to the coupling treatment alone (\cref{prop:attribution}), and to build
-an operational testbed whose coupling rows enter the heterogeneous-block regime the synthetic grid
-already identifies as where the metadata pays. The synthetic comparison already meets that bar;
-the operational one does not yet.
+that fails original-scale verification---in preference to the augmented rule, whose use of the
+right-hand side adds a documented reliability failure mode.
+
+External scaling, metadata-specific conditioning, and solver acceleration are thus three distinct
+layers of evidence, and the study's design keeps them apart. The operational instances establish the
+practical value of the external pass under Gurobi; the controlled heterogeneous-block study
+identifies when metadata adds a numerical capability a flat rule cannot supply. The two experiments
+are complementary---one locates the value of external local normalization in a realistic pipeline,
+the other isolates the structural metadata mechanism---and together they answer, for generated
+block-structured MIPs, both whether generator-level preprocessing helps and when block metadata
+makes the difference.
 
 % Float barrier removed to improve two-column layout.
 
