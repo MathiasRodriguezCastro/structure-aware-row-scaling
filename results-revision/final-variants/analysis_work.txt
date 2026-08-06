@@ -1,0 +1,48 @@
+# Final-variants paired analysis  (metric=work_units, PAR10 timeout=1800s)
+
+== cell gurobi_sgtm_01pct  (15 instances) ==
+   timeouts:   Base=0  Flat-GM=1  Flat-L2=1  Role-Hybrid=1
+   max|resid|: Base=9.9e-08  Flat-GM=5.3e-11  Flat-L2=5.8e-08  Role-Hybrid=5.7e-09
+   Flat-GM     / Base    : med=0.377 gm=0.768 CI[0.392,1.560] W/T/L=12/0/3 p=0.2293
+   Flat-L2     / Base    : med=0.708 gm=1.051 CI[0.652,1.849] W/T/L=10/0/5 p=0.4212
+   Role-Hybrid / Base    : med=0.566 gm=0.807 CI[0.399,1.668] W/T/L=11/0/4 p=0.5245
+   Flat-L2     / Flat-GM : med=1.029 gm=1.238 CI[0.923,1.776] W/T/L=2/3/5 p=0.5781
+   Role-Hybrid / Flat-GM : med=1.000 gm=1.051 CI[0.938,1.188] W/T/L=4/2/4 p=0.6328
+
+== cell gurobi_sgtm_1pct  (15 instances) ==
+   timeouts:   Base=0  Flat-GM=1  Flat-L2=1  Role-Hybrid=1
+   max|resid|: Base=9.9e-08  Flat-GM=5.3e-11  Flat-L2=5.8e-08  Role-Hybrid=2.3e-11
+   Flat-GM     / Base    : med=0.388 gm=0.827 CI[0.419,1.714] W/T/L=11/0/4 p=0.2524
+   Flat-L2     / Base    : med=0.732 gm=1.200 CI[0.759,2.121] W/T/L=9/0/6 p=0.6788
+   Role-Hybrid / Base    : med=0.388 gm=0.854 CI[0.417,1.803] W/T/L=10/0/5 p=0.5245
+   Flat-L2     / Flat-GM : med=1.029 gm=1.313 CI[0.932,1.925] W/T/L=2/3/5 p=0.5781
+   Role-Hybrid / Flat-GM : med=1.000 gm=1.032 CI[0.898,1.179] W/T/L=4/2/4 p=0.5938
+
+== cell gurobi_simple_01pct  (15 instances) ==
+   timeouts:   Base=0  Flat-GM=0  Flat-L2=0  Role-Hybrid=0
+   max|resid|: Base=9.0e-06  Flat-GM=2.4e-05  Flat-L2=4.3e-04  Role-Hybrid=2.4e-05
+   Flat-GM     / Base    : med=1.026 gm=1.042 CI[0.864,1.240] W/T/L=6/1/8 p=0.7197
+   Flat-L2     / Base    : med=1.070 gm=1.435 CI[0.923,2.426] W/T/L=6/1/8 p=0.5245
+   Role-Hybrid / Base    : med=1.026 gm=1.042 CI[0.864,1.240] W/T/L=6/1/8 p=0.7197
+   Flat-L2     / Flat-GM : med=1.000 gm=1.377 CI[0.854,2.332] W/T/L=1/8/6 p=0.2359
+   Role-Hybrid / Flat-GM : med=1.000 gm=1.000 CI[1.000,1.000] W/T/L=0/15/0 p= n/a
+
+== cell gurobi_simple_1pct  (15 instances) ==
+   timeouts:   Base=0  Flat-GM=0  Flat-L2=0  Role-Hybrid=0
+   max|resid|: Base=9.0e-06  Flat-GM=1.8e-06  Flat-L2=5.0e+00  Role-Hybrid=1.8e-06
+   Flat-GM     / Base    : med=0.877 gm=0.632 CI[0.328,1.029] W/T/L=9/0/6 p=0.1876
+   Flat-L2     / Base    : med=1.070 gm=1.823 CI[1.037,3.473] W/T/L=7/0/8 p=0.4543
+   Role-Hybrid / Base    : med=0.877 gm=0.632 CI[0.328,1.029] W/T/L=9/0/6 p=0.1876
+   Flat-L2     / Flat-GM : med=1.000 gm=2.886 CI[1.408,6.318] W/T/L=0/10/5 p=0.0431
+   Role-Hybrid / Flat-GM : med=1.000 gm=1.000 CI[1.000,1.000] W/T/L=0/15/0 p= n/a
+
+== DECISION RULE (per the plan) ==
+Reading: a variant 'wins' a cell if its geomean ratio vs Base < 1 with the
+bootstrap CI upper bound < 1 (robust speedup), no new timeouts, residual valid.
+
+  Flat-GM     vs Base: robustly-better 0 / worse 0 / neutral 4 cells
+  Flat-L2     vs Base: robustly-better 0 / worse 1 / neutral 3 cells
+  Role-Hybrid vs Base: robustly-better 0 / worse 0 / neutral 4 cells
+
+  Role-Hybrid vs Flat-GM : better 0 / worse 0 / neutral 4 cells
+  Role-Hybrid vs Flat-L2 : better 1 / worse 0 / neutral 3 cells
