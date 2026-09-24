@@ -125,10 +125,19 @@ cumple, T = 7200.
 
 ## 7. Conteos
 
-- **Evaluación:** 490 Simple, 490 SG-Ter-Mer y 470 Full = **1.450 instancias**.
-- **Primaria:** 1.450 × 4 políticas × 3 solvers × 2 gaps × 1 seed = **34.800 corridas**.
-- **Multi-seed:** 50 + 50 + 50 (primeras de la evaluación por orden de hash) × 4 × 3 × 2 × 4 seeds
-  extra = **14.400 corridas**.
+> **Corrección de pre-registro (2026-09-24, antes de toda corrida de política).** Esta sección
+> había quedado con el conteo de un borrador anterior (470 Full de evaluación y 50 de multi-seed).
+> El split congelado (`design/instance-split.csv`) y el modelo de costo
+> (`design/cost-model.json`), ambos referenciados por hash en `campaign-manifest.json`, usan 120
+> Full de evaluación y 20 de multi-seed: Full domina el costo (274 de las 414 CPU-h esperadas por
+> solver) y la licencia de Gurobi limita la concurrencia. Se corrigen los números para que el
+> documento y el manifiesto digan lo mismo.
+
+- **Evaluación:** 490 Simple, 490 SG-Ter-Mer y 120 Full = **1.100 instancias**.
+- **Primaria:** 1.100 × 4 políticas × 3 solvers × 2 gaps × 1 seed = **26.400 corridas** (8.800 por
+  solver).
+- **Multi-seed:** 50 + 50 + 20 (primeras de la evaluación por orden de hash) × 4 × 3 × 2 × 4 seeds
+  extra = **11.520 corridas** (3.840 por solver).
 - **Piloto:** 50 × 2 solvers × 1 corrida = 100 corridas (cap 7200 s).
 - **Auditoría de instance077:**
   - dos versiones (la histórica defectuosa y la corregida) × 3 × 4 × 2 × 5 seeds = 240 corridas con
@@ -149,8 +158,8 @@ cumple, T = 7200.
 
 | Por solver | Esperado | Peor caso |
 |---|---:|---:|
-| Primaria | **1.246 CPU-h** (Simple 35, SG-Ter-Mer 105, Full 1.106) | 7.733 CPU-h |
-| Multi-seed | **499 CPU-h** (Full 439) | 3.222 CPU-h |
+| Primaria | **414 CPU-h** (Simple 35, SG-Ter-Mer 105, Full 275) | 4.910 CPU-h |
+| Multi-seed | **297 CPU-h** (Full 237) | 2.254 CPU-h |
 | Piloto (CPLEX + HiGHS) | — | 200 CPU-h |
 | instance077 | — | 124 CPU-h |
 
@@ -159,8 +168,8 @@ cumple, T = 7200.
     peor caso en Full;
   - sin límite de licencia, así que con ~100 cores concurrentes son **1–3 días de pared** cada uno.
 - **Gurobi (el cuello de botella):**
-  - **con 2 sesiones:** 1.745 CPU-h / 2 ≈ **36 días de pared**;
-  - **con 16 sesiones:** ≈ **4,5 días**.
+  - **con 2 sesiones:** 711 CPU-h / 2 ≈ **15 días de pared**;
+  - **con 16 sesiones:** ≈ **2 días**.
 - **Almacenamiento:**
   - ~3 GB (fila de resumen + log comprimido + JSON de procedencia);
   - los CSV de despacho se descartan después de la verificación interna.
