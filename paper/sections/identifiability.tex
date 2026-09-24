@@ -60,8 +60,12 @@ Under the skip-band assumptions of \cref{prop:audit-collapse},
  u^{-1}\leq\frac{\gamma_r^{\mathrm{block}}}
                        {\gamma_r^{\mathrm{L2}}}\leq u,
 \]
-and, before coupling safeguards, the condition numbers of the two exports differ by
-at most a factor $u^2$ on their common nonzero singular spectrum.
+and, before coupling safeguards,
+\[
+ u^{-2}\leq\frac{\kappa_2^+(A_{\mathrm{block}})}{\kappa_2^+(A_{\mathrm{L2}})}\leq u^2,
+\]
+where $\kappa_2^+(A)=\sigma_{\max}(A)/\sigma_{\min}^+(A)$ is taken over the positive singular
+values, so the bound covers rectangular and rank-deficient exports.
 \end{proposition}
 \begin{proof}
 The equality follows by substituting $s_i=1$. In the second case,
@@ -72,9 +76,9 @@ The equality follows by substituting $s_i=1$. In the second case,
 which gives the factor bound. Write the block-based export as $EA_{\mathrm{L2}}$,
 where $E$ has unit entries on local rows and entries in $[1/u,u]$ on coupling
 rows. Multiplication by $E$ changes each singular value by a factor between
-$1/u$ and $u$ and preserves rank. Applying these inequalities to the largest and
-smallest positive singular values in both directions proves the condition-number
-bound.
+$1/u$ and $u$ and preserves rank, so $\sigma_{\max}$ and $\sigma_{\min}^+$ each move by at
+most $u$; taking the two extremes in opposite directions gives the stated interval for their
+ratio.
 \end{proof}
 
 Both statements assume that the block summary sees every coefficient. Coefficient-window
@@ -163,4 +167,7 @@ $\kappa_2$ decreases to one as $\gamma\to0$, while a fixed residual on the expor
 row corresponds to an original residual larger by the factor $1/\gamma$. A conditioning
 criterion alone cannot say how small a coupling factor may be: on any interval its
 minimizer for $A_\gamma$ is the lower endpoint $\ell$. \Cref{sec:contract} derives that
-endpoint from an application-unit residual budget.
+endpoint from an application-unit residual budget. The two halves of the paper meet here.
+Block ownership did not survive the preceding normalization as usable scaling information;
+application-unit accuracy does survive it, once it is encoded as a residual budget carried
+with the row.

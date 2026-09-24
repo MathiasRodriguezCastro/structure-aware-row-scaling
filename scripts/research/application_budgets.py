@@ -87,6 +87,9 @@ def main():
     for (label, unit, delta), members in sorted(groups.items()):
         gm, admissible, residuals = [], 0, []
         lo_all, hi_all = [], []
+        # The policies use three distinct kernels; Role-Hybrid picks one of the last two per row,
+        # so it is admissible wherever both are.
+        kernels = {"Base": 0, "Flat-GM": 0, "Flat-L2": 0}
         for a, _ in members:
             nz = np.abs(a[a != 0])
             d = select_factor(a, delta, epsilon=args.epsilon,
@@ -96,6 +99,9 @@ def main():
             lo_all.append(d.lower); hi_all.append(d.upper)
             admissible += int(d.lower <= g <= d.upper)
             residuals.append(args.epsilon / g)
+            for name, factor in (("Base", 1.0), ("Flat-GM", g),
+                                 ("Flat-L2", 1.0 / float(np.linalg.norm(a)))):
+                kernels[name] += int(d.lower <= factor <= d.upper)
         out.append({"constraint_group": label, "rows": len(members), "unit": unit,
                     "declared_budget": delta,
                     "median_gm_factor": float(np.median(gm)),
@@ -104,7 +110,10 @@ def main():
                     "gm_admissible_rows": admissible,
                     "median_original_residual_under_gm": float(np.median(residuals)),
                     "max_original_residual_under_gm": float(np.max(residuals)),
-                    "margin_factor": float(delta / np.max(residuals))})
+                    "margin_factor": float(delta / np.max(residuals)),
+                    "base_admissible_rows": kernels["Base"],
+                    "flat_gm_admissible_rows": kernels["Flat-GM"],
+                    "flat_l2_admissible_rows": kernels["Flat-L2"]})
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=list(out[0]))
