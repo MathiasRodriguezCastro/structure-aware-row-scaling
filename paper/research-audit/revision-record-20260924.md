@@ -26,6 +26,19 @@ What this round changes, and which claims are confirmatory and which exploratory
    (`results-revision/research-audit/application-budgets/`). It needs no solver and adds no
    experiment: the budgets are declared by the modeller, which the limitations say plainly.
 
+5. **Narrative and precision pass.** The title now says *generated* mixed-integer programs; the
+   introduction states the paper's single question and says which contribution answers which
+   half; Section 4 ends on the bridge to Section 5 and Section 5 opens by picking it up. Claims
+   a referee would question were tightened: the illustrative budgets are the modeller's, the
+   collapse result and the triangular optimum are stated separately, the abstract says the basis
+   is fixed per model and names the subset behind the 30--32 percent, the comparator is explicit
+   wherever a budgeted rule "never lost" a configuration, the admissibility claim is backed by
+   checking all three kernels on every row, Proposition 4.2 is written with the pseudo-condition
+   number, and the stress counts are introduced as what they are rather than as failure rates.
+
+6. **Sensitivity to the scenario defect** (supplement): both endpoints repeated on the six
+   SG-Ter-Mer instances without the demand inversion.
+
 ## Confirmatory (registered before the data were seen)
 
 - C5 stress experiment under CPLEX: budgeted versus budget-free paired discordance. This is the
