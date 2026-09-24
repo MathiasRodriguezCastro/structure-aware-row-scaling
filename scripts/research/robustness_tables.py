@@ -57,8 +57,12 @@ def par10_table(cells, out):
     (out / "robustness-par10.tex").write_text("\n".join(lines) + "\n")
 
 
-def paired_table(paired, out, name="robustness-paired.tex", endpoint="time"):
-    """Policy/Base ratio on the instances every policy completed."""
+def paired_table(paired, out, name="robustness-paired.tex", endpoint="time", stat="gm"):
+    """Policy/Base ratio on the instances every policy completed.
+
+    `stat` selects the geometric mean with its interval or the median, which differ when the
+    gain is concentrated in a subset of instances rather than typical.
+    """
     d = order(paired[paired.stage.eq("primary") & paired.endpoint.eq(endpoint)])
     pol = POLICIES[1:]
     lines = [r"\begin{tabular}{llrr" + "r" * len(pol) + "}", r"\toprule",
@@ -69,7 +73,8 @@ def paired_table(paired, out, name="robustness-paired.tex", endpoint="time"):
         for p in pol:
             if p in row.index:
                 r = row.loc[p]
-                vals.append(f"{r.geometric_mean_ratio:.3f} [{r.ci_low:.3f}, {r.ci_high:.3f}]")
+                vals.append(f"{r.geometric_mean_ratio:.3f} [{r.ci_low:.3f}, {r.ci_high:.3f}]"
+                            if stat == "gm" else f"{r.median_ratio:.3f}")
             else:
                 vals.append("--")
         n = int(g.n_pairs.max())
@@ -126,6 +131,7 @@ def main():
     paired = read(args.analysis / "paired-primary.csv")
     if len(paired) and paired.stage.eq("primary").any():
         paired_table(paired, args.tables)
+        paired_table(paired, args.tables, "robustness-paired-median.tex", "time", stat="median")
         if paired.endpoint.eq("effort").any():
             paired_table(paired, args.tables, "robustness-paired-effort.tex", "effort")
     clustered = read(args.analysis / "paired-clustered.csv")
