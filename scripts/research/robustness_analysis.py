@@ -65,6 +65,9 @@ def cells(d):
                 "median_final_gap_censored_pct": round(float(gp[gp.censored].gap_pct.median()), 4)
                     if gp.censored.any() else None,
                 "verified_rate": round(float(gp.verified.mean()), 4),
+                # Upper bound on the cost of the policy itself: build + scale + verify.
+                "median_nonsolver_overhead_s": round(float((gp.wall_s - gp.tiempo_solver_s).median()), 2)
+                    if gp.wall_s.notna().any() else None,
                 "infrastructure_failures": int(gp.infrastructure_failure.astype(bool).sum()),
             })
     return pd.DataFrame(out)
