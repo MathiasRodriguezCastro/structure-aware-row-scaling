@@ -237,52 +237,6 @@ resolution of 0.01 units, on the instances that every policy completed; paired g
 ratios carry exploratory bootstrap intervals (Online Resource 1). The two gap settings reuse the same instances and are not independent
 replications.
 
-\subsection{Solver-robustness campaign}
-\label{subsec:design-robustness}
-The reconstruction above fixes one solver, one seed, one thread count and 15 instances per
-class. A second campaign separates what survives changing those choices. Its protocol was
-frozen before any evaluation run: the design document, the instance split, the run tables and
-their hashes are stored in the repository, and every planned run is reconciled with its record
-in a closing audit (Online Resource 1). Reruns are admissible only on documented external
-failure --- node loss, corrupted file, unavailable licence, scheduler kill unrelated to the
-solver. A solver timeout is an outcome, not a failed job.
-
-\paragraph{Instances.} Three families of 500 instances each --- Simple, SG-Ter-Mer and Full ---
-form the benchmark. Instances are ordered by the digest of the campaign identifier, the family
-and the instance file; the first 10, 10 and 30 form a calibration set used only to choose time
-limits and excluded from every comparison, and the next 490, 490 and 120 form the evaluation
-set. The Full family is smaller because its runs are the most expensive and the Gurobi
-licence sustains two concurrent sessions; the reduction was decided from the historical cost
-model before any policy ran on the pool. A separate pool of 10{,}000 Simple instances exists and is not used:
-enlarging the easiest family would inflate the run count without addressing the open question.
-
-\paragraph{Time limits.} The family time limits follow a rule registered before the calibration
-runs: the smallest limit in $\{1800, 3600, 7200\}$ seconds for which the unscaled policy
-completes at least 80\% of calibration instances at a 1\% gap and at least 70\% at 0.1\%, for
-Gurobi and for CPLEX, and 7{,}200 seconds if none qualifies. A non-completion is scored at ten
-times its own family limit, and PAR10 is never averaged across families.
-
-\paragraph{Solvers.} Gurobi~13.0.1, CPLEX~22.1.2 and HiGHS~1.15.1 solve the same exported
-models through their C++ interfaces, each on one thread, with a primal feasibility tolerance of
-$10^{-6}$, an integrality tolerance of $10^{-5}$, and presolve, cuts and internal scaling at
-their defaults. The thread count was fixed before any comparison; conditioning instrumentation
-is off so that it cannot perturb the measured effort. Effort measures are solver-specific
---- work units, deterministic ticks, nodes --- and are compared only within a solver. A second
-registered rule restricts HiGHS to the replication subset in any family where it completes
-fewer than half of the calibration instances at the family limit; its censoring is reported as
-a result rather than hidden by a larger limit.
-
-\paragraph{Endpoints and replication.} The primary endpoints are PAR10 over the assigned pool
-and the completion, timeout and censored-gap rates, reported for each family, solver and gap
-separately; the 1\% and 0.1\% settings are never pooled. The secondary endpoint is the paired
-ratio on the instances that every policy completes. Every returned point is verified against
-the original model in its own units. A replication subset of 50, 50 and 20 instances, fixed
-before any result was seen, is rerun with four further solver seeds; its inference resamples
-instances, not instance--seed pairs, because seeds of one instance are not independent
-replications. Instance077, which reversed the PAR10 ordering in the reconstruction, stays in
-the evaluation set and is additionally audited on its own, in both its historical and its
-corrected version, under the historical thread count as well as the campaign's.
-
 \subsection{Enumerated residual-budget stress experiment}
 \label{subsec:design-stress}
 Three binary families with 12 variables contain a cardinality row, three positive packing rows
@@ -499,7 +453,7 @@ applies to continuous rows and to constraints admitting no such reduction.
 representation reduced completed-run work and caused a timeout, the same factors were accepted
 differently by the three solvers, and a one-ulp change in a factor changed HiGHS outcomes.
 
-\subsection{What remains limited}
+\subsection{Scope and limitations}
 The operational evidence comes from one application, with two classes in the solver campaign,
 one solver, one seed and 15 fixed instances per class. The stress instances are small and
 deliberately adversarial; their budget of 0.01 is a numerical test parameter, and engineering
@@ -518,14 +472,15 @@ while preserving the MILP in exact arithmetic, and the kernel determines whether
 
 Correct attribution changes the explanation of the gain. The advantage originally attributed to
 block metadata is a coupling-kernel effect: exact GM local normalization erases the
-extrema-based post-local block statistic, and a Euclidean coupling normalization, optimal in the idealized triangular model, accounts for
+extrema-based post-local block statistic, and the closed-form coupling factor of the idealized
+triangular model, which reduces to Euclidean normalization in the single-row case, accounts for
 the improvement without ownership information.
 
 Residual budgets provide a constructive way to encode information that keeps its meaning in
 original application units. They come with exact feasibility and incompatibility conditions, a
 centered factor, invariance under re-emission, and explicit rounding and binary64 export
-conditions, and in the stress experiment they removed the verification losses caused by
-coefficient centering on two of the three solvers tested, without ever causing one.
+conditions, and in the stress experiment adding the residual budget to the same scaling rule
+never reduced verification on any of the three solvers tested.
 
 What a solver does with a scaled representation still has to be measured, and its output still
 has to be verified. The practical lesson is therefore not to avoid external scaling, but to make

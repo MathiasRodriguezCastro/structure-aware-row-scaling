@@ -166,11 +166,10 @@ hours and reaches 259 units. The exported models remain well-posed MILPs and eve
 in this paper is between representations of the same model, so no reported equivalence,
 residual or effort measurement is affected. What the defect does mean is that those instances
 are not faithful market scenarios and that the physical reading of their solutions is
-unreliable. The pool used by the solver-robustness campaign is the corrected one, built from
-the authoritative demand series, in which no instance shows the inversion (0 of 500, against
-291 of 500 in the uncorrected release). The counts are produced by
-\path{scripts/research/check_sgtm_demand.py} and stored in
-\path{results-revision/solver-robustness/inventory/sgtm-demand-check.json}.
+unreliable. A corrected pool built from the authoritative demand series exists and shows the
+inversion in none of its 500 instances, against 291 of 500 in the uncorrected release; it is
+not used by any result reported here. The counts are produced by
+\path{scripts/research/check_sgtm_demand.py}.
 
 \paragraph{Work and uncertainty.}
 The old runner's scaled-policy Work markers inherited a fixed, zero-decimal stream
@@ -220,53 +219,6 @@ input hashes and analysis settings. The script
 main-text table. A separate two-run smoke check under \path{precision-smoke/}
 verifies that the corrected C++ Work marker preserves the solver API's precision;
 it does not replace any of the 240 historical observations.
-
-\section{Solver-robustness campaign protocol}
-\label{si:robustness}
-The campaign identifier is \texttt{solver-robustness-v1}. Its pre-registration is
-\path{results-revision/solver-robustness/campaign-manifest.json} (SHA-256 \texttt{bee02909\dots}),
-which references the instance manifest (\texttt{fb8e8fe7\dots}), the instance split
-(\texttt{091e8c45\dots}) and the design document
-\path{paper/research-audit/solver-robustness-design-20260916.md}. Every run record carries the
-campaign identifier, the manifest hash, the source commit and the SHA-256 of the binary that
-produced it.
-
-\paragraph{Split.} Instances are ordered within a family by
-$\mathrm{SHA\text{-}256}(\texttt{solver-robustness-v1}\,|\,\text{family}\,|\,h_i)$ ascending,
-where $h_i$ is the digest of the instance file. The first 10, 10 and 30 instances of Simple,
-SG-Ter-Mer and Full are the calibration set, the next 490, 490 and 120 the evaluation set, and
-the first 50, 50 and 20 of the evaluation set the replication subset. The order in which the
-four policies are run on an instance is a permutation seeded by that instance's digest together
-with the solver, gap and seed, so that policy order is not confounded with machine drift.
-
-\paragraph{Registered rules.} \emph{R1}: the family limit $T_F$ is the smallest of 1{,}800,
-3{,}600 and 7{,}200 seconds for which Base completes at least 80\% of instances at gap 1\% and
-at least 70\% at gap 0.1\%, evaluated on the historical one-thread Gurobi logs and on the CPLEX
-calibration runs; if none qualifies, $T_F=7{,}200$. \emph{R2}: HiGHS runs the full evaluation
-set of a family unless its calibration completion at $T_F$ and gap 1\% is below 50\%, in which
-case it runs only the replication subset of that family. A non-completion contributes $10\,T_F$
-to PAR10, and PAR10 is never averaged across families.
-
-\paragraph{Settings.} One thread per run, two cores reserved per task on Intel nodes; primal
-feasibility tolerance $10^{-6}$; integrality tolerance $10^{-5}$; presolve, cuts and internal
-solver scaling at their defaults; conditioning instrumentation disabled; primary solver seed 1
-and replication seeds 2--5. HiGHS exposes a single MIP feasibility tolerance, set to the same
-$10^{-6}$, and its small-coefficient threshold is lowered to $10^{-12}$ so that an exported
-coefficient is never silently dropped.
-
-\paragraph{Confirmatory contrasts.} Registered before the campaign: C1, the Flat-GM/Base
-completed-run effort ratio; C2, the PAR10 difference Flat-GM minus Base; C3, the completion
-difference Flat-GM minus Base; C4, the sign stability of C1 and C2 across seeds; C5, the paired
-discordance between budgeted and budget-free policies in the stress experiment under CPLEX.
-Everything else reported from the campaign is descriptive. Inference is within family, solver
-and gap, paired by instance, with a bootstrap that resamples instances; seeds and gaps are not
-independent replications.
-
-\paragraph{Reruns and audit.} Only runs classified as a licence failure or an infrastructure
-failure are repeated, and the classification is made from the run log by
-\path{scripts/research/robustness_runner.py}. A solver timeout, a numerical failure or an
-absent incumbent is an outcome and is reported as such. Every planned run in the frozen tables
-is reconciled with its record, and the audit reports each absence by class.
 
 \section{Fresh matrix audit}
 Ten seeds, 20260909--20260918, are crossed with exponent ranges $[-R,R]$ for
@@ -444,13 +396,12 @@ make research-check-python  # tests, saved binary audit, matrix hashes
 make research-check         # also builds/tests the native C++ exporter
 make research-analysis      # current tables and vector figures
 make research-fixed-basis-check  # rebuild all 1,530 bases from LP text
-make research-robustness-analysis # campaign aggregates, audit and tables
 make paper                  # article and this supplement
 \end{lstlisting}
 The reproducibility archive carries the analyses, the aggregates and the inputs they read, and
 lists in \path{EXCLUDED.txt} the bulk files it leaves out: the exported LP text and bases of the
-fixed-basis audit and the per-run records of the campaign, about 5~GB that stay in the
-repository. The fixed-basis rebuild reads those exports and therefore needs them.
+fixed-basis audit, about 5~GB that stay in the repository. The fixed-basis rebuild reads those
+exports and therefore needs them.
 The full export check needs GNU Make and a C++17 compiler. PDF compilation uses
 pdfLaTeX, BibTeX and standard TeX packages, without the old proprietary-font
 requirements. Figures are generated with matplotlib from stored data or explicit
