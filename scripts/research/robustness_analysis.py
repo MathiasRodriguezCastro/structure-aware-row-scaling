@@ -8,6 +8,7 @@ on the instances completed by all four policies. Seeds and gaps are never
 pooled as independent replications.
 """
 import argparse
+import csv
 import json
 from pathlib import Path
 
@@ -124,10 +125,69 @@ def seed_stability(d):
     return pd.DataFrame(rows)
 
 
+
+def audit(d, tables_dir):
+    """One row per planned run: every absence is classified, none is silently dropped."""
+    planned = []
+    for path in sorted(Path(tables_dir).glob("*.csv")):
+        planned += list(csv.DictReader(path.open()))
+    if not planned:
+        raise SystemExit(f"no run tables under {tables_dir}")
+    p = pd.DataFrame(planned)[["run_id", "stage", "family", "instance", "policy", "solver", "gap", "seed"]]
+    got = d.set_index("run_id")
+    p["record"] = p.run_id.isin(got.index)
+    p["outcome"] = p.run_id.map(got.outcome) if len(got) else None
+    p["infrastructure_failure"] = p.run_id.map(got.infrastructure_failure.astype(bool)) if len(got) else False
+    p["status"] = np.where(~p.record, "absent: not yet executed",
+                  np.where(p.infrastructure_failure.fillna(False), "present: infrastructure failure",
+                           "present: solver outcome"))
+    return p
+
+
+def clustered(d, policies=None):
+    """Multi-seed inference with the instance as the resampling unit.
+
+    Seeds of one instance are not independent replications: the per-instance mean of the
+    log ratio is the observation, and the bootstrap resamples instances.
+    """
+    policies = policies or POLICIES[1:]
+    ms = d[d.stage.eq("multiseed") | (d.stage.eq("primary") & d.seed.eq(1))]
+    rows = []
+    for (fam, solver, gap), g in ms.groupby(["family", "solver", "gap"]):
+        inst_ms = set(g[g.stage.eq("multiseed")].instance)
+        g = g[g.instance.isin(inst_ms)]
+        for policy in policies:
+            per_instance = []
+            for instance, gi in g.groupby("instance"):
+                wide_t = gi.pivot_table(index="seed", columns="policy", values="tiempo_solver_s")
+                wide_c = gi.pivot_table(index="seed", columns="policy", values="completed")
+                if policy not in wide_t or "Base" not in wide_t:
+                    continue
+                keep = wide_c.reindex(columns=[policy, "Base"]).fillna(False).all(axis=1)
+                r = (wide_t.loc[keep, policy] / wide_t.loc[keep, "Base"]).dropna()
+                r = r[r > 0]
+                if len(r):
+                    per_instance.append((instance, float(np.log(r.values).mean()), len(r)))
+            if len(per_instance) < 3:
+                continue
+            vals = np.array([v for _, v, _ in per_instance])
+            rng = np.random.default_rng(20260916)
+            idx = rng.integers(0, len(vals), size=(4000, len(vals)))
+            boot = np.exp(vals[idx].mean(axis=1))
+            rows.append({"family": fam, "solver": solver, "gap": gap, "policy": policy,
+                         "n_instances": len(vals),
+                         "seeds_per_instance_median": float(np.median([n for _, _, n in per_instance])),
+                         "geometric_mean_ratio": round(float(np.exp(vals.mean())), 4),
+                         "ci_low": round(float(np.quantile(boot, 0.025)), 4),
+                         "ci_high": round(float(np.quantile(boot, 0.975)), 4)})
+    return pd.DataFrame(rows)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--runs", type=Path, default=BASE / "runs-raw")
     ap.add_argument("--out", type=Path, default=BASE / "analysis")
+    ap.add_argument("--tables", type=Path, default=BASE / "runs")
     args = ap.parse_args()
     d = load(args.runs)
     args.out.mkdir(parents=True, exist_ok=True)
@@ -136,10 +196,15 @@ def main():
     paired(d, seed=1).to_csv(args.out / "paired-primary.csv", index=False)
     paired(d).to_csv(args.out / "paired-all-seeds.csv", index=False)
     seed_stability(d).to_csv(args.out / "seed-stability.csv", index=False)
+    clustered(d).to_csv(args.out / "paired-clustered.csv", index=False)
+    a = audit(d, args.tables)
+    a.to_csv(args.out / "audit.csv", index=False)
     summary = {"runs": len(d), "stages": d.stage.value_counts().to_dict(),
                "outcomes": d.outcome.value_counts().to_dict(),
                "infrastructure_failures": int(d.infrastructure_failure.astype(bool).sum()),
-               "solvers": sorted(set(d.solver)), "families": sorted(set(d.family))}
+               "solvers": sorted(set(d.solver)), "families": sorted(set(d.family)),
+               "audit": {f"{k[0]}|{k[1]}": int(v)
+                         for k, v in a.groupby(["stage", "status"]).size().items()}}
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary, indent=2))
 
