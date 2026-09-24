@@ -1,0 +1,42 @@
+{
+  "thresholds": {
+    "0.01": 0.8,
+    "0.001": 0.7
+  },
+  "caps_considered": [
+    1800.0,
+    3600.0,
+    7200.0
+  ],
+  "decision": {
+    "Simple": {
+      "cap_s": 1800.0,
+      "rule": "R1",
+      "fallback_used": false,
+      "checks": [],
+      "highs_base_completion_at_cap_gap_1pct": 0.1,
+      "highs_pilot_runs": "10/10",
+      "highs_scope": "multiseed subset only (rule R2)"
+    },
+    "SG-Ter-Mer": {
+      "cap_s": 1800.0,
+      "rule": "R1",
+      "fallback_used": false,
+      "checks": [],
+      "highs_base_completion_at_cap_gap_1pct": 0.9,
+      "highs_pilot_runs": "10/10",
+      "highs_scope": "full evaluation set"
+    },
+    "Full": {
+      "cap_s": 3600.0,
+      "rule": "R1",
+      "fallback_used": false,
+      "checks": [
+        "gurobi gap 0.001 at 1800s: 0.676 < 0.7"
+      ],
+      "highs_base_completion_at_cap_gap_1pct": 0.25,
+      "highs_pilot_runs": "8/30",
+      "highs_scope": "undecided: HiGHS pilot incomplete"
+    }
+  }
+}
