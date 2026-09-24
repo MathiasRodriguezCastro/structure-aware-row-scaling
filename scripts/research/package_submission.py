@@ -13,7 +13,8 @@ def collect(folder, suffixes=None):
         rel = p.relative_to(ROOT)
         if not p.is_file() or p.is_symlink():
             continue
-        if any(x.startswith('build') or x in {'__pycache__', '.git', '.pytest_cache', 'rendered'}
+        if any(x.startswith('build') or x in {'__pycache__', '.git', '.pytest_cache', 'rendered',
+                                              'runs-raw'}
                for x in rel.parts):
             continue
         if suffixes is None or p.suffix in suffixes or p.name in {'Makefile', 'README.md'}:
@@ -48,6 +49,9 @@ def main():
     artifact += list(collect('data'))
     artifact += list(collect('results-revision/research-audit'))
     artifact += list(collect('results-revision/attribution-controls'))
+    # Campaign: pre-registration, split, run tables and aggregates; the per-run records
+    # (runs-raw) stay out, they are several gigabytes of logs.
+    artifact += list(collect('results-revision/solver-robustness'))
     artifact += [p.relative_to(ROOT) for p in (ROOT/'results-revision/final-variants').glob('*/resumen.csv')]
     artifact += list(collect('paper/research-audit',{'.md','.json','.csv','.txt'}))
     artifact += list(collect('paper/research-audit/baseline-20260908',{'.tex','.pdf','.bib','.cpp'}))
