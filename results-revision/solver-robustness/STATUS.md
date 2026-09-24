@@ -21,18 +21,25 @@ Campaign id `solver-robustness-v1`. Design and pre-registration:
 - [x] Cluster build (job 5807818).
 - [x] Smoke on the cluster: CPLEX (5807824) clean, 5 completed + 1 Full timeout at the 300 s
       smoke cap; HiGHS (5807825) exercises both censored outcomes. Gurobi deferred.
-- [ ] Pilot (Base only, calibration set, cap 7200 s): CPLEX 5807908, HiGHS 5807909, throttle 10.
-- [ ] Cap decision by rules R1/R2 (`scripts/research/robustness_calibration.py`).
-- [ ] Primary campaign, multiseed, instance077 audit.
+- [x] Pilot, CPLEX (5807908): 100/100. Simple completes 100% at 1800 s, SG-Ter-Mer 90%, Full
+      86.7% at 1% and 80.0% at 0.1%.
+- [ ] Pilot, HiGHS (5807909): Simple and SG-Ter-Mer done, Full running.
+- [x] Caps by rule R1: Simple 1800 s, SG-Ter-Mer 1800 s, Full 3600 s (the Gurobi history misses
+      the 0.1% threshold on Full at 1800 s). PAR10 penalty = 10x the family cap.
+- [~] Rule R2: HiGHS keeps the full evaluation set on SG-Ter-Mer (90% Base completion) and only
+      the replication subset on Simple (10%); Full pending its pilot.
+- [x] Primary tables frozen for Gurobi and CPLEX (8,800 runs each).
+- [~] Primary campaign: CPLEX submitted (5808803, 316 shards, throttle 24). Gurobi smoke 5808828.
+- [ ] Multiseed, instance077 audit, HiGHS primary.
 - [x] Analysis: job audit against the frozen tables, clustered multi-seed inference.
 - [x] Paper: three-solver stress results and the campaign design subsection written.
 
-## Licence coordination (blocking for the Gurobi arm)
+## Licence coordination
 
-The cluster is running the thesis 100k campaign (jobs 5807148-5807150), which uses the Gurobi
-WLS licence. Running our Gurobi arm at the same time risks exhausting the concurrent sessions
-and breaking *that* campaign, so every Gurobi stage waits until it finishes. CPLEX and HiGHS
-do not touch that licence and run meanwhile.
+The thesis 100k campaign (job 5807148) finished at 2026-09-24T10:13Z, so the Gurobi WLS licence
+is free; only its postprocessing job remains and that one is pure Python. The Gurobi arm starts
+with a low array throttle and the runner classifies any licence error as an infrastructure
+failure, which is the only class of run that may be repeated.
 
 ## Known local findings before the cluster run
 
