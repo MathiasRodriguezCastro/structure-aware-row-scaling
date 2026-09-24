@@ -215,6 +215,43 @@ def equivalence(d):
     return pd.DataFrame(rows)
 
 
+
+def contradictions(d, tol=1e-6):
+    """Claims contradicted by a solution that is verified feasible for the same model.
+
+    The dispatch model is a minimization and every returned point is checked against the
+    original, unscaled model, so any verified point of any run on that instance is an upper
+    bound on its optimum, whatever policy, solver, gap or seed produced it. A run that claims
+    optimality within its gap at a worse objective, or reports a dual bound above that point,
+    is wrong.
+    """
+    rows = []
+    for (fam, instance), g in d.groupby(["family", "instance"]):
+        ok = g[g.verified & g.verif_solver_obj_original.notna()]
+        if ok.empty:
+            continue
+        i = ok.verif_solver_obj_original.idxmin()
+        best = float(ok.loc[i, "verif_solver_obj_original"])
+        source = f'{ok.loc[i, "solver"]}/{ok.loc[i, "policy"]}/{ok.loc[i, "stage"]}'
+        scale = max(abs(best), 1.0)
+        for _, r in g.iterrows():
+            obj = r.get("verif_solver_obj_original")
+            excess = (float(obj) - best) / scale if pd.notna(obj) else None
+            bound = r.get("best_bound")
+            bound_excess = (float(bound) - best) / scale if pd.notna(bound) else None
+            claimed = bool(r.completed) and excess is not None and excess > float(r.gap) + tol
+            invalid = bound_excess is not None and bound_excess > tol
+            if claimed or invalid:
+                rows.append({"stage": r.stage, "family": fam, "solver": r.solver, "gap": r.gap,
+                             "seed": r.seed, "instance": instance, "policy": r.policy,
+                             "outcome": r.outcome, "objective": obj, "best_known": best,
+                             "relative_excess": excess, "best_bound": bound,
+                             "bound_relative_excess": bound_excess,
+                             "optimality_claim_contradicted": claimed, "dual_bound_invalid": invalid,
+                             "best_known_from": source})
+    return pd.DataFrame(rows)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--runs", type=Path, default=BASE / "runs-raw")
@@ -231,12 +268,18 @@ def main():
     clustered(d).to_csv(args.out / "paired-clustered.csv", index=False)
     eq = equivalence(d)
     eq.to_csv(args.out / "objective-equivalence.csv", index=False)
+    bad = contradictions(d)
+    bad.to_csv(args.out / "contradictions.csv", index=False)
     a = audit(d, args.tables)
     a.to_csv(args.out / "audit.csv", index=False)
     summary = {"runs": len(d), "stages": d.stage.value_counts().to_dict(),
                "outcomes": d.outcome.value_counts().to_dict(),
                "infrastructure_failures": int(d.infrastructure_failure.astype(bool).sum()),
                "solvers": sorted(set(d.solver)), "families": sorted(set(d.family)),
+               "contradictions": {"runs_flagged": int(len(bad)),
+                   "optimality_claims_contradicted": int(bad.optimality_claim_contradicted.sum()) if len(bad) else 0,
+                   "invalid_dual_bounds": int(bad.dual_bound_invalid.sum()) if len(bad) else 0,
+                   "by_policy": {k: int(v) for k, v in bad.policy.value_counts().items()} if len(bad) else {}},
                "objective_equivalence": {"instances_compared": int(len(eq)),
                    "above_target_gap": int(eq.above_target_gap.sum()) if len(eq) else 0,
                    "max_rel_objective_gap": float(eq.max_rel_objective_gap.max()) if len(eq) else None},
