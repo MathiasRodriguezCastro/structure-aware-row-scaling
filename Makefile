@@ -55,7 +55,7 @@ audit-build:
 	$(MAKE) -C code BUILD_DIR=build-audit USE_GUROBI=0 USE_CPLEX=0 USE_CBC=0 USE_HEXALY=0
 
 research-check-python:
-	$(PYTHON) -m pytest -q tests/test_budget_scaling.py
+	$(PYTHON) -m pytest -q tests/test_budget_scaling.py tests/test_robustness_analysis.py
 	$(PYTHON) scripts/research/verify_saved_experiment.py --root $(AUDIT_ROOT)/budget-final
 	cd $(AUDIT_ROOT)/identifiability-final && sha256sum --quiet -c checksums.sha256
 
