@@ -43,8 +43,9 @@ def main():
     ap.add_argument("--time-limit", type=float, default=900.0)
     ap.add_argument("--seed", type=int, default=1)
     args = ap.parse_args()
+    args.out = args.out.resolve()
     args.out.mkdir(parents=True, exist_ok=True)
-    lp = args.out / "original.lp"
+    lp = args.out / "original.lp"  # absolute: the binary runs in its own directory
     if not lp.exists():
         export(args.instance, args.exe, lp)
     import gurobipy as gp
