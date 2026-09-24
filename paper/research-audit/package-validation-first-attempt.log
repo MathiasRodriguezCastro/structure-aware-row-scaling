@@ -1,0 +1,87 @@
+COMMAND: sha256sum --quiet -c CONTENTS.sha256
+COMMAND: make research-check
+make -C code BUILD_DIR=build-audit USE_GUROBI=0 USE_CPLEX=0 USE_CBC=0 USE_HEXALY=0
+make[1]: se entra en el directorio '/tmp/row-scaling-review-6rhz23hu/code'
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c synthetic/ComandoBenchmarkSintetico.cpp -o build-audit/synthetic/ComandoBenchmarkSintetico.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c synthetic/GeneradorBenchmarkSintetico.cpp -o build-audit/synthetic/GeneradorBenchmarkSintetico.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c synthetic/RunnerBenchmarkSintetico.cpp -o build-audit/synthetic/RunnerBenchmarkSintetico.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/SystemController.cpp -o build-audit/SystemController/SystemController.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Agentes/Demanda/Demandas/DemandaFija.cpp -o build-audit/SystemController/Agentes/Demanda/Demandas/DemandaFija.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Problema/Problema.cpp -o build-audit/SystemController/Problema/Problema.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Problema/ProblemaLp/ProblemaLp.cpp -o build-audit/SystemController/Problema/ProblemaLp/ProblemaLp.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.cpp -o build-audit/SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Despacho/Despacho.cpp -o build-audit/SystemController/Despacho/Despacho.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Despacho/DespachoMercado/DespachoMercado.cpp -o build-audit/SystemController/Despacho/DespachoMercado/DespachoMercado.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Despacho/DespachoFijo/DespachoFijo.cpp -o build-audit/SystemController/Despacho/DespachoFijo/DespachoFijo.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c SystemController/Despacho/DespachoProporcional/DespachoProporcional.cpp -o build-audit/SystemController/Despacho/DespachoProporcional/DespachoProporcional.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -MMD -MP -c 1_SistemaElectrico.cpp -o build-audit/1_SistemaElectrico.o
+g++ build-audit/synthetic/ComandoBenchmarkSintetico.o build-audit/synthetic/GeneradorBenchmarkSintetico.o build-audit/synthetic/RunnerBenchmarkSintetico.o build-audit/SystemController/SystemController.o build-audit/SystemController/Agentes/Demanda/Demandas/DemandaFija.o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.o build-audit/SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.o build-audit/SystemController/Problema/Problema.o build-audit/SystemController/Problema/ProblemaLp/ProblemaLp.o build-audit/SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.o build-audit/SystemController/Despacho/Despacho.o build-audit/SystemController/Despacho/DespachoMercado/DespachoMercado.o build-audit/SystemController/Despacho/DespachoFijo/DespachoFijo.o build-audit/SystemController/Despacho/DespachoProporcional/DespachoProporcional.o build-audit/1_SistemaElectrico.o -o build-audit/SistemaElectrico 
+Build done: build-audit/SistemaElectrico  (GUROBI=0 CPLEX=0 CBC=0 HEXALY=0)
+make[1]: se sale del directorio '/tmp/row-scaling-review-6rhz23hu/code'
+python3 -m pytest -q tests/test_budget_scaling.py
+............                                                             [100%]
+12 passed in 0.50s
+python3 scripts/research/verify_saved_experiment.py --root results-revision/research-audit/budget-final
+{
+  "models_independently_enumerated": 96,
+  "configurations_audited": 3456,
+  "exact_dyadic_exports_checked": 768,
+  "abstentions_verified": 288,
+  "runs_sha256": "f0cfa86aa97e60dcca6985dd66b235883ecabafb1fe1f4de40a3b70b39840aa2",
+  "checker_sha256": "743ff0f6abf8d0eda3b7cc77e84088114bf771c873831bb361547bb9aa28adfa"
+}
+cd results-revision/research-audit/identifiability-final && sha256sum --quiet -c checksums.sha256
+python3 -m pytest -q tests/test_export_roundtrip.py
+.                                                                        [100%]
+1 passed in 0.49s
+COMMAND: make research-analysis
+python3 scripts/research/analyze_budget_experiment.py --root results-revision/research-audit/budget-final
+                        n  attempted  abstained  exact_optimal  failed
+solver method                                                         
+highs  L2             192        192          0            141      51
+gurobi L2             192        192          0            139      53
+highs  Budget-GM      192        192          0            182      10
+gurobi Budget-GM      192        192          0            152      40
+highs  GM             192        192          0            141      51
+gurobi GM             192        192          0            140      52
+highs  Dyadic-GM      192        192          0            142      50
+gurobi Dyadic-GM      192        192          0            140      52
+highs  Base           192        192          0            167      25
+gurobi Base           192        192          0            156      36
+highs  Budget-round   192         48        144             48       0
+gurobi Budget-round   192         48        144             48       0
+highs  Budget-only    192        192          0            191       1
+gurobi Budget-only    192        192          0            151      41
+highs  GM-tight       192        192          0            166      26
+gurobi GM-tight       192        192          0            166      26
+highs  Budget-dyadic  192        192          0            161      31
+gurobi Budget-dyadic  192        192          0            153      39
+python3 scripts/research/analyze_identifiability.py
+     control  block_range  n  ratio_min  ratio_median  ratio_max  byte_equal
+     Flat-GM            1 60   0.721482      0.936971   1.583883         0.0
+     Flat-GM            2 60   0.073950      0.101525   0.176784         0.0
+     Flat-GM            3 60   0.006735      0.009726   0.017689         0.0
+ Role-Hybrid            1 60   0.943340      1.000000   1.059112        44.0
+ Role-Hybrid            2 60   0.939004      1.000000   1.016773        46.0
+ Role-Hybrid            3 60   0.956750      1.000000   1.079492        46.0
+SA-Mat-permB            1 60   0.999619      1.000000   1.000212        55.0
+SA-Mat-permB            2 60   0.999999      1.000000   1.000001        55.0
+SA-Mat-permB            3 60   1.000000      1.000000   1.000000        55.0
+     Flat-L2            1 60   2.070910      2.700764   4.470116         NaN
+     Flat-L2            2 60   1.830469      2.689414   4.224945         NaN
+     Flat-L2            3 60   1.968636      2.610504   4.471790         NaN
+python3 scripts/audit_operational_evidence.py --source results-revision/final-variants --output results-revision/research-audit/operational --timeout 1800 --bootstrap 10000
+Traceback (most recent call last):
+  File "/tmp/row-scaling-review-6rhz23hu/scripts/audit_operational_evidence.py", line 287, in <module>
+    main()
+  File "/tmp/row-scaling-review-6rhz23hu/scripts/audit_operational_evidence.py", line 111, in main
+    manifest.append({"path": str(source.relative_to(root)), "sha256": sha256(source)})
+  File "/usr/lib/python3.10/pathlib.py", line 818, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'results-revision/final-variants/gurobi_sgtm_01pct/resumen.csv' is not in the subpath of '/tmp/row-scaling-review-6rhz23hu' OR one path is relative and the other is absolute.
+make: *** [Makefile:50: research-operational-analysis] Error 1

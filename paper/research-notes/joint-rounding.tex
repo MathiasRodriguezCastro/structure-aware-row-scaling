@@ -1,0 +1,449 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,booktabs,graphicx,xurl,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\title{When Can Row Scaling Make Integer Rounding Safe?\\\large Working research note: geometry, certificates and local strengthening}
+\author{Mathias Rodr\'iguez Castro}
+\date{13 September 2026 --- research in progress}
+\begin{document}
+\maketitle
+This note develops a possible replacement for the previous paper's central contribution.
+It is not a claim of established publication novelty. Farkas separation, nonnegative
+aggregation, safe cut rounding, Boolean no-good clauses and geometric programming
+are established tools. The question is whether a useful, sufficiently distinct result
+arises from characterizing which numerical acceptance failures row scaling can repair.
+
+\section{A universal acceptance property}
+Let $P=\{x:Ax\le b,\;0\le x\le1\}$, with rational data and $n$ binary variables.
+For a fixed $0\le\eta<1/2$, the rounding cell of $z\in\{0,1\}^n$ is
+\[
+ C_z=z+E_z,\qquad E_z=\{e:-\eta\boldsymbol1\le e\le\eta\boldsymbol1,
+                            \;0\le z+e\le1\}.
+\]
+The theorems below use these exact bounds. The implementation also certifies
+acceptance with an enlarged bound-tolerance box, while the intrinsic obstruction
+test retains the original exact bounds. A bad center is an integer
+$z\notin P$. A nonnegative vector $t$ specifies an original-row residual hypothesis:
+$A(z+e)\le b+t$. For exported row tolerances $\epsilon_r>0$ and positive row
+factors $d_r$, $t_r=\epsilon_r/d_r$. Numerical safety means that every point satisfying
+this hypothesis and the rounding-cell condition rounds to a feasible integer center.
+It is a universal conditional property, not a statement that a solver enforces its
+input tolerances on the exported rows or proves a correct optimal bound.
+
+\begin{theorem}[Exact cell exclusion]
+A bad center $z$ cannot be accepted if and only if there exists $\lambda\ge0$ such that
+\begin{equation}\label{eq:certificate}
+ \lambda^T(Az-b-t)>h_{E_z}(-A^T\lambda),
+ \qquad h_E(v)=\max_{e\in E}v^Te.
+\end{equation}
+\end{theorem}
+\begin{proof}
+Acceptance is feasibility of $Ae\le b+t-Az$ in the compact nonempty box $E_z$.
+If \eqref{eq:certificate} holds, multiplying those inequalities by $\lambda$ contradicts
+$\lambda^TAe\ge-h_{E_z}(-A^T\lambda)$. Conversely, infeasibility separates the
+compact convex set $AE_z$ from the downward orthant translated by $b+t-Az$.
+The separating normal is nonnegative because that orthant is unbounded downward;
+strict separation gives the displayed inequality.
+\end{proof}
+For a symmetric error box, the support is
+$\sum_j\eta_j|(A^T\lambda)_j|$. Cancellation occurs before the absolute values.
+A row-by-row certificate restricts $\lambda$ to unit vectors; matching the actual
+one-sided binary bounds alone does not recover all multirow certificates.
+
+\begin{proposition}[Finite complete family for two rows]
+For a two-row block, it suffices to test $\lambda=(s,1-s)$ at $s=0$, $s=1$, and
+all values in $(0,1)$ satisfying
+$s a_{1j}+(1-s)a_{2j}=0$ for a column whose expression is not identically zero.
+Zero columns are ignored. There are at most $n+2$ candidates.
+Thus every binary rounding cell can be tested using rational arithmetic without
+an optimizer; all cells can be tested in $O(2^n n^2)$ rational arithmetic operations.
+\end{proposition}
+\begin{proof}
+Normalize a nonzero separating multiplier by its positive coordinate sum. The
+certificate margin is a continuous concave piecewise-affine function of $s$.
+Each box support term changes its affine expression only when the corresponding
+coordinate of $A^T\lambda$ changes sign. An affine function on each closed interval
+between consecutive breakpoints attains its maximum at an endpoint. Testing all
+breakpoints and endpoints is therefore complete. Evaluating a candidate costs $O(n)$.
+The operation count does not suppress the bit cost of rational arithmetic.
+\end{proof}
+
+\begin{proposition}[Complete finite family for a fixed number of rows]
+Let $m\ge1$. Intersect the multiplier simplex $\{\lambda\ge0:
+\boldsymbol1^T\lambda=1\}$ with the column hyperplanes
+$(A^T\lambda)_j=0$. The vertices of the resulting closed sign cells form a complete
+certificate family $V(A)$, independently of $z,b,t$ and the box endpoints.
+It suffices to consider at most $\binom{n+m}{m-1}$ candidates. Every required
+ray has support at most $\min\{m,n+1\}$.
+\end{proposition}
+\begin{proof}
+On each closed sign cell the box support, and hence the certificate margin,
+is affine. Its maximum is attained at a vertex. A vertex of the simplex has
+$m-1$ independent active equations chosen from its coordinate facets and the
+column hyperplanes; solving these equations with $\boldsymbol1^T\lambda=1$
+enumerates all candidates. Singular systems are skipped. If a vertex has support
+$s$, its relative simplex has dimension $s-1$, requiring $s-1$ independent
+column cancellations. Thus $s\le n+1$. Equivalently, enumerate each support of
+size $s$ and each set of $s-1$ columns. The number of systems is bounded by
+\[
+ \sum_{s=1}^{\min(m,n+1)}\binom ms\binom n{s-1}
+ =\binom{n+m}{m-1}.
+\]
+Duplicate vertices and degenerate hyperplanes only reduce the output size.
+\end{proof}
+This is an application of classical hyperplane-arrangement and zonotope-normal
+geometry, not a new facet-enumeration construction. For fixed $m$ the multiplier
+enumeration is polynomial in $n$, but testing every binary center still costs
+$2^n$ times that amount. The implementation uses exact rational elimination;
+its arithmetic and bit costs must be distinguished.
+
+\begin{proposition}[Exact weighted residual threshold]\label{prop:radius}
+Fix positive weights $w\in\mathbb Q_{>0}^m$. For a bad center define
+\[
+ R_z=\max_{\lambda\in V(A)}
+ \frac{\lambda^T(Az-b)-h_{E_z}(-A^T\lambda)}{\lambda^Tw}.
+\]
+Then
+\[
+ R_z=\min_{e\in E_z}\max_r\frac{a_r^T(z+e)-b_r}{w_r}.
+\]
+If there is at least one bad center, put $R=\min_{z\text{ bad}}R_z$.
+For $s\ge0$, the acceptance contract $Ax\le b+s w$ is safe if and only if $s<R$.
+Equality is unsafe. If there are no bad centers, every $s\ge0$ is safe.
+\end{proposition}
+\begin{proof}
+Normalize multipliers by $\lambda^Tw=1$ and apply the minimax theorem to the
+bilinear expression $\lambda^T(A(z+e)-b)$ on two compact convex sets. Its maximum
+over normalized multipliers at a fixed $e$ is the displayed maximum row residual.
+On a sign cell of the usual unit-sum simplex, the numerator is affine and the
+denominator is strictly positive affine. Its ratio at a convex combination of
+vertices is a convex combination of their ratios, with weights proportional to
+the positive denominators. A maximizing vertex therefore suffices. Finally,
+compactness makes $s\ge R_z$ equivalent to the existence of an accepted point in
+that cell. Taking the minimum over bad centers proves the strict threshold.
+\end{proof}
+For fixed positive reference scales $d_r^0$ and exported tolerances $\epsilon_r$,
+take $w_r=\epsilon_r/d_r^0$. A common extra factor $\alpha$ is safe precisely when
+$1/\alpha<R$. If $R>0$, this gives the sharp condition $\alpha>1/R$; if $R\le0$,
+no such factor works. This quantifies the earlier qualitative obstruction.
+The result is conditional on the exported inequalities and uses exact stored data.
+
+\paragraph{A strict improvement over bound-aware individual rows.}
+Take $M=10^9$, $\eta=10^{-6}$,
+\[
+ A=\begin{bmatrix}M&1-M\\1-M&M\end{bmatrix},\qquad b=(1/2,1/2)^T,
+ \qquad t=(1/4,1/4)^T.
+\]
+Only $(0,0)$ is integer feasible. At $z=(1,1)$ each individual row can hide its
+violation within the one-sided cell: decreasing the coordinate with positive
+coefficient by $\eta$ changes its activity by $M\eta$. But the combined row
+$x_1+x_2\le1$ gives a certificate whenever $t_1+t_2<1-2\eta$.
+The other bad centers $(1,0)$ and $(0,1)$ are excluded by individual rows. The
+joint certificate therefore establishes a property that no collection of independent
+row certificates establishes. This example remains valid with a bound tolerance
+of $\eta$, using the enlarged symmetric error box.
+
+\section{What row scaling cannot repair}
+\begin{theorem}[Intrinsic obstruction and scaling remediability]
+Fix the rounding cells. There exists some finite positive diagonal row scaling
+that makes the exported-residual acceptance property safe if and only if
+$P\cap C_z=\varnothing$ for every bad center $z$. If an intersection is nonempty,
+no positive row scaling and no collection of inequalities valid for the whole LP
+relaxation $P$ can remove that obstruction.
+\end{theorem}
+\begin{proof}
+An exact feasible point in a bad rounding cell stays feasible under positive scaling
+and under every LP-valid added row. Conversely, there are finitely many bad centers.
+For each, compactness gives a strictly positive minimum
+\[
+ \rho_z=\min_{e\in E_z}\max_r\{a_r^T(z+e)-b_r\}
+\]
+when the cell does not meet $P$. Their minimum $\rho$ is positive. A common factor
+$d>\max_r\epsilon_r/\rho$ excludes all bad cells under the exported-row hypothesis.
+If there are no bad centers, safety is immediate.
+\end{proof}
+With coefficient ceilings, each row has a maximum admissible factor $H_r$.
+Acceptance sets shrink monotonically as factors increase, so a feasible scaling
+exists within the factor box if and only if its componentwise maximum $H$ is safe.
+This test can be costly even though monotonicity is elementary.
+
+\begin{theorem}[Complexity of the intrinsic safety test]
+For any fixed rational $0<\eta<1/4$, deciding whether every point of $P$ within
+$\eta$ of a binary center rounds to a feasible center is coNP-complete, even when
+$P$ has a known binary feasible point and all matrix entries belong to $\{-1,0,1\}$.
+\end{theorem}
+\begin{proof}
+Reduce a 3-SAT instance with distinct variables per clause. Introduce its binary
+variables $x$ and another binary variable $y$. For every clause with literal
+functions $\ell_1,\ell_2,\ell_3$, impose
+\[
+ y\le\ell_1(x)+\ell_2(x)+\ell_3(x),\qquad y\le1-\eta.
+\]
+All variables have bounds $[0,1]$. The matrix has entries in $\{-1,0,1\}$;
+$(x,y)=(0,0)$ is an integer feasible point. Every binary point with $y=0$ is feasible.
+If the formula is satisfiable, its satisfying assignment with $y=1-\eta$ belongs
+to $P$ and rounds to an infeasible center with $y=1$.
+Conversely, an intrinsic bad cell must have rounded $y=1$. If its rounded $x$
+violates a clause, each of that clause's three literal values at the nearby continuous
+point is at most $\eta$, whereas $y\ge1-\eta$. This contradicts the clause row
+because $1-\eta>3\eta$. Thus an intrinsic bad cell implies a satisfying assignment.
+The complement is in NP: a bad binary center together with a rational feasible
+point in its cell is a polynomially verifiable witness. A nonempty bounded rational
+polytope has a rational vertex of polynomial encoding length.
+\end{proof}
+The construction applies to a fixed tolerance such as $10^{-6}$. The difficulty is
+not caused by large coefficients. It also distinguishes a certificate of safety for
+all possible returned points from checking one already returned solution.
+
+\begin{corollary}[Sparse unit-coefficient hardness]
+The preceding hardness result still holds when every row of $A$ has at most four
+nonzeros and every column of $A$ has at most five nonzeros.
+\end{corollary}
+\begin{proof}
+Give every occurrence of each SAT variable its own copy and link successive copies
+by equalities. Likewise use one gate variable $y_c$ per clause, link the gates in
+a chain, and impose the cap $y_1\le1-\eta$ at an endpoint. Each equality is written
+as two inequalities. Exact equality forces equal rounded centers since $\eta<1/2$.
+Consequently a bad cell cannot arise from inconsistent copies: its gate centers
+must all equal one, and the earlier satisfying-assignment argument applies.
+The all-zero point remains integer feasible. A copy occurs in one clause and at
+most two chain equalities, for at most five inequality rows. The capped gate is
+at an endpoint, so it occurs in at most four rows. Clause rows contain four
+variables, equality rows two, and the cap one. The construction is polynomial.
+\end{proof}
+
+\paragraph{A limitation of this hardness construction.}
+The theorem concerns the given LP relaxation. Integer bound tightening immediately
+sets $y=0$ in the constructed instance and removes the obstruction. It therefore
+does not establish that finding an integer-equivalent safe reformulation is hard.
+Indeed, for integer rows with integer right-hand sides, the familiar rowwise lattice
+test $\epsilon+\eta\|a_r\|_1<1$ already guarantees rounded feasibility. Fractional
+right-hand sides near an integer are essential to this unit-coefficient construction.
+
+\begin{proposition}[One-row tractability at a fixed tolerance]\label{prop:one-row}
+For one rational inequality in binary variables and a fixed rational
+$0<\eta<1/2$, intrinsic safety is decidable in polynomial time in the number of
+variables and the data encoding length. An explicit algorithm uses
+$O(n^{\lceil1/\eta\rceil})$ rational arithmetic operations. The exponent makes
+this a theoretical tractability result, not a practical bound at solver tolerances.
+If $\eta$ is part of the input, the one-row problem is coNP-complete, even for
+positive integer coefficients, an integer right-hand side and a known feasible
+binary point.
+\end{proposition}
+\begin{proof}
+Complement variables with negative coefficients, obtaining
+$\sum_j a_j x_j\le B$ with $a_j\ge0$. Complementation preserves binary rounding
+distances. Cases $B\le0$ and $B\ge\sum_j a_j$ are immediately safe: the relaxation
+is empty, permits only zero-weight coordinates, or contains every binary center,
+respectively. Assume $0<B<\sum_j a_j$.
+
+A binary subset with weight $S$ has a bad cell meeting the relaxation precisely when
+\[
+ B<S\le U:=\frac{B}{1-\eta}.
+\]
+The minimum activity in its cell is $(1-\eta)S$. Put $\Delta=U-B>0$ and ignore
+items heavier than $U$. Call weights above $\Delta$ large and positive weights
+at most $\Delta$ small. A witness contains strictly fewer than
+$U/\Delta=1/\eta$ large items. Enumerate every possible set of at most
+$\lceil1/\eta\rceil-1$ large items, with total $L$. If $B<L\le U$, a witness has
+been found. If $L\le B$ and adding all small items can exceed $B$, add small
+items until the first strict crossing. The total is then at most $B+\Delta=U$.
+These cases are exhaustive: any witness's large-item set is enumerated and its
+small-item subset cannot outweigh the set of all small items. Enumeration has
+the stated polynomial bound for fixed $\eta$. The produced near-binary witness
+is $x=(1-\eta)z$ in the complemented coordinates.
+
+For hardness when $\eta$ is input, take an instance of SUBSET SUM with positive
+integer weights and integer target $T\ge3$. Set $B=T-1$ and $\eta=1/T$.
+Then $U=T$, so an integer subset weight in $(B,U]$ is exactly a subset of weight
+$T$. The origin is feasible, the reduction has polynomial encoding length, and
+a witness subset is polynomially verifiable. Taking complements gives the result.
+\end{proof}
+This proof specializes an interval subset-sum argument; it makes no claim of a
+new knapsack algorithm. It complements the multirow hardness result by identifying
+which parameters cause the obstruction-recognition problem to be hard. Exact
+margin computation remains harder than testing its sign: for one positive row,
+the threshold in Proposition~\ref{prop:radius} with unit weight equals
+$(1-\eta)S^*-B$, where $S^*$ is the minimum attainable subset weight strictly
+above $B$. Computing that exact minimum contains SUBSET SUM even for fixed $\eta$.
+
+\section{From diagnosis to an explicit repair}
+For a small generator block, enumerate its integer centers and classify each bad
+one under the intended scaled-row acceptance model. Three actions are distinct:
+\begin{enumerate}
+\item A current joint certificate already excludes the cell; no new row is needed.
+\item An LP-valid aggregate excludes the cell after suitable numerical normalization;
+      adding a redundant row can enforce a useful acceptance margin.
+\item The original LP meets the bad cell; an LP-redundant row cannot repair it.
+      An integer-valid strengthening or a tighter integrality requirement is needed.
+\end{enumerate}
+For the third case, our exploratory implementation uses established Boolean no-good
+clauses. A partial assignment $(z_j)_{j\in S}$ occurring in no local feasible integer
+center yields
+\[
+ \sum_{j\in S:z_j=1}x_j-\sum_{j\in S:z_j=0}x_j
+ \le |\{j\in S:z_j=1\}|-1.
+\]
+It excludes any matching binary center by one unit; the margin remains at least
+$1-|S|\eta$ in its rounding cell. Small integer coefficients make a positive
+exported-residual tolerance easy to accommodate. Selecting clauses only for cells
+not already excluded is a finite coverage problem. The prototype uses deterministic
+greedy coverage with sparsity tie-breaking; it does not claim minimum cardinality.
+These are familiar cuts, and their selection must be compared with full local
+strengthening and ordinary presolve.
+
+\paragraph{Preserving LP validity when an aggregate is written in binary64.}
+Let the exact nonnegative aggregate be $p^Tx\le q$ on $[0,1]^n$, and let
+$\widehat p$ be its rounded coefficient vector after a positive normalization.
+Writing
+\[
+ \widehat q=\operatorname{roundUp}\left(q+
+        \sum_j\max\{\widehat p_j-p_j,0\}\right)
+\]
+preserves validity for every point of $P$. The correction is the exact box support
+of the coefficient-rounding error. A subsequent cell-exclusion check must use the
+actually exported $(\widehat p,\widehat q)$, so outward relaxation is paid for in the
+certificate. This is safe rounding of an established aggregation, not a novel cut family.
+
+\paragraph{Scope of the local-to-global claim.}
+If every original local row belongs to a block whose rounded centers are certified,
+then rounding preserves those local rows. Coupling rows need their own certificates;
+local safety does not imply global safety. In the experiment, the single coupling
+row has integer coefficients and integer RHS, and its unit lattice violation exceeds
+$\epsilon+\eta\|a\|_1$. This certifies that row separately. General mixed continuous
+coupling requires an additional argument and is not covered by this experiment.
+
+\section{Relation to prior work and research gates}
+The numerical acceptance model is already discussed in the MIPLIB 2010 paper,
+\url{https://doi.org/10.1007/s12532-011-0025-9}. Feasible rounding through inner
+parallel sets and granularity is developed by Neumann, Stein and Sudermann-Merx;
+see \url{https://doi.org/10.1007/s10013-020-00393-4} and its references. Coey, Lubin
+and Vielma explicitly scale conic certificate cuts to maintain guarantees under LP
+feasibility tolerances, \url{https://doi.org/10.1007/s12532-020-00178-3}, Section 3.2.
+Consequently, certificate-based tolerance scaling alone is not a defensible novelty
+claim. Standard presolve reductions, including GCD and RHS strengthening, are
+reviewed at \url{https://doi.org/10.1287/ijoc.2018.0857}.
+
+Finite multiplier enumeration also uses established zonotope facet-normal geometry;
+see Althoff, Stursberg and Buss, Theorem~7,
+\url{https://mediatum.ub.tum.de/doc/1287515/document.pdf}.
+Local table encodings and strengthened table cuts for ILP are studied by Bierlee,
+Piessens, Guns and Stuckey (CP~2026),
+\url{https://doi.org/10.4230/LIPIcs.CP.2026.6}; automatic subproblem tabulation is
+studied by Akg\"un et al. (JAIR~2025),
+\url{https://doi.org/10.1613/jair.1.17032}. These results further restrict any
+compiler novelty claim. Selecting forbidden partial patterns for unsafe centers,
+while treating already-excluded centers as don't-cares, is a Boolean minimization
+problem. The numerical construction of that care set is the question under study.
+
+Potentially distinct content is the exact row-scaling remediability characterization,
+the complete finite two-row certificate family, and a compiler that separates
+LP-redundant repairs from necessary integer-domain strengthening before choosing
+sparse additions. Establishing publication merit requires a careful prior-art audit,
+independent verification of the hardness argument and certificates, and evidence
+that this distinction is useful beyond constructed examples.
+
+The current experiments retain exact feasible-rounded-point and optimality outcomes
+separately. A local feasibility certificate cannot justify a solver's global dual
+bound. The early pilot already contains feasible but suboptimal outputs labeled
+optimal by HiGHS, making that limitation operationally relevant. No speedup or
+solver-independent optimality guarantee is asserted.
+
+\section{A completed control experiment and its negative conclusion}
+The revised synthetic study uses twelve 72-variable binary models: four independent
+random seeds, each at three magnitudes $M\in\{10^6,10^9,10^{12}\}$. Each model has
+twelve six-variable blocks and an integer resource constraint. Within a block,
+\[
+ A_k=\begin{bmatrix}M v_k^T+u_k^T\\-M v_k^T+w_k^T\end{bmatrix},
+ \qquad v_k\in\mathbb Z^6,\quad u_k,w_k\in\{1,\ldots,7\}^6.
+\]
+Right-hand sides are half-integers of moderate magnitude. The original integer
+optimum is computed by dynamic programming over the exact local feasible states,
+then independently recomputed. Eight original methods produce 384 assigned
+configurations with two solvers and presolve on/off. An additional classical control
+adds 48 configurations. Forty-eight assignments abstain without calling a solver;
+the complete comparison therefore contains 384 actual solver calls. Native limits
+are ten seconds, with an external 25-second limit and one thread. Failures and
+timeouts remain in the denominator. The magnitude and presolve repetitions are
+not independent statistical replicates.
+
+\paragraph{An exact obstruction, independent of solver behavior.}
+An independent rational vertex-enumeration routine constructs 83 exact feasible
+points in bad rounding cells, spread across all twelve original models. Each local
+witness is embedded into the full model by setting the other blocks to zero; every
+original row, including the resource row, is checked exactly. These are explicit
+obstructions to safety under \emph{any} row scaling or LP-valid added rows, regardless
+of their numerical normalization. They are not inferred from solver failures.
+
+\paragraph{A necessary classical reformulation control.}
+Because $v_k^Tz$ is integral and $M$ dominates the smaller terms and right-hand
+sides, an integer feasible point necessarily satisfies $v_k^Tz=0$. Thus the
+original local integer set is exactly represented by
+\[
+ v_k^Tz=0,\qquad u_k^Tz\le\lfloor b_{k1}\rfloor,
+ \qquad w_k^Tz\le\lfloor b_{k2}\rfloor.
+\]
+For example, $v_k^Tz\ge1$ implies
+$M v_k^Tz+u_k^Tz\ge M+\sum_j\min(u_{kj},0)>b_{k1}$; the other sign is analogous.
+The experiment checks these strict dominance inequalities and verifies equality of
+the two integer sets on all 64 local centers. This is a generator-aware lattice
+reformulation using classical reasoning, not a new algorithm.
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{lrrrrr}
+\toprule
+&\multicolumn{2}{c}{Gurobi / 24}&\multicolumn{2}{c}{HiGHS / 24}&Median\\
+Method&Feasible&Optimal&Feasible&Optimal&rows\\
+\midrule
+Original&12&7&15&15&25\\
+GCD and RHS flooring&15&10&15&15&25\\
+Targeted integer clauses&24&24&24&18&37\\
+Full clause cover&24&24&24&20&125.5\\
+Lattice decomposition&24&24&24&24&49\\
+\bottomrule
+\end{tabular}
+\caption{Exact checks of rounded outputs against the original integer model and
+its independently computed optimum. Twenty-four configurations per solver comprise
+twelve models and two presolve settings. Full results include the remaining four
+controls and all abstentions.}
+\end{table}
+
+The targeted clauses certify all local bad-cell exclusions under the declared
+exported-row and rounding hypotheses, using 145 clauses across 144 blocks.
+They return feasible rounded outputs in all 48 configurations, but six HiGHS
+outputs marked optimal are suboptimal; all six use presolve. Full clause covers
+also recover feasibility but retain four suboptimal HiGHS outputs. Keeping the
+original ill-scaled rows therefore leaves numerical optimality problems that the
+primal safety certificate does not address.
+
+The lattice reformulation returns an exactly optimal rounded point in all 48
+configurations. Its median preparation time is 0.00045 seconds, compared with
+0.313 seconds for targeted clauses and 0.050 seconds for the full clause cover.
+These small local timings are descriptive, exclude independent post-run validation,
+and do not establish a general speedup. They are sufficient to reject a claim that
+the targeted compiler is preferable on this family merely because it adds fewer
+rows. Further expansion of this same synthetic family cannot substitute for a
+different application or a sufficiently substantive theoretical contribution.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{paper/research-audit/guards-comparison-20260913/feasibility-and-optimality.pdf}
+\caption{All nine methods, including the late-added lattice control. Light bars
+count exact feasible rounded points and dark bars count exact optima. Numeric labels
+give optimal/feasible counts, each out of 24; they are not success-rate fractions.
+The selected LP-valid guard method abstains on every assigned model.}
+\end{figure}
+
+\paragraph{Reproducibility of this investigation.}
+Saved inputs, source snapshots, assignments, outputs and exact certificates are in
+\path{results-revision/research-audit/guards-holdout-100-isolated/} and
+\path{results-revision/research-audit/guards-lattice-control-100/}. Separate saved-data and rational-witness
+checkers do not import the certificate compiler or an optimizer. The expanded
+mathematical routines are covered by independent LP comparisons, exhaustive exact
+one-row checks, reduction examples and boundary tests. The main submission package
+predates these results and remains a superseded candidate.
+\end{document}

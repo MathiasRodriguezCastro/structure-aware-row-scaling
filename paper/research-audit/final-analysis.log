@@ -1,0 +1,38 @@
+python3 scripts/research/analyze_budget_experiment.py --root results-revision/research-audit/budget-final
+                        n  attempted  abstained  exact_optimal  failed
+solver method                                                         
+highs  L2             192        192          0            141      51
+gurobi L2             192        192          0            139      53
+highs  Budget-GM      192        192          0            182      10
+gurobi Budget-GM      192        192          0            152      40
+highs  GM             192        192          0            141      51
+gurobi GM             192        192          0            140      52
+highs  Dyadic-GM      192        192          0            142      50
+gurobi Dyadic-GM      192        192          0            140      52
+highs  Base           192        192          0            167      25
+gurobi Base           192        192          0            156      36
+highs  Budget-round   192         48        144             48       0
+gurobi Budget-round   192         48        144             48       0
+highs  Budget-only    192        192          0            191       1
+gurobi Budget-only    192        192          0            151      41
+highs  GM-tight       192        192          0            166      26
+gurobi GM-tight       192        192          0            166      26
+highs  Budget-dyadic  192        192          0            161      31
+gurobi Budget-dyadic  192        192          0            153      39
+python3 scripts/research/analyze_identifiability.py
+     control  block_range  n  ratio_min  ratio_median  ratio_max  byte_equal
+     Flat-GM            1 60   0.721482      0.936971   1.583883         0.0
+     Flat-GM            2 60   0.073950      0.101525   0.176784         0.0
+     Flat-GM            3 60   0.006735      0.009726   0.017689         0.0
+ Role-Hybrid            1 60   0.943340      1.000000   1.059112        44.0
+ Role-Hybrid            2 60   0.939004      1.000000   1.016773        46.0
+ Role-Hybrid            3 60   0.956750      1.000000   1.079492        46.0
+SA-Mat-permB            1 60   0.999619      1.000000   1.000212        55.0
+SA-Mat-permB            2 60   0.999999      1.000000   1.000001        55.0
+SA-Mat-permB            3 60   1.000000      1.000000   1.000000        55.0
+     Flat-L2            1 60   2.070910      2.700764   4.470116         NaN
+     Flat-L2            2 60   1.830469      2.689414   4.224945         NaN
+     Flat-L2            3 60   1.968636      2.610504   4.471790         NaN
+python3 scripts/audit_operational_evidence.py --source results-revision/final-variants --output results-revision/research-audit/operational --timeout 1800 --bootstrap 10000
+Audited 240 runs; wrote /home/mathiasr/Escritorio/generator-aware-row-scaling/results-revision/research-audit/operational
+cp results-revision/research-audit/operational/main_table_four_cells.tex paper/tables/operational-results.tex

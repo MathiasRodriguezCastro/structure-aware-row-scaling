@@ -1,0 +1,1646 @@
+% Supporting Information for
+% "When Does Generator Metadata Help? A Controlled Study of Structure-Aware Row Scaling for Generated Mixed-Integer Programs"
+% Build: xelatex supporting-information (or pdflatex; no Wiley class needed)
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage{amsmath}
+\newcommand{\diag}{\operatorname{diag}}
+\newenvironment{proof}{\par\noindent\textit{Proof.}\ }{\hfill\qedsymbol\par\medskip}
+\providecommand{\qedsymbol}{\ensuremath{\square}}
+\usepackage{xurl}   % breakable paths/URLs (\path)
+% break long paths only at natural separators, not mid-token
+\makeatletter\def\UrlBreaks{\do\/\do\_\do\-\do\.}\makeatother
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[labelfont=bf]{caption}
+\usepackage{booktabs,multirow,threeparttable,longtable,array}
+\usepackage{siunitx}
+\sisetup{detect-weight=true,detect-family=true,detect-mode=text,mode=text,
+  group-digits=integer,group-minimum-digits=4,group-separator={,},
+  table-number-alignment=center}
+\usepackage{pdflscape}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black]{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\graphicspath{{figs/}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thealgorithm}{S\arabic{algorithm}}
+\providecommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\sgm}{\ensuremath{\operatorname{sgm}}}
+\newcommand{\PARten}{\ensuremath{\operatorname{PAR10}}}
+\newcommand{\PARavail}{\ensuremath{\operatorname{PAR10}_{\mathrm{avail}}}}
+\newcommand{\methodAug}{SA-Aug}
+\newcommand{\methodMat}{SA-Mat}
+\newcommand{\methodBase}{Base}
+\newcommand{\methodRuiz}{Ruiz}
+\newcommand{\methodRuizCols}{Ruiz+Cols}
+\newcommand{\AvgGap}{\ensuremath{\overline{\gamma}_{\mathrm{cb}}}}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries Supporting Information}\\[0.5em]
+\emph{When Does Generator Metadata Help? A Controlled Study of Structure-Aware Row Scaling for Generated Mixed-Integer Programs}\\[0.3em]
+Mathias Rodr\'iguez Castro
+\end{center}
+
+\bigskip
+\noindent This document contains (i) the $0.1\%$-MIPGap Gurobi distributional, diagnostic, and
+performance-profile views (Scenario~2 of the main text; Figures~S1--S3), which mirror the
+corresponding $1\%$-MIPGap figures of the main text; (ii) the $0.1\%$-MIPGap CPLEX
+distributional and profile views (Scenario~4; Figure~S4); (iii) the hyperparameter
+sensitivity of the structure-aware rule (Table~S1); (iv) the per-variant original-scale
+reliability breakdown with PAR10 under the three readings of the main text (Table~S2);
+(v) the out-of-sample sensitivity of the collective coupling reliability floor (Table~S3);
+(vi) the evaluation of the optional local reliability floor on the failing Simple subset
+(Table~S4); (vii) the common-pool exclusions and full-pool sensitivity (Table~S5);
+(viii) paired-test attrition, the corrected Wilcoxon procedure, and clustered-bootstrap
+accounting (Table~S6);
+(ix) the available solver-internal-scaling sweep and the verified CPLEX
+\texttt{Read::Scale}$=-1$ audit (Table~S7); and (x) the archived runtime comparison used for
+the coupling-stage activation audit (Table~S8); (xi) the direct SA--Flat strict/mixed
+reliability audit (Table~S9); and (xii) the multiplicity, operational-family, bootstrap,
+preprocessing-plus-solver, deterministic-effort, and own-incumbent sensitivities for that
+direct comparison (Table~S10); (xiii) its per-contrast attrition and cached-metadata endpoint on both builds (Table~S11); and
+(xiv) the measurement environment, build comparison and cross-environment transfer-factor
+sensitivity (Table~S12); and (xv) the full traceability of the kernel-matched metadata grid---
+the block-heterogeneous family, its per-block scale distribution, the seeds, the per-variant
+$\kappa_2^{+}$ distribution on the headline cell, and the reproduction command (Section~S3,
+Table~S13).
+
+\section*{Section S1. Proofs of the spectral propositions}
+\noindent These are the full proofs of the two propositions stated in Section~3 of the
+main text, moved here to keep the motivation and the method adjacent.
+
+\noindent\textbf{Proof of Proposition~1 (Ideal scalar scaling of block-diagonal matrices).}
+\begin{proof}
+For fixed positive scalars $\alpha_i$, the scaled matrix is block diagonal:
+\begin{equation*}
+\diag(\alpha_1 I,\ldots,\alpha_B I)D
+=
+\diag(\alpha_1 A_1,\ldots,\alpha_B A_B).
+\end{equation*}
+The singular values of a block-diagonal matrix are the union of the singular values of
+its blocks. Therefore, for every $i$,
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\kappa_2(\alpha_i A_i)
+=
+\kappa_2(A_i).
+\end{equation*}
+Taking the maximum over $i$ gives the lower bound
+\begin{equation*}
+\kappa_2\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+\ge
+\max_i \kappa_2(A_i)
+\end{equation*}
+for every admissible block scaling.
+
+Now choose $\alpha_i=(M_i m_i)^{-1/2}$. Then the largest and smallest singular values of
+$\alpha_i A_i$ are
+\begin{align*}
+\sigma_{\max}(\alpha_i A_i)
+&=\sqrt{\frac{M_i}{m_i}}=\sqrt{\kappa_2(A_i)},\\
+\sigma_{\min}(\alpha_i A_i)
+&=\sqrt{\frac{m_i}{M_i}}=\frac{1}{\sqrt{\kappa_2(A_i)}}.
+\end{align*}
+Because the singular values of the complete block-diagonal matrix are obtained by
+pooling the singular values of its blocks,
+\begin{equation*}
+\sigma_{\max}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\sqrt{\max_i \kappa_2(A_i)},
+\end{equation*}
+and
+\begin{equation*}
+\sigma_{\min}\!\left(\diag(\alpha_1 A_1,\ldots,\alpha_B A_B)\right)
+=
+\frac{1}{\sqrt{\max_i \kappa_2(A_i)}}.
+\end{equation*}
+The resulting condition number is $\max_i\kappa_2(A_i)$, matching the lower bound.
+\end{proof}
+
+\noindent\textbf{Proof of Proposition~2 (Conditioning of a triangular coupling factor).}
+\begin{proof}
+Let $R=U\Sigma V^\top$ be a singular value decomposition (SVD) of $R$, with $U$ and $V$
+orthogonal. Orthogonal multiplication does not change singular values, and hence
+$T_R$ has the same singular values as
+\begin{equation*}
+\begin{bmatrix}
+V^\top & 0\\
+0 & U^\top
+\end{bmatrix}
+\begin{bmatrix}
+I_n & 0\\
+R & I_m
+\end{bmatrix}
+\begin{bmatrix}
+V & 0\\
+0 & U
+\end{bmatrix}
+=
+\begin{bmatrix}
+I_n & 0\\
+\Sigma & I_m
+\end{bmatrix}.
+\end{equation*}
+For each singular value $\sigma$ of $R$, the nontrivial part reduces to the two-dimensional
+block
+\begin{equation*}
+B_\sigma=
+\begin{bmatrix}
+1 & 0\\
+\sigma & 1
+\end{bmatrix}.
+\end{equation*}
+The squared singular values of $B_\sigma$ are the eigenvalues of
+\begin{equation*}
+B_\sigma^\top B_\sigma=
+\begin{bmatrix}
+1+\sigma^2 & \sigma\\
+\sigma & 1
+\end{bmatrix},
+\end{equation*}
+namely
+\begin{equation*}
+\lambda_{\pm}(\sigma)=
+\frac{\sigma^2+2\pm \sigma\sqrt{\sigma^2+4}}{2}.
+\end{equation*}
+Their product is one, and $\lambda_+(\sigma)$ is increasing for $\sigma\ge0$. Additional
+directions associated with zero singular values of $R$ contribute singular values equal to
+one. Therefore the largest squared singular value of $T_R$ is $\lambda_+(\rho)$ and the
+smallest squared singular value is $1/\lambda_+(\rho)$. Consequently,
+\begin{align*}
+\kappa_2(T_R)
+&=\lambda_+(\rho)\\
+&=\frac{\rho^2+2+\rho\sqrt{\rho^2+4}}{2}\\
+&=\left(\frac{\sqrt{\rho^2+4}+\rho}{2}\right)^2 .
+\end{align*}
+\end{proof}
+
+\section*{Section S2. Supplementary computational results}
+
+\medskip
+\noindent Here, \PARten{} (including its ITT/strict/mixed superscripts) denotes the
+common-pool metric defined in the main text. The distinct symbol
+\PARavail{} is reserved for archived descriptive revision tables: its denominator is the
+variant's available solver-output records, a timeout receives $36{,}000$\,s, and a pure
+pipeline error with no solver output is excluded. It must not be compared numerically with
+the fixed-pool metric.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{esc2_gurobi_01pct_boxplot.pdf}
+\caption{At $0.1\%$ MIPGap, the Gurobi speedup distributions preserve the same qualitative
+pattern observed at the looser tolerance. Values above one indicate faster runs than the
+unscaled formulation.}
+\label{fig:si-boxplot-gap01}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.485\textwidth}\centering
+  \includegraphics[width=\linewidth]{esc2_gurobi_01pct_scatter_rho.pdf}
+  \caption{Static coefficient-range ratio.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.485\textwidth}\centering
+  \includegraphics[width=\linewidth]{esc2_gurobi_01pct_scatter_rhosolver.pdf}
+  \caption{Solver-level conditioning ratio.}
+\end{subfigure}
+\caption{At $0.1\%$ MIPGap, the pooled scatter shows a stronger association with speedup for
+the own-incumbent path-specific fixed-LP diagnostic than for the exported-range proxy. This describes
+solver paths; it does not make the former a purer measure of representation or an
+instance-level predictor for the structure-aware variants.}
+\label{fig:si-scatter-gap01}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{esc2_gurobi_01pct_perfil.pdf}
+\caption{At $0.1\%$ MIPGap, fixed-pool Dolan--Mor\'e profiles use the common denominators
+and individual $36{,}000$-s failure cost defined in the main text.}
+\label{fig:si-profile-gap01}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.485\textwidth}\centering
+  \includegraphics[width=\linewidth]{esc4_cplex_01pct_boxplot.pdf}
+  \caption{Total-time speedup distribution.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.485\textwidth}\centering
+  \includegraphics[width=\linewidth]{esc4_cplex_01pct_perfil.pdf}
+  \caption{Fixed-pool performance profile.}
+\end{subfigure}
+\caption{At $0.1\%$ MIPGap, the CPLEX visual evidence remains mixed under the stricter
+tolerance. The profile uses a common pool and assigns $36{,}000$\,s to an individual
+timeout, abort, missing run, or invalid time, as defined in the main text.}
+\label{fig:si-cplex-gap01}
+\end{figure}
+
+\begin{table}[!htbp]
+\centering
+\caption{Hyperparameter sensitivity of \methodAug{} (Simple class, Gurobi, 1\% MIPGap).
+Solver-time $\sgm$ ($s=1$\,s) and descriptive \PARavail{}, in seconds; default settings in bold.}
+\label{tab:si-hyperparam}
+\begin{threeparttable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Parameter & Value & {$\sgm$ (s)} & {\PARavail{} (s)} \\
+\midrule
+\multirow{3}{*}{Band $u$}
+ & $1.5$ & 2.09 & 2.46 \\
+ & $\mathbf{2}$ & 2.07 & 2.45 \\
+ & $4$ & 2.12 & 2.49 \\
+\midrule
+\multirow{3}{*}{Window $[\varepsilon_{\min},\varepsilon_{\max}]$}
+ & $[10^{-6},10^{6}]$ & 2.04 & 2.40 \\
+ & $\mathbf{[10^{-9},10^{9}]}$ & 2.02 & 2.39 \\
+ & $[10^{-12},10^{12}]$ & 2.01 & 2.36 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Base $\sgm$ is $3.73$\,s for reference. Each row is a separate matched run; the
+spread across all settings ($\sgm\in[2.01,2.12]$) is far below the base-to-scaled gap, and
+the median paired speedup is $\approx 1.0$ throughout. The number of Ruiz iterations $K$ is a
+parameter of the Ruiz baselines, not of the structure-aware rule, so it is fixed at $K=4$;
+varying it leaves \methodAug{} unchanged, as expected.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2.4pt}
+\begin{longtable}{@{}llllrrrrrrrrrr@{}}
+\caption{Per-variant audit and \PARten{} under the three operational readings. All campaigns
+use the manifest-declared $T_{\max}=3600$\,s. A timeout or pipeline abort receives
+$10T_{\max}=36000$\,s in every reading; a returned output that fails the relevant verifier
+receives that penalty only in the strict or mixed reading. The count columns use the raw
+manifest pool: $n_{\mathrm{att}}$ is every attempted instance and $n_{\mathrm{out}}$
+reproduces the pooled diagnostic audit's status-OK denominator, including time-limited runs
+and three records that lack verification fields. TO is a subset of $n_{\mathrm{out}}$, and
+Abort is $n_{\mathrm{att}}-n_{\mathrm{out}}$. Pass counts are among those status-OK records;
+missing verification is non-passing. Strict pass means $v_{\mathrm{row}}\le10^{-4}$ and
+$v_{\mathrm{int}}\le10^{-5}$; mixed pass rescues only row failures with
+$v_r/(1+|b_r|)\le10^{-6}$. In contrast, the four \PARten{} columns use the reproducible
+scenario-specific common pool after the uniformly-unavailable exclusion in
+Table~\ref{tab:si-exclusions}: Base ITT and, for the listed variant, ITT/strict/mixed. Values
+are seconds, rounded to the nearest second.}
+\label{tab:si-reliability}\\
+\toprule
+Solver & Gap & Class & Variant & $n_{\rm att}$ & $n_{\rm out}$ & TO & Abort &
+$n_{\rm pass}^{\rm str}$ & $n_{\rm pass}^{\rm mix}$ & Base ITT & ITT & Strict & Mixed \\
+\midrule
+\endfirsthead
+\multicolumn{14}{c}{\tablename\ \thetable\ (continued)}\\
+\toprule
+Solver & Gap & Class & Variant & $n_{\rm att}$ & $n_{\rm out}$ & TO & Abort &
+$n_{\rm pass}^{\rm str}$ & $n_{\rm pass}^{\rm mix}$ & Base ITT & ITT & Strict & Mixed \\
+\midrule
+\endhead
+\midrule
+\multicolumn{14}{r}{Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Gurobi & 1\% & Simple & SA-Aug & 204 & 197 & 0 & 7 & 185 & 185 & 373 & 364 & 2535 & 2535 \\
+Gurobi & 1\% & Simple & SA-Mat & 204 & 198 & 0 & 6 & 179 & 180 & 373 & 183 & 3620 & 3439 \\
+Gurobi & 1\% & Simple & Ruiz & 204 & 198 & 0 & 6 & 143 & 146 & 373 & 207 & 10153 & 9611 \\
+Gurobi & 1\% & Simple & Ruiz+Cols & 204 & 199 & 0 & 5 & 180 & 189 & 373 & 28 & 3462 & 1835 \\
+Gurobi & 1\% & SG-Ter-Mer & SA-Aug & 68 & 67 & 1 & 1 & 66 & 67 & 1094 & 1083 & 1613 & 1083 \\
+Gurobi & 1\% & SG-Ter-Mer & SA-Mat & 68 & 67 & 0 & 1 & 65 & 66 & 1094 & 1079 & 1608 & 1079 \\
+Gurobi & 1\% & SG-Ter-Mer & Ruiz & 68 & 68 & 1 & 0 & 67 & 68 & 1094 & 567 & 1095 & 567 \\
+Gurobi & 1\% & SG-Ter-Mer & Ruiz+Cols & 68 & 68 & 1 & 0 & 67 & 68 & 1094 & 585 & 1113 & 585 \\
+Gurobi & 1\% & Full & SA-Aug & 34 & 34 & 3 & 0 & 27 & 27 & 3385 & 3308 & 9640 & 9640 \\
+Gurobi & 1\% & Full & SA-Mat & 34 & 34 & 2 & 0 & 31 & 31 & 3385 & 3473 & 5586 & 5586 \\
+Gurobi & 1\% & Full & Ruiz & 34 & 33 & 4 & 1 & 31 & 31 & 3385 & 5491 & 7577 & 7577 \\
+Gurobi & 1\% & Full & Ruiz+Cols & 34 & 33 & 4 & 1 & 31 & 32 & 3385 & 5617 & 6666 & 5617 \\
+\midrule
+Gurobi & 0.1\% & Simple & SA-Aug & 204 & 195 & 0 & 9 & 174 & 178 & 928 & 928 & 4705 & 3987 \\
+Gurobi & 0.1\% & Simple & SA-Mat & 204 & 198 & 0 & 6 & 168 & 172 & 928 & 381 & 5776 & 5057 \\
+Gurobi & 0.1\% & Simple & Ruiz & 204 & 199 & 0 & 5 & 155 & 159 & 928 & 221 & 8138 & 7419 \\
+Gurobi & 0.1\% & Simple & Ruiz+Cols & 204 & 195 & 0 & 9 & 175 & 185 & 928 & 948 & 4544 & 2746 \\
+Gurobi & 0.1\% & SG-Ter-Mer & SA-Aug & 68 & 63 & 1 & 5 & 62 & 63 & 2246 & 1683 & 2237 & 1683 \\
+Gurobi & 0.1\% & SG-Ter-Mer & SA-Mat & 68 & 65 & 0 & 3 & 63 & 64 & 2246 & 576 & 1130 & 576 \\
+Gurobi & 0.1\% & SG-Ter-Mer & Ruiz & 68 & 65 & 1 & 3 & 65 & 65 & 2246 & 587 & 587 & 587 \\
+Gurobi & 0.1\% & SG-Ter-Mer & Ruiz+Cols & 68 & 62 & 1 & 6 & 61 & 62 & 2246 & 2262 & 2814 & 2262 \\
+Gurobi & 0.1\% & Full & SA-Aug & 34 & 30 & 3 & 4 & 27 & 27 & 5992 & 5897 & 8140 & 8140 \\
+Gurobi & 0.1\% & Full & SA-Mat & 34 & 31 & 4 & 3 & 28 & 30 & 5992 & 6026 & 9293 & 7148 \\
+Gurobi & 0.1\% & Full & Ruiz & 34 & 30 & 4 & 4 & 27 & 27 & 5992 & 7066 & 9277 & 9277 \\
+Gurobi & 0.1\% & Full & Ruiz+Cols & 34 & 31 & 5 & 3 & 28 & 29 & 5992 & 7073 & 9312 & 8191 \\
+\midrule
+CPLEX & 1\% & Simple & SA-Aug & 204 & 204 & 0 & 0 & 37 & 37 & 6 & 3 & 29471 & 29471 \\
+CPLEX & 1\% & Simple & SA-Mat & 204 & 204 & 0 & 0 & 43 & 43 & 6 & 3 & 28412 & 28412 \\
+CPLEX & 1\% & Simple & Ruiz & 204 & 204 & 0 & 0 & 44 & 44 & 6 & 4 & 28237 & 28237 \\
+CPLEX & 1\% & Simple & Ruiz+Cols & 204 & 204 & 0 & 0 & 137 & 138 & 6 & 3 & 11825 & 11649 \\
+CPLEX & 1\% & SG-Ter-Mer & SA-Aug & 68 & 68 & 0 & 0 & 68 & 68 & 3 & 10 & 10 & 10 \\
+CPLEX & 1\% & SG-Ter-Mer & SA-Mat & 68 & 68 & 0 & 0 & 68 & 68 & 3 & 6 & 6 & 6 \\
+CPLEX & 1\% & SG-Ter-Mer & Ruiz & 68 & 68 & 0 & 0 & 68 & 68 & 3 & 10 & 10 & 10 \\
+CPLEX & 1\% & SG-Ter-Mer & Ruiz+Cols & 68 & 68 & 0 & 0 & 68 & 68 & 3 & 15 & 15 & 15 \\
+CPLEX & 1\% & Full & SA-Aug & 34 & 34 & 5 & 0 & 25 & 25 & 6515 & 5546 & 15014 & 15014 \\
+CPLEX & 1\% & Full & SA-Mat & 34 & 34 & 6 & 0 & 25 & 26 & 6515 & 6498 & 14932 & 13875 \\
+CPLEX & 1\% & Full & Ruiz & 34 & 34 & 3 & 0 & 28 & 28 & 6515 & 3506 & 8744 & 8744 \\
+CPLEX & 1\% & Full & Ruiz+Cols & 34 & 34 & 4 & 0 & 32 & 33 & 6515 & 4681 & 6793 & 5737 \\
+\midrule
+CPLEX & 0.1\% & Simple & SA-Aug & 204 & 204 & 1 & 0 & 40 & 40 & 214 & 188 & 29119 & 29119 \\
+CPLEX & 0.1\% & Simple & SA-Mat & 204 & 204 & 1 & 0 & 38 & 38 & 214 & 203 & 29311 & 29311 \\
+CPLEX & 0.1\% & Simple & Ruiz & 204 & 204 & 1 & 0 & 44 & 44 & 214 & 192 & 28413 & 28413 \\
+CPLEX & 0.1\% & Simple & Ruiz+Cols & 204 & 204 & 3 & 0 & 144 & 146 & 214 & 547 & 10955 & 10779 \\
+CPLEX & 0.1\% & SG-Ter-Mer & SA-Aug & 68 & 68 & 0 & 0 & 68 & 68 & 19 & 21 & 21 & 21 \\
+CPLEX & 0.1\% & SG-Ter-Mer & SA-Mat & 68 & 68 & 0 & 0 & 68 & 68 & 19 & 16 & 16 & 16 \\
+CPLEX & 0.1\% & SG-Ter-Mer & Ruiz & 68 & 68 & 0 & 0 & 68 & 68 & 19 & 8 & 8 & 8 \\
+CPLEX & 0.1\% & SG-Ter-Mer & Ruiz+Cols & 68 & 68 & 1 & 0 & 68 & 68 & 19 & 539 & 539 & 539 \\
+CPLEX & 0.1\% & Full & SA-Aug & 34 & 34 & 8 & 0 & 24 & 24 & 9951 & 8930 & 18283 & 18283 \\
+CPLEX & 0.1\% & Full & SA-Mat & 34 & 33 & 10 & 1 & 25 & 26 & 9951 & 11916 & 20280 & 19226 \\
+CPLEX & 0.1\% & Full & Ruiz & 34 & 34 & 5 & 0 & 32 & 32 & 9951 & 5857 & 7917 & 7917 \\
+CPLEX & 0.1\% & Full & Ruiz+Cols & 34 & 33 & 10 & 1 & 31 & 32 & 9951 & 11950 & 14063 & 13007 \\
+\end{longtable}
+\end{landscape}
+
+\noindent\textit{Objective-difference audit.}
+MIPGap bounds each incumbent against its own dual bound and is not a cross-run agreement
+test. Of 4,806 variant runs with returned solver output, 72 differ from the corresponding Base
+incumbent by more than twice the nominal gap; these cases are concentrated in a small set of
+instance identifiers. The largest pooled relative deviations occur in Full/Ruiz cells
+($\lvert\Delta z_{\rm rel}\rvert\approx1.8\times10^{2}$ under Gurobi and
+$5.3\times10^{1}$ under CPLEX). Base is not presumed correct: one Simple Base incumbent is
+73\% worse than the best verified incumbent, and one CPLEX Full Base incumbent is roughly
+six times worse. Accordingly, correctness is assessed against the best original-scale-verified
+incumbent on each instance, with Base subjected to the same feasibility and integrality checks
+as every scaled variant.
+
+\begin{table}[!htbp]
+\centering
+\caption{Out-of-sample sensitivity of the reliability floor for the collective coupling
+factor (\methodAug{}), on twenty seeds ($21$--$40$) never used while designing the floor.
+Cells: coupling, coupling-uniform, and mixed patterns at severity $S=6$ ($60$ instances,
+Gurobi, MIPGap $10^{-3}$, $600$\,s limit). Median post-scaling global
+coefficient-and-right-hand-side magnitude-range proxy per
+pattern; number of runs failing original-scale verification; worst original-scale row
+violation; instances whose objective disagrees with the base beyond the MIPGap. The
+failure mode replicates out-of-sample with the floor disabled, and every floor value
+across three orders of magnitude eliminates it.}
+\label{tab:si-floor-sensitivity}
+\small
+\begin{tabular}{@{}l rrr rrr@{}}
+\toprule
+Floor & {coupling} & {coupling-unif.} & {mixed} & $n_{\mathrm{fail}}$ & $v_{\mathrm{max}}$ & {over gap} \\
+\midrule
+(pre-scaling)     & $4.4\times10^{8}$ & $3.3\times10^{6}$ & $1.5\times10^{14}$ & & & \\
+\addlinespace
+disabled          & $3.8\times10^{7}$ & $5.4\times10^{3}$ & $2.9\times10^{7}$ & 4 & $4.2\times10^{-1}$ & 4 \\
+$10^{-2}$         & $9.1\times10^{5}$ & $5.4\times10^{3}$ & $2.9\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+$10^{-3}$ (default) & $3.5\times10^{5}$ & $5.4\times10^{3}$ & $2.3\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+$10^{-4}$         & $1.0\times10^{6}$ & $5.4\times10^{3}$ & $2.3\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+$10^{-5}$         & $2.1\times10^{6}$ & $5.4\times10^{3}$ & $3.0\times10^{6}$ & 0 & $1.2\times10^{-7}$ & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textit{Coupling-trigger sensitivity.}
+On the original synthetic grid, sweeping
+$\widehat\rho_{\mathrm{trigger}}\in\{2,5,10,20,50\}$ leaves every displayed coupling and
+coupling-uniform cell median unchanged. Approximately one instance in twenty lies in the
+$[2,50]$ band, so some individual activation decisions change, but the proxy is effectively
+bimodal (above $10^{2}$ on oversized instances and below one on undersized instances). The
+result therefore supports the stated conclusion about the one-sided design, not a privileged
+choice of the cutoff $10$.
+
+\begin{table}[!htbp]
+\centering
+\caption{Optional local reliability floor (\methodAug{}-LF), evaluated on the twelve Simple
+instances (Gurobi, $1\%$ MIPGap) whose \methodAug{} runs fail original-scale verification.
+The floor applies the local factor only if $\alpha_r^{A,b}\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$,
+so $d_r\ge\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ bounds the conditional
+original-scale residual by $\varepsilon/\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$;
+rows below the floor stay at base scale. $n_{\mathrm{fail}}$ is the number of the twelve runs
+failing the strict absolute criterion; $\sigma_{\mathrm{gm}}$ is the shifted geometric mean
+solver time ($s=1$\,s); $\widehat\kappa_{\rm range}^{\mathrm{post}}$ is the median exported
+coefficient-and-right-hand-side magnitude-range proxy;
+$v_{\mathrm{max}}$ is the worst original-scale row violation. \methodMat{} is shown for
+reference.}
+\label{tab:si-local-floor}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Variant & $n_{\mathrm{fail}}$ & $\sigma_{\mathrm{gm}}$ (s) & $\widehat\kappa_{\rm range}^{\mathrm{post}}$ & $v_{\mathrm{max}}$ \\
+\midrule
+Base                                     & 0  & 4.90 & --        & 0 \\
+\methodAug{} (no floor, default)         & 12 & 2.47 & $6.6\times10^{9}$  & $3.7\times10^{-3}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-1}$ & 0  & 2.64 & $5.5\times10^{11}$ & $5.3\times10^{-5}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-2}$ & 0  & 2.89 & $5.5\times10^{11}$ & $7.4\times10^{-5}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-3}$ & 6  & 5.52 & $2.0\times10^{14}$ & $4.0\times10^{-2}$ \\
+\methodAug{}-LF, $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}=10^{-4}$ & 6  & 2.19 & $2.0\times10^{14}$ & $5.3\times10^{-4}$ \\
+\methodMat{}                             & 5  & 2.57 & $4.5\times10^{12}$ & $1.9\times10^{-3}$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} The floor is monotone: $n_{\mathrm{fail}}$ falls from $12$ (no floor) to $6$
+(shallow floors $10^{-3}$/$10^{-4}$, which protect only the most extreme rows) to $0$
+($10^{-2}$/$10^{-1}$), consistent with the residual bound
+$\varepsilon/\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$. At the effective floor $10^{-2}$
+the variant eliminates every failure while retaining a solver-time advantage over the base
+($\sigma_{\mathrm{gm}}$ $2.89$ vs $4.90$\,s), even though it \emph{raises} the exported
+magnitude-range proxy (the protected rows are exactly the over-compressed
+large-right-hand-side rows)---a further illustration that this static proxy is a weak
+predictor of runtime.
+The threshold is imposed on the representation-dependent factor
+$\alpha_r^{A,b}$ and is therefore not invariant to a positive re-emission of the same
+unscaled row. Here it is defined relative to the generator's canonical export in physical
+units. A representation-invariant alternative could threshold a norm of the resulting scaled
+row, but it would not inherit the same
+$\varepsilon/\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ residual bound.
+The $\sigma_{\mathrm{gm}}$ values on twelve instances are noisy and are not a full-class
+estimate. This subset was selected by a post-treatment outcome (the \methodAug{} failures),
+so the table is a demonstration on the failing set; the full-class reliability and runtime
+effect, and the behavior on Full, remain untested.
+\end{flushleft}
+\end{table}
+
+\begin{table}[!p]
+\centering
+\caption{Uniformly unavailable operational records and sensitivity to retaining them. Panel A
+applies the documented reproducible data rule: exclude an instance only when all five attempted variants
+have nonzero pipeline return codes. Panel B restores those cells to the manifest-declared full
+pool and assigns each a 36000-s penalty. Triplets are ITT/strict/mixed \PARten{} in seconds;
+only scenarios with exclusions are shown because common- and full-pool results otherwise
+coincide. The within-reading ordering of Base, \methodAug{}, and \methodMat{} is unchanged
+(the rounded common-pool tie in Gurobi Simple at $0.1\%$ is broken by less than one second before
+rounding in the full pool).}
+\label{tab:si-exclusions}
+\scriptsize
+\renewcommand{\arraystretch}{0.92}
+\begin{threeparttable}
+\textbf{Panel A: identifiers}\\[2pt]
+\begin{tabular}{@{}lllrl@{}}
+\toprule
+Solver & Gap & Class & $N/n$ & Uniformly unavailable identifiers \\
+\midrule
+Gurobi & 1\% & Simple & 204/199 & \texttt{caso46f}, \texttt{caso47a}--\texttt{caso47d} \\
+Gurobi & 0.1\% & Simple & 204/200 & \texttt{caso02c}--\texttt{caso02e}, \texttt{caso22a} \\
+Gurobi & 0.1\% & SG-Ter-Mer & 68/65 & \texttt{instance020}--\texttt{instance022} \\
+Gurobi & 0.1\% & Full & 34/32 & \texttt{instance046}, \texttt{instance047} \\
+\bottomrule
+\end{tabular}
+
+\vspace{3pt}
+\textbf{Panel B: common pool versus penalized full pool}\\[2pt]
+\begin{tabular}{@{}lllrrr@{}}
+\toprule
+Gap/class & Variant & Pool & ITT & Strict & Mixed \\
+\midrule
+\multirow{10}{*}{\begin{tabular}[c]{@{}l@{}}1\%, Simple\\($n=199$, $N=204$)\end{tabular}}
+ & Base & common & 373 & 554 & 554 \\
+ &      & full   & 1246 & 1422 & 1422 \\
+ & SA-Aug & common & 364 & 2535 & 2535 \\
+ &        & full   & 1238 & 3355 & 3355 \\
+ & SA-Mat & common & 183 & 3620 & 3439 \\
+ &        & full   & 1061 & 4414 & 4237 \\
+ & Ruiz & common & 207 & 10153 & 9611 \\
+ &      & full   & 1085 & 10786 & 10258 \\
+ & Ruiz+Cols & common & 28 & 3462 & 1835 \\
+ &           & full   & 909 & 4260 & 2673 \\
+\midrule
+\multirow{10}{*}{\begin{tabular}[c]{@{}l@{}}0.1\%, Simple\\($n=200$, $N=204$)\end{tabular}}
+ & Base & common & 928 & 1108 & 1108 \\
+ &      & full   & 1615 & 1792 & 1792 \\
+ & SA-Aug & common & 928 & 4705 & 3987 \\
+ &        & full   & 1616 & 5318 & 4615 \\
+ & SA-Mat & common & 381 & 5776 & 5057 \\
+ &        & full   & 1079 & 6369 & 5664 \\
+ & Ruiz & common & 221 & 8138 & 7419 \\
+ &      & full   & 923 & 8684 & 7980 \\
+ & Ruiz+Cols & common & 948 & 4544 & 2746 \\
+ &           & full   & 1635 & 5161 & 3398 \\
+\midrule
+\multirow{10}{*}{\begin{tabular}[c]{@{}l@{}}0.1\%, SG-Ter-Mer\\($n=65$, $N=68$)\end{tabular}}
+ & Base & common & 2246 & 2246 & 2246 \\
+ &      & full   & 3735 & 3735 & 3735 \\
+ & SA-Aug & common & 1683 & 2237 & 1683 \\
+ &        & full   & 3197 & 3727 & 3197 \\
+ & SA-Mat & common & 576 & 1130 & 576 \\
+ &        & full   & 2139 & 2668 & 2139 \\
+ & Ruiz & common & 587 & 587 & 587 \\
+ &      & full   & 2149 & 2149 & 2149 \\
+ & Ruiz+Cols & common & 2262 & 2814 & 2262 \\
+ &           & full   & 3750 & 4279 & 3750 \\
+\midrule
+\multirow{10}{*}{\begin{tabular}[c]{@{}l@{}}0.1\%, Full\\($n=32$, $N=34$)\end{tabular}}
+ & Base & common & 5992 & 5992 & 5992 \\
+ &      & full   & 7757 & 7757 & 7757 \\
+ & SA-Aug & common & 5897 & 8140 & 8140 \\
+ &        & full   & 7668 & 9779 & 9779 \\
+ & SA-Mat & common & 6026 & 9293 & 7148 \\
+ &        & full   & 7789 & 10864 & 8845 \\
+ & Ruiz & common & 7066 & 9277 & 9277 \\
+ &      & full   & 8768 & 10849 & 10849 \\
+ & Ruiz+Cols & common & 7073 & 9312 & 8191 \\
+ &           & full   & 8775 & 10882 & 9827 \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\begin{minipage}{0.94\textwidth}\scriptsize
+\emph{Note.} $N$ is the manifest pool and $n$ the common pool. In the archived logs for every
+excluded identifier, Base, \methodAug{}, Ruiz, and Ruiz+Cols stop at a Gurobi WLS
+\texttt{Overage for too long} licensing error and report no configured solver. The
+\methodMat{} logs instead record optimal completions written to a separate
+\texttt{*-matricial} result tree, while their aggregate campaign records retain nonzero
+return codes. Thus the evidence supports a combination of license-capacity failure and
+incomplete artifact consolidation; the exclusion itself is defined only by the observable
+all-variant return-code rule and does not assert that every underlying solve failed.
+\end{minipage}
+\end{table}
+
+\begin{landscape}
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\begin{longtable}{@{}llllrrrrrrrrrr@{}}
+\caption{Pair attrition and corrected Wilcoxon audit. $n$ is the effective matched-pair
+count. UM denotes the all-variant uniformly-unavailable exclusion; $D_{\rm TO}$, $D_{\rm A}$,
+and $D_{\rm mix}$ are exclusions because both Base and the listed variant are, respectively,
+timeouts, pipeline aborts, or different kinds of noncompletion. $C_1$ is a one-sided
+noncompletion retained at exactly $T_{\max}=3600$\,s. There are no missing-time or exact-zero
+pairs in any row. A one-sided timeout is right-censored at $T_{\max}$; assigning the same
+cost to a one-sided algorithmic/pipeline abort is an operational-failure convention rather
+than a censoring claim. The test is two-sided Wilcoxon signed-rank on
+$t_{\rm variant}-t_{\rm Base}$ (SciPy 1.15.3), with exact zeros discarded, tied absolute
+differences assigned midranks, and no continuity correction. The exact null distribution is
+used for at most 50 nonzero untied differences; otherwise the tie-corrected normal
+approximation is used. The displayed structure-aware Simple/SG rows use the approximation and
+Full rows use the exact distribution; no zero or tied-absolute-difference pair occurs.
+$r_{\rm rb}<0$ favors the listed variant. $q$ is Benjamini--Hochberg adjusted over the twelve
+tests in each solver-by-gap family (three classes by four variants).}
+\label{tab:si-paired-attrition}\\
+\toprule
+Solver & Gap & Class & Variant & $n$ & UM & $D_{\rm TO}$ & $D_{\rm A}$ & $D_{\rm mix}$ & $C_1$ & $W$ & $p$ & $q$ & $r_{\rm rb}$ \\
+\midrule
+\endfirsthead
+\multicolumn{14}{c}{\tablename\ \thetable\ (continued)}\\
+\toprule
+Solver & Gap & Class & Variant & $n$ & UM & $D_{\rm TO}$ & $D_{\rm A}$ & $D_{\rm mix}$ & $C_1$ & $W$ & $p$ & $q$ & $r_{\rm rb}$ \\
+\midrule
+\endhead
+\midrule
+\multicolumn{14}{r}{Continued on next page}\\
+\endfoot
+\bottomrule
+\endlastfoot
+Gurobi & 1\% & Simple & SA-Aug & 197 & 5 & 0 & 2 & 0 & 0 & 7535 & $5.67\times10^{-3}$ & $9.72\times10^{-3}$ & $-0.227$ \\
+Gurobi & 1\% & Simple & SA-Mat & 198 & 5 & 0 & 1 & 0 & 1 & 3011 & $2.42\times10^{-17}$ & $2.90\times10^{-16}$ & $-0.694$ \\
+Gurobi & 1\% & Simple & Ruiz & 198 & 5 & 0 & 1 & 0 & 1 & 7248 & $1.27\times10^{-3}$ & $3.04\times10^{-3}$ & $+0.264$ \\
+Gurobi & 1\% & Simple & Ruiz+Cols & 199 & 5 & 0 & 0 & 0 & 2 & 7414 & $1.82\times10^{-3}$ & $3.65\times10^{-3}$ & $+0.255$ \\
+Gurobi & 1\% & SG-Ter-Mer & SA-Aug & 66 & 0 & 1 & 1 & 0 & 0 & 501 & $1.13\times10^{-4}$ & $4.51\times10^{-4}$ & $-0.547$ \\
+Gurobi & 1\% & SG-Ter-Mer & SA-Mat & 66 & 0 & 0 & 1 & 1 & 0 & 115 & $2.49\times10^{-10}$ & $1.50\times10^{-9}$ & $-0.896$ \\
+Gurobi & 1\% & SG-Ter-Mer & Ruiz & 67 & 0 & 1 & 0 & 0 & 1 & 1129 & $0.950$ & $0.950$ & $-0.009$ \\
+Gurobi & 1\% & SG-Ter-Mer & Ruiz+Cols & 67 & 0 & 1 & 0 & 0 & 1 & 598 & $7.26\times10^{-4}$ & $2.18\times10^{-3}$ & $+0.475$ \\
+Gurobi & 1\% & Full & SA-Aug & 32 & 0 & 2 & 0 & 0 & 2 & 175 & $0.0984$ & $0.148$ & $-0.337$ \\
+Gurobi & 1\% & Full & SA-Mat & 32 & 0 & 2 & 0 & 0 & 2 & 204 & $0.270$ & $0.360$ & $-0.227$ \\
+Gurobi & 1\% & Full & Ruiz & 31 & 0 & 2 & 0 & 1 & 2 & 197 & $0.327$ & $0.393$ & $+0.206$ \\
+Gurobi & 1\% & Full & Ruiz+Cols & 32 & 0 & 2 & 0 & 0 & 4 & 243 & $0.705$ & $0.769$ & $+0.080$ \\
+\midrule
+Gurobi & 0.1\% & Simple & SA-Aug & 195 & 4 & 0 & 5 & 0 & 0 & 6963 & $1.02\times10^{-3}$ & $3.06\times10^{-3}$ & $-0.271$ \\
+Gurobi & 0.1\% & Simple & SA-Mat & 198 & 4 & 0 & 2 & 0 & 3 & 7069 & $5.70\times10^{-4}$ & $2.28\times10^{-3}$ & $-0.282$ \\
+Gurobi & 0.1\% & Simple & Ruiz & 199 & 4 & 0 & 1 & 0 & 4 & 7429 & $1.94\times10^{-3}$ & $4.66\times10^{-3}$ & $+0.253$ \\
+Gurobi & 0.1\% & Simple & Ruiz+Cols & 199 & 4 & 0 & 1 & 0 & 8 & 7517 & $2.78\times10^{-3}$ & $5.46\times10^{-3}$ & $+0.245$ \\
+Gurobi & 0.1\% & SG-Ter-Mer & SA-Aug & 62 & 3 & 1 & 2 & 0 & 1 & 456 & $2.63\times10^{-4}$ & $1.58\times10^{-3}$ & $-0.533$ \\
+Gurobi & 0.1\% & SG-Ter-Mer & SA-Mat & 64 & 3 & 0 & 0 & 1 & 3 & 341 & $2.95\times10^{-6}$ & $3.53\times10^{-5}$ & $-0.672$ \\
+Gurobi & 0.1\% & SG-Ter-Mer & Ruiz & 64 & 3 & 1 & 0 & 0 & 3 & 889 & $0.313$ & $0.341$ & $-0.145$ \\
+Gurobi & 0.1\% & SG-Ter-Mer & Ruiz+Cols & 64 & 3 & 1 & 0 & 0 & 6 & 599 & $3.19\times10^{-3}$ & $5.46\times10^{-3}$ & $+0.424$ \\
+Gurobi & 0.1\% & Full & SA-Aug & 28 & 2 & 3 & 1 & 0 & 2 & 124 & $0.0735$ & $0.110$ & $-0.389$ \\
+Gurobi & 0.1\% & Full & SA-Mat & 27 & 2 & 4 & 1 & 0 & 0 & 173 & $0.714$ & $0.714$ & $-0.085$ \\
+Gurobi & 0.1\% & Full & Ruiz & 28 & 2 & 3 & 0 & 1 & 3 & 144 & $0.186$ & $0.248$ & $+0.291$ \\
+Gurobi & 0.1\% & Full & Ruiz+Cols & 28 & 2 & 4 & 0 & 0 & 3 & 149 & $0.227$ & $0.272$ & $-0.266$ \\
+\midrule
+CPLEX & 1\% & Simple & SA-Aug & 204 & 0 & 0 & 0 & 0 & 0 & 9377 & $0.202$ & $0.346$ & $-0.103$ \\
+CPLEX & 1\% & Simple & SA-Mat & 204 & 0 & 0 & 0 & 0 & 0 & 7460 & $3.89\times10^{-4}$ & $2.33\times10^{-3}$ & $+0.286$ \\
+CPLEX & 1\% & Simple & Ruiz & 204 & 0 & 0 & 0 & 0 & 0 & 9496 & $0.256$ & $0.384$ & $+0.092$ \\
+CPLEX & 1\% & Simple & Ruiz+Cols & 204 & 0 & 0 & 0 & 0 & 0 & 8958 & $0.0762$ & $0.183$ & $+0.143$ \\
+CPLEX & 1\% & SG-Ter-Mer & SA-Aug & 68 & 0 & 0 & 0 & 0 & 0 & 1068 & $0.521$ & $0.521$ & $+0.090$ \\
+CPLEX & 1\% & SG-Ter-Mer & SA-Mat & 68 & 0 & 0 & 0 & 0 & 0 & 740 & $8.15\times10^{-3}$ & $0.0326$ & $+0.369$ \\
+CPLEX & 1\% & SG-Ter-Mer & Ruiz & 68 & 0 & 0 & 0 & 0 & 0 & 1041 & $0.420$ & $0.458$ & $+0.113$ \\
+CPLEX & 1\% & SG-Ter-Mer & Ruiz+Cols & 68 & 0 & 0 & 0 & 0 & 0 & 438 & $7.09\times10^{-6}$ & $8.50\times10^{-5}$ & $+0.627$ \\
+CPLEX & 1\% & Full & SA-Aug & 29 & 0 & 4 & 0 & 1 & 1 & 172 & $0.336$ & $0.428$ & $+0.209$ \\
+CPLEX & 1\% & Full & SA-Mat & 28 & 0 & 5 & 0 & 1 & 0 & 131 & $0.104$ & $0.208$ & $-0.355$ \\
+CPLEX & 1\% & Full & Ruiz & 31 & 0 & 2 & 0 & 1 & 3 & 200 & $0.357$ & $0.428$ & $-0.194$ \\
+CPLEX & 1\% & Full & Ruiz+Cols & 30 & 0 & 3 & 0 & 1 & 2 & 130 & $0.0345$ & $0.104$ & $+0.441$ \\
+\midrule
+CPLEX & 0.1\% & Simple & SA-Aug & 204 & 0 & 0 & 0 & 0 & 2 & 8765 & $0.0453$ & $0.121$ & $-0.162$ \\
+CPLEX & 0.1\% & Simple & SA-Mat & 203 & 0 & 1 & 0 & 0 & 0 & 10056 & $0.723$ & $0.723$ & $-0.029$ \\
+CPLEX & 0.1\% & Simple & Ruiz & 204 & 0 & 0 & 0 & 0 & 2 & 9364 & $0.196$ & $0.356$ & $-0.104$ \\
+CPLEX & 0.1\% & Simple & Ruiz+Cols & 203 & 0 & 1 & 0 & 0 & 2 & 8092 & $6.98\times10^{-3}$ & $0.0419$ & $+0.218$ \\
+CPLEX & 0.1\% & SG-Ter-Mer & SA-Aug & 68 & 0 & 0 & 0 & 0 & 0 & 1085 & $0.591$ & $0.709$ & $+0.075$ \\
+CPLEX & 0.1\% & SG-Ter-Mer & SA-Mat & 68 & 0 & 0 & 0 & 0 & 0 & 985 & $0.251$ & $0.372$ & $-0.160$ \\
+CPLEX & 0.1\% & SG-Ter-Mer & Ruiz & 68 & 0 & 0 & 0 & 0 & 0 & 853 & $0.0505$ & $0.121$ & $-0.273$ \\
+CPLEX & 0.1\% & SG-Ter-Mer & Ruiz+Cols & 68 & 0 & 0 & 0 & 0 & 1 & 473 & $1.89\times10^{-5}$ & $2.27\times10^{-4}$ & $+0.597$ \\
+CPLEX & 0.1\% & Full & SA-Aug & 27 & 0 & 6 & 0 & 1 & 3 & 173 & $0.714$ & $0.723$ & $-0.085$ \\
+CPLEX & 0.1\% & Full & SA-Mat & 26 & 0 & 6 & 0 & 2 & 4 & 125 & $0.208$ & $0.356$ & $-0.288$ \\
+CPLEX & 0.1\% & Full & Ruiz & 30 & 0 & 3 & 0 & 1 & 6 & 134 & $0.0427$ & $0.121$ & $-0.424$ \\
+CPLEX & 0.1\% & Full & Ruiz+Cols & 27 & 0 & 6 & 0 & 1 & 6 & 143 & $0.279$ & $0.372$ & $+0.243$ \\
+\end{longtable}
+
+\noindent\textit{One-sided-abort sensitivity.}
+Replacing the primary $T_{\max}$ convention by $10T_{\max}$ for a one-sided
+algorithmic/pipeline abort leaves every effect direction and inferential decision unchanged.
+The largest change among the displayed Gurobi structure-aware rows is Full/SA-Aug at $0.1\%$:
+$W=124\to125$, $p=0.07354\to0.07742$, $q_{\mathrm{BH}}=0.11031\to0.11612$, and
+$r_{\mathrm{rb}}=-0.389\to-0.384$. All other Gurobi structure-aware rows are unchanged;
+CPLEX structure-aware $W$, $p$, and $r_{\mathrm{rb}}$ are unchanged, with only minor BH shifts
+caused by other members of the twelve-test family. The sensitivity is reproduced by
+\texttt{scripts/paired\_tests.py --abort-penalty par10}.
+
+\noindent\textit{Cluster-bootstrap accounting for the conditioning comparison.}
+At $1\%$, $298$ of $306$ instances have at least one complete conditioning--speedup pair;
+eight are lost because Base errored. The whole-instance bootstrap uses $1185$ complete
+variant--instance observations (seven of the possible $298\times4$ lack the conditioning
+diagnostic). At $0.1\%$, $288$ instances contribute; eighteen Base errors remove nine Simple,
+six SG-Ter-Mer, and three Full instances. Of $1152$ potential rows, $1135$ enter the joint
+comparison: twelve lack a usable variant speedup and five more lack the solver-conditioning
+diagnostic. Each of the $2000$ resamples keeps all available formulation rows of an instance
+together. At $1\%$, the within-class solver-level coefficients are $-0.31$ (Simple), $-0.13$
+(SG-Ter-Mer), and $-0.12$ (Full); their varying magnitudes reinforce that the pooled coefficient
+is descriptive rather than an instance-level predictor.
+
+\noindent\textit{Exploratory dependence check.}
+If repeated rows and seeds are naively treated as independent observations, the first-order
+partial rank correlation between runtime improvement and the solver-facing conditioning
+diagnostic is approximately $-0.25$ after controlling for loaded nonzeros, and a
+Williams--Steiger comparison gives $Z\approx6.1$. Because both calculations ignore the
+clustered generator design, they are reported only as descriptive diagnostics and support no
+confirmatory claim.
+\end{landscape}
+
+\begin{landscape}
+\begin{table}[!p]
+\centering
+\caption{Available solver-internal-scaling sweep over both solvers, both MIPGap settings,
+and all three classes. Each cell is solver-time $\sgm$ ($s=1$\,s)/\PARavail{} in seconds,
+using the descriptive revision-campaign convention (timeouts receive 36000\,s; pure pipeline
+errors are excluded). SA-Aug and SA-Mat retain the solver default. For Gurobi, Off/A/B/C
+mean \texttt{ScaleFlag}=0/1/2/3. For CPLEX they mean
+\texttt{Read::Scale}=$-1$/0/1/not applicable. The CPLEX Full $0.1\%$ Scale=0 artifact is
+partial (26 of 34 rows), and Scale=1 is absent because the four-day sweep budget expired;
+all other configuration folders contain the manifest-declared number of rows. The lower
+panel audits the apparently fast CPLEX Scale=$-1$ Full cell directly from the stored
+original-scale verifier fields.}
+\label{tab:si-internal-scaling}
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\textbf{Panel A: timing sweep ($\sgm$/\PARavail{})}\\[2pt]
+\begin{tabular}{@{}lllrrrrrrr@{}}
+\toprule
+Solver & Gap & Class & Base & SA-Aug & SA-Mat & Off & A & B & C \\
+\midrule
+Gurobi & 1\% & Simple & 3.936/11.26 & 2.133/2.50 & 2.166/2.56 & 41.969/1541.92 & 5.811/20.39 & 4.402/12.60 & 3.791/10.79 \\
+Gurobi & 1\% & SG-Ter-Mer & 14.087/564.33 & 8.282/554.10 & 8.635/554.64 & 56.625/740.17 & 14.664/566.35 & 20.907/589.78 & 21.475/580.46 \\
+Gurobi & 1\% & Full & 109.375/3448.17 & 95.239/3349.65 & 102.025/3458.10 & 561.945/9716.08 & 128.449/2444.67 & 138.112/2497.10 & 133.828/3468.97 \\
+Gurobi & 0.1\% & Simple & 9.656/36.16 & 6.419/210.83 & 6.248/202.17 & 89.358/2031.10 & 15.299/219.91 & 10.607/33.11 & 9.438/35.10 \\
+Gurobi & 0.1\% & SG-Ter-Mer & 14.587/566.63 & 8.811/554.42 & 9.066/555.19 & 54.784/727.17 & 16.972/620.44 & 11.753/32.85 & 23.102/585.62 \\
+Gurobi & 0.1\% & Full & 437.243/4766.52 & 388.446/4714.38 & 456.365/4821.25 & 396.978/9577.84 & 337.331/4621.00 & 347.613/3687.08 & 353.389/4697.74 \\
+\midrule
+CPLEX & 1\% & Simple & 2.621/7.24 & 1.725/3.65 & 1.861/4.01 & 2.500/3.93 & 2.549/7.59 & 2.431/7.18 & -- \\
+CPLEX & 1\% & SG-Ter-Mer & 2.253/3.57 & 2.400/10.26 & 2.309/5.94 & 5.168/12.29 & 2.229/3.53 & 2.175/5.66 & -- \\
+CPLEX & 1\% & Full & 147.821/5609.27 & 127.360/3616.84 & 120.881/6509.40 & 14.381/35.45 & 159.012/5621.84 & 189.129/5644.99 & -- \\
+CPLEX & 0.1\% & Simple & 5.143/215.88 & 4.266/188.91 & 4.450/203.68 & 7.634/209.70 & 5.203/216.59 & 5.625/369.68 & -- \\
+CPLEX & 0.1\% & SG-Ter-Mer & 2.664/22.29 & 2.678/24.19 & 2.667/19.50 & 5.844/13.69 & 2.725/23.13 & 2.477/11.78 & -- \\
+CPLEX & 0.1\% & Full & 425.043/9419.41 & 426.712/9179.82 & 387.204/11235.11 & 13.476/24.97 & $303.376/6196.93^{\dagger}$ & -- & -- \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel B: CPLEX Full, \texttt{Read::Scale}$=-1$, original-scale audit}\\[2pt]
+\begin{tabular}{@{}lrrrrrrl@{}}
+\toprule
+Gap & Runs & Strict pass & Mixed pass & $\max v_{\rm row}$ & $\max v_{\rm int}$ &
+$\max|z_{\rm solver}-z_{\rm recomputed}|$ & Strict-fail identifiers \\
+\midrule
+1\% & 34 & 26 & 26 & $1.3149\times10^{-2}$ & 0 & $3.73\times10^{-8}$ &
+\texttt{002,003,004,012,014,022,023,044} \\
+0.1\% & 34 & 26 & 26 & $1.3149\times10^{-2}$ & 0 & $3.73\times10^{-8}$ &
+\texttt{002,003,004,012,014,022,023,044} \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.94\linewidth}\footnotesize
+\emph{Notes.} The raw feasibility, integrality, and recomputed-objective fields are present for
+all 34 runs; the two gap folders contain identical objectives and verifier values. At 1\%,
+11 of 34 Scale=$-1$ objectives differ from the default-base objective by more than twice the
+stopping tolerance; six of those 11 also fail strict verification, while five pass it. Thus
+the speedup is real as timing but cannot be classified as a reliable solution improvement.
+The campaign's generic \texttt{mip\_equivalente} field labels every variant named
+\texttt{base} as \texttt{BASE}, irrespective of its internal-scaling parameter, so the pass
+counts above are rebuilt from the raw verifier fields rather than that label.
+$^{\dagger}$Partial artifact; its descriptive value is not comparable to a complete 34-instance cell.
+\end{minipage}
+\end{table}
+\end{landscape}
+
+\begin{table}[!p]
+\centering
+\caption{Archived runtime comparison for the operational coupling-stage activation campaign
+(Gurobi, 1\% MIPGap). Solver-time shifted geometric mean ($\sgm$, $s=1$\,s) and descriptive
+\PARavail{} are seconds. The accompanying activation diagnostic found zero coupling-stage
+activations and byte-identical exports for each full/local-only pair; their small runtime
+differences therefore measure run-to-run variability, not a coupling-stage effect. The
+coupling-only variant coincides with Base at the exported-model level.}
+\label{tab:si-activation-runtime}
+\small
+\begin{threeparttable}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Class & Variant & $\sgm$ (s) & \PARavail{} (s) \\
+\midrule
+\multirow{7}{*}{Simple}
+ & Base & 3.73 & 10.47 \\
+ & \methodAug{} (local+coupling) & 2.02 & 2.42 \\
+ & \methodAug{}, local only & 2.01 & 2.38 \\
+ & \methodAug{}, coupling only & 3.74 & 10.44 \\
+ & \methodMat{} (local+coupling) & 2.04 & 2.43 \\
+ & \methodMat{}, local only & 2.06 & 2.48 \\
+ & \methodMat{}, coupling only & 3.73 & 10.26 \\
+\midrule
+\multirow{7}{*}{Full}
+ & Base & 82.55 & 3379.7 \\
+ & \methodAug{} (local+coupling) & 71.41 & 3315.9 \\
+ & \methodAug{}, local only & 70.94 & 3314.4 \\
+ & \methodAug{}, coupling only & 83.69 & 3381.5 \\
+ & \methodMat{} (local+coupling) & 78.75 & 4384.9 \\
+ & \methodMat{}, local only & 78.88 & 4386.1 \\
+ & \methodMat{}, coupling only & 90.21 & 3394.1 \\
+\midrule
+\multirow{7}{*}{SG-Ter-Mer}
+ & Base & 14.42 & 565.6 \\
+ & \methodAug{} (local+coupling) & 8.55 & 555.1 \\
+ & \methodAug{}, local only & 8.58 & 555.2 \\
+ & \methodAug{}, coupling only & 14.45 & 565.9 \\
+ & \methodMat{} (local+coupling) & 8.96 & 555.6 \\
+ & \methodMat{}, local only & 8.83 & 555.6 \\
+ & \methodMat{}, coupling only & 14.43 & 565.8 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item In SG-Ter-Mer one near-limit instance times out under every variant in this independent
+batch, so \PARavail{} is dominated by a single 36000-s penalty. In Full, three or four runs time
+out per variant, so the raw $\sgm$ values use different solved subsets and are descriptive.
+The attribution is the export/activation result: full equals local only, and coupling only
+equals Base.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\begin{landscape}
+\begin{table}[!p]
+\centering
+\caption{Direct SA--Flat reliability audit under Gurobi. Each row uses all available records
+from one dedicated class--tolerance batch; both SA and Flat were rerun in that batch.
+Timeouts (TO), strict/mixed original-scale verification failures (S/M), and fixed-pool
+\PARten{} are reported for both coverage policies. Each \PARten{} cell is
+ITT/strict/mixed in seconds, on the capped solver-time cost $c^{(k,\mathrm{solver})}$ of
+the main text; recomputing with the preprocessing-plus-solver cost shifts every cell by
+less than $0.2$\,s and changes no ordering.}
+\label{tab:si-flat-reliability}
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{@{}lllrrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $N$ & TO SA/Flat & SA fail S/M & Flat fail S/M &
+SA \PARten{} I/S/M & Flat \PARten{} I/S/M \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Augmented   & 204 & 0/0 & 12/12 & 13/12 & 2.4/2119.8/2119.8 & 2.4/2296.2/2119.7 \\
+ & Simple & Matrix-only & 204 & 0/0 & 19/18 & 19/18 & 2.4/3355.1/3178.7 & 2.4/3355.1/3178.6 \\
+ & SG-Ter-Mer & Augmented   & 68 & 1/1 & 1/0 & 2/0 & 554.5/1083.9/554.5 & 541.1/1598.9/541.1 \\
+ & SG-Ter-Mer & Matrix-only & 68 & 1/1 & 1/0 & 1/0 & 555.0/1083.7/555.0 & 551.6/1080.8/551.6 \\
+ & Full & Augmented   & 34 & 3/3 & 6/6 & 3/3 & 3312.1/9643.7/9643.7 & 3374.3/6464.9/6464.9 \\
+ & Full & Matrix-only & 34 & 3/3 & 2/2 & 4/4 & 3420.9/5533.6/5533.6 & 3430.6/7554.0/7554.0 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Augmented   & 204 & 1/0 & 22/18 & 25/22 & 211.9/4090.0/3386.8 & 30.3/4436.5/3908.1 \\
+ & Simple & Matrix-only & 204 & 1/1 & 30/26 & 30/26 & 203.5/5491.9/4787.2 & 203.7/5492.1/4787.4 \\
+ & SG-Ter-Mer & Augmented   & 68 & 1/1 & 1/0 & 1/0 & 556.0/1085.4/556.0 & 542.4/1071.4/542.4 \\
+ & SG-Ter-Mer & Matrix-only & 68 & 1/1 & 1/0 & 1/0 & 556.5/1085.6/556.5 & 552.8/1082.0/552.8 \\
+ & Full & Augmented   & 30 & 3/3 & 2/2 & 2/1 & 3951.0/6342.2/6342.2 & 4004.3/6290.8/5109.3 \\
+ & Full & Matrix-only & 30 & 4/4 & 2/1 & 0/0 & 5193.8/7585.0/6389.5 & 5154.8/5154.8/5154.8 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.96\linewidth}\footnotesize
+\emph{Notes.} There are no algorithmic or pipeline aborts in these direct batches. Strict
+penalizes every strict original-scale failure; mixed penalizes only a failure that also lacks
+a reliable counterpart on the same instance, as defined in the main text. At Full $0.1\%$,
+instances 045--048 are absent from both policies. Under an equal-penalty imputation for those
+four unrecorded instances the ordering is unchanged and the added pairs are operational ties;
+that assumption does not address selection under unequal missing outcomes, for which the
+adversarial signed-rank sensitivity is reported in the main text and in the Notes to Tables~S10--S12. The key reliability
+sensitivity is visible in Simple/Augmented: the small Flat solver-time advantage at $0.1\%$
+reverses under both strict and mixed costs. SG-Ter-Mer/Augmented retains a small descriptive
+Flat advantage because neither policy has a mixed failure.
+\end{minipage}
+\end{table}
+\end{landscape}
+
+\begin{landscape}
+\begin{table}[!p]
+\centering
+\caption{Magnitude and dependence sensitivities for the direct SA--Flat contrasts
+(exploratory endpoint hierarchy; see the main text). Panel A reports
+instance-level and operational-family inference for the two
+central $0.1\%$ augmented contrasts on the prototype preprocessing-plus-solver implementation endpoint and on the
+capped solver-time decomposition, on the shared paired variable
+$d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$, with the Hodges--Lehmann pseudomedian expressed
+as the typical SA/Flat ratio $\exp(-\widehat\theta_{\rm HL})$. Panel B reports the corresponding Gurobi Work-unit sensitivity. Panel C reports the
+own-incumbent path-specific diagnostic, which does not hold the integer solution fixed across
+policies.}
+\label{tab:si-flat-sensitivities}
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\textbf{Panel A: paired log time ratio and dependence (central augmented $0.1\%$ contrasts)}\\[2pt]
+\begin{tabular}{@{}llrrrrrrrrrr@{}}
+\toprule
+Class & Endpoint & $n/G$ & med. SA/Flat & HL SA/Flat & family-bootstrap 95\% CI &
+$p_{\rm inst}$ & $q_6$ & $q_{12}$ &
+$p_{\rm block}$ & $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+Simple & prototype pre+solve & 204/34 & 1.0320 & 1.0359 & [1.0274, 1.0418] &
+$3.3\times10^{-11}$ & $2.0\times10^{-10}$ & $1.3\times10^{-10}$ &
+$5.1\times10^{-8}$ & $3.1\times10^{-7}$ & $2.1\times10^{-7}$ \\
+Simple & solver & 204/34 & 1.0093 & 1.0135 & [1.0019, 1.0212] &
+0.00173 & 0.01038 & 0.02075 & 0.00266 & 0.01595 & 0.03190 \\
+SG-Ter-Mer & prototype pre+solve & 67/34 & 1.0473 & 1.1577 & [1.0170, 1.2065] &
+0.00031 & 0.00063 & 0.00063 & 0.00056 & 0.00111 & 0.00117 \\
+SG-Ter-Mer & solver & 67/34 & 1.0159 & 1.1229 & [0.9797, 1.1309] &
+0.02616 & 0.05232 & 0.09346 & 0.03320 & 0.06640 & 0.11980 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel A2: prototype preprocessing-plus-solver endpoint, all twelve contrasts}\\[2pt]
+\noindent\scriptsize Adjusted values only; effect directions and median SA/Flat ratios are
+reported in Table~18 of the main text.\par\vspace{2pt}
+
+\begin{tabular}{@{}lllrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & $q_6$ & $q_{12}$ & $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Augmented & 204 & $7.9\times10^{-26}$ & $1.6\times10^{-25}$ & $1.0\times10^{-9}$ & $2.1\times10^{-9}$ \\
+ & Simple & Matrix-only & 204 & $3.0\times10^{-32}$ & $6.0\times10^{-32}$ & $7.0\times10^{-10}$ & $1.4\times10^{-9}$ \\
+ & SG-Ter-Mer & Augmented & 67 & 0.00057 & 0.00063 & 0.00117 & 0.00117 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.01126 & 0.01287 & 0.01893 & 0.02163 \\
+ & Full & Augmented & 31 & 0.1502 & 0.1502 & 0.1502 & 0.1502 \\
+ & Full & Matrix-only & 32 & 0.3403 & 0.3712 & 0.3403 & 0.3712 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Augmented & 204 & $2.0\times10^{-10}$ & $1.3\times10^{-10}$ & $3.1\times10^{-7}$ & $2.1\times10^{-7}$ \\
+ & Simple & Matrix-only & 203 & $4.9\times10^{-8}$ & $4.9\times10^{-8}$ & 0.00042 & 0.00042 \\
+ & SG-Ter-Mer & Augmented & 67 & 0.00063 & 0.00063 & 0.00111 & 0.00117 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.02239 & 0.02468 & 0.02765 & 0.03072 \\
+ & Full & Augmented & 27 & 0.02239 & 0.02487 & 0.02765 & 0.02798 \\
+ & Full & Matrix-only & 27 & 0.8408 & 0.8408 & 0.8408 & 0.8408 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel B: deterministic effort (\(\mathrm{Work}_{\rm Flat}-\mathrm{Work}_{\rm SA}\))}\\[2pt]
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+Class & $n$ & Exact zeros & med. Work SA & med. Work Flat &
+$r_{\rm rb}$ & $p_{\rm block}$ & $q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+Simple & 204 & 138 & 2 & 2 & $-0.382$ & 0.01196 & 0.03587 & 0.04782 \\
+SG-Ter-Mer & 67 & 31 & 7 & 4 & $-0.649$ & 0.000970 & 0.00582 & 0.00637 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel C: median own-incumbent path-diagnostic ratio}\\[2pt]
+\begin{tabular}{@{}lllrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ &
+med. $\rho_{\kappa,\rm SA}^{\rm solver}/\rho_{\kappa,\rm Flat}^{\rm solver}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Augmented & 204 & 1.000 \\
+ & Simple & Matrix-only & 204 & 1.000 \\
+ & SG-Ter-Mer & Augmented & 67 & 0.626 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.849 \\
+ & Full & Augmented & 31 & 0.628 \\
+ & Full & Matrix-only & 32 & 0.849 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Augmented & 204 & 1.000 \\
+ & Simple & Matrix-only & 203 & 1.000 \\
+ & SG-Ter-Mer & Augmented & 67 & 0.629 \\
+ & SG-Ter-Mer & Matrix-only & 67 & 0.849 \\
+ & Full & Augmented & 27 & 0.634 \\
+ & Full & Matrix-only & 27 & 0.849 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
+
+\begin{landscape}
+\begin{table}[!p]
+\centering
+\caption{Attrition, original-batch preprocessing timing, and release-versus-diagnostic cached-metadata sensitivities for the direct SA--Flat controls. Panel D reports single-call preprocessing summaries from the original fixed-order solve batches. Panels E1--E2 use per-instance median preprocessing times estimated from the replicated low-contention protocols; uncertainty in those estimated medians is not propagated into the derived inferential quantities.}
+\label{tab:si-flat-attrition}
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\textbf{Panel D: per-contrast attrition and preprocessing-time summaries}\\[2pt]
+\begin{tabular}{@{}lllrrrrr rrr@{}}
+\toprule
+Gap & Class & Kernel & Nominal & Recorded & Common pool & Double noncompl. & $n$ used &
+med.\ $T_{\rm pre}^{\rm SA}$ (s) & med.\ $T_{\rm pre}^{\rm Flat}$ (s) & med.\ diff (s) \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Augmented & 204 & 204 & 204 & 0 & 204 & 0.074 & 0.025 & $+0.050$ \\
+ & Simple & Matrix-only & 204 & 204 & 204 & 0 & 204 & 0.077 & 0.025 & $+0.053$ \\
+ & SG-Ter-Mer & Augmented & 68 & 68 & 68 & 1 & 67 & 0.049 & 0.019 & $+0.031$ \\
+ & SG-Ter-Mer & Matrix-only & 68 & 68 & 68 & 1 & 67 & 0.051 & 0.019 & $+0.033$ \\
+ & Full & Augmented & 34 & 34 & 34 & 3 & 31 & 0.121 & 0.041 & $+0.080$ \\
+ & Full & Matrix-only & 34 & 34 & 34 & 2 & 32 & 0.125 & 0.041 & $+0.084$ \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Augmented & 204 & 204 & 204 & 0 & 204 & 0.077 & 0.025 & $+0.051$ \\
+ & Simple & Matrix-only & 204 & 204 & 204 & 1 & 203 & 0.079 & 0.025 & $+0.054$ \\
+ & SG-Ter-Mer & Augmented & 68 & 68 & 68 & 1 & 67 & 0.051 & 0.019 & $+0.032$ \\
+ & SG-Ter-Mer & Matrix-only & 68 & 68 & 68 & 1 & 67 & 0.052 & 0.019 & $+0.033$ \\
+ & Full & Augmented & 34 & 30 & 30 & 3 & 27 & 0.120 & 0.041 & $+0.079$ \\
+ & Full & Matrix-only & 34 & 30 & 30 & 3 & 27 & 0.124 & 0.041 & $+0.083$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\textbf{Panel E1: release-build cached-metadata endpoint (implementation-cost sensitivity of record)}\\[2pt]
+\begin{tabular}{@{}lllrrrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ &
+$q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 & 0.364 & 0.337 & 0.450 \\
+ & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 & 0.173 & 0.162 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 & 0.173 & 0.120 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 & 0.337 & 0.450 \\
+ & Full$^\dagger$ & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 & 0.173 & 0.173 \\
+ & Full$^\dagger$ & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 & 0.337 & 0.396 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 & 0.016 & 0.031 \\
+ & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 & 0.546 & 0.469 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 & 0.065 & 0.120 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 & 0.546 & 0.496 \\
+ & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 & 0.045 & 0.090 \\
+ & Full$^\dagger$ & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
+\bottomrule
+\end{tabular}
+
+\noindent\scriptsize $\dagger$ Approximate cross-build sensitivity; five Full instances exhibit last-bit model-construction differences. See Section~S2.1.\par\vspace{4pt}
+
+\vspace{7pt}
+\textbf{Panel E2: non-optimized diagnostic-build audit}\\[2pt]
+\begin{tabular}{@{}lllrrrrrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\rm rb}$ & $q_6$ & $q_{12}$ &
+$q_{6,\rm block}$ & $q_{12,\rm block}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0008 & $-0.124$ & 0.185 & 0.212 & 0.258 & 0.295 \\
+ & Simple & Mat & 204 & 1.0019 & $-0.333$ & 0.0002 & 0.0005 & 0.004 & 0.008 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0074 & $-0.303$ & 0.093 & 0.075 & 0.119 & 0.095 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.148$ & 0.291 & 0.388 & 0.310 & 0.414 \\
+ & Full & Aug & 31 & 0.9197 & $+0.355$ & 0.173 & 0.173 & 0.173 & 0.173 \\
+ & Full & Mat & 32 & 0.9869 & $+0.242$ & 0.286 & 0.358 & 0.286 & 0.358 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0096 & $-0.259$ & 0.008 & 0.008 & 0.013 & 0.013 \\
+ & Simple & Mat & 203 & 0.9983 & $+0.065$ & 0.506 & 0.460 & 0.633 & 0.576 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.314$ & 0.051 & 0.075 & 0.065 & 0.095 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0036 & $-0.116$ & 0.506 & 0.460 & 0.633 & 0.512 \\
+ & Full & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.060 & 0.045 & 0.060 \\
+ & Full & Mat & 27 & 0.9804 & $+0.053$ & 0.822 & 0.822 & 0.822 & 0.822 \\
+\bottomrule
+\end{tabular}
+
+\vspace{7pt}
+\end{table}
+\end{landscape}
+
+\vspace{10pt}
+\subsection*{Section S2.1. Timing, build, and transfer-factor audits}
+
+\noindent\textbf{Table S12: timing, build, and cross-environment transfer-factor audits for the
+direct SA--Flat controls.} Panel~E3 reports the number and identity of fast-class contrasts
+with $q_6<0.05$ over the hypothetical transfer-factor grids; Panel~E4 reports the corresponding
+Full-Augmented sensitivity; Panel~E5 reports the release-build absolute preprocessing times.
+The accompanying text documents the build comparison and the export-invariance audit. The
+transfer factors are hypothetical: the
+workstation-to-ClusterUY transfer was never observed, and the only measured perturbation is
+the change of toolchain on the same machine.
+\label{tab:si-flat-transfer}
+
+\noindent\scriptsize
+\noindent\scriptsize $\dagger$ Five Full instances exhibit last-bit model-construction differences, so the Full release-cached values in Panel~E1 should be read as approximate build sensitivities rather than exact recombinations of one model; see the build-audit details below and \path{results-revision/preproc-timing/build_invariance.csv}. On the cached counterpart, the role-blind rule has the lower per-instance median in $585/612$ records under the pinned release build, $607/612$ under the pinned diagnostic build and $408/612$ under the concurrent diagnostic protocol. For a descriptive within-instance dispersion comparison, we call record $i$ a \emph{within-dispersion tie} for build $b$ when
+\[
+\bigl\lvert\widetilde T^{\mathrm{cached},b}_{\mathrm{preproc,SA},i}
+-\widetilde T^{\mathrm{cached},b}_{\mathrm{preproc,Flat},i}\bigr\rvert\le B_i^{b},
+\qquad
+B_i^{b}=\max\Bigl\{\operatorname{IQR}\bigl(T^{\mathrm{cached},b}_{\mathrm{preproc,SA},i}\bigr),
+\operatorname{IQR}\bigl(T^{\mathrm{cached},b}_{\mathrm{preproc,Flat},i}\bigr)\Bigr\},
+\]
+where $\widetilde T$ denotes the median and the interquartile ranges are taken over the $R=20$
+repetitions; the quantities are cached \emph{preprocessing} times, not the
+preprocessing-plus-solver endpoint. Using this descriptive scale-of-dispersion classification, the three-way
+classification (role-blind-favoured, selective-favoured, tie) is $461/1/150$ under the pinned
+release build, $554/0/58$ under the pinned diagnostic build and $37/0/575$ under the concurrent
+protocol; each row sums to $612$. The band is an ad hoc scale-of-dispersion heuristic based on the larger marginal IQR; it is not
+an uncertainty estimate for the paired median difference, nor a confidence interval, an
+equivalence test or a domain-calibrated practical-significance margin, so records inside it are
+within-dispersion ties rather than statistically indeterminate. A sharper screen would use the
+per-repetition paired differences $D^{b}_{ir}$ and their $\operatorname{IQR}_r$, which the
+archived summaries do not retain. These counts condition
+on the $R=20$ per-instance median estimates and do not propagate within-instance timing
+uncertainty. The three record-level counts are computed by
+\path{scripts/preproc_timing_replication.py} from the \texttt{cached\_sa\_s} and
+\texttt{cached\_flat\_s} columns of
+\path{results-revision/preproc-timing/replicated_pinned_release.csv} (pinned release),
+\path{results-revision/preproc-timing/replicated_pinned.csv} (pinned diagnostic) and
+\path{results-revision/preproc-timing/replicated.csv} (concurrent diagnostic).\par\vspace{4pt}
+
+\textbf{Panel E3: release-build cross-environment transfer-factor sensitivity}\\[2pt]
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Grid point & \multicolumn{6}{c}{Fast-class contrasts with $q_6<0.05$ (of eight)} \\
+\midrule
+Common $\lambda$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & $8$ \\
+ & 1 & 1 & 1 & 1 & 2 & 2 \\
+\addlinespace
+Ratio $\rho=\lambda_{\rm SA}/\lambda_{\rm Flat}$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & --- \\
+ & 1 & 1 & 1 & 3 & 5 & --- \\
+\bottomrule
+\end{tabular}
+
+\vspace{4pt}
+\vspace{6pt}
+\noindent\textbf{Measurement and build-audit details.}\par\vspace{2pt}
+\noindent\scriptsize The crossing contrasts are identified as follows. On the common-factor
+grid, Simple/Augmented at $0.1\%$ crosses at every point; Simple/Matrix-only at $1\%$ joins it
+at $\lambda=4$ and $8$. On the policy-specific grid, Simple/Augmented at $0.1\%$ crosses at
+every point; at $\rho=2$ it is joined by SG-Ter-Mer/Augmented at $0.1\%$ and
+Simple/Matrix-only at $1\%$; at $\rho=4$ also by SG-Ter-Mer/Augmented at $1\%$ and
+Simple/Augmented at $1\%$. Panel~E3 is restricted to the eight fast-class contrasts. In the separate Full-Augmented
+$0.1\%$ calculation, $q_6=0.045$ at every evaluated common-factor point and at the
+policy-specific points $\rho\le2$, falling to $0.036$ at $\rho=4$; the joint value $q_{12}$
+remains above $0.05$ except at $\rho=4$, where it is $0.042$ (Panel~E4). None of these nominal
+Full crossings is retained by the adversarial missing-pair sensitivity. The $q_{12}=0.042$
+crossing at the extreme evaluated point $\rho=4$ is moreover conditional on a hypothetical
+policy-specific transfer factor, on approximate cross-build Full models, and on the $27$
+observed eligible pairs; it is not treated as evidence of a robust Full coverage ordering. No
+other Full contrast has $q_6<0.05$ anywhere on the grids.\par\vspace{4pt}
+
+\noindent\scriptsize\textbf{Panel E4: Full-Augmented at $0.1\%$ across the transfer grids}
+(approximate cross-build row; $n=27$).\\[2pt]
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Common $\lambda$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & $8$ \\
+\midrule
+$q_6$ & 0.045 & 0.045 & 0.045 & 0.045 & 0.045 & 0.045 \\
+$q_{12}$ & 0.090 & 0.090 & 0.090 & 0.063 & 0.060 & 0.060 \\
+\midrule
+Ratio $\rho$ & $0.25$ & $0.5$ & $1$ & $2$ & $4$ & --- \\
+\midrule
+$q_6$ & 0.045 & 0.045 & 0.045 & 0.045 & 0.036 & --- \\
+$q_{12}$ & 0.090 & 0.090 & 0.090 & 0.060 & \textbf{0.042} & --- \\
+\bottomrule
+\end{tabular}\par\vspace{2pt}
+\noindent\scriptsize The adversarial missing-pair sensitivity was recomputed at every grid
+point on this cached endpoint: its effective nonzero sample remains $n=31$ and
+$p_{\rm adv}=0.433$ at all eleven points, so no point falls below $0.05$ (the corresponding
+value on the prototype endpoint is $0.47$). For the observed-pair, non-adversarial analysis, the
+unadjusted values are likewise invariant along both grids ($p=0.0151$,
+$p_{\rm block}=0.0151$), because scaling the preprocessing term cannot
+change the paired ranks here---that term is milliseconds against solver times of
+seconds---so only the BH-adjusted values move, and they move because the other contrasts in the
+family do. Because every Full instance is a singleton operational family, the family-level
+values coincide with the instance-level values at every grid point: $q_{6,\rm block}=q_6$ and
+$q_{12,\rm block}=q_{12}$.\par\vspace{4pt}
+
+\noindent\scriptsize The release-build endpoint (Panel E1) is the implementation-cost
+sensitivity used in the main text; the diagnostic-build results (Panel E2) are retained only
+to show the sensitivity of the cached comparison to compiler optimization. Panel E3 reports
+within-tolerance $q_6$ crossings only; these counts do not imply retention under the joint or
+operational-family adjustments. Among the eight fast-class contrasts summarized in
+Panel~E3, Simple-Augmented at $0.1\%$ is the only contrast with $q_6<0.05$ at every evaluated
+grid point; the separate approximate Full-Augmented row also has $q_6<0.05$ throughout, but its
+evidence is conditional on the observed eligible pairs and is not retained by the adversarial
+missing-pair sensitivity. Additional within-tolerance $q_6$ crossings first
+appear at the evaluated point $\rho=2$; the exact transition threshold between $1$ and $2$ is
+not identified by this grid. The transfer factors are hypothetical: the workstation-to-ClusterUY
+transfer was never observed, and the only measured perturbation is the change of toolchain on
+the same machine. Comparing Panels E1 and E2 gives the implied toolchain ratio. Writing, for build
+$b\in\{\text{release},\text{diagnostic}\}$, class $c$ and kernel $k$,
+\[
+R_{b,c,k}=\exp\!\Bigl[\operatorname{median}_{i}
+\log\bigl(T^{\mathrm{cached},b}_{\mathrm{preproc,SA},i}/
+T^{\mathrm{cached},b}_{\mathrm{preproc,Flat},i}\bigr)\Bigr],
+\qquad
+\rho^{\mathrm{toolchain}}_{c,k}=\frac{R_{\mathrm{release},c,k}}{R_{\mathrm{diagnostic},c,k}},
+\]
+The quantities in this definition are cached \emph{preprocessing} times only, not the cached
+preprocessing-plus-solver endpoint of the main-text table; it is a ratio of exponentiated
+median log-ratios, not a ratio of marginal median preprocessing times (the quantity computed by
+\path{scripts/cached_transfer_sensitivity.py}). Its values are
+$0.947$, $0.942$, $1.012$, $0.994$, $0.978$ and $0.966$ for Full/Aug, Full/Mat,
+SG-Ter-Mer/Aug, SG-Ter-Mer/Mat, Simple/Aug and Simple/Mat; optimization leaves the prototype
+preprocessing-call ratios essentially unchanged ($5.38$--$6.12\times$ against $5.07$--$6.00\times$) and the
+metadata share at $81$--$83\%$. Exporting the preprocessed model with both builds over all $306$
+instances, both kernels and both coverage policies gives $1204/1224$ byte-identical exports
+(\path{scripts/build_invariance_audit.py}; full record in
+\path{results-revision/preproc-timing/build_invariance.csv}). All Simple and SG-Ter-Mer
+records are identical. The $20$ exceptions are five Full instances under all four variants,
+where the nonlinear-hydro linearization coefficients differ by one unit in the last place
+($4.7\times10^{-16}$ relative); the audit localizes the discrepancy to optimization-dependent
+floating-point evaluation during model construction rather than to a change in the selected
+scaling factors or safeguard decisions. The complete contrast-by-grid values---every contrast, grid
+point, median ratio, $r_{\rm rb}$, $p$, $q_6$ and $q_{12}$---are in
+\path{results-revision/preproc-timing/cached_transfer_sensitivity.csv} of the
+reproducibility package, regenerated by
+\path{scripts/cached_transfer_sensitivity.py} \texttt{--dump-csv}.
+
+\vspace{4pt}
+\noindent\scriptsize\textbf{Panel E5: release-build absolute preprocessing times}, in milliseconds as
+median [IQR]; an IQR below $0.001$\,ms is shown as $<0.001$ rather than rounded to zero. The
+absolute times quoted elsewhere in these notes are from the diagnostic build.\\[3pt]
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+ & & \multicolumn{2}{c}{Prototype preprocessing call (ms)} & \multicolumn{2}{c}{Cached preprocessing counterpart (ms)} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Class & Kernel & SA & Flat & SA & Flat \\
+\midrule
+Simple & Augmented & 8.447 [0.093] & 1.410 [0.044] & 1.362 [0.012] & 1.288 [0.043] \\
+Simple & Matrix-only & 8.606 [0.100] & 1.405 [0.048] & 1.528 [0.011] & 1.283 [0.044] \\
+SG-Ter-Mer & Augmented & 5.335 [0.041] & 0.991 [0.005] & 0.911 [0.006] & 0.894 [0.004] \\
+SG-Ter-Mer & Matrix-only & 5.433 [0.040] & 0.975 [0.006] & 1.006 [0.009] & 0.877 [0.006] \\
+Full & Augmented & 13.607 [0.121] & 2.401 [0.119] & 2.248 [0.044] & 2.220 [0.121] \\
+Full & Matrix-only & 13.878 [0.147] & 2.384 [0.085] & 2.514 [0.093] & 2.203 [0.077] \\
+\bottomrule
+\end{tabular}
+\normalsize
+
+
+\noindent\footnotesize
+\emph{Notes to Tables~S10--S12.} Both time endpoints use the paired variable
+$d_i=\log(T_{\rm Flat,i}/T_{\rm SA,i})$; negative values favor Flat. The test, the effect
+size, and the median ratio are computed on this one scale and share its direction
+convention but do not target an identical estimand; the Hodges--Lehmann column is the
+location estimate aligned with the signed-rank test. \(G\) is the number of operational
+families. Simple groups the six
+\texttt{casoXX[a--f]} scenarios with a common root; SG-Ter-Mer groups each
+\texttt{instanceXXX}/\texttt{instance(XXX+48)} pair (34 pairs, no singletons); Full is
+singleton by construction.
+The exact block-sign test preserves each scenario's absolute-rank contribution, sums those
+contributions within family, and flips one common sign per family; its null distribution is
+computed by dynamic programming. The percentile bootstrap resamples whole families
+($B=2000$, seed 12345; the pre+solve and solver-time intervals are drawn from one RNG
+stream in that order). Negative Work \(r_{\rm rb}\) favors Flat under the sign convention of
+the main table. Work reproduces both augmented $0.1\%$ solver-time directions but, with
+medians 2 versus 2 in Simple and
+7 versus 4 in SG-Ter-Mer, does not turn the small solver-time effects into large speedups;
+a single default-seed run per cell means seed- and trajectory-level variability is not
+eliminated.
+In Panel C each policy fixes the integer variables to the incumbent found by that same run.
+The ratio can therefore reflect both representation and a different integer solution; no
+common-incumbent diagnostic can be reconstructed from the archived artifacts.
+In Panel D, ``Recorded'' counts instances present in the batch CSV (at Full $0.1\%$,
+instances 045--048 were not recorded), the common pool removes uniformly unavailable
+instances (none here beyond the unrecorded ones), and double noncompletions are pairs in
+which neither policy completes. No pair is dropped for a missing time and no exact-zero
+difference occurs; $n$ used applies to both endpoints. In these batches the preprocessing
+calls are timed once each, with the C++ high-resolution wall clock, in the batch's fixed
+(un-randomized) execution order and without repetitions; per-policy IQRs are at most
+$0.003$\,s in every cell. Timing environment for the preprocessing replication: Intel Core i7-13620H ($10$ physical / $16$ logical cores, $0.4$--$4.9$\,GHz, \texttt{powersave} governor), Ubuntu 22.04.5 with Linux 6.8.0, g++ 11.4.0 at \texttt{-std=c++17 -g} (no \texttt{-O} flag), binary \path{code/build_diag/SistemaElectrico}; the pinned protocol binds one worker to a single logical CPU with \texttt{taskset}, the concurrent protocol uses $12$ unpinned workers. The release-build replication uses the same source commit, hardware, operating system, compiler, libraries, timing protocol, seeds, execution order and affinity policy, compiled with \texttt{-std=c++17 -O2 -DNDEBUG} into \path{code/build_release/SistemaElectrico}; the two builds differ only in optimization flags. The solve batches ran on ClusterUY as described in the main text, so the cached-metadata endpoint is a cross-protocol counterfactual.
+
+\emph{Order-randomized preprocessing replication}
+(\path{scripts/preproc_timing_replication.py}; $R=20$, seeded order per repetition,
+fresh process per call, MIP never solved). Two protocols were run: a \emph{concurrent}
+stress test ($12$ workers on a $16$-core workstation, no CPU pinning) and a
+\emph{low-contention} estimate (one worker, every call pinned to one logical CPU via
+\texttt{--pin-cpu}). The pinned protocol is the cleaner estimator---relative IQR
+$0.00$--$0.02$ against $0.18$--$1.83$---and gives, per class and kernel, selective versus
+role-blind medians and paired ratios:
+Simple/Aug $0.0487$ vs $0.0083$ ($5.85\times$; cached $0.0087$ vs $0.0081$, $1.08\times$);
+Simple/Mat $0.0499$ vs $0.0083$ ($6.00\times$; cached $0.0099$ vs $0.0081$, $1.23\times$);
+SG-Ter-Mer/Aug $0.0300$ vs $0.0059$ ($5.07\times$; cached $0.0058$ vs $0.0057$,
+$1.01\times$); SG-Ter-Mer/Mat $0.0307$ vs $0.0058$ ($5.28\times$; cached $0.0065$ vs
+$0.0056$, $1.15\times$); Full/Aug $0.0773$ vs $0.0136$ ($5.71\times$; cached $0.0141$ vs
+$0.0132$, $1.07\times$); Full/Mat $0.0797$ vs $0.0137$ ($5.81\times$; cached $0.0161$ vs
+$0.0133$, $1.21\times$). All $612$ instance--kernel records favor the role-blind rule on the
+full call under both protocols. On the cached counterpart the role-blind rule has the lower
+median in $20$--$32$ of the $34$ operational families per cell, so that residual is
+descriptive rather than uniform.
+
+The concurrent protocol is retained as a stress test of the direction under adverse
+measurement conditions. Its per-class and per-kernel values---medians of the per-instance
+median call time (selective versus role-blind, seconds), the median paired ratio, the
+cached-metadata counterpart $T_{\rm diagnosis}+T_{\rm application}$, and the relative
+interquartile range, which replaces the coefficient of variation because the latter is
+unstable for short, skewed timings---are:
+Simple/Aug $0.272$ vs $0.031$ ($8.38\times$; cached $0.032$ vs $0.029$, $1.08\times$;
+relative IQR $0.32$ vs $1.51$);
+Simple/Mat $0.281$ vs $0.031$ ($8.58\times$; cached $0.040$ vs $0.029$, $1.40\times$;
+$0.32$ vs $1.58$);
+SG-Ter-Mer/Aug $0.165$ vs $0.018$ ($9.10\times$; cached $0.020$ vs $0.018$, $1.08\times$;
+$0.20$ vs $1.70$);
+SG-Ter-Mer/Mat $0.167$ vs $0.020$ ($8.54\times$; cached $0.023$ vs $0.019$, $1.24\times$;
+$0.18$ vs $1.83$);
+Full/Aug $0.412$ vs $0.066$ ($6.45\times$; cached $0.072$ vs $0.062$, $1.15\times$;
+$0.21$ vs $1.15$);
+Full/Mat $0.424$ vs $0.072$ ($6.08\times$; cached $0.084$ vs $0.067$, $1.32\times$;
+$0.23$ vs $1.04$).
+The selective median exceeds the role-blind median on all $612$ instance--kernel records
+(paired Wilcoxon $p\le1.2\times10^{-10}$ per cell), and every operational family---$34$ in
+each class---has a positive median difference in both kernels. Metadata reconstruction
+accounts for $72$--$89\%$ of the selective preprocessing time and at most $0.6$\,ms of the
+role-blind time. The batches contain no one-sided aborts, so the $10T_{\max}$ abort sensitivity is
+identical to the primary convention. Each of the six dedicated CSVs contains both SA and
+Flat reruns from the same class--tolerance batch, independent of the main campaign.
+Adversarial signed-rank sensitivity for the four unrecorded pairs (Full augmented $0.1\%$,
+pre+solve endpoint): appending instances 045--048 with the adverse sign at above-maximal
+ranks gives $p=0.47$ and $r_{\rm rb}=+0.15$. For this sensitivity the nominal pool contains all
+$34$ instances---the $27$ observed nonzero pairs, the four appended adverse missing pairs and
+the three double timeouts restored as exact-zero operational ties---and the signed-rank
+procedure discards those three zeros, leaving an effective nonzero sample of $n=31$, so the adjusted Full contrast is
+conditional on the $27$ eligible observed pairs. This construction bounds the signed-rank
+evidence under adverse missing pairs; it is not a universal worst-case bound for the median
+ratio, the Hodges--Lehmann estimate, or the reliability-adjusted aggregate costs. On the
+same augmented sample the adversarial location estimates remain directionally favorable to
+selectivity (median SA/Flat $0.9596$, HL $0.9465$); the matrix-only counterpart moves the
+other way (median $1.0861$, HL $1.0977$, $p=0.34$). The three double timeouts enter as
+operational ties (exact zeros).
+\normalsize
+
+
+\section*{Section S3. Traceability of the kernel-matched metadata grid}
+\noindent This section documents the experiment behind the kernel-matched metadata grid of the
+main text (the comparison of the matrix-only structure-aware rule \methodMat{} against a
+same-kernel role-blind control), so the paper's central positive finding is fully reproducible.
+
+\paragraph{Instance family.} Every cell uses the block-heterogeneous coefficient family on
+$B=4$ blocks, each with $6$ continuous and $2$ binary variables, $8$ local rows and $3$ coupling
+rows. Block $i$ ($1$-indexed) carries a base magnitude $10^{e_i}$ with the exponents spread
+uniformly over $[-R,R]$, $e_i=-R+2R\,(i-1)/(B-1)$, so that equal absolute coefficients denote
+different physical scales across blocks. The block-scale range $R$ is the row variable of the
+grid and is set through the \texttt{SYNTH\_BLOCK\_RANGE} environment variable (default $2$, which
+reproduces the original block-heterogeneous set byte-for-byte). At $R=2$ the four block magnitudes
+are $10^{-2},10^{-2/3},10^{2/3},10^{2}$; at $R=3$ they are $10^{-3},10^{-1},10^{1},10^{3}$. The
+coupling disturbance of severity $S$ is applied on top of this, as in the main synthetic grid.
+
+\paragraph{Seeds and variants.} Each cell draws $30$ instances from consecutive seeds starting at
+$20250803$. The variants are Base, the matrix-only structure-aware rule \methodMat{}, and its
+kernel-matched role-blind control Flat-Mat (the flat rule run with the coefficient-only kernel,
+added to the synthetic runner for this test); \methodAug{}, Flat and Ruiz are included on the
+headline cell for reference. The exported constraint matrix of every variant is read back and
+decomposed with \texttt{scripts/spectral\_audit.py}, and the reported statistic is the paired
+ratio $\kappa_2^{+}(\methodMat{})/\kappa_2^{+}(\text{Flat-Mat})$; because the two rules share both
+kernel and coverage, the ratio isolates the block metadata.
+
+\paragraph{Headline cell.} Table~S13 gives the per-variant $\kappa_2^{+}$ distribution on the
+headline cell (coupling pattern, $R=2$, $S=6$, $30$ seeds). The matrix-only structure-aware rule
+is lower than its role-blind twin on all $30$ instances; the homogeneous control is the $[-1,1]$
+row of the metadata grid in the main text, where the two coincide within noise.
+
+% The transfer-factor audits above are presented as ``Table S12'' by a manual heading
+% (they are typeset as panels, not as a float), so the table counter---which only counts
+% real environments---is one short here; bump it so this genuine float is numbered S13.
+\addtocounter{table}{1}
+\begin{table}[htbp]
+\caption{Per-variant $\kappa_2^{+}$ on the headline cell of the kernel-matched grid (coupling
+pattern, block-scale range $[-2,2]$, $S=6$, $30$ seeds): median, interquartile range, and full
+range. The paired \methodMat{}/Flat-Mat ratio has median $0.098$ ($30/30$ instances, Wilcoxon
+$p=1.9\times10^{-9}$).}
+\label{tab:si-metadata-headline}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Variant & Median $\kappa_2^{+}$ & IQR & Range \\
+\midrule
+Base       & $5.3\times10^{8}$ & $[2.4\times10^{7},\,3.2\times10^{9}]$  & $[4.2\times10^{5},\,2.2\times10^{11}]$ \\
+\methodMat{} & $1.3\times10^{3}$ & $[1.2\times10^{3},\,1.7\times10^{3}]$  & $[8.7\times10^{2},\,1.7\times10^{4}]$ \\
+Flat-Mat   & $1.4\times10^{4}$ & $[1.1\times10^{4},\,1.9\times10^{4}]$  & $[6.2\times10^{3},\,2.1\times10^{5}]$ \\
+\methodAug{} & $2.1\times10^{5}$ & $[4.3\times10^{4},\,6.1\times10^{5}]$  & $[1.2\times10^{4},\,1.1\times10^{7}]$ \\
+Flat       & $2.4\times10^{4}$ & $[1.8\times10^{4},\,3.1\times10^{4}]$  & $[8.5\times10^{3},\,3.4\times10^{5}]$ \\
+Ruiz       & $3.9\times10^{5}$ & $[8.3\times10^{4},\,9.2\times10^{5}]$  & $[2.6\times10^{4},\,1.3\times10^{7}]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Reproduction.} The full $18$-cell sweep and the per-instance $\kappa_2^{+}$ values are
+archived under \texttt{results-revision/spectral-heterogeneous/} (\texttt{metadata\_grid.csv} for
+the sweep, \texttt{coupling\_blockhet\_spectral.csv} for the headline cell). One cell is produced
+by setting \texttt{SYNTH\_BLOCK\_RANGE=2} and piping to the solver the command
+\texttt{benchmarkSintetico -{}-coef-family block\_heterogeneous -{}-volcar-lp <dir>} followed by
+the parameter lines \texttt{DummyLp}, seed \texttt{20250803}, $30$ instances, $4$ blocks,
+\texttt{6 2}, \texttt{8 3}, pattern \texttt{coupling}, severity \texttt{6}, variant list
+\texttt{Base,SA-Aug,SA-Mat,Flat,Flat-Mat,Ruiz}, and an output path; then
+\texttt{scripts/spectral\_audit.py -{}-lp-dir <dir>} reads the exported matrices. The whole grid
+is driven by \texttt{scripts/synth\_metadata\_grid.py}.
+
+\section*{Section S4. Algorithmic summary}
+\label{si:algorithm}
+
+The recommended rule is the exhaustive matrix-only structure-aware scaling of
+Algorithm~\ref{alg:matrix-scaling}; the augmented variant studied for comparison differs from it in
+two independent ways---folding the right-hand side into the magnitude extremes and replacing the
+per-row coupling factors with a single collective factor---detailed after the algorithm. Equation
+numbers refer to the main text.
+
+Both assume an \emph{exhaustive} role map---every row is either local to one block or a coupling
+row, $\mathcal{R}_{\mathrm{all}}=\bigl(\dot{\textstyle\bigcup}_{i\in\mathcal{B}}\mathcal{R}_i\bigr)
+\;\dot\cup\;\mathcal{R}_{\mathrm{cpl}}$, with no residual category. The archived operational
+campaigns used a non-exhaustive implementation in which a block of market-shortage rows remained
+unassigned and therefore unscaled; Algorithm~\ref{alg:matrix-scaling} instead states the
+exhaustive rule that defines the target method, and the coverage-restored control of the main text
+removes the confound that non-exhaustive map introduced.
+
+\begin{algorithm}[t]
+\caption{Exhaustive matrix-only structure-aware row scaling (recommended rule)}
+\label{alg:matrix-scaling}
+\begin{algorithmic}[1]
+\Require Matrix $A$, right-hand side $b$, exhaustive row roles (local/coupling), block ownership $\beta(\cdot)$, coupling incidence
+\Ensure Scaled matrix $\widetilde A$, scaled right-hand side $\widetilde b$
+\State Initialize row factors $d_r\gets 1$ for every row
+\For{each local block $i\in\mathcal{B}$}
+  \For{each local row $r\in\mathcal{R}_i$}
+    \State Build $\mathcal{S}_r^{A}$ from the nonzero coefficients of row $r$ (the right-hand side is excluded)
+    \If{$\mathcal{S}_r^{A}\neq\emptyset$}
+      \State Compute $M_r^{A}=\max\mathcal{S}_r^{A}$ and $m_r^{A}=\min\mathcal{S}_r^{A}$
+      \State Set $\alpha_r^{A}\gets 1/\sqrt{M_r^{A}m_r^{A}}$
+      \If{the safeguards admit $\alpha_r^{A}$} \State Update $d_r\gets d_r\alpha_r^{A}$ \EndIf
+    \EndIf
+  \EndFor
+\EndFor
+\State Compute the locally scaled coefficients $\widetilde a_{rj}=d_r a_{rj}$
+\State Compute block scales $s_i^{A}=\sqrt{M_i^{A}m_i^{A}}$ from the block coefficient extremes
+\For{each coupling row $r\in\mathcal{R}_{\mathrm{cpl}}$} \Comment{per-row coupling factor (Section~4.3)}
+  \State Compute the coupling proxy $\widehat\rho_r^{A}=\bigl(\sum_j(\lvert a_{rj}\rvert/s_{\beta(j)}^{A})^2\bigr)^{1/2}$
+  \If{$\widehat\rho_r^{A}>0$}
+    \State Set $\gamma_r^{A}\gets 1/\widehat\rho_r^{A}$; clip $\gamma_r^{A}$ to $[10^{-8},10^{8}]$
+    \If{$\gamma_r^{A}$ lies outside the near-identity band \textbf{and} passes the coefficient-window and reliability safeguards}
+      \State Update $d_r\gets d_r\gamma_r^{A}$
+    \EndIf
+  \EndIf
+\EndFor
+\State Return $\widetilde A=\diag(d)A$ and $\widetilde b=\diag(d)b$
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Augmented exploratory variant (SA-Aug).} The augmented rule of the comparison differs
+from Algorithm~\ref{alg:matrix-scaling} in two independent ways, not one. First, the per-row set
+$\mathcal{S}_r$ and the block extremes $M_i,m_i$ fold in the nonzero right-hand side as well as the
+coefficients (their $A,b$ counterparts, Eqs.~(16), (20), (22) of the main text), and an optional
+local reliability floor $\varepsilon_{\mathrm{floor}}^{\mathrm{loc}}$ may gate the local update.
+Second, and independently, the per-row coupling factors $\gamma_r^{A}=1/\widehat\rho_r^{A}$ are
+replaced by a single \emph{collective} factor $\gamma^{A,b}=\argmin_{\gamma}\Phi(\gamma)$ chosen by
+grid search over $\gamma\in[10^{-6},10^{6}]$ and applied to every coupling row whose proxy exceeds
+the threshold. Folding $|b_r|$ into the extremes is what carries the additional documented
+original-scale reliability failure mode on zero-right-hand-side balance rows; the collective
+coupling factor is the coarser treatment that obtains no spectral advantage over its role-blind
+control. We therefore report SA-Aug as exploratory and recommend the matrix-only rule above.
+
+\section*{Section S5. Relocated results tables}
+\noindent These tables were moved here from the main text during the length revision; they carry
+detailed 0.1\%-tolerance results, sensitivities, and audits that support but are not central to
+the argument. Each is referenced from the main text by its number here.
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{At $0.1\%$ MIPGap, completed-run Gurobi efficiency metrics retain the same
+descriptive pattern as at $1\%$; fixed-pool \PARten{} is in the main-text reliability table.}
+\label{tab:robust-gurobi-01pct-mipgap}
+\begin{tabular}{@{}ll S[table-format=3.0] S[table-format=3.2] S[table-format=1.2] S[table-format=1.3] @{}}
+\toprule
+Class & Variant & {$n$} & {$\sgm T$} & {med. sp.$^{\det}$} & {\AvgGap{}} \\
+\midrule
+Simple & \methodBase & 195 & 8.28 & 1.00 & \textbf{0.176} \\
+ & \methodAug & 195 & 5.65 & \textbf{1.11} & 0.180 \\
+ & \methodMat & 198 & \textbf{5.44} & 1.10 & 0.182 \\
+ & \methodRuiz & 199 & 14.12 & 0.88 & 0.261 \\
+ & \methodRuizCols & 195 & 12.55 & 1.02 & 0.199 \\
+\addlinespace
+Full & \methodBase & 31 & 305.30 & 1.00 & 0.027 \\
+ & \methodAug & 30 & \textbf{226.90} & 1.26 & 0.028 \\
+ & \methodMat & 31 & 306.39 & 1.12 & 0.025 \\
+ & \methodRuiz & 30 & 341.56 & 0.87 & 0.027 \\
+ & \methodRuizCols & 31 & 267.10 & \textbf{1.62} & \textbf{0.022} \\
+\addlinespace
+SG-Ter-Mer & \methodBase & 62 & 14.49 & 1.00 & 0.642 \\
+ & \methodAug & 63 & 8.99 & 1.32 & 0.473 \\
+ & \methodMat & 65 & \textbf{7.97} & \textbf{1.35} & \textbf{0.439} \\
+ & \methodRuiz & 65 & 14.27 & 1.05 & 0.633 \\
+ & \methodRuizCols & 62 & 19.16 & 0.78 & 0.625 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Bold values mark the best descriptive value within each class and metric;
+lower is better for $\sgm T$ and \AvgGap{}, higher is better for med. sp.$^{\det}$.
+\end{flushleft}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\caption{At $0.1\%$ MIPGap, CPLEX remains close to parity for the structure-aware variants,
+reinforcing the contrast with the Gurobi results in the tested pipelines.}
+\label{tab:robust-cplex-01pct-mipgap}
+\begin{tabular}{@{}ll S[table-format=3.0] S[table-format=3.2] S[table-format=1.2] r @{}}
+\toprule
+Class & Variant & {$n$} & {$\sgm T$} & {med. sp.$^{\det}$} & {\AvgGap{}} \\
+\midrule
+Simple & \methodBase & 204 & 5.14 & 1.00 & $1.2\times10^{-12}$ \\
+ & \methodAug & 204 & 4.20 & 1.02 & $6.5\times10^{-13}$ \\
+ & \methodMat & 204 & 4.48 & 1.01 & $5.6\times10^{-13}$ \\
+ & \methodRuiz & 204 & \textbf{4.13} & 1.00 & $\mathbf{1.0\times10^{-15}}$ \\
+ & \methodRuizCols & 204 & 5.28 & 0.94 & $7.7\times10^{-13}$ \\
+\addlinespace
+Full & \methodBase & 33 & 421.59 & 1.00 & $2.7\times10^{-8}$ \\
+ & \methodAug & 34 & 422.62 & 1.07 & $2.7\times10^{-8}$ \\
+ & \methodMat & 33 & 370.45 & 1.05 & $2.3\times10^{-8}$ \\
+ & \methodRuiz & 34 & \textbf{285.10} & \textbf{1.28} & $\mathbf{1.9\times10^{-8}}$ \\
+ & \methodRuizCols & 33 & 377.41 & 0.96 & $5.2\times10^{-8}$ \\
+\addlinespace
+SG-Ter-Mer & \methodBase & 68 & 2.82 & 1.00 & $1.1\times10^{-10}$ \\
+ & \methodAug & 68 & 2.84 & 1.01 & $\mathbf{1.0\times10^{-10}}$ \\
+ & \methodMat & 68 & 2.84 & 1.00 & $1.1\times10^{-10}$ \\
+ & \methodRuiz & 68 & \textbf{2.61} & \textbf{1.02} & $1.1\times10^{-10}$ \\
+ & \methodRuizCols & 68 & 4.02 & 0.85 & $1.3\times10^{-10}$ \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}\footnotesize
+\emph{Notes.} Bold values mark the best descriptive value within each class and metric.
+Under CPLEX these descriptive minima do not imply a robust positive external-scaling effect.
+\end{flushleft}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{Descriptive postselected Gurobi internal-scaling comparison at $1\%$ MIPGap. Within
+each class, the internal mode with the lowest class-level solver-time $\sgm$ is selected on the
+same data; SA-Aug and SA-Mat use default internal scaling. Ratios are medians of
+$T_{\mathrm{internal}}/T_{\mathrm{SA}}$ under the main paired convention: double non-completions
+are excluded and a one-sided non-completion is assigned $T_{\max}=3600$\,s. This same-sample
+postselection is descriptive, not inferential.}
+\label{tab:internal-scaling}
+\footnotesize
+\setlength{\tabcolsep}{3.8pt}
+\begin{tabular}{@{}llrrrrrrr@{}}
+\toprule
+Class & Selected mode & {$\sgm T_{\mathrm{int}}$} & {$\sgm T_{\mathrm{Aug}}$}
+& {$\sgm T_{\mathrm{Mat}}$} & {$n_{\mathrm{Aug}}$} & {$n_{\mathrm{Mat}}$}
+& {Med. ratio Aug} & {Med. ratio Mat} \\
+\midrule
+Simple & aggressive & 3.79 & 2.13 & 2.17 & 204 & 204 & 0.97 & 0.96 \\
+SG-Ter-Mer & equilibration & 14.66 & 8.28 & 8.64 & 67 & 67 & 1.18 & 1.28 \\
+Full & equilibration & 128.45 & 95.24 & 102.03 & 32 & 32 & 1.21 & 1.25 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[t]
+\centering
+\caption{Cached-metadata sensitivity: the direct SA--Flat comparison of the main text recomputed
+on $T_{\mathrm{pre+solve}}^{\mathrm{cached}}=T_{\rm diagnosis}+T_{\rm application}+T_{\rm solver}$,
+which removes the prototype's metadata-reconstruction stage. Preprocessing components come from the
+\emph{release} build ($-\mathtt{O2}$ $-\mathtt{DNDEBUG}$). For Full, five instances exhibit
+last-bit model-construction differences across builds; the four Full rows (marked $\dagger$) are
+therefore approximate cross-build timing sensitivities. Median ratios are SA/Flat; negative
+$r_{\mathrm{rb}}$ favors Flat; $q_6$ and $q_{12}$ are BH-adjusted within the six- and twelve-test
+families. Exploratory.}
+\label{tab:flat-cached}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc r rrrr@{}}
+\toprule
+Gap & Class & Kernel & $n$ & med.\ SA/Flat & $r_{\mathrm{rb}}$ & $q_{6}$ & $q_{12}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & 1.0004 & $-0.090$ & 0.318 & 0.364 \\
+ & Simple & Mat & 204 & 1.0011 & $-0.167$ & 0.115 & 0.092 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0075 & $-0.303$ & 0.115 & 0.092 \\
+ & SG-Ter-Mer & Mat & 67 & 0.9976 & $-0.140$ & 0.318 & 0.381 \\
+ & Full$^\dagger$ & Aug & 31 & 0.9193 & $+0.355$ & 0.173 & 0.173 \\
+ & Full$^\dagger$ & Mat & 32 & 0.9866 & $+0.246$ & 0.318 & 0.364 \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 204 & 1.0094 & $-0.253$ & 0.010 & 0.021 \\
+ & Simple & Mat & 203 & 0.9981 & $+0.089$ & 0.410 & 0.364 \\
+ & SG-Ter-Mer & Aug & 67 & 1.0159 & $-0.313$ & 0.051 & 0.092 \\
+ & SG-Ter-Mer & Mat & 67 & 1.0008 & $-0.109$ & 0.526 & 0.478 \\
+ & Full$^\dagger$ & Aug & 27 & 0.8771 & $+0.529$ & 0.045 & 0.090 \\
+ & Full$^\dagger$ & Mat & 27 & 0.9803 & $+0.053$ & 0.822 & 0.822 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Completed-pair component summaries from the original fixed-order solve batches of the
+direct SA--Flat comparison: medians of $\Delta T=T^{\rm SA}-T^{\rm Flat}$, in seconds. A positive
+value favors Flat. The preprocessing-plus-solver margins in the two fast classes are tens of
+milliseconds per instance; in Full the solver term dominates and reverses the sign.}
+\label{tab:flat-absolute}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llc r rr rr@{}}
+\toprule
+Gap & Class & Kernel & $n$ &
+med.\ $\Delta T_{\rm preproc}$ & IQR($\Delta T_{\rm preproc}$) &
+med.\ $\Delta T_{\rm solver}$ & med.\ $\Delta T_{\rm pre+solve}$ \\
+\midrule
+\multirow{6}{*}{$1\%$}
+ & Simple & Aug & 204 & $+0.050$ & 0.0005 & $+0.001$ & $+0.051$ \\
+ & Simple & Mat & 204 & $+0.053$ & 0.0006 & $+0.002$ & $+0.054$ \\
+ & SG-Ter-Mer & Aug & 67 & $+0.031$ & 0.0007 & $+0.010$ & $+0.041$ \\
+ & SG-Ter-Mer & Mat & 67 & $+0.033$ & 0.0009 & $-0.002$ & $+0.030$ \\
+ & Full & Aug & 31 & $+0.080$ & 0.0015 & $-11.38$ & $-11.30$ \\
+ & Full & Mat & 30 & $+0.084$ & 0.0014 & $-0.16$ & $-0.08$ \\
+\midrule
+\multirow{6}{*}{$0.1\%$}
+ & Simple & Aug & 203 & $+0.051$ & 0.0029 & $+0.016$ & $+0.067$ \\
+ & Simple & Mat & 203 & $+0.054$ & 0.0027 & $-0.006$ & $+0.049$ \\
+ & SG-Ter-Mer & Aug & 67 & $+0.032$ & 0.0002 & $+0.038$ & $+0.070$ \\
+ & SG-Ter-Mer & Mat & 67 & $+0.033$ & 0.0004 & $+0.000$ & $+0.033$ \\
+ & Full & Aug & 27 & $+0.079$ & 0.0008 & $-13.44$ & $-13.36$ \\
+ & Full & Mat & 25 & $+0.083$ & 0.0010 & $-1.09$ & $-1.01$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Common-pool reliability readings for the augmented SA--Flat contrasts at $0.1\%$ MIPGap
+(Gurobi). \PARten{} in seconds under the intent-to-treat, strict, and mixed readings of the main
+text, on the capped solver-time cost $c^{(k,\mathrm{solver})}$; completed-run failure counts
+$(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$; timeouts are penalized in all three readings. The Full
+\PARten{} pool contains all $30$ recorded instances, including three double timeouts that carry no
+signed-rank direction. The full twelve-contrast audit is Table~S9.}
+\label{tab:flat-reliability-body}
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}llr rrr c@{}}
+\toprule
+Class & Variant & $n$ & {ITT} & {strict} & {mixed} &
+$(n_{\mathrm{fail,s}},n_{\mathrm{fail,m}})$ \\
+\midrule
+\multirow{2}{*}{Simple}
+ & SA-Aug   & 204 & 212 & \bfseries 4090 & \bfseries 3387 & (22, 18) \\
+ & Flat-Aug & 204 & \bfseries 30 & 4437 & 3908 & (25, 22) \\
+\addlinespace
+\multirow{2}{*}{SG-Ter-Mer}
+ & SA-Aug   & 68 & 556 & 1085 & 556 & (1, 0) \\
+ & Flat-Aug & 68 & \bfseries 542 & \bfseries 1071 & \bfseries 542 & (1, 0) \\
+\addlinespace
+\multirow{2}{*}{Full}
+ & SA-Aug   & 30 & \bfseries 3951 & 6342 & 6342 & (2, 2) \\
+ & Flat-Aug & 30 & 4004 & \bfseries 6291 & \bfseries 5109 & (2, 1) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\caption{The computational environment fixes solver versions, time limits, and default presolve
+settings for all comparisons.}
+\label{tab:computational-environment}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Item & Configuration \\
+\midrule
+Cluster & ClusterUY, partition \texttt{ute} \\
+Processor & Intel Xeon Gold 6138 \\
+Threads & 16 \\
+Memory limit & 12 GB \\
+Time limit & 1 hour per solve \\
+Gurobi version & 13.0.1 \\
+CPLEX version & 22.1.2.0 \\
+Presolve & solver default, enabled \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]\footnotesize
+\item Solver-internal scaling and presolve were left at their default enabled settings
+unless otherwise stated. CPLEX 22.1.2.0 is the version available in the ClusterUY
+environment used for the long runs; conclusions involving CPLEX should therefore be
+interpreted as solver-version and environment specific.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+
+\end{document}

@@ -1,0 +1,166 @@
+\section{Identifying the mechanism}
+\label{sec:identifiability}
+
+This section shows that, under exact geometric-mean local normalization, the extrema-based
+post-local block statistic used by the original policy carries no block-scale information, so
+the coupling stage cannot use it, and it derives the simpler mechanism that remains.
+
+\subsection{Collapse of post-normalization block centers}
+
+For each nonzero local row $r$, write $m_r$ and $M_r$ for its smallest and largest
+nonzero coefficient magnitudes. The geometric-mean kernel applies
+$d_r=(m_rM_r)^{-1/2}$. Let $\widetilde m_r=d_rm_r$ and $\widetilde M_r=d_rM_r$ denote the
+exported extrema. For a nonempty set $I$ of local rows, the block statistic is
+\[
+ s_I=\sqrt{\left(\min_{r\in I}\widetilde m_r\right)
+                 \left(\max_{r\in I}\widetilde M_r\right)}.
+\]
+
+\begin{proposition}[Exact collapse and the effect of a skip band]
+\label{prop:audit-collapse}
+If every row receives its geometric-mean factor, then $s_I=1$ for every nonempty grouping
+$I$ of local rows. More generally, suppose the only safeguard replaces $d_r$ by $1$ when the
+candidate lies in $(1/u,u)$, where $u\geq1$. Then $s_I\in[1/u,u]$, independently of the
+original coefficient scales and of the grouping of the rows.
+\end{proposition}
+\begin{proof}
+Under exact normalization, $\widetilde m_r=\sqrt{m_r/M_r}=1/\widetilde M_r$. Consequently
+$\min_r\widetilde m_r=1/\max_r\widetilde M_r$, proving the first statement.
+For the second, let $c_r=\sqrt{\widetilde m_r\widetilde M_r}$. An accepted row has
+$c_r=1$; a skipped row has $c_r=\sqrt{m_rM_r}\in(1/u,u)$. Thus
+$u^{-2}\leq\widetilde m_r\widetilde M_r\leq u^2$ for every row. Choose $p$ attaining
+the maximum exported row magnitude and $q$ attaining the minimum. Then
+\[
+ u^{-2}\leq\widetilde m_q\widetilde M_q
+ \leq\widetilde m_q\widetilde M_p
+ \leq\widetilde m_p\widetilde M_p\leq u^2.
+\]
+Taking square roots gives the result.
+\end{proof}
+
+For a coupling row $a_r$, let $\beta(j)$ assign column $j$ to a local block, and
+define the block-weighted candidate and its ownership-blind counterpart by
+\[
+ \gamma_r^{\mathrm{block}}
+ =\left(\sum_j a_{rj}^2/s_{\beta(j)}^2\right)^{-1/2},
+ \qquad
+ \gamma_r^{\mathrm{L2}}=\left(\sum_j a_{rj}^2\right)^{-1/2}.
+\]
+Blockless columns may use an arithmetic mean of valid block scales or the unit
+fallback; both conventions preserve the interval in \cref{prop:audit-collapse}.
+
+\begin{proposition}[Loss of ownership information]
+\label{prop:audit-ownership}
+Under exact local normalization and with no coefficient filtering,
+$\gamma_r^{\mathrm{block}}=\gamma_r^{\mathrm{L2}}$ for every coupling row, so
+changing the ownership map cannot change the candidate export; applying the same
+coupling safeguards to identical candidates preserves equality.
+Under the skip-band assumptions of \cref{prop:audit-collapse},
+\[
+ u^{-1}\leq\frac{\gamma_r^{\mathrm{block}}}
+                       {\gamma_r^{\mathrm{L2}}}\leq u,
+\]
+and, before coupling safeguards, the condition numbers of the two exports differ by
+at most a factor $u^2$ on their common nonzero singular spectrum.
+\end{proposition}
+\begin{proof}
+The equality follows by substituting $s_i=1$. In the second case,
+\[
+ u^{-2}\|a_r\|_2^2\leq\sum_j a_{rj}^2/s_{\beta(j)}^2
+ \leq u^2\|a_r\|_2^2,
+\]
+which gives the factor bound. Write the block-based export as $EA_{\mathrm{L2}}$,
+where $E$ has unit entries on local rows and entries in $[1/u,u]$ on coupling
+rows. Multiplication by $E$ changes each singular value by a factor between
+$1/u$ and $u$ and preserves rank. Applying these inequalities to the largest and
+smallest positive singular values in both directions proves the condition-number
+bound.
+\end{proof}
+
+Both statements assume that the block summary sees every coefficient. Coefficient-window
+vetoes and filtered extrema lie outside the hypotheses: a row with magnitudes
+$(10^{-8},3,10^8)$ is geometrically centered, but restricting the summary to
+$(10^{-6},10^6)$ produces $s_I=3$, a nonunit statistic created by the filter rather than by
+retained physical scale. The export audit in \cref{sec:results} measures how often the
+implemented safeguards break exact equality.
+
+\subsection{What a matched comparison identifies}
+
+With equal coverage and equal local kernels, two exports agree on their local rows, so any
+difference is confined to the coupling rows. This localizes the difference without
+attributing it to ownership, because the coupling kernels may still differ. The ownership
+control therefore keeps local GM and coupling L2 normalization but replaces every block
+scale by one (Role-Hybrid in \cref{tab:policies}); SA-Mat versus Role-Hybrid is the
+ownership comparison. Flat-GM changes the coupling kernel and Flat-L2 changes the local
+kernel, so neither isolates ownership.
+
+Equality also requires equal \emph{applied} factors, not merely an inactive coupling stage in
+one policy. For local rows $x_1\leq1$, $x_2\leq1$ and the coupling row
+$x_1+10^{-2}x_2\leq1$, both block scales are one and the Euclidean coupling candidate
+$(1+10^{-4})^{-1/2}$ falls inside the skip band $(1/2,2)$, whereas the flat GM candidate
+$10$ is applied. Both policies cover every row, yet their exports differ.
+
+\subsection{The spectral slope in a stylized model}
+
+Take $B\geq2$ local singleton rows with positive coefficients $v_i=10^{e_i}$,
+where $\min_i e_i=-R$ and $\max_i e_i=R$, and one coupling row $v^\top$.
+Exact local normalization produces $I_B$ and unit post-local block centers. A
+whole-row coupling factor $\gamma$ gives
+\[
+ A_\gamma=\begin{bmatrix}I_B\\\gamma v^\top\end{bmatrix},
+ \qquad A_\gamma^\top A_\gamma=I_B+\gamma^2vv^\top,
+ \qquad
+ \kappa_2(A_\gamma)=\sqrt{1+\gamma^2\|v\|_2^2}.
+\]
+Flat geometric-mean normalization selects $\gamma=1$, whereas both the post-local block
+rule and the hybrid Euclidean control select $\gamma=1/\|v\|_2$. Hence
+\[
+ \kappa_2(A_{\mathrm{GM}})=\sqrt{1+\sum_i10^{2e_i}},
+ \qquad
+ \kappa_2(A_{\mathrm{block}})=\kappa_2(A_{\mathrm{hybrid}})=\sqrt2.
+\]
+For fixed $B$ the ratio is of order $10^{-R}$: the advantage grows with block heterogeneity
+and survives removal of the ownership map. Every coupling coefficient is multiplied by the
+same $\gamma$, so all within-row ratios are preserved; dividing each $v_i$ by its own
+$10^{e_i}$ would change the constraint and is not a row scaling.
+
+\subsection{Optimal coupling factor after local whitening}
+
+The stylized model suggests a constructive replacement for the metadata explanation: once
+local scale has been removed, choose the coupling factor from the coupling coefficients
+themselves. In the idealized triangular model this choice has an exact solution.
+
+\begin{proposition}[Optimal common coupling factor after local whitening]
+\label{prop:audit-triangular-optimum}
+Let $R\in\mathbb R^{m\times n}$, with $m,n\geq1$, and set $\rho=\|R\|_2$. For
+\[
+ C_\gamma=\begin{bmatrix}I_n&0\\\gamma R&\gamma I_m\end{bmatrix},
+ \qquad\gamma>0,
+\]
+the unique factor minimizing $\kappa_2(C_\gamma)$ is
+\[
+ \gamma_*=(1+\rho^2)^{-1/2},
+ \qquad
+ \min_{\gamma>0}\kappa_2(C_\gamma)=\sqrt{1+\rho^2}+\rho.
+\]
+On an admissible interval $0<\ell\leq\gamma\leq h$, the optimum is
+$\min\{h,\max\{\ell,\gamma_*\}\}$.
+\end{proposition}
+The proof (Online Resource 1) reduces the spectrum by an SVD to two-by-two blocks. For the
+block at $\rho$, the singular-value ratio $k$ satisfies
+$k+k^{-1}=\gamma^{-1}+\gamma(1+\rho^2)$, whose unique minimizer gives the result.
+
+For a single coupling row, $\gamma_*$ is the Euclidean normalization of the complete row,
+including the coefficient of its aggregate variable. The idealized coupling problem
+therefore has a simple optimal whole-row normalization that uses no ownership information,
+and this is the mechanism the matched control isolates empirically. The statement concerns a
+common factor on a locally whitened triangular structure; for general generated MIPs it
+motivates the Euclidean coupling kernel rather than certifying it.
+
+\paragraph{Why conditioning needs a residual bound.}
+The interval form of \cref{prop:audit-triangular-optimum} matters. In $A_\gamma$,
+$\kappa_2$ decreases to one as $\gamma\to0$, while a fixed residual on the exported coupling
+row corresponds to an original residual larger by the factor $1/\gamma$. A conditioning
+criterion alone cannot say how small a coupling factor may be: on any interval its
+minimizer for $A_\gamma$ is the lower endpoint $\ell$. \Cref{sec:contract} derives that
+endpoint from an application-unit residual budget.

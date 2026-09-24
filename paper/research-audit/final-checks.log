@@ -1,0 +1,20 @@
+make -C code BUILD_DIR=build-audit USE_GUROBI=0 USE_CPLEX=0 USE_CBC=0 USE_HEXALY=0
+make[1]: se entra en el directorio '/home/mathiasr/Escritorio/generator-aware-row-scaling/code'
+Build done: build-audit/SistemaElectrico  (GUROBI=0 CPLEX=0 CBC=0 HEXALY=0)
+make[1]: se sale del directorio '/home/mathiasr/Escritorio/generator-aware-row-scaling/code'
+python3 -m pytest -q tests/test_budget_scaling.py
+............                                                             [100%]
+12 passed in 0.53s
+python3 scripts/research/verify_saved_experiment.py --root results-revision/research-audit/budget-final
+{
+  "models_independently_enumerated": 96,
+  "configurations_audited": 3456,
+  "exact_dyadic_exports_checked": 768,
+  "abstentions_verified": 288,
+  "runs_sha256": "f0cfa86aa97e60dcca6985dd66b235883ecabafb1fe1f4de40a3b70b39840aa2",
+  "checker_sha256": "743ff0f6abf8d0eda3b7cc77e84088114bf771c873831bb361547bb9aa28adfa"
+}
+cd results-revision/research-audit/identifiability-final && sha256sum --quiet -c checksums.sha256
+python3 -m pytest -q tests/test_export_roundtrip.py
+.                                                                        [100%]
+1 passed in 0.44s

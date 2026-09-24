@@ -1,0 +1,435 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm,mathtools}
+\usepackage{graphicx,booktabs,tabularx,array,enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,allcolors=blue!45!black]{hyperref}
+\usepackage{xcolor}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\usepackage{lineno}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\nnz}{\operatorname{nnz}}
+\graphicspath{{figs/research/}{figs/}}
+\title{Identifiability and Feasibility Budgets in Pre-Export Row Scaling for Mixed-Integer Programs}
+\author{Mathias Rodr\'iguez Castro\\
+\small Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Uruguay\\
+\small\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
+\date{}
+\begin{document}
+\maketitle
+\begin{abstract}
+Positive row scaling preserves a mixed-integer linear program in exact arithmetic, but
+an observed numerical improvement need not identify the information used to select the
+factors. We analyze a local--block--coupling construction and prove that geometric-mean
+row centering can erase its block-scale information exactly. With a near-identity band,
+the remaining scale information is bounded independently of the original heterogeneity.
+A matched kernel control explains an apparent order-of-magnitude spectral improvement
+without using block scales. We then characterize the positive row factors compatible
+with an explicit original-unit residual budget and a coefficient window. The admissible
+set is an interval; constrained geometric-mean centering is its logarithmic minimax
+solution, and an empty interval provides an explicit incompatibility certificate.
+An additional bound accounts for integer rounding, which row scaling cannot suppress.
+A reconstruction of 240 dispatch runs separates completed-run effort from failures,
+and 3,456 configurations of exactly enumerable binary stress instances distinguish
+conditional row guarantees from solver behavior. Budget projection improves verification
+on HiGHS in this stress experiment, but does not establish a solver-independent advantage;
+a rounding-aware contract trades acceptance for conservative abstention. The results
+provide precise controls for attributing scaling gains and for stating what a numerical
+scaling policy can actually guarantee.
+\end{abstract}
+\noindent\textbf{Keywords:} mixed-integer linear programming; row scaling; numerical
+reliability; equilibration; residual budgets; computational reproducibility.
+\linenumbers
+
+\section{Introduction}
+A model generator may retain the ownership of variables, the roles of constraints and
+physical tolerances that are absent from a conventional matrix export. Such information
+can guide numerical preprocessing. However, its presence in an algorithm does not show
+that it affects the exported matrix, and a comparison against an unscaled model cannot
+establish which part of the preprocessing caused an improvement. Coverage, normalization
+kernel, safeguards and structural metadata can all change at once.
+
+This distinction matters in mixed-integer linear programming (MILP), where a small change
+in representation can affect presolve, relaxation bases, integer acceptance and the search
+path. Positive row factors preserve the mathematical feasible set, but solver acceptance
+is governed by tolerances and finite precision. Good coefficient magnitudes, favorable
+matrix condition numbers, small original-data residuals and short running times are
+therefore different outcomes. Their distinction is established in the scaling literature;
+our question is how to make the attribution and reliability requirements explicit for a
+particular class of generator-level policies.
+
+We study two kinds of information. The first is a block map used after local
+geometric-mean centering to summarize each block by the geometric mean of its smallest
+and largest nonzero magnitudes. We prove that this summary is exactly one when all rows
+are centered without vetoes. With an identity band, it lies in that band regardless of
+how heterogeneous the original blocks were. Thus the construction can erase the very
+information its final stage is intended to exploit. A Euclidean coupling-row control
+then explains a favorable spectral comparison that would otherwise be attributed to the
+block map.
+
+The second kind of information is an original-unit residual budget. A specified budget
+has a direct interpretation that a block label lacks: it says which returned violations
+are acceptable. We combine it with a prescribed coefficient window, derive the exact
+admissible interval for a row factor, and characterize constrained logarithmic centering.
+We also identify a limitation: rounding a nearly integral variable produces an error
+proportional to its original coefficient, independently of row scaling. A useful policy
+must disclose incompatible specifications and check the returned point.
+
+The contribution is consequently an analysis and an audit protocol, not a claim that a
+new universal scaler outperforms commercial solvers. The theory explains an information
+loss mechanism, provides a correct kernel comparison, and states a conditional
+feasibility contract. The computations include a controlled matrix audit, an operational
+case study with reconstructed measurements, and a deliberately adversarial binary
+experiment whose optima can be verified independently. Simple tolerance scaling is
+included as a baseline so that the constrained construction is not credited with a
+benefit that the simpler rule already provides.
+
+\input{sections/related_work}
+
+\section{Model, policies and comparisons}
+\label{sec:model}
+Consider
+\[
+ \min c^Tx\quad\text{subject to }Ax\le b,\quad l\le x\le u,\quad x_j\in\mathbb Z\ (j\in J).
+\]
+Equalities and opposite inequality senses are allowed. For a positive diagonal matrix
+$D_r$, replacing $(A,b)$ by $(D_rA,D_rb)$ preserves every constraint, variable domain
+and objective value in exact arithmetic. It is essential to multiply the whole row,
+including its right-hand side, by the same positive number. Dividing different
+coefficients of a coupling row by different block scales is not a row scaling and is
+outside this equivalence statement.
+
+Let the generator provide a fixed partition of the local rows into nonempty blocks,
+a coupling-row set, and a column-to-block map $\beta$. Coverage specifies which rows
+are eligible for scaling; a kernel maps eligible row data to a candidate factor;
+safeguards decide which factors are applied. These are separate choices. A block map
+can influence the factors even when coverage and kernels are fixed, but only if the
+block summaries retain information and are actually used.
+
+For a nonzero row, put $m_r=\min_{a_{rj}\ne0}|a_{rj}|$ and
+$M_r=\max_j|a_{rj}|$. The geometric-mean (GM) factor is $(m_rM_r)^{-1/2}$;
+the Euclidean (L2) factor is $1/\|a_r\|_2$. Both are coefficient-only rules.
+Calling them ``the same kernel'' because neither uses the RHS is incorrect.
+The following comparisons keep this distinction visible.
+\begin{table}[tb]
+\centering\small
+\caption{Controls for the coefficient-only construction. Row eligibility and safeguards
+must also be matched for the indicated comparison. A role map and a block-scale map are
+separate information sources.}\label{tab:policies}
+\begin{tabularx}{\linewidth}{lXXX}
+\toprule
+Policy & Local rows & Coupling rows & Information used\\
+\midrule
+Base & None & None & None\\
+Flat-GM & GM & GM & Row coefficients\\
+Flat-L2 & L2 & L2 & Row coefficients\\
+Role-Hybrid & GM & L2 & Row roles, coefficients\\
+SA-Mat & GM & $\left[\sum_j(a_{rj}/s_{\beta(j)})^2\right]^{-1/2}$ & Roles, block scales, ownership\\
+SA-Pre & GM & Same expression, pre-local scales & Roles, original block scales\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The direct test of the \emph{block scales} is SA-Mat versus Role-Hybrid at matched
+coverage and safeguards. Flat-L2 also changes the local kernel, whereas Flat-GM changes
+the coupling kernel. Relabeling blocks without changing their assignments is an
+invariance check. Permuting the assignment of unequal scales is a different intervention:
+it tests the usefulness of the map on the chosen instances, and is not assumed to
+preserve semantic validity.
+
+\input{sections/identifiability}
+\input{sections/residual_contract}
+
+\section{Computational design}
+\label{sec:experiments}
+\subsection{Matrix attribution audit}
+The C++ generator constructs local blocks and coupling rows while retaining their row
+roles and column ownership. The archived headline cell uses four heterogeneous blocks,
+coefficient exponent range $[-2,2]$, coupling disturbance severity $6$, and 30 seeds.
+All policies in \cref{tab:policies} are available in the same implementation. Their
+exported matrices allow a comparison before any optimizer is called. The analysis
+records spectral pseudo-condition numbers and direct export comparisons; equal
+condition numbers alone are not evidence of identical matrices.
+
+The spectral diagnostic is $\kappa_2^+(A)=\sigma_{\max}(A)/\sigma_{\min}^+(A)$,
+where numerical rank is determined relative to the largest singular value. It is a
+diagnostic of the exported constraint matrix, not of the active basis at every node.
+Variable bounds, redundant rows and slack conventions can change its interpretation.
+A condition-number ratio is never used as a proxy for verified solver success.
+
+\subsection{Operational reconstruction}
+The operational case study uses the final four-arm campaign from the dispatch
+repository: Base, Flat-GM, Flat-L2 and Role-Hybrid; 15 instances from each of the
+Simple and SG-Ter-Mer families; Gurobi; relative MIP gaps 1\% and 0.1\%; seed 42;
+16 threads; and a 1,800-second solver limit. The fixed subsets are retained rather
+than reselected after inspecting outcomes. This gives 240 assigned runs. We retrieved
+all native logs from the cluster and preserved input hashes.
+
+The scalar Work marker in the archived runner inherited a stream setting that rounded
+scaled-variant values to integers, while the unscaled marker retained decimals. We
+therefore reconstruct Work from the native Gurobi summaries, which retain two decimals,
+and explicitly retain that measurement resolution. Work is never penalized with a
+number of seconds. The primary failure-sensitive runtime summary is the arithmetic
+mean PAR10 on all 15 assigned instances per cell: each non-completion receives 18,000
+seconds. This endpoint concerns solver completion; it does not silently turn a completed
+but numerically suspect point into a verified solution.
+
+Secondary Work comparisons use the same all-variants-completed pool within a cell.
+We report paired geometric-mean ratios with exploratory paired bootstrap intervals,
+plus a separate sensitivity to the 0.01-unit log resolution. These conditional summaries
+do not repair the exclusion of difficult non-completions. The small selected pools,
+one seed per cell and repeated instances across gap settings preclude interpreting
+pooled cells as independent replications of general solver performance.
+
+\subsection{Enumerated residual-budget stress experiment}
+We construct three binary families with 12 variables: a cardinality row, three positive
+packing rows, and three rows with signed integer coefficients. Profits are positive
+integers. If $W$ is the integer matrix and $k$ an integer capacity vector, the canonical
+constraints are
+\begin{equation}\label{eq:stress-family}
+ 10^e Wx\le 10^e k-0.1\,\boldsymbol 1,\qquad x\in\{0,1\}^{12},
+ \quad e\in\{0,3,6,9\}.
+\end{equation}
+For these exponents the exact binary feasible set is $Wx\le k-\boldsymbol 1$.
+Thus changing $e$ changes the numerical representation and continuous relaxation while
+preserving the binary feasible set. It is not pure row re-emission, because the absolute
+margin 0.1 remains fixed. The corresponding distinction is intentional: it exposes
+integer acceptance near a facet without changing the binary optimum.
+
+The budget is 0.01 in the canonical row's units. These are declared stress-test units,
+not engineering tolerances inferred from the dispatch data. Eight seeds, 100--107, were
+reserved after a one-seed exploratory pilot; all four exponents and all three families
+are retained. Both presolve settings are run on HiGHS 1.15.1 and Gurobi 13.0.2, with one
+thread, zero target MIP gap, a ten-second limit, and primal/integrality tolerances
+$10^{-6}$. The nine policies give 3,456 planned configurations. Budget-round abstains
+on 288 of them, leaving 3,168 optimizer calls.
+
+Base, GM and L2 have their definitions in \cref{tab:policies}, with full coverage and no
+identity-band veto in this experiment. GM-tight uses GM and tightens both tolerance
+settings to $10^{-9}$. Budget-only uses the established direct factor
+$\epsilon/\delta_r$. Budget-GM uses \cref{prop:budget}, coefficient limits
+$[10^{-9},10^9]$ and $\epsilon=10^{-6}$. Budget-round additionally reserves
+$E_r=10^{-6}\sum_j|a_{rj}|$ for rounding and abstains on the whole model if any row has
+an empty interval. Abstention is counted separately, not as a successful solve.
+Dyadic-GM uses a power-of-two GM factor with coefficient limits and an exact
+binary64 export; Budget-dyadic additionally imposes the row budget through
+Proposition~\ref{prop:dyadic}. These two arms were added after inspecting the
+floating-point endpoint issue in the initial run. They are an explicitly exploratory
+arithmetic sensitivity, not an independent holdout. The original seven arms are retained
+with the corrected endpoint implementation and unchanged instance seeds.
+
+All $2^{12}$ assignments are enumerated to obtain the binary optimum. The script checks
+that each stored binary64 RHS lies strictly between the two adjacent scaled integer
+activities used in that argument. Returned solutions, row factors and generated data
+are saved. Original row residuals are evaluated as exact rational expressions in the
+stored binary64 data. A verified optimum requires a feasible rounded binary assignment
+with the enumerated objective, valid original variable bounds, and a returned point
+within $10^{-9}$ of its rounded assignment. We also record residual budgets and
+integrality errors separately. This conservative acceptance rule is declared independently
+of the solver's status; a rejected approximately integral point is not automatically a
+solver implementation error.
+
+This experiment tests a failure mechanism. It is too small and deliberately too close
+to integer feasibility boundaries to estimate practical runtime or failure rates on
+industrial MILPs. Counts are descriptive, and no significance tests treat the repeated
+solver settings on a generated instance as independent samples.
+
+\section{Results}
+\label{sec:results}
+\subsection{A kernel effect mistaken for a block effect}
+In the archived heterogeneous headline cell, the median spectral diagnostic is
+$5.30\times10^8$ for Base, $1.36\times10^4$ for Flat-GM,
+$1.33\times10^3$ for SA-Mat and $4.68\times10^2$ for Flat-L2.
+The ratio of Flat-GM to SA-Mat is about 10.2. That comparison changes the coupling
+kernel. Role-Hybrid matches SA-Mat in the 30 archived spectral records, and permuting
+the block-scale assignments leaves the same diagnostic. The collapse result explains
+why the block-relative formula becomes an ordinary L2 normalization in this regime.
+Flat-L2's smaller diagnostic does not establish a better MIP policy: it changes local
+normalization as well and requires a separate solve/verification evaluation.
+
+Using pre-local block scales does not rescue a positive metadata claim on these
+instances. SA-Pre is worse than Role-Hybrid on all 30 archived instances, with a median
+paired condition-number ratio about 4.27. In the exhaustive 24-permutation assignment
+sweep, the true scale assignment is never the best; its median rank is 18. These are
+falsification results for this choice of summary and benchmark. They are not a theorem
+that semantic metadata or all block-based preconditioners are useless.
+
+\IfFileExists{sections/matrix_replication.tex}{\input{sections/matrix_replication}}{}
+
+\subsection{Completed-run gains and timeout-sensitive outcomes}
+\begin{table}[tb]
+\centering\small
+\caption{Reconstructed operational campaign. Arithmetic mean PAR10 in seconds on the
+15 assigned instances per cell; a timeout contributes 18,000 seconds. Parentheses give
+completed runs. All rows concern Gurobi.}\label{tab:operational}
+\begin{tabular}{llrrrr}
+\toprule
+Family & MIP gap & Base & Flat-GM & Flat-L2 & Role-Hybrid\\
+\midrule
+Simple & 1\% & 11.90 (15) & 2.12 (15) & 20.44 (15) & 2.11 (15)\\
+Simple & 0.1\% & 52.00 (15) & 72.98 (15) & 33.17 (15) & 72.63 (15)\\
+SG-Ter-Mer & 1\% & 116.15 (15) & 1216.51 (14) & 1217.60 (14) & 1217.34 (14)\\
+SG-Ter-Mer & 0.1\% & 134.08 (15) & 1216.24 (14) & 1216.05 (14) & 1216.91 (14)\\
+\bottomrule
+\end{tabular}
+\end{table}
+The distinction between endpoints is material. On the 14 common completed SG-Ter-Mer
+instances, Flat-GM/Base has a Work geometric-mean ratio 0.698 at 1\% gap
+(exploratory 95\% bootstrap interval $[0.486,0.944]$) and 0.682 at 0.1\%
+($[0.470,0.925]$). These are favorable conditional effort results. Yet instance077
+completes under Base and times out under every scaled policy at both gaps, so the
+fixed-pool PAR10 ordering reverses sharply (\cref{tab:operational}). Neither reporting
+only completed runs nor adding a seconds-based penalty to Work gives an adequate
+summary of this evidence.
+
+The Simple family also prevents a uniform ordering. Flat-GM reduces the arithmetic
+runtime summary at 1\%, but increases it at 0.1\%. At 1\%, Flat-L2 has a completed-pool
+Work ratio 1.792 against Base, with exploratory interval $[1.033,3.542]$.
+The data support solver- and setting-specific comparisons; they do not select a
+universal replacement for the unscaled pipeline.
+
+Original-data residuals require a stated normalization. For caso46e, Flat-L2 at 1\%
+has an absolute equality residual about 4.97 on a zero-RHS row. Dividing by
+$1+|b_r|$ leaves 4.97; it does not make this a 497\% physical error. The maximum
+activity-normalized diagnostic in the same run is $1.15\times10^{-7}$. Both are
+reported in the artifact, and neither is treated as an application acceptance decision
+without a justified budget. A comparison of optimal objective labels alone would
+miss this difference in returned feasibility.
+
+\subsection{Conditional contracts and verified binary optima}
+\begin{table}[tb]
+\centering\small
+\caption{Enumerated stress experiment, 192 planned configurations per policy and solver.
+``Verified'' means that the returned point passes the declared acceptance rule and its
+rounded assignment attains the independently enumerated optimum. ``Other'' includes
+unverified outputs and solver errors; ``Abstain'' means no optimizer call was attempted.
+Abstention is not a performance success.}\label{tab:budget-results}
+\input{tables/budget-results}
+\end{table}
+\begin{figure}[tb]
+\centering\includegraphics[width=\linewidth]{budget-verification.pdf}
+\caption{Verification by coefficient multiplier. Each cell contains 48 configurations
+(three families, eight seeds and two presolve settings) per policy and solver.
+The fixed margin in \eqref{eq:stress-family} makes the continuous feasibility boundary
+increasingly close to an integer activity. Hatched cells are explicit abstentions.}
+\label{fig:budget-verification}
+\end{figure}
+Budget-GM verifies 182 of 192 configurations on HiGHS, compared with 141 for GM and
+167 for Base. Budget-only verifies 191: direct budget scaling is more successful than the extra
+minimax centering in this experiment. On Gurobi,
+Budget-GM verifies 152, compared with 140 for GM and 156 for Base. GM-tight verifies
+166 under each solver. Thus the row-budget construction does not establish a
+solver-independent reliability improvement, and its conditional hypothesis must remain
+visible.
+
+Dyadic-GM verifies 142 configurations on HiGHS and 140 on Gurobi;
+Budget-dyadic verifies 161 and 153, respectively. Exact representation of the scaled
+row is therefore insufficient for reliable solver acceptance on these stress cases.
+In a preserved earlier implementation, rounding the budget endpoint to nearest instead
+of inward changed HiGHS Budget-GM's verified count from 182 to 191. This is a numerical
+sensitivity result, not a reason to prefer a factor that fails its declared interval.
+The artifact preserves both implementations' outputs and identifies the corrected run.
+
+Budget-round accepts and verifies 48 configurations per solver, and abstains on the
+other 144. Its zero observed verification failures have a substantial cost: it declines
+many instances that another policy solves correctly. This is expected of a worst-case
+rounding bound. An incompatibility certificate explains why the requested uniform
+contract cannot be asserted; it is not evidence that the MILP itself cannot be solved.
+Figure~\ref{fig:budget-verification} reports the denominator explicitly so that abstention
+cannot masquerade as perfect overall performance.
+
+\begin{figure}[tb]
+\centering\includegraphics[width=.8\linewidth]{budget-compatibility.pdf}
+\caption{Exact compatibility regions for a row with fixed within-row spread. Below the
+solid line, the residual budget conflicts with the coefficient ceiling. In the middle
+region the constrained minimax factor is projected onto the admissible interval; above
+the dashed line ordinary GM already satisfies it. This diagram concerns the conditional
+row contract, before reserving any integer-rounding allowance.}\label{fig:budget-compatibility}
+\end{figure}
+
+\section{Discussion and limits}
+\label{sec:discussion}
+The collapse theorem concerns a particular summary after a particular normalization.
+It does not rule out using variable scales, physically meaningful tolerances, Jacobian
+information or different block statistics. It gives a concrete reason to test whether
+metadata survives the preceding operations. The band extension similarly bounds
+candidate-factor differences, not the whole solver trajectory. A safeguard may accept
+one candidate and reject another, producing a discontinuity that must be audited on
+the actual export.
+
+The attribution lesson is operational: compare policies with the same eligible rows,
+the same kernels on those rows and the same safeguards before assigning an effect to
+block scales. Test row factors or named matrix entries directly. Equal scalar diagnostics,
+equal node counts and rounded Work values cannot establish export identity. When a
+control changes the kernel or coverage, interpret the comparison as that combined
+intervention. These requirements are useful even when the final result is negative.
+
+The contract offers a different use for generator information. A physical residual
+budget can be transported under row re-emission and combined with numerical limits.
+The minimax interval result makes that combination explicit, but its proof is elementary
+and it is not a new principle of solver tolerance scaling. Its practical value is the
+ability to state incompatible requirements and to separate coefficient centering from
+acceptance. The stress results show why this separation is necessary: internal presolve
+and integer tolerances can defeat a prediction based solely on exported row residuals.
+A production implementation needs a postsolve check and an explicit rejection or repair
+policy, with its full cost measured.
+
+The archived operational campaign covers two instance classes from one application,
+one solver, one seed and 15 selected instances per class. It is retained as an auditable
+case study, not an industrial benchmark distribution. The synthetic matrix audit tests
+the algebraic mechanism; the binary tests deliberately amplify a tolerance issue and
+are not independent evidence of typical application speedups. Binary enumeration
+certifies their small-instance optimum, but no corresponding exact optimality claim is
+made for the dispatch runs. The new budget policies have not been validated under
+application-supplied engineering tolerances on those dispatch models.
+
+\section{Conclusion}
+For the studied local--block--coupling construction, geometric-mean row centering
+can remove all information from a subsequent extrema-based block-scale summary.
+A bounded identity band only restores bounded scale variation. This explains why
+changing a coupling-row kernel can look like a block-metadata benefit when the
+comparison does not hold kernels fixed. The operational reconstruction further shows
+that favorable completed-run effort can coexist with an unfavorable failure-sensitive
+runtime summary.
+
+An explicit residual budget provides a separate, interpretable basis for row scaling.
+Its compatibility with coefficient limits can be characterized exactly, and constrained
+logarithmic centering has a closed-form solution. Integer-rounding amplification and
+solver-internal transformations limit what this conditional contract can guarantee.
+The resulting recommendation is to expose the information used, audit the actual
+transformation, declare incompatible specifications, and verify the returned point.
+
+\section*{Data and software availability}
+The accompanying repository contains the C++ generator, frozen historical aggregates,
+the reconstructed operational logs and analysis, the exact-enumeration experiment,
+row-factor implementation, tests, and scripts generating the new tables and vector
+figures. The current research sources are distinguished from the historical draft,
+whose positive block-attribution claim is superseded. All newly reported stress data
+and solutions are stored under \texttt{results-revision/research-audit/}. No commercial
+solver is required to regenerate figures, verify the saved binary solutions, or run the
+HiGHS stress arm. Re-running the Gurobi arm requires a suitable license.
+
+\section*{Acknowledgments and declarations}
+The computational platform builds on the author's hydrothermal-dispatch thesis work.
+The manuscript reports research results and does not claim that an external review has
+established their novelty or acceptance. Author contribution, funding, competing-interest
+and assisted-writing declarations will be finalized by the author for the selected
+journal's requirements.
+
+\bibliographystyle{plainnat}
+\bibliography{research-references}
+\end{document}

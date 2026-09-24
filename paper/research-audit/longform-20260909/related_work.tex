@@ -1,0 +1,80 @@
+\section{Related work and scope of the contribution}
+\label{sec:related}
+
+\paragraph{Equilibration and numerical reliability.}
+Diagonal scaling is an established numerical intervention. Classical methods include
+the logarithmic scaling of Curtis and Reid \cite{curtis1972scaling}; the computational
+comparison by Elble and Sahinidis \cite{elble2012scaling} shows that additional
+complexity does not necessarily improve simplex performance over simple
+equilibration. Klotz \cite{klotz2014numerics} explains how finite precision,
+ill-conditioning and formulation choices produce inaccurate or inconsistent LP and
+MIP results. These precedents motivate separate measurements of coefficient
+magnitudes, numerical reliability and computational effort. Neither the validity of
+positive row scaling nor the observation that conditioning and runtime can disagree
+is a contribution of the present work.
+
+Optimal diagonal preconditioning is a broader problem than coefficient centering.
+Qu et al. \cite{qu2024diagonal} formulate condition-number minimization through
+quasiconvex and semidefinite optimization, and Demmel \cite{demmel2023block}
+provides guarantees for block-Jacobi scaling. The scalar triangular calculation
+below is a tractable special case used to explain the coupling-kernel mechanism;
+it is not a general optimal-preconditioning algorithm.
+
+Robustness also has a direct antecedent in MIP scaling. Berthold and Hendel
+\cite{berthold2021scaling} select between standard and Curtis--Reid scaling in
+Xpress by learning an indicator of numerical difficulties, rather than optimizing
+runtime alone. Their implementation uses power-of-two factors and their evaluation
+includes inconsistencies across seeds. We instead study an external rule with explicit
+row-level admissibility conditions. Its conditions concern a declared residual budget
+and coefficient window; they do not predict the solver's numerical behavior or
+replace its internal scaling.
+
+\paragraph{Scaling at the modeling layer.}
+User-defined scaling is supported by modeling environments: Pyomo's
+\texttt{ScaleModel} applies factors attached to model components
+\cite{pyomoScaleModel}, and GAMS provides equation and variable scale attributes
+\cite{gamsScaling}. IDAES goes further by storing factors within the owning blocks,
+deriving constraint scales from variable and expression scales, and providing
+propagation between submodels \cite{idaesScaling,idaesCustomScaler}. Graph-based
+modeling in Plasmo.jl likewise preserves local problems and linking constraints
+\cite{jalving2022plasmo}. Thus using generator information before solver invocation
+is established practice. In the setting considered here, the additional input is a
+declared budget for each original residual. A row's block label or coefficient norm
+alone does not determine that budget.
+
+\paragraph{Tolerances and application units.}
+Gurobi's numerical guide explains that its feasibility and integrality tolerances
+are absolute, and that very small constraint coefficients may be discarded
+\cite{gurobiScaling}. Its modeling guidance explicitly recommends external scaling
+that makes tolerance-sized violations negligible in the application
+\cite{gurobiExternalScaling}. Tolerance-based constraint scaling also appears
+outside MIP: Pritchett, Howell and Grebow \cite{pritchett2017scaling} choose scales
+from the ratio between a desired physical accuracy and SNOPT's feasibility
+tolerance. The elementary transfer of a residual budget through a positive row
+factor therefore has clear precedent.
+
+The construction in Section~\ref{sec:contract} combines this transfer with a
+prescribed coefficient window. It characterizes the admissible factors, gives the
+constrained geometric-mean choice, and distinguishes two reasons why a row-only
+intervention cannot satisfy the requested specifications. Its integer-rounding
+extension isolates a further error term that is unaffected by row scaling. These
+results organize familiar numerical ingredients into a checkable contract; the
+empirical question is whether that contract and its abstention cases improve the
+interpretation and reliability of preprocessing decisions. No general superiority
+over existing scaling methods follows from the characterization.
+
+\paragraph{Checking results and checking attribution.}
+Independent verification of MIP results is a broader task. Cheung, Gleixner and
+Steffy \cite{cheung2017certificates} introduce certificates for checking claimed
+integer-programming results, while Hoen and Gleixner \cite{hoen2024correctness}
+analyze the numerical correctness of individual branch-and-bound decisions.
+The exact original-data residual checks used here address primal acceptance;
+they do not certify a solver's global lower bound. Optimality is checked separately
+by enumeration only on our small stress instances.
+
+The archived experiments provide a complementary attribution study. A change in
+row coverage or in the norm used on linking rows can explain a difference initially
+ascribed to block information. We therefore compare actual transformations under
+matched coverage and kernels, including algebraic simplification and export
+identity checks. The resulting conclusions concern the mechanisms and instance
+families tested, rather than an impossibility of useful structure-aware scaling.

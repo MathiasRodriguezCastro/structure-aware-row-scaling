@@ -1,0 +1,799 @@
+     Identifiability and Feasibility Budgets in Pre-Export Row Scaling for
+                            Mixed-Integer Programs
+                                           Mathias Rodríguez Castro
+                    Facultad de Ingeniería, Universidad de la República, Montevideo, Uruguay
+                                              mathiasr@fing.edu.uy
+
+
+                                                      Abstract
+               Positive row scaling preserves a mixed-integer linear program in exact arithmetic, but an
+          observed numerical improvement need not identify the information used to select the factors.
+          We analyze a local–block–coupling construction and prove that geometric-mean row centering
+          can erase its block-scale information exactly. With a near-identity band, the remaining scale
+          information is bounded independently of the original heterogeneity. A matched kernel control
+          explains an apparent order-of-magnitude spectral improvement without using block scales. We
+          then characterize the positive row factors compatible with an explicit original-unit residual budget
+          and a coefficient window. The admissible set is an interval; constrained geometric-mean centering
+          is its logarithmic minimax solution, and an empty interval provides an explicit incompatibility
+          certificate. An integer-rounding bound isolates an error that scaling cannot suppress, and a
+          discrete characterization selects exactly representable power-of-two exports. A reconstruction
+          of 240 dispatch runs separates completed-run effort from failures, and 3,456 configurations of
+          exactly enumerable binary stress instances distinguish conditional row guarantees from solver
+          behavior. Budget projection improves verification on HiGHS in this stress experiment, but does
+          not establish a solver-independent advantage; a rounding-aware contract trades acceptance for
+          conservative abstention. The results provide precise controls for attributing scaling gains and for
+          stating what a numerical scaling policy can actually guarantee.
+
+ 1   Keywords: mixed-integer linear programming; row scaling; numerical reliability; equilibration;
+ 2   residual budgets; computational reproducibility.
+
+
+ 3   1    Introduction
+ 4   Model generators retain variable ownership, constraint roles and application units that a conventional
+ 5   matrix export may discard. Such information can guide scaling, but its presence in an algorithm does
+ 6   not establish that it affects the exported matrix. Row coverage, normalization kernels, safeguards
+ 7   and metadata can change together, confounding the interpretation of a numerical improvement.
+ 8       In mixed-integer linear programming (MILP), positive row scaling preserves the exact feasible
+ 9   set while changing the representation seen by presolve, relaxation solves and integer acceptance
+10   tests. Coefficient magnitudes, matrix condition numbers, original-data residuals and running time
+11   are therefore distinct outcomes. We study which generator information remains identifiable after
+12   preprocessing and which numerical guarantees can be stated independently of solver behavior.
+13       First, we analyze a local–block–coupling construction whose block statistic is the geometric mean
+14   of the smallest and largest post-local coefficient magnitudes. Exact geometric-mean row centering
+15   makes every such statistic one; an identity band permits only bounded variation. A matched
+16   Euclidean coupling-row control then explains an apparent block-metadata benefit. Counterexamples
+17   and direct export comparisons delimit the result when practical safeguards intervene.
+
+                                                           1
+18       Second, an original-unit residual budget supplies information that survives a change of row
+19   units when transformed with the row. We characterize the factors that combine this budget with
+20   coefficient limits, derive the constrained logarithmic minimax factor, and extend admissibility to
+21   integer rounding and exact power-of-two export. An empty admissible set certifies incompatible
+22   numerical specifications, not MILP infeasibility. Solver acceptance remains a separate question.
+23       The evidence combines a controlled matrix audit, reconstructed dispatch measurements, and
+24   exactly enumerable binary stress instances. Direct tolerance scaling and matched kernel controls
+25   prevent crediting the proposed construction with benefits already explained by simpler rules. The
+26   contribution is a characterization and reproducible audit of these mechanisms, with explicit limits
+27   on the guarantees.
+
+
+28   2    Related work
+29   Diagonal scaling has a long history, including the logarithmic method of Curtis and Reid [3]. Elble
+30   and Sahinidis [5] compare scalers for simplex and find that additional complexity need not improve
+31   performance. Klotz [14] relates numerical instability to formulation and finite precision. Optimal
+32   diagonal preconditioning is a broader problem: Qu et al. [17] use quasiconvex and semidefinite
+33   formulations, while Demmel [4] gives block-Jacobi guarantees. Our triangular calculation is an
+34   explanatory scalar special case, not a general preconditioning algorithm.
+35       Robustness is also an established objective in MIP scaling. Berthold and Hendel [1] learn to
+36   select between standard and Curtis–Reid scaling in Xpress from an indicator of numerical difficulties.
+37   Their implementation uses power-of-two factors and their evaluation examines inconsistencies across
+38   seeds. Our external construction instead states row-level admissibility conditions; it does not predict
+39   or replace internal solver scaling.
+40       Modeling environments already support generator-level information: Pyomo’s ScaleModel
+41   applies component factors [16], GAMS has variable and equation scale attributes [6], and IDAES
+42   derives and propagates scales across submodels [10, 11]. Plasmo.jl retains local problems and linking
+43   constraints [13]. Consequently, using modeling metadata before export is not new. Our identifiability
+44   result concerns the loss of one specific block statistic after a preceding normalization.
+45       Tolerance-based scaling also has direct precedent. Gurobi documents absolute feasibility/integrality
+46   tolerances and the treatment of very small coefficients [7], and recommends external scaling that
+47   makes tolerance-sized violations negligible in application units [9]. Pritchett, Howell and Grebow [15]
+48   similarly scale constraints using physical accuracy requirements and SNOPT’s tolerance. Section 5
+49   combines this known transfer with coefficient limits, identifies incompatible specifications, and solves
+50   the constrained centering problem. Integer rounding and exact binary64 export impose additional
+51   restrictions.
+52       Finally, Cheung, Gleixner and Steffy [2] provide certificates for integer-programming results, and
+53   Hoen and Gleixner [8] analyze individual branch-and-bound decisions. Our rational residual checks
+54   concern primal acceptance; independent enumeration establishes optimality only on the small binary
+55   instances. The complementary attribution audit checks actual exports under matched kernels and
+56   coverage. These contributions concern identifiable mechanisms and explicit numerical contracts,
+57   without claiming universal performance superiority.
+
+
+58   3    Model, policies and comparisons
+59   Consider
+                         min cT x   subject to Ax ≤ b,       l ≤ x ≤ u,   xj ∈ Z (j ∈ J).
+
+
+                                                         2
+     Table 1: Controls for the coefficient-only construction. Row eligibility and safeguards must also be
+     matched for the indicated comparison. A role map and a block-scale map are separate information
+     sources.
+      Policy         Local rows                    Coupling rows                Information used
+      Base           None                          None                         None
+      Flat-GM        GM                            GM                           Row coefficients
+      Flat-L2        L2                            L2                           Row coefficients
+      Role-Hybrid    GM                            L2                           Row roles, coefficients
+                                                   hP                   i−1/2
+                                                                      2
+      SA-Mat         GM                               j (arj /sβ(j) )           Roles, block scales, owner-
+                                                                                ship
+      SA-Pre         GM                            Same expression, pre-local   Roles, original block scales
+                                                   scales
+
+
+60   Equalities and opposite inequality senses are allowed. For a positive diagonal matrix Dr , replacing
+61   (A, b) by (Dr A, Dr b) preserves every constraint, variable domain and objective value in exact
+62   arithmetic. It is essential to multiply the whole row, including its right-hand side, by the same
+63   positive number. Dividing different coefficients of a coupling row by different block scales is not a
+64   row scaling and is outside this equivalence statement.
+65       Let the generator provide a fixed partition of the local rows into nonempty blocks, a coupling-row
+66   set, and a column-to-block map β. Coverage specifies which rows are eligible for scaling; a kernel
+67   maps eligible row data to a candidate factor; safeguards decide which factors are applied. These are
+68   separate choices. A block map can influence the factors even when coverage and kernels are fixed,
+69   but only if the block summaries retain information and are actually used.
+70       For a nonzero row, put mr = minarj ̸=0 |arj | and Mr = maxj |arj |. The geometric-mean (GM)
+71   factor is (mr Mr )−1/2 ; the Euclidean (L2) factor is 1/∥ar ∥2 . Both are coefficient-only rules. Calling
+72   them “the same kernel” because neither uses the RHS is incorrect. The following comparisons keep
+73   this distinction visible.
+74       The direct test of the block scales is SA-Mat versus Role-Hybrid at matched coverage and
+75   safeguards. Flat-L2 also changes the local kernel, whereas Flat-GM changes the coupling kernel.
+76   Relabeling blocks without changing their assignments is an invariance check. Permuting the
+77   assignment of unequal scales is a different intervention: it tests the usefulness of the map on the
+78   chosen instances, and is not assumed to preserve semantic validity.
+
+
+79   4     Identifying the contribution of structural metadata
+80   An external scaling policy may use a row’s coverage status, a kernel selected by its role, and the
+81   ownership of its columns. These are distinct inputs. A comparison identifies the contribution
+82   of block ownership only when coverage, the row-role assignment, and the kernels remain fixed.
+83   Matching the local kernel alone does not meet this condition. This distinction has a particularly
+84   strong consequence for the post-normalization block statistic used by the original policy.
+
+85   4.1    Collapse of post-normalization block centers
+86   For each nonzero local row r, write mr and Mr for its smallest and largest nonzero coefficient
+87   magnitudes. The coefficient geometric-mean kernel applies dr = (mr Mr )−1/2 . Let m
+                                                                                       e r = dr mr and
+
+
+
+
+                                                          3
+88    M
+      fr = dr Mr denote the exported extrema. For a nonempty set I of local rows, define
+                                                     s                          
+                                              sI =       min m
+                                                             er                fr .
+                                                                           max M
+                                                          r∈I              r∈I
+
+89    This definition uses all coefficients, including the row extrema.
+90    Proposition 4.1 (Exact collapse and the effect of a skip band). If every row receives its geometric-
+91    mean factor, then sI = 1 for every nonempty grouping I of local rows. More generally, suppose
+92    the only safeguard is to replace dr by 1 when its candidate belongs to (1/u, u), where u ≥ 1. Then
+93    sI ∈ [1/u, u], independently of the original coefficient scales and of the grouping of the rows.
+                                                      p
+94    Proof. Under exact normalization, m
+                                        er =              mr /Mr q
+                                                                 = 1/M
+                                                                     fr . Consequently minr m
+                                                                                            e r = 1/ maxr M
+                                                                                                          fr ,
+
+95    proving the first statement. For the second, let cr = m e rM
+                                                                 fr . An accepted row has cr = 1; a skipped
+                     √
+96    row has cr = mr Mr ∈ (1/u, u). Thus u−2 ≤ m           fr ≤ u2 for every row. Choose p attaining the
+                                                         e rM
+97    maximum exported row magnitude and q attaining the minimum. Then
+                                     u−2 ≤ m  fq ≤ m
+                                           e qM       fp ≤ m
+                                                   e qM       fp ≤ u2 .
+                                                           e pM
+98    Taking square roots gives the result.
+99       For a coupling row ar , let β(j) assign column j to a local block, and define the block-weighted
+100   candidate and its ownership-blind counterpart by
+                                                         −1/2                                 −1/2
+                                          X                                             X
+                            γrblock =        a2rj /s2β(j)           ,     γrL2 =           a2rj      .
+                                          j                                             j
+
+101   Blockless columns may use an arithmetic mean of valid block scales or the unit fallback; both
+102   conventions preserve the interval in the preceding proposition.
+103   Proposition 4.2 (Loss of ownership information). Under exact local normalization and with no
+104   coefficient filtering, γrblock = γrL2 for every coupling row. Thus changing the block ownership map
+105   cannot change the candidate export. Applying the same coupling safeguards to the identical
+106   candidates preserves equality. Under the skip-band assumptions of Proposition 4.1,
+                                                                γrblock
+                                                     u−1 ≤              ≤ u.
+                                                                 γrL2
+107   Before coupling safeguards, the condition numbers of the two exports differ by at most a factor u2 ,
+108   on their common nonzero singular spectrum.
+109   Proof. The equality follows by substituting si = 1. In the second case,
+                                      u−2 ∥ar ∥22 ≤
+                                                          X
+                                                                a2rj /s2β(j) ≤ u2 ∥ar ∥22 ,
+                                                           j
+
+110   which gives the factor bound. Write the block-based export as EAL2 , where E has unit entries on
+111   local rows and entries in [1/u, u] on coupling rows. Multiplication by E changes each singular value
+112   by a factor between 1/u and u and preserves rank. Applying these inequalities to the largest and
+113   smallest positive singular values in both directions proves the condition-number bound.
+114      Coefficient-window vetoes and filtering must be audited separately: they are outside the hy-
+115   potheses. Even exact row normalization does not preserve the reciprocity argument if the block
+116   summary discards extrema. For example, a row with magnitudes (10−8 , 3, 108 ) is geometrically
+117   centered, but restricting the summary to (10−6 , 106 ) produces sI = 3. Such a nonunit statistic arises
+118   from the filter. It cannot, by itself, be interpreted as retained physical scale.
+
+                                                                  4
+119   4.2   What a matched comparison identifies
+120   With equal coverage and equal local kernels, two exports agree on their local rows. Their differences
+121   are confined to the coupling rows. This elementary localization result does not establish that
+122   the difference is due to block ownership: the coupling kernels may differ too. An appropriate
+123   ownership control keeps local geometric-mean normalization and coupling Euclidean normalization,
+124   but replaces all block scales by one. A separate role control compares this hybrid policy with
+125   Euclidean normalization on every row. Comparing only with geometric-mean normalization on
+126   every row mixes role-dependent kernel selection with ownership information.
+127       Inactivity of one policy’s coupling stage does not imply equality with a flat policy. Consider
+128   local rows x1 ≤ 1, x2 ≤ 1, and the coupling inequality x1 + 10−2 x2 ≤ 1. Both local blocks have scale
+129   one. The Euclidean coupling candidate is (1 + 10−4 )−1/2 and is skipped by the band (1/2, 2). The
+130   flat geometric-mean candidate is 10 and is applied. Both policies cover all rows, yet their coupling
+131   exports differ. Equality requires equality of the actually applied factors, rather than inactivity of
+132   just one policy.
+
+133   4.3   A valid explanation of the stylized spectral slope
+134   Take B ≥ 2 local singleton rows with positive coefficients vi = 10ei , where mini ei = −R and
+135   maxi ei = R, and one coupling row v ⊤ . Exact local normalization produces IB and unit post-local
+136   block centers. A whole-row coupling factor γ gives
+                           "    #
+                           IB
+                                                                                   q
+                     Aγ =      ,          A⊤            2 ⊤
+                                           γ Aγ = IB + γ vv ,         κ2 (Aγ ) =    1 + γ 2 ∥v∥22 .
+                          γv ⊤
+
+137   Flat geometric-mean normalization selects γ = 1, whereas both the post-local block rule and the
+138   hybrid Euclidean control select γ = 1/∥v∥2 . Their condition numbers are therefore
+                                      s     X                                               √
+                        κ2 (AGM ) =   1+         102ei ,   κ2 (Ablock ) = κ2 (Ahybrid ) =       2.
+                                             i
+
+139   For fixed B, the ratio is of order 10−R . The slope is explained by the coupling kernel and survives
+140   removal of the ownership map. Every coupling coefficient is multiplied by the same γ, and all
+141   within-row ratios are preserved. Replacing vi individually by vi /10ei would change the constraint
+142   and is not a row-scaling operation.
+143       The matrix Aγ also illustrates a limitation of this spectral endpoint: letting γ tend to zero
+144   drives κ2 to one while allowing an arbitrarily large original-row residual under a fixed exported
+145   residual budget. Thus minimizing this rectangular-matrix condition number alone does not enforce
+146   the intended numerical accuracy of the coupling constraint.
+
+147   4.4   Exact scalar optimization in the triangular model
+148   The idealized triangular model also admits a useful closed form that requires no ownership map
+149   after local whitening. It describes a common coupling factor, not the per-row optimum for a general
+150   generated MIP.
+151   Proposition 4.3 (Optimal common coupling factor after local whitening). Let R ∈ Rm×n , with
+152   m, n ≥ 1, and set ρ = ∥R∥2 . For
+                                                  "            #
+                                               I   0
+                                          Cγ = n      ,             γ > 0,
+                                               γR γIm
+
+                                                           5
+153   the unique factor minimizing κ2 (Cγ ) is
+                                                                          q
+                                            2 −1/2
+                               γ∗ = (1 + ρ )         ,   min κ2 (Cγ ) =       1 + ρ2 + ρ.
+                                                         γ>0
+
+154   With an admissible interval 0 < ℓ ≤ γ ≤ h, the optimum is min{h, max{ℓ, γ∗ }}.
+155       The proof in Online Resource 1 reduces the spectrum by an SVD to two-by-two blocks. For the
+156   block at ρ, the singular-value ratio k satisfies k + k −1 = γ −1 + γ(1 + ρ2 ), whose unique minimizer
+157   gives the result.
+158       For a single coupling row, γ∗ normalizes that complete row’s Euclidean norm, including the
+159   aggregate-variable coefficient. This provides an exact kernel explanation of the idealized conditioning
+160   improvement. It is not a guarantee about LP bases, presolve transformations, or mixed-integer
+161   runtime.
+
+
+162   5    Equilibration with an explicit residual budget
+163   Block ownership is not the only information a generator can supply. An application can also state
+164   how much violation of each original constraint is acceptable. Such a budget must come from the
+165   application or be declared as a numerical test parameter; it cannot be inferred reliably from a zero
+166   right-hand side or a block label. Scaling to make solver tolerances meaningful is established practice
+167   [7, 11]. The contribution of the following construction is an explicit feasibility test and an optimality
+168   characterization for combining that budget with coefficient limits, including a reason to abstain.
+169       For a nonconstant row aT x ≤ b, define the original residual v(x) = (aT x − b)+ and specify a
+170   budget δ > 0. Let ϵ > 0 be a hypothetical bound on the residual of the exported row. A solver’s
+171   feasibility parameter alone does not establish this hypothesis: internal scaling, presolve, integrality
+172   tolerances and finite precision intervene. For a positive row factor α, the identity
+                                               (αaT x − αb)+ = αv(x)                                        (1)
+173   holds in exact arithmetic. Consequently, the hypothesis of exported residual at most ϵ implies
+174   v(x) ≤ δ whenever α ≥ ϵ/δ. Absolute residuals give the same identity for equality constraints.
+175       Write m = minaj ̸=0 |aj | and M = maxj |aj |, and specify coefficient limits 0 < ℓ ≤ U . These
+176   bounds concern the constraint matrix, not variable domains, objective coefficients or the right-hand
+177   side. If an RHS magnitude limit Ub is also required, intersect the upper bound below with Ub /|b|
+178   for b ̸= 0.
+179   Proposition 5.1 (Feasibility and optimal constrained centering). The factors that place every
+180   nonzero coefficient in [ℓ, U ] and satisfy ϵ/α ≤ δ form exactly the interval
+                              I = [L, H],        L = max{ϵ/δ, ℓ/m},            H = U/M.                     (2)
+181   The interval is nonempty if and only if
+                                         M/m ≤ U/ℓ           and   δ ≥ ϵM/U.                                (3)
+182   When it is nonempty, the unique minimizer of
+                                               min max | log(α|aj |)|                                       (4)
+                                                α∈I aj ̸=0
+
+183   is
+                                       α∗ = min{H, max{L, (mM )−1/2 }}.                                     (5)
+184   If L > H, no positive row factor meets both requirements.
+
+                                                             6
+185   Proof. The coefficient bounds are equivalent to αm ≥ ℓ and αM ≤ U . Together with αδ ≥ ϵ they
+186   give (2). The condition L ≤ H is equivalent to the two inequalities in (3). To solve the objective, put
+187   t = log α, q = (log m + log M )/2 and h = (log M − log m)/2. Since the extreme absolute logarithms
+188   occur at an endpoint,
+                         max |t + log |aj || = max{|t + log m|, |t + log M |} = h + |t + q|.
+                           j
+
+189   The unique minimizer on [log L, log H] is the projection of −q onto that interval. Exponentiating
+190   gives (5).
+191       Thus the rule optimizes a coefficient-centering criterion; it does not minimize a condition number
+192   or predict running time. The two causes of abstention have different interpretations. A within-row
+193   ratio exceeding U/ℓ cannot be repaired by row scaling. A budget below ϵM/U conflicts with the
+194   prescribed coefficient ceiling even if the row is perfectly balanced. Returning the base row does not
+195   resolve either conflict and must not be reported as satisfying the contract. The test identifies an
+196   incompatibility among numerical specifications, not an infeasible optimization model. Revising the
+197   units, limits or formulation requires a separate decision.
+198   Corollary 5.2 (Invariance under positive re-emission). Replace (a, b, δ) by (qa, qb, qδ) for any q > 0,
+199   keeping ϵ, ℓ, U fixed. The interval becomes I/q, abstention is unchanged, and the selected factor
+200   becomes α∗ /q. The exported row and the budget-normalized original residual v(x)/δ are therefore
+201   unchanged.
+202   Proof. Both coefficient extremes and the original budget acquire the factor q. Each term defining L,
+203   H and (mM )−1/2 is divided by q. Equation (1) gives the residual statement.
+204       This invariance is lost if the row is re-emitted but its budget is not transformed with it. It also
+205   distinguishes a budget in canonical units from a fixed cutoff on the scaling factor itself. Restricting
+206   factors to powers of two can avoid additional rounding in multiplication when no underflow or
+207   overflow occurs, but this familiar technique [1] preserves the stated invariance only for power-of-two
+208   re-emissions, subject to representability. The dyadic construction below explicitly checks those
+209   arithmetic restrictions.
+
+210   5.1   The part that row scaling cannot fix: integer rounding
+211   Let J be the integer columns and let x̄ be obtained by rounding only these coordinates of x. Suppose
+      |x̄j − xj | ≤ ηj for j ∈ J and put E = j∈J |aj |ηj . The triangle inequality and (1) give the useful
+                                              P
+212
+
+213   but conditional bound
+                                                 v(x̄) ≤ ϵ/α + E.                                      (6)
+214   It applies to equalities with absolute residuals as well. The two terms have different behavior:
+215   changing the row factor can reduce the exported-residual term, whereas it leaves the amplification
+216   of integer rounding in original units unchanged. The scalar normalization of a big-M row therefore
+217   cannot, by itself, remove the effect of an integrality tolerance on that row.
+218       For a contract based on the worst-case bound (6), Proposition 5.1 applies after replacing δ by
+219   δ − E, provided δ > E. If δ ≤ E and ϵ > 0, no positive factor satisfies this worst-case contract.
+220   This does not say that every returned solution will violate its budget: actual rounding errors may
+221   be smaller or cancel, and other constraints can exclude the worst case. It says that the stated
+222   information is insufficient to certify it. Re-emission invariance still holds because E transforms to
+223   qE. A tighter integrality bound or a reformulation can reduce E; pure row scaling cannot. This
+224   distinction prevents the row-only guarantee from being mistaken for a guarantee about a rounded
+225   MIP solution.
+
+                                                         7
+226   5.2   An exact export on a dyadic grid
+227   Even when a factor satisfies the real-arithmetic interval, independently rounded products fl(αaj )
+228   and fl(αb) need not describe an exactly proportional row over the stored data. Merely rounding a
+229   computed endpoint to nearest can also move it outside a closed admissible interval. Our arbitrary-
+230   factor implementation forms the interval endpoints as exact rational numbers in the supplied
+231   binary64 inputs and rounds them inward; it abstains if the interval contains no positive binary64
+232   factor. This certifies factor admissibility, not exactness of all subsequent products.
+233       Powers of two provide an established way to avoid multiplication rounding. The following
+234   explicit intersection also accounts for subnormal numbers and for the RHS. Assume IEEE binary64
+235   arithmetic with gradual underflow [12]. Write each nonzero datum z ∈ {a1 , . . . , an , b} uniquely as
+236   z = sign(z)Nz 2pz with Nz a positive odd integer, and put qz = ⌊log2 |z|⌋. Let [L, H] be the desired
+237   real factor interval, including any rounding allowance from (6).
+
+      Proposition 5.3 (Exact dyadic admissibility). A factor α = 2k is positive and representable in
+      binary64, belongs to [L, H], and multiplies every nonzero coefficient and the RHS exactly into a
+      finite binary64 value if and only if the integer k satisfies
+                                         n                                   o
+                             K− = max −1074, ⌈log2 L⌉, max(−1074 − pz ) ≤ k,
+                                                             z
+                                               n                                 o
+                                k ≤ K+ = min 1023, ⌊log2 H⌋, min(1023 − qz ) .
+                                                                  z
+
+238   If K− > K+ there is no such factor. Otherwise an exponent nearest to − 12 log2 (mM ) among the
+239   integers in [K− , K+ ] minimizes the logarithmic coefficient objective (4) on this exact-export set. A
+240   tie may be resolved by choosing the larger factor.
+
+241   Proof. The factor itself requires −1074 ≤ k ≤ 1023. Since the datum’s odd significand is unchanged,
+242   the product Nz 2pz +k lies on the subnormal grid exactly when pz + k ≥ −1074; its highest bit stays
+243   below overflow exactly when qz + k ≤ 1023. The original significand has at most 53 bits, so these
+244   two conditions are also sufficient. Intersecting them over the row data and with L ≤ 2k ≤ H gives
+245   the interval of integer exponents. The objective is 12 log(M/m) + |k log 2 + 12 log(mM )|, proving the
+246   nearest-exponent claim.
+
+247       The implementation obtains the endpoint exponents using integer ratios and bit lengths, and
+248   checks the rounded products against exact rational products. A round-trip decimal serializer is
+249   necessary if the row is subsequently written to a text file: fixed decimal places can discard small
+250   values even when the multiplication is exact. These checks concern the represented mathematical
+251   model. They still do not guarantee that the solver will return an acceptable point.
+
+252   Verification after solving. The interval theorem is conditional and exact-arithmetic. Every
+253   returned point must still be checked against the original rows, bounds and integrality restrictions.
+254   Our small stress experiments compute row residuals by exact rational arithmetic on the supplied
+255   binary64 coefficients and returned solution. They also enumerate the binary assignments to determine
+256   the optimum independently. These checks are possible because those instances are deliberately small.
+257   On large dispatch models the archived checker uses floating-point residuals, which are diagnostics
+258   rather than a proof of MIP optimality. General certificates of branch-and-bound correctness address
+259   a much stronger task [2].
+
+
+
+
+                                                        8
+260   6     Computational design
+261   6.1   Matrix attribution audit
+262   The C++ generator constructs local blocks and coupling rows while retaining their row roles and
+263   column ownership. The archived headline cell uses four heterogeneous blocks, coefficient exponent
+264   range [−2, 2], coupling disturbance severity 6, and 30 seeds. All policies in table 1 are available
+265   in the same implementation. Their exported matrices allow a comparison before any optimizer
+266   is called. The analysis records spectral pseudo-condition numbers and direct export comparisons;
+267   equal condition numbers alone are not evidence of identical matrices.
+268       The spectral diagnostic is κ+                        +
+                                         2 (A) = σmax (A)/σmin (A), where numerical rank is determined
+269   relative to the largest singular value. It is a diagnostic of the exported constraint matrix, not of the
+270   active basis at every node. Variable bounds, redundant rows and slack conventions can change its
+271   interpretation. A condition-number ratio is never used as a proxy for verified solver success.
+
+272   6.2   Operational reconstruction
+273   The operational case study uses the final four-arm campaign from the dispatch repository: Base,
+274   Flat-GM, Flat-L2 and Role-Hybrid; 15 instances from each of the Simple and SG-Ter-Mer families;
+275   Gurobi; relative MIP gaps 1% and 0.1%; seed 42; 16 threads; and a 1,800-second solver limit. The
+276   fixed subsets are retained rather than reselected after inspecting outcomes. This gives 240 assigned
+277   runs. We retrieved all native logs from the cluster and preserved input hashes.
+278       The primary runtime endpoint is arithmetic mean PAR10 over all 15 assigned instances per cell,
+279   with 18,000 seconds assigned to a non-completion. This measures solver completion rather than
+280   independently certified feasibility. Native logs recover Work at a common resolution of 0.01 units;
+281   the archived runner had accidentally rounded scaled-variant markers to integers. Work is analyzed
+282   separately on the common all-variants-completed pool, with exploratory paired bootstrap intervals.
+283   Online Resource 1 specifies the reconstruction, resolution sensitivity and residual checks. The
+284   selected pools and repeated instances across gap settings do not constitute independent replications
+285   of general solver performance.
+
+286   6.3   Enumerated residual-budget stress experiment
+287   We construct three binary families with 12 variables: a cardinality row, three positive packing rows,
+288   and three rows with signed integer coefficients. Profits are positive integers. If W is the integer
+289   matrix and k an integer capacity vector, the canonical constraints are
+
+                           10e W x ≤ 10e k − 0.1 1,     x ∈ {0, 1}12 ,   e ∈ {0, 3, 6, 9}.                (7)
+
+290   For these exponents the exact binary feasible set is W x ≤ k − 1. Thus changing e changes the
+291   numerical representation and continuous relaxation while preserving the binary feasible set. It is not
+292   pure row re-emission, because the absolute margin 0.1 remains fixed. The corresponding distinction
+293   is intentional: it exposes integer acceptance near a facet without changing the binary optimum.
+294        The budget is 0.01 in the canonical row’s units. These are declared stress-test units, not
+295   engineering tolerances inferred from the dispatch data. Eight seeds, 100–107, were reserved after
+296   a one-seed exploratory pilot; all four exponents and all three families are retained. Both presolve
+297   settings are run on HiGHS 1.15.1 and Gurobi 13.0.2, with one thread, zero target MIP gap, a
+298   ten-second limit, and primal/integrality tolerances 10−6 . The nine policies give 3,456 planned
+299   configurations. Budget-round abstains on 288 of them, leaving 3,168 optimizer calls.
+
+
+                                                         9
+300       Base, GM and L2 have their definitions in table 1, with full coverage and no identity-band veto
+301   in this experiment. GM-tight uses GM and tightens both tolerance settings to 10−9 . Budget-only
+302   uses the established direct factor ϵ/δr . Budget-GM uses proposition 5.1, coefficient limits [10−9 , 109 ]
+      and ϵ = 10−6 . Budget-round additionally reserves Er = 10−6 j |arj | for rounding and abstains
+                                                                         P
+303
+
+304   on the whole model if any row has an empty interval. Abstention is counted separately, not as a
+305   successful solve. Dyadic-GM uses a power-of-two GM factor with coefficient limits and an exact
+306   binary64 export; Budget-dyadic additionally imposes the row budget through Proposition 5.3. These
+307   two arms were added after inspecting the floating-point endpoint issue in the initial run. They are
+308   an explicitly exploratory arithmetic sensitivity, not an independent holdout. The original seven
+309   arms are retained with the corrected endpoint implementation and unchanged instance seeds.
+310       All 212 assignments are enumerated to obtain the binary optimum. The script checks that each
+311   stored binary64 RHS lies strictly between the two adjacent scaled integer activities used in that
+312   argument. Returned solutions, row factors and generated data are saved. Original row residuals are
+313   evaluated as exact rational expressions in the stored binary64 data. A verified optimum requires a
+314   feasible rounded binary assignment with the enumerated objective, valid original variable bounds,
+315   and a returned point within 10−9 of its rounded assignment. We also record residual budgets and
+316   integrality errors separately. This conservative acceptance rule is declared independently of the
+317   solver’s status; a rejected approximately integral point is not automatically a solver implementation
+318   error.
+319       This experiment tests a failure mechanism. It is too small and deliberately too close to integer
+320   feasibility boundaries to estimate practical runtime or failure rates on industrial MILPs. Counts are
+321   descriptive, and no significance tests treat the repeated solver settings on a generated instance as
+322   independent samples.
+
+
+323   7     Results
+324   7.1   A kernel effect mistaken for a block effect
+325   In the archived heterogeneous headline cell, the median spectral diagnostic is 5.30 × 108 for Base,
+326   1.36 × 104 for Flat-GM, 1.33 × 103 for SA-Mat and 4.68 × 102 for Flat-L2. The ratio of Flat-GM to
+327   SA-Mat is about 10.2. That comparison changes the coupling kernel. Role-Hybrid matches SA-Mat
+328   in the 30 archived spectral records, and permuting the block-scale assignments leaves the same
+329   diagnostic. The collapse result explains why the block-relative formula becomes an ordinary L2
+330   normalization in this regime. Flat-L2’s smaller diagnostic does not establish a better MIP policy: it
+331   changes local normalization as well and requires a separate solve/verification evaluation.
+332       Using pre-local block scales does not rescue a positive metadata claim on these instances. SA-Pre
+333   is worse than Role-Hybrid on all 30 archived instances, with a median paired condition-number
+334   ratio about 4.27. In the exhaustive 24-permutation assignment sweep, the true scale assignment is
+335   never the best; its median rank is 18. These are falsification results for this choice of summary and
+336   benchmark. They are not a theorem that semantic metadata or all block-based preconditioners are
+337   useless.
+
+338   Fresh exports with matched controls. The new replication uses ten seeds, 20260909–20260918,
+339   at each of three exponent ranges, two severities and three coupling patterns: 180 generated instances
+340   and 1,080 exports. The corrected serializer preserves binary64 values on readback, including
+341   coefficients, RHS values and bounds. All exports preserve named structure and pass the whole-row
+342   proportionality check at relative tolerance 10−13 . This is a floating-point transformation audit, not
+343   an exact rational equivalence certificate.
+
+                                                         10
+      SA-Mat / control: condition-number ratio             (a) Different coupling kernels                                                                                (b) Matched kernels
+
+
+
+
+                                                                                                          SA-Mat / control: condition-number ratio
+                                                                                                                                                     1.100
+                                                                                                                                                                                 Control
+                                                 100                                                                                                 1.075                       Role-Hybrid
+                                                                                                                                                                                 SA-Mat-permB
+                                                                                                                                                     1.050
+
+                                                                                                                                                     1.025
+                                                 10−1
+                                                                                                                                                     1.000
+
+                                                                                                                                                     0.975
+
+                                                        Control                                                                                      0.950
+                                                 10−2
+                                                           Flat-GM
+                                                                                                                                                     0.925
+                                                        [-1,1]                  [-2,2]           [-3,3]                                                      [-1,1]                [-2,2]           [-3,3]
+                                                                 Original block exponent range                                                                        Original block exponent range
+
+
+      Figure 1: Fresh matrix audit. Each exponent range contains 60 generated instances. The left
+      comparison changes the coupling kernel; the right comparisons hold the kernels fixed and remove
+      or permute block-scale information. Marks show individual ratios with deterministic horizontal
+      jitter; short horizontal segments are medians. The panels use different vertical scales to expose the
+      remaining small differences.
+
+
+344       SA-Mat and Role-Hybrid are byte-identical on 136 of 180 instances; SA-Mat and its permuted-
+345   scale counterpart are byte-identical on 165. The nonidentical cases matter: the production im-
+346   plementation includes window vetoes and filtered block extrema, so the exact-collapse hypotheses
+347   need not hold universally. On the common-rank spectral diagnostic, the SA-Mat/Role-Hybrid ratio
+348   lies between 0.939 and 1.079, with median one. The scale-permutation ratio lies between 0.99962
+349   and 1.00022. In contrast, the median SA-Mat/Flat-GM ratios are 0.937, 0.102 and 0.00973 as the
+350   exponent range grows from [−1, 1] to [−3, 3]. Thus the large heterogeneity-dependent advantage is
+351   explained by the coupling kernel; the matched control reveals smaller implementation-dependent
+352   differences.
+353       Numerical rank is fixed per instance from the row-L2-normalized Base at threshold 10−12 and
+354   used for every variant. Independently thresholding each variant would give different ranks in 25
+355   of the 1,080 exports. Several unscaled matrices approach binary64 resolution, so their very large
+356   condition estimates are not interpreted quantitatively. The scaled matrices used in the paired ratios
+357   have diagnostics below 6.5 × 106 . Direct named-export comparisons carry the identity claims and
+358   do not depend on singular-value estimation.
+
+359   7.2                                           Completed-run gains and timeout-sensitive outcomes
+360   On the 14 common completed SG-Ter-Mer instances, Flat-GM/Base has Work geometric-mean
+361   ratios 0.698 and 0.682 at the two gaps. Yet instance077 completes under Base and times out under
+362   every scaled policy at both gaps, sharply reversing the fixed-pool PAR10 ordering (Online Resource
+363   1, Table S1). The Simple family also has no uniform ordering: Flat-GM reduces the arithmetic
+364   runtime summary at 1% but increases it at 0.1%. These results illustrate why completed-run effort
+365   and failure-sensitive runtime must be reported separately.
+366       Original-data residuals also require an explicit interpretation. An absolute equality residual of
+367   4.97 on a zero-RHS row in caso46e is not a 497% physical error; the same run’s maximum activity-
+
+
+                                                                                                      11
+                                 (a) HiGHS 1.15.1                             (b) Gurobi 13.0.2
+
+                 Base    48/48    48/48        44/48      27/48     48/48      48/48        30/48      30/48
+
+
+                  GM     48/48    48/48        23/48      22/48     48/48      48/48        22/48      22/48
+
+
+                   L2    48/48    48/48        23/48      22/48     48/48      47/48        22/48      22/48
+
+
+              GM-tight   48/48    48/48        48/48      22/48     48/48      48/48        48/48      22/48
+
+
+            Dyadic-GM    48/48    48/48        24/48      22/48     48/48      48/48        22/48      22/48
+
+
+         Budget-only     48/48    48/48        48/48      47/48     48/48      48/48        29/48      26/48
+
+
+            Budget-GM    48/48    48/48        48/48      38/48     48/48      48/48        30/48      26/48
+
+
+       Budget-dyadic     48/48    48/48        37/48      28/48     48/48      48/48        30/48      27/48
+
+
+       Budget-round      48/48    abstain     abstain     abstain   48/48      abstain     abstain     abstain
+
+                         100       103         106         109       100        103         106         109
+                                 Coefficient multiplier                       Coefficient multiplier
+
+
+      Figure 2: Verification by coefficient multiplier. Each cell contains 48 configurations (three families,
+      eight seeds and two presolve settings) per policy and solver. The fixed margin in (7) makes the
+      continuous feasibility boundary increasingly close to an integer activity. Hatched cells are explicit
+      abstentions.
+
+368   normalized residual is 1.15 × 10−7 . Online Resource 1 gives both definitions and the exploratory
+369   Work intervals. Neither residual normalization establishes application acceptance without a justified
+370   original-unit budget.
+
+371   7.3     Conditional contracts and verified binary optima
+372   The full counts appear in Online Resource 1 (Table S2). Budget-GM verifies 182 of 192 configurations
+373   on HiGHS, compared with 141 for GM and 167 for Base. Budget-only verifies 191: direct budget
+374   scaling is more successful than the extra minimax centering in this experiment. On Gurobi,
+375   Budget-GM verifies 152, compared with 140 for GM and 156 for Base. GM-tight verifies 166 under
+376   each solver. Thus the row-budget construction does not establish a solver-independent reliability
+377   improvement, and its conditional hypothesis must remain visible.
+378       Dyadic-GM verifies 142 configurations on HiGHS and 140 on Gurobi; Budget-dyadic verifies 161
+379   and 153, respectively. Exact representation of the scaled row is therefore insufficient for reliable
+380   solver acceptance on these stress cases. In a preserved earlier implementation, rounding the budget
+381   endpoint to nearest instead of inward changed HiGHS Budget-GM’s verified count from 182 to 191.
+382   This is a numerical sensitivity result, not a reason to prefer a factor that fails its declared interval.
+383   The artifact preserves both implementations’ outputs and identifies the corrected run.
+384       Budget-round accepts and verifies 48 configurations per solver, and abstains on the other 144.
+385   Its zero observed verification failures have a substantial cost: it declines many instances that
+386   another policy solves correctly. This is expected of a worst-case rounding bound. An incompatibility
+387   certificate explains why the requested uniform contract cannot be asserted; it is not evidence that
+
+                                                           12
+388   the MILP itself cannot be solved. Figure 2 reports the denominator explicitly so that abstention
+389   cannot masquerade as perfect overall performance.
+
+
+390   8    Discussion and limits
+391   The collapse theorem concerns extrema-based summaries after geometric-mean normalization. It
+392   does not rule out useful variable scales, physical tolerances or other block statistics. Its practical
+393   implication is to hold coverage, kernels and safeguards fixed before attributing an effect to block
+394   information, and to inspect the actual row factors or named exports. Safeguards can introduce
+395   discontinuities; equal scalar diagnostics or rounded Work values cannot prove export identity.
+396       Residual budgets give a distinct interpretation to generator information. Their joint compatibility
+397   with coefficient limits is explicit and invariant under consistent row re-emission. The contract remains
+398   conditional: integer-rounding amplification and internal solver transformations can defeat predictions
+399   based on the exported row alone. Production use requires a postsolve acceptance or repair policy
+400   and measurement of its full cost.
+401       The dispatch reconstruction covers two application classes, one solver, one seed and 15 selected
+402   instances per class. The new budget policies have not been validated there using application-
+403   supplied engineering tolerances. The matrix audit tests an algebraic mechanism; the binary
+404   instances deliberately amplify tolerance sensitivity. Neither estimates typical industrial failure
+405   rates or speedups. Enumeration certifies the small-instance optima, with no corresponding exact
+406   optimality claim for dispatch.
+
+
+407   9    Conclusion
+408   For the studied local–block–coupling construction, geometric-mean row centering can remove all
+409   information from a subsequent extrema-based block-scale summary. A bounded identity band
+410   only restores bounded scale variation. This explains why changing a coupling-row kernel can look
+411   like a block-metadata benefit when the comparison does not hold kernels fixed. The operational
+412   reconstruction further shows that favorable completed-run effort can coexist with an unfavorable
+413   failure-sensitive runtime summary.
+414        An explicit residual budget provides a separate, interpretable basis for row scaling. Its compati-
+415   bility with coefficient limits can be characterized exactly, and constrained logarithmic centering has
+416   a closed-form solution. Integer-rounding amplification and solver-internal transformations limit what
+417   this conditional contract can guarantee. The resulting recommendation is to expose the information
+418   used, audit the actual transformation, declare incompatible specifications, and verify the returned
+419   point.
+
+
+420   Data and software availability
+421   The accompanying repository contains the C++ generator, frozen historical aggregates, the recon-
+422   structed operational logs and analysis, the exact-enumeration experiment, row-factor implementation,
+423   tests, and scripts generating the new tables and vector figures. The current research sources are
+424   distinguished from the historical draft, whose positive block-attribution claim is superseded. All
+425   newly reported stress data and solutions are stored under results-revision/research-audit/.
+426   No commercial solver is required to regenerate figures, verify the saved binary solutions, or run the
+427   HiGHS stress arm. Re-running the Gurobi arm requires a suitable license.
+
+
+                                                        13
+428   Statements and Declarations
+429   Funding and competing interests. The author received no external funding for this work and
+430   declares no financial or non-financial competing interests.
+
+431   Authorship and computational resources. Mathias Rodríguez Castro is the sole author.
+432   The computational platform originates in his hydrothermal-dispatch thesis work; the operational
+433   experiments used ClusterUY.
+
+434   Use of AI assistance. OpenAI Codex was used to assist with mathematical derivations and
+435   their internal review, experiment and verification code, literature analysis, and drafting and revising
+436   the manuscript. Reported numerical results come from the stored computational runs. Figures were
+437   generated programmatically from those data or the stated equations. The author is responsible for
+438   the scientific content and the version submitted for publication.
+
+
+439   Supplementary information
+440   Online Resource 1 provides the triangular-model proof, operational reconstruction details, frozen
+441   experiment protocols, arithmetic implementation checks, and reproduction instructions. The
+442   accompanying source and data archive is Online Resource 2.
+
+
+443   References
+444    [1] Timo Berthold and Gregor Hendel. Learning to scale mixed-integer programs. Proceedings of
+445        the AAAI Conference on Artificial Intelligence, 35(5):3661–3668, 2021. https://doi.org/10.
+446        1609/aaai.v35i5.16482.
+
+447    [2] Kevin K. H. Cheung, Ambros Gleixner, and Daniel E. Steffy. Verifying integer programming
+448        results. In Friedrich Eisenbrand and Jochen Koenemann, editors, Integer Programming and
+449        Combinatorial Optimization, volume 10328 of Lecture Notes in Computer Science, pages 148–160.
+450        Springer, 2017. https://doi.org/10.1007/978-3-319-59250-3_13.
+
+451    [3] A. R. Curtis and J. K. Reid. On the automatic scaling of matrices for Gaussian elimination. IMA
+452        Journal of Applied Mathematics, 10(1):118–124, 1972. https://doi.org/10.1093/imamat/10.
+453        1.118.
+
+454    [4] James Demmel. Nearly optimal Block-Jacobi preconditioning. SIAM Journal on Matrix
+455        Analysis and Applications, 44(1):408–413, 2023. https://doi.org/10.1137/22M1504901.
+
+456    [5] Joseph M. Elble and Nikolaos V. Sahinidis. Scaling linear optimization problems prior to
+457        application of the simplex method. Computational Optimization and Applications, 52(2):
+458        345–371, 2012. https://doi.org/10.1007/s10589-011-9420-4.
+
+459    [6] GAMS Development Corporation. Special features for mathematical programs: Model scaling—
+460        the scale option. GAMS User’s Guide, online documentation, 2026. URL https://www.gams.
+461        com/latest/docs/UG_LanguageFeatures.html. Accessed September 8, 2026; documentation
+462        access year.
+
+
+
+
+                                                        14
+463    [7] Gurobi Optimization, LLC. Tolerances and user-scaling. Gurobi Optimizer Reference Man-
+464        ual, online documentation, 2026. URL https://docs.gurobi.com/projects/optimizer/en/
+465        current/concepts/numericguide/tolerances_scaling.html. Accessed September 8, 2026;
+466        page updated June 17, 2026.
+
+467    [8] Alexander Hoen and Ambros Gleixner. Analyzing the numerical correctness of branch-and-
+468        bound decisions for mixed-integer programming. In Guido Tack, editor, Integration of Con-
+469        straint Programming, Artificial Intelligence, and Operations Research, volume 15763 of Lec-
+470        ture Notes in Computer Science, pages 35–50. Springer, 2025. https://doi.org/10.1007/
+471        978-3-031-95976-9_3.
+
+472    [9] Silke Horn.   How do I scale my model to improve its numerical properties?
+473        Gurobi Help Center, 2025.     URL https://support.gurobi.com/hc/en-us/articles/
+474        26284047605521-How-do-I-scale-my-model-to-improve-its-numerical-properties.
+475        Updated December 22, 2025; accessed September 8, 2026.
+
+476   [10] IDAES Project. CustomScalerBase class. IDAES v2.12.0 documentation, 2026. URL
+477        https://idaes-pse.readthedocs.io/en/stable/reference_guides/scaling/custom_
+478        scaler.html. Accessed September 8, 2026; documentation access year.
+
+479   [11] IDAES Project. Scaling methods. IDAES v2.12.0 documentation, 2026. URL https://
+480        idaes-pse.readthedocs.io/en/stable/reference_guides/core/util/scaling.html. Ac-
+481        cessed September 8, 2026; documentation access year.
+
+482   [12] IEEE. IEEE Standard for Floating-Point Arithmetic. IEEE, 2019. IEEE Std 754-2019.
+483        https://doi.org/10.1109/IEEESTD.2019.8766229.
+
+484   [13] Jordan Jalving, Sungho Shin, and Victor M. Zavala. A graph-based modeling abstraction
+485        for optimization: Concepts and implementation in Plasmo.jl. Mathematical Programming
+486        Computation, 14:699–747, 2022. https://doi.org/10.1007/s12532-022-00223-3.
+
+487   [14] Ed Klotz. Identification, assessment, and correction of ill-conditioning and numerical instability
+488        in linear and integer programs. In Bridging Data and Decisions, INFORMS TutORials in
+489        Operations Research, pages 54–108. INFORMS, 2014. https://doi.org/10.1287/educ.2014.
+490        0130.
+
+491   [15] Robert Pritchett, Kathleen Howell, and Daniel Grebow.    Low-thrust transfer de-
+492        sign based on collocation techniques:  Applications in the restricted three-body
+493        problem.    In AAS/AIAA Astrodynamics Specialist Conference, Stevenson, Wash-
+494        ington, 2017.    URL https://engineering.purdue.edu/people/kathleen.howell.1/
+495        Publications/Conferences/2017_AAS_PriHowGre.pdf. AAS Paper 17-626.
+
+496   [16] Pyomo Development Team. ScaleModel: Model scaling transformation. Pyomo 6.9.1 documen-
+497        tation, 2026. URL https://pyomo.readthedocs.io/en/6.9.1/api/pyomo.core.plugins.
+498        transform.scaling.ScaleModel.html. Accessed September 8, 2026; documentation access
+499        year.
+
+500   [17] Zhaonan Qu, Wenzhi Gao, Oliver Hinder, Yinyu Ye, and Zhengyuan Zhou. Optimal diagonal
+501        preconditioning. Operations Research, 73(3):1479–1495, 2025. https://doi.org/10.1287/
+502        opre.2022.0592.
+
+
+
+                                                       15
+

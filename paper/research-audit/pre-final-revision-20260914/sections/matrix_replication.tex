@@ -1,0 +1,37 @@
+\paragraph{Fresh exports with matched controls.}
+The new replication uses ten seeds, 20260909--20260918, at each of three exponent
+ranges, two severities and three coupling patterns: 180 generated instances and
+1,080 exports. The corrected serializer preserves binary64 values on readback,
+including coefficients, RHS values and bounds. All exports preserve named
+structure and pass the whole-row proportionality check at relative tolerance
+$10^{-13}$. This is a floating-point transformation audit, not an exact rational
+equivalence certificate.
+
+SA-Mat and Role-Hybrid are byte-identical on 136 of 180 instances; SA-Mat and
+its permuted-scale counterpart are byte-identical on 165. The nonidentical cases
+matter: the production implementation includes window vetoes and filtered block
+extrema, so the exact-collapse hypotheses need not hold universally.
+On the common-rank spectral diagnostic, the SA-Mat/Role-Hybrid ratio lies between
+0.939 and 1.079, with median one. The scale-permutation ratio lies between
+0.99962 and 1.00022. In contrast, the median SA-Mat/Flat-GM ratios are 0.937,
+0.102 and 0.00973 as the exponent range grows from $[-1,1]$ to $[-3,3]$.
+Thus the large heterogeneity-dependent advantage is explained by the coupling
+kernel; the matched control reveals smaller implementation-dependent differences.
+
+\begin{figure}[tb]
+\centering\includegraphics[width=\linewidth]{identifiability.pdf}
+\caption{Fresh matrix audit. Each exponent range contains 60 generated instances.
+The left comparison changes the coupling kernel; the right comparisons hold the
+kernels fixed and remove or permute block-scale information. Marks show individual
+ratios with deterministic horizontal jitter; short horizontal segments are medians.
+The panels use different vertical scales to expose the remaining small differences.}
+\label{fig:identifiability}
+\end{figure}
+
+Numerical rank is fixed per instance from the row-L2-normalized Base at threshold
+$10^{-12}$ and used for every variant. Independently thresholding each variant
+would give different ranks in 25 of the 1,080 exports. Several unscaled matrices
+approach binary64 resolution, so their very large condition estimates are not
+interpreted quantitatively. The scaled matrices used in the paired ratios have
+diagnostics below $6.5\times10^6$. Direct named-export comparisons carry the
+identity claims and do not depend on singular-value estimation.

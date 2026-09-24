@@ -1,0 +1,43 @@
+\section{Related work}
+\label{sec:related}
+Diagonal scaling has a long history, including the logarithmic method of Curtis and
+Reid \cite{curtis1972scaling}. Elble and Sahinidis \cite{elble2012scaling} compare
+scalers for simplex and find that additional complexity need not improve performance.
+Klotz \cite{klotz2014numerics} relates numerical instability to formulation and finite
+precision. Optimal diagonal preconditioning is a broader problem: Qu et al.
+\cite{qu2024diagonal} use quasiconvex and semidefinite formulations, while Demmel
+\cite{demmel2023block} gives block-Jacobi guarantees. Our triangular calculation is
+an explanatory scalar special case, not a general preconditioning algorithm.
+
+Robustness is also an established objective in MIP scaling. Berthold and Hendel
+\cite{berthold2021scaling} learn to select between standard and Curtis--Reid scaling
+in Xpress from an indicator of numerical difficulties. Their implementation uses
+power-of-two factors and their evaluation examines inconsistencies across seeds.
+Our external construction instead states row-level admissibility conditions; it does
+not predict or replace internal solver scaling.
+
+Modeling environments already support generator-level information: Pyomo's
+\texttt{ScaleModel} applies component factors \cite{pyomoScaleModel}, GAMS has
+variable and equation scale attributes \cite{gamsScaling}, and IDAES derives and
+propagates scales across submodels \cite{idaesScaling,idaesCustomScaler}. Plasmo.jl
+retains local problems and linking constraints \cite{jalving2022plasmo}. Consequently,
+using modeling metadata before export is not new. Our identifiability result concerns
+the loss of one specific block statistic after a preceding normalization.
+
+Tolerance-based scaling also has direct precedent. Gurobi documents absolute
+feasibility and integrality tolerances and the treatment of very small coefficients
+\cite{gurobiScaling}, and recommends external scaling that makes tolerance-sized
+violations negligible in application units \cite{gurobiExternalScaling}. Pritchett,
+Howell and Grebow \cite{pritchett2017scaling} similarly scale constraints using
+physical accuracy requirements and SNOPT's tolerance. Section~\ref{sec:contract}
+combines this known transfer with coefficient limits, identifies incompatible
+specifications, and solves the constrained centering problem. Integer rounding and
+exact binary64 export impose additional restrictions.
+
+Finally, Cheung, Gleixner and Steffy \cite{cheung2017certificates} provide certificates
+for integer-programming results, and Hoen and Gleixner \cite{hoen2024correctness}
+analyze individual branch-and-bound decisions. Our rational residual checks concern
+primal acceptance; independent enumeration establishes optimality only on the small
+binary instances. The complementary attribution audit checks actual exports under
+matched kernels and coverage. These contributions concern identifiable mechanisms
+and explicit numerical contracts, without claiming universal performance superiority.

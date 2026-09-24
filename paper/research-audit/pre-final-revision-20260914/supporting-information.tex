@@ -3,14 +3,13 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern,microtype,amsmath,amssymb,amsthm,graphicx,booktabs,tabularx}
 \usepackage{xcolor}
-\usepackage{xurl}
 \usepackage[colorlinks=true,allcolors=blue!45!black]{hyperref}
 \usepackage{listings}
 \lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
-\title{Online Resource 1\\\large Supplement to ``Pre-Export Row Scaling for Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts''}
+\title{Online Resource 1\\\large Supplement to ``Identifiability and Feasibility Budgets in Pre-Export Row Scaling for Mixed-Integer Programs''}
 \author{Mathias Rodr\'iguez Castro\\\small Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay\\\small\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
 \date{Prepared for Optimization Letters}
 \begin{document}
@@ -32,116 +31,6 @@ The interval-constrained optimum clips this factor to the interval.
 This scalar result assumes already whitened local blocks and one common coupling
 factor. It does not solve general diagonal preconditioning and says nothing directly
 about simplex bases or mixed-integer search.
-
-\section{Fixed-basis conditioning audit}
-\paragraph{Protocol.}
-The protocol was fixed after a pilot on the first five inputs of each class
-(\path{fixed-basis-recovery-20260914-v2/}) and then applied, unchanged except for the policy
-set of the manuscript, to all 306 archived dispatch inputs with no exclusion: 204 Simple, 68
-SG-Ter-Mer and 34 Full models. The audit build of the C++ generator writes five LP files per model through its
-solver-free exporter, with the following preprocessing flags.
-\begin{center}\small
-\begin{tabular}{ll}
-\toprule
-Policy & Flags of \texttt{preprocesar}\\
-\midrule
-Base & \texttt{-{}-solodiagnostico}\\
-Flat-GM & \texttt{-{}-local-matricial -{}-plano}\\
-Flat-L2 & \texttt{-{}-local-matricial -{}-plano -{}-kernel-euclideo}\\
-Role-Hybrid & \texttt{-{}-local-matricial -{}-acoplamiento-l2}\\
-SA-Mat & \texttt{-{}-local-matricial}\\
-\bottomrule
-\end{tabular}
-\end{center}
-HiGHS 1.15.1 reads Base with small-matrix threshold $10^{-12}$, drops integrality and solves the
-LP relaxation with the simplex method (one thread, random seed 0, 300-second limit); all 306
-solves are optimal. The basis is stored by row and column names.
-
-Each variant is read with the same reader and compared with Base before assembly: identical
-named rows and columns, sparsity pattern, bounds, objective, offset and integrality. A row's
-factor is inferred from its largest-magnitude coefficient, and the whole row and both RHS values
-must agree with that factor to relative tolerance $2\times10^{-13}$; the largest observed
-deviation is $2.5\times10^{-16}$. The basis consists of the basic structural columns of the
-variant's own matrix and a unit column for every basic slack.
-
-\paragraph{Estimate and verification.}
-$\|B\|_1$ is computed from the stored entries, and $\|B^{-1}\|_1$ is estimated by SciPy's
-\texttt{onenormest} ($t=4$) on solves with a SuperLU factorization, with seeds 0, 1 and 2; the
-tables use seed 0. The seeds agree within a factor of 2.4, and 63 of 1,530 records differ by more
-than 1\%. The largest componentwise backward error of a diagnostic solve is $1.9\times10^{-8}$.
-The script \path{scripts/research/verify_fixed_basis.py} imports neither the driver nor the
-HiGHS reader. It checks the recorded hashes, parses every LP file as text, rebuilds each basis
-from the stored names and compares it entry by entry with the stored matrix: all 1,530 bases
-match exactly. It then recomputes each estimate as $B^{-1}=Q^{-1}D$, with $Q=DB$ and $D$ an exact
-power-of-two row equilibration. The two routes differ by less than $10^{-6}$ in 1,512 records and
-by at most 23\% in all; since their test solutions agree to $10^{-12}$ in every record, the
-remaining differences point to the randomized estimator's iteration path rather than to the
-solves.
-
-\begin{table}[tb]
-\centering\small
-\caption{Fixed-basis audit: per-instance ratios $\kappa_1(\text{policy})/\kappa_1(\text{Base})$ on
-the common basis. ``Improved'' counts ratios below one.}\label{tab:si-fixed-basis}
-\input{tables/fixed-basis-si}
-\end{table}
-
-\paragraph{Interpretation.}
-Row scaling changes $\kappa_1$, so the audit measures the exported representation before any
-solver-internal scaling. The Base estimates exceed the reciprocal of machine precision; the
-precision check below shows that they are nevertheless accurate on a stress sample. Every row of the 306 models has a coefficient of magnitude at
-least one, and $1/\|a_r\|_2\le1/\max_j|a_{rj}|$, so no Flat-L2 factor exceeds one. Across all
-rows, Flat-GM enlarges 22.5\% (Simple), 32.1\% (SG-Ter-Mer) and 27.3\% (Full) and leaves 30.0\%,
-22.0\% and 24.5\% unscaled; Flat-L2 enlarges none and leaves 57.6\%, 64.3\% and 59.2\% unscaled.
-SA-Mat and Role-Hybrid exports are byte-identical on all 306 models. SA-Mat coincides with
-Flat-GM on every Simple model and, in each SG-Ter-Mer and Full model, differs from it only on
-the 1,440 \texttt{falla\_tramo} market-shortage rows, which SA-Mat and Role-Hybrid leave
-unscaled. The authoritative directory is
-\path{results-revision/research-audit/fixed-basis-final-20260914/}, with design, source
-snapshot, exports, bases, per-row factors, verification and \texttt{analysis.json}.
-
-\paragraph{Precision check.}
-Because the unscaled values exceed the reciprocal of machine precision, the script
-\path{scripts/research/verify_fixed_basis_precision.py} checks their accuracy on a stress sample
-fixed before computation: in each class, the model with the largest Base estimate, the model with
-the largest Flat-GM/Base estimated ratio, and one other model drawn with seed 20260915. In Full
-the first two coincide (instance014), which gives eight models and 24 bases under Base, Flat-GM
-and Flat-L2. For each hash-checked basis, $\|B\|_1$ is computed in exact rational arithmetic.
-Every column of $B^{-1}$ is solved in double precision; with $x_j$ the computed column and
-$\rho_j$ a bound on $\|Bx_j-e_j\|_1$ that includes the rounding-error terms of the residual
-evaluation, $\|B^{-1}\|_1\le\max_j\|x_j\|_1/(1-\max_j\rho_j)$ whenever $\max_j\rho_j<1$. This
-upper bound is evaluated in floating point with explicit error terms rather than directed
-rounding. For the five largest columns, the solution is refined with residuals computed exactly
-in rational arithmetic on the stored binary64 data; since $\|B^{-1}\|_1\ge\|x\|_1/\|Bx\|_1$ for
-every nonzero $x$, the exact quotient certifies a lower bound.
-
-The largest residual bound is $6.0\times10^{-3}$, and refinement stops within two steps. The
-enclosures have relative width at most $6.0\times10^{-3}$ for Base, $4.8\times10^{-3}$ for
-Flat-L2 and $2.0\times10^{-5}$ for Flat-GM, and the resulting bound on the Flat-GM/Base ratio
-agrees with the estimated ratio to $2.1\times10^{-5}$ in all eight models
-(Table~\ref{tab:si-precision}). Twenty-three of the 24 estimates lie inside their enclosures. The
-Flat-L2 estimate for Full instance046 is 2.4 times smaller than its certified lower bound, as a
-lower-bound estimator can be; this makes Flat-L2 less favorable, not more. Outputs are in
-\path{precision-check/} within the audit directory.
-
-\begin{table}[tb]
-\centering\small
-\caption{Precision check on the stress sample. ``Base $\kappa_1\ge$'' is the certified lower
-bound. ``Enclosure width'' is the largest relative width (upper over lower bound, minus one)
-among Base, Flat-GM and Flat-L2. The last two columns give the estimated ratio
-$\kappa_1(\text{Flat-GM})/\kappa_1(\text{Base})$ and its upper bound, the a posteriori upper bound
-for Flat-GM divided by the certified lower bound for Base.}\label{tab:si-precision}
-\input{tables/fixed-basis-precision}
-\end{table}
-
-\paragraph{Archived fixed-incumbent computation.}
-An earlier computation (\path{results-revision/fixed-basis/}) used a different reference
-basis: Gurobi solved each Base MIP (relative gap $10^{-3}$, 16 threads), fixed the integers at its
-incumbent and took the basis of the resulting LP. Its archived medians point in the same
-direction with smaller magnitudes; for SA-Mat relative to Base they are $1.2\times10^{-3}$
-(Simple), $3.6\times10^{-4}$ (Full) and 0.41 (SG-Ter-Mer). The magnitudes therefore depend on the
-reference basis. That computation did not retain its exports, basis identities or binary hash,
-and its multithreaded incumbents cannot be replayed, so it is not used as evidence. The
-provenance audit is in \path{results-revision/research-audit/fixed-basis-recovery-20260914-v2/}.
 
 \section{Operational evidence and reconstruction}
 The final historical campaign assigned 15 instances in each of two dispatch families,
@@ -236,9 +125,9 @@ precision serializer and is superseded for current matrix claims.
 \section{Frozen binary stress protocol}
 The experiment crosses three binary families, eight seeds (100--107), and four
 coefficient exponents (0, 3, 6, 9): 96 models with 12 binary variables each. Each
-model is run under two presolve settings, three solvers, and nine policies, giving
-5,184 planned configurations. Budget-round abstains on 432 configurations before
-calling an optimizer; hence there are 4,752 actual calls. These configurations are
+model is run under two presolve settings, two solvers, and nine policies, giving
+3,456 planned configurations. Budget-round abstains on 288 configurations before
+calling an optimizer; hence there are 3,168 actual calls. These configurations are
 not statistically independent observations.
 
 For seed $s$, NumPy's default generator is seeded by $20260908+s$. The cardinality
@@ -290,47 +179,9 @@ verified configurations becomes 182 with correctly inward-rounded endpoints.
 ``Verified'' means that the returned point passes the declared acceptance rule and its
 rounded assignment attains the independently enumerated optimum. ``Other'' includes
 unverified outputs and solver errors; ``Abstain'' means no optimizer call was attempted.
-Abstention is not a performance success. The separated GCD-floor row is the later
-integer-aware control, with the same denominator and acceptance rule.}\label{tab:budget-results}
+Abstention is not a performance success.}\label{tab:budget-results}
 \input{tables/budget-results}
 \end{table}
-
-\paragraph{Paired outcomes and factor distances.}
-The paired comparison in the main text uses identical model, presolve and solver keys; its
-counts are regenerated by \path{scripts/research/analyze_budget_experiment.py}, which also writes
-\path{budget-final/paired-discordance.json}. Budget-only and Budget-GM select different factors at
-multipliers $10^0$ and $10^3$, where both verify every configuration on all three solvers. At $10^6$
-and $10^9$ the budget endpoint binds, and Budget-GM returns the inward-rounded endpoint, at most
-one unit in the last place from Budget-only's factor $\epsilon/\delta$ on every row of every
-model. All ten configurations whose verification outcomes differ between the two policies lie at
-these multipliers. The failure categories quoted in the main text are taken from
-\path{results-revision/research-audit/exploration-failures/summary.json} for HiGHS and Gurobi and
-\path{exploration-failures-cplex/summary.json} for CPLEX, both written by the same script, which
-classifies each returned point with an infeasible rounded assignment by whether it violates the
-original row budget and whether it violates the exported tolerance.
-
-\paragraph{Classical integer-row controls.}
-The follow-up in \path{results-revision/research-audit/exploration-lattice/}
-uses the same 96 stored models, three solvers and two presolve settings. For an
-integral row $a^Tz\le b$, let $g=\gcd_j |a_j|$ and replace it by
-$(a/g)^Tz\le\lfloor b/g\rfloor$. Exact rational division of the stored RHS
-determines the floor. GCD-floor exports this row directly; GCD-floor-GM adds
-floating GM normalization; GCD-midgap-GM first replaces the floored RHS by
-$\lfloor b/g\rfloor+1/2$ and then applies GM. The three controls account for
-1,728 further calls, all yielding verified original-model optima. The midpoint
-operation is integer-equivalent before multiplication and weakens the LP relative
-to flooring. These are established reductions or arithmetic controls, not new
-scaling proposals.
-
-The direct GCD-floor export preserves all 96 binary feasible sets exactly and
-verifies 192/192 configurations per solver. Independent enumeration of the
-actual binary64 exports also finds equivalence for all 96 GCD-midgap-GM models,
-but detects excluded feasible boundary points in 60 of the GCD-floor-GM models.
-Thus successful returned optima do not establish equivalence of every represented
-constraint. The main comparison foregrounds GCD-floor, whose transformation and
-export are both exact for these inputs. This arithmetic distinction also explains
-why an exact-export condition is separate from selecting a mathematically
-admissible real factor.
 
 \begin{figure}[tb]
 \centering\includegraphics[width=.8\linewidth]{figs/research/budget-compatibility.pdf}
@@ -381,7 +232,6 @@ recorded analysis environment. The following commands need no optimizer license:
 make research-check-python  # tests, saved binary audit, matrix hashes
 make research-check         # also builds/tests the native C++ exporter
 make research-analysis      # current tables and vector figures
-make research-fixed-basis-check  # rebuild all 1,530 bases from LP text
 make paper                  # article and this supplement
 \end{lstlisting}
 The full export check needs GNU Make and a C++17 compiler. PDF compilation uses
@@ -392,8 +242,6 @@ mathematical expressions.
 Fresh experiments write to separate directories and are not required for verification:
 \begin{lstlisting}
 make research-grid GRID_OUT=results-revision/research-audit/reruns/grid
-make research-fixed-basis \
-  FIXED_BASIS_OUT=results-revision/research-audit/reruns/fixed-basis
 make research-budget BUDGET_SOLVERS=highs \
   BUDGET_OUT=results-revision/research-audit/reruns/highs
 \end{lstlisting}

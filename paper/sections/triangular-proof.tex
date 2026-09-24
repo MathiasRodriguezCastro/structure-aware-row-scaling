@@ -1,0 +1,19 @@
+\begin{proof}
+An SVD of $R$ and orthogonal transformations reduce the nontrivial spectrum to
+blocks $\left[\begin{smallmatrix}1&0\\\gamma\sigma&\gamma\end{smallmatrix}\right]$,
+one for each singular value $\sigma$ of $R$, with possible additional singular
+values $1$ or $\gamma$. Each block's squared singular values have product
+$\gamma^2$ and sum $1+\gamma^2(1+\sigma^2)$. Their largest value increases and
+smallest value decreases with $\sigma$; the block at $\sigma=\rho$ therefore
+determines both extrema, including any additional values. If $k$ is their
+singular-value ratio, then
+\[
+ k+k^{-1}=\frac{1+\gamma^2(1+\rho^2)}{\gamma}
+ =\gamma^{-1}+\gamma(1+\rho^2).
+\]
+The left-hand side is increasing for $k\geq1$. The right-hand side has a unique
+minimum at $\gamma_*=(1+\rho^2)^{-1/2}$, decreases before that point, and increases
+after it. At the minimum, $k+k^{-1}=2\sqrt{1+\rho^2}$, whose root $k\geq1$ is
+$\sqrt{1+\rho^2}+\rho$. The interval result follows from the same monotonicity.
+For $\rho=0$, the argument reduces to balancing the diagonal entries at one.
+\end{proof}
