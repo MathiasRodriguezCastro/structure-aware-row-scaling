@@ -171,6 +171,28 @@ exists outside this work and shows no inversion; no result reported here uses it
 above are produced by \path{scripts/research/check_sgtm_demand.py} from the instance files in
 the archive.
 
+\paragraph{Does the defect drive the SG-Ter-Mer result?}
+Six of the fifteen instances are free of the inversion. Table~\ref{tab:defect-sensitivity} repeats
+the two endpoints on that subset, with the same work measure and the same common-completion
+pool as the main text. The conditional gain does not depend on the defective scenarios: the
+Flat-GM work ratio is 0.452 at a 1\% gap and 0.502 at 0.1\% on the six, against 0.698 and 0.682
+on all fifteen. The failure-sensitive reversal does depend on them, for a reason worth stating:
+the instance that times out under every scaled policy, instance077, is one of the nine, so on
+the defect-free subset every scaled policy completes and PAR10 follows the conditional gain
+instead of contradicting it. The reversal reported in the main text therefore rests on a single
+instance, which is what makes it a statement about failure sensitivity rather than about
+typical effort.
+
+\begin{table}[tb]
+\centering\small
+\caption{SG-Ter-Mer reconstruction on all fifteen assigned instances and on the six without the
+demand inversion. Work ratios are geometric means against Base on the instances every policy
+completed; PAR10 is the arithmetic mean over the assigned pool, with 18,000 seconds for a
+non-completion.}
+\label{tab:defect-sensitivity}
+\input{tables/defect-sensitivity}
+\end{table}
+
 \paragraph{Work and uncertainty.}
 The old runner's scaled-policy Work markers inherited a fixed, zero-decimal stream
 format. Native Gurobi summaries instead retain two decimals. The reconstruction uses
