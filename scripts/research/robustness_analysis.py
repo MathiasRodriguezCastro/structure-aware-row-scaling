@@ -37,6 +37,7 @@ def load(root):
     d["completed"] = d.outcome.eq("COMPLETED")
     d["censored"] = d.outcome.isin(["TIME_LIMIT", "TIME_LIMIT_NO_SOLUTION", "WRAPPER_TIMEOUT"])
     d["failed"] = ~(d.completed | d.censored)
+    d["no_incumbent"] = d.outcome.eq("TIME_LIMIT_NO_SOLUTION")
     # PAR10 cost: measured solver time when completed, ten times the cap otherwise.
     d["par10_s"] = np.where(d.completed, d.tiempo_solver_s.fillna(d.cap_s), 10.0 * d.cap_s)
     d["verified"] = ((d.get("verif_solver_max_viol_relact", pd.Series(np.nan, index=d.index)) <= 1e-6)
@@ -56,6 +57,7 @@ def cells(d):
                 "family": fam, "solver": solver, "gap": gap, "seed": seed, "policy": policy,
                 "n": len(gp), "completed": int(gp.completed.sum()), "censored": int(gp.censored.sum()),
                 "failed": int(gp.failed.sum()),
+                "censored_without_incumbent": int(gp.no_incumbent.sum()),
                 "completion_rate": round(float(gp.completed.mean()), 4),
                 "par10_mean_s": round(float(gp.par10_s.mean()), 2),
                 "median_time_completed_s": round(float(done.tiempo_solver_s.median()), 2) if len(done) else None,
