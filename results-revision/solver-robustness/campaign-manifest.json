@@ -1,0 +1,131 @@
+{
+  "campaign_id": "solver-robustness-v1",
+  "status": "pre-registered before any policy comparison on the benchmark pool",
+  "date": "2026-09-16",
+  "design_document": "paper/research-audit/solver-robustness-design-20260916.md",
+  "inputs": {
+    "instance_manifest": {
+      "path": "results-revision/solver-robustness/inventory/instance-manifest.csv",
+      "sha256": "fb8e8fe7d3e3d0399f15ad4de3cc481a38a50c83c1802ca1df8c5ea6fe4a06d5"
+    },
+    "instance_split": {
+      "path": "results-revision/solver-robustness/design/instance-split.csv",
+      "sha256": "091e8c458010e4c0ba2e281ea859c7fc789cebf79b97929a6089894535462bde"
+    },
+    "historical_base_times": {
+      "path": "results-revision/solver-robustness/inventory/historical-base-times.csv",
+      "sha256": "8989a947ee89b7105587baaa52856e4c59a33326b1bf1216c384426cbd02c582"
+    },
+    "benchmark_directory": "data/benchmark-v1"
+  },
+  "split": {
+    "ordering": "sha256('solver-robustness-v1' | family | instance file sha256), ascending",
+    "calibration": {
+      "Simple": 10,
+      "SG-Ter-Mer": 10,
+      "Full": 30
+    },
+    "evaluation": {
+      "Simple": 490,
+      "SG-Ter-Mer": 490,
+      "Full": 120
+    },
+    "multiseed": {
+      "Simple": 50,
+      "SG-Ter-Mer": 50,
+      "Full": 20
+    },
+    "full_reduction_reason": "Gurobi WLS licence sustains two concurrent sessions; decided from the historical Base cost model before any policy run on the pool"
+  },
+  "policies": [
+    "Base",
+    "Flat-GM",
+    "Flat-L2",
+    "Role-Hybrid"
+  ],
+  "solvers": {
+    "gurobi": "13.0.1 (C++ API)",
+    "cplex": "22.1.2 (C++ Concert API, static)",
+    "highs": "1.15.1 (C++ API, static, in-memory model)"
+  },
+  "gaps": [
+    0.01,
+    0.001
+  ],
+  "threads": 1,
+  "hardware": "ute partition, Intel nodes (--constraint=intel), 2 cores reserved per task",
+  "seeds": {
+    "primary": 1,
+    "multiseed_extra": [
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "solver_settings": {
+    "primal_feasibility_tolerance": 1e-06,
+    "integrality_tolerance": 1e-05,
+    "highs_note": "HiGHS uses one MIP feasibility tolerance; primal_feasibility_tolerance and mip_feasibility_tolerance are both 1e-6",
+    "presolve": "solver default",
+    "internal_scaling": "solver default",
+    "conditioning_instrumentation": "off (--sin-kappa)",
+    "small_matrix_value_highs": 1e-12
+  },
+  "caps": {
+    "provisional": {
+      "Simple": 1800,
+      "SG-Ter-Mer": 1800,
+      "Full": 3600
+    },
+    "rule_R1": "T_F = smallest T in {1800, 3600, 7200} such that Base completes >= 80% at gap 1% and >= 70% at gap 0.1% for Gurobi (historical one-thread logs) and for CPLEX (pilot); otherwise 7200",
+    "rule_R2": "HiGHS runs family F in the primary campaign unless its pilot Base completion at T_F and gap 1% is below 50%; then HiGHS in F runs only on the multiseed subset with the primary seed",
+    "par10_penalty": "10 x family cap"
+  },
+  "pilot": {
+    "instances": "calibration set",
+    "policies": [
+      "Base"
+    ],
+    "solvers": [
+      "cplex",
+      "highs"
+    ],
+    "cap_s": 7200,
+    "gaps": [
+      0.01,
+      0.001
+    ]
+  },
+  "instance077_audit": {
+    "versions": [
+      "historical data/entradas/entrada-SG-Ter-Mer/instance077.txt (defective total demand)",
+      "corrected data/benchmark-v1/instance077-corrected/instance077.txt"
+    ],
+    "runs": "3 solvers x 4 policies x 2 gaps x seeds {1,...,5} at the SG-Ter-Mer cap; plus Gurobi 16 threads seed 42 on the historical version",
+    "extension": "censored runs may be repeated at 2 x cap as a separate diagnostic that never changes primary outcomes"
+  },
+  "endpoints": {
+    "primary": [
+      "PAR10 over the assigned pool (family x solver x gap)",
+      "completion rate",
+      "timeout rate",
+      "final gap among censored runs"
+    ],
+    "secondary": [
+      "paired runtime ratio (geometric mean, median) on instances completed by all four policies",
+      "solver-specific effort: Gurobi work units, CPLEX deterministic ticks, nodes and LP iterations",
+      "original-model residuals and verification label"
+    ],
+    "verification_label": "activity-normalized maximum row violation <= 1e-6, bound violations <= 1e-6, integrality <= 1e-5, no missing values",
+    "confirmatory_contrasts": [
+      "C1 Flat-GM/Base completed-run effort ratio",
+      "C2 PAR10 difference Flat-GM - Base",
+      "C3 completion difference Flat-GM - Base",
+      "C4 sign stability of C1-C2 across seeds",
+      "C5 stress experiment under CPLEX: budget vs budget-free paired discordance"
+    ],
+    "inference": "within family x solver x gap; paired by instance; cluster bootstrap by instance; seeds and gaps are not independent replications"
+  },
+  "rerun_policy": "only runs classified LICENSE_FAILURE or INFRASTRUCTURE_FAILURE (documented) are repeated; timeouts and solver errors are outcomes"
+}

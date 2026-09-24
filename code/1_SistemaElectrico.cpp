@@ -173,7 +173,7 @@ string normalizeSolverFlag(const string& raw) {
               [](unsigned char c){ return tolower(c); });
 
     static const std::vector<std::string> canonicos =
-        {"DummyLp", "Gurobi", "Cbc", "Cplex", "Hexaly"};
+        {"DummyLp", "Gurobi", "Cbc", "Cplex", "Hexaly", "Highs"};
     for (const auto& canon : canonicos) {
         string canonLower = canon;
         transform(canonLower.begin(), canonLower.end(), canonLower.begin(),
@@ -682,7 +682,7 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                 std::cout << "\033[34m[info] Uso: crearDespacho --fija|--proporcional|--mercado [--conDemandaTotal]\033[0m" << std::endl;
             }
         } else if (args[0] == "configurarSolver") {
-            const std::vector<std::string> solvers = {"DummyLp", "Gurobi", "Cbc", "Cplex", "Hexaly"};
+            const std::vector<std::string> solvers = {"DummyLp", "Gurobi", "Cbc", "Cplex", "Hexaly", "Highs"};
 
             if (args.size() >= 2) {
                 string tipoSolver = normalizeSolverFlag(args[1]);
@@ -765,6 +765,21 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                             }
                             config.scaleIndCplex = val;
 
+                        } else if (args[i] == "--feastol" || args[i] == "--inttol") {
+                            // Tolerancias explícitas de factibilidad primal / integralidad.
+                            const bool esFact = args[i] == "--feastol";
+                            double val;
+                            if (i + 1 >= args.size() || !parseDoubleStrict(args[++i], val) || val <= 0) {
+                                std::cerr << "\033[31m[error] " << (esFact ? "--feastol" : "--inttol")
+                                          << " requiere un número > 0\033[0m" << std::endl;
+                                errorFlag = true; break;
+                            }
+                            (esFact ? config.tolFactibilidad : config.tolIntegralidad) = val;
+
+                        } else if (args[i] == "--sin-kappa") {
+                            // Omite el diagnóstico de condicionamiento del solver (no agrega tiempo).
+                            config.diagnosticoKappa = false;
+
                         } else if (args[i] == "--cplexpresolve" || args[i] == "-cplexpresolve") {
                             // Sondeo R1: presolve de CPLEX (0 off, 1 on). ¿Absorbe el escalado externo?
                             if (i + 1 >= args.size()) {
@@ -781,7 +796,7 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
 
                         } else {
                             std::cerr << "\033[31m[error] Flag desconocida: " << args[i] << "\033[0m" << std::endl;
-                            std::cout << "\033[34m[info] Uso: configurarSolver --<solver> [--timeout <seg>] [--mipgap <val>] [--scaleflag <-1..3>] [--cplexscale <-1..1>] [--cplexpresolve <0|1>]\033[0m" << std::endl;
+                            std::cout << "\033[34m[info] Uso: configurarSolver --<solver> [--timeout <seg>] [--mipgap <val>] [--scaleflag <-1..3>] [--cplexscale <-1..1>] [--cplexpresolve <0|1>] [--seed <n>] [--feastol <v>] [--inttol <v>] [--sin-kappa]\033[0m" << std::endl;
                             errorFlag = true; break;
                         }
                     }
@@ -799,6 +814,14 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                                 std::cout << " | cplexscale=" << config.scaleIndCplex;
                             if (config.presolveIndCplex != SolverConfig::SOLVER_PARAM_AUTO)
                                 std::cout << " | cplexpresolve=" << config.presolveIndCplex;
+                            if (config.semillaSolver != SolverConfig::SOLVER_PARAM_AUTO)
+                                std::cout << " | seed=" << config.semillaSolver;
+                            if (config.tolFactibilidad > 0.0)
+                                std::cout << " | feastol=" << config.tolFactibilidad;
+                            if (config.tolIntegralidad > 0.0)
+                                std::cout << " | inttol=" << config.tolIntegralidad;
+                            if (!config.diagnosticoKappa)
+                                std::cout << " | kappa=off";
                             std::cout << "\033[0m" << std::endl;
 
                         } catch (const std::exception& e) {
@@ -815,7 +838,7 @@ void procesarComando(bool& inicializado,const vector<string>& args, SystemContro
                     }
                 }
             } else {
-                std::cout << "\033[34m[info] Uso: configurarSolver --DummyLp|--Gurobi|--Cbc|--Cplex [--timeout <seg>] [--mipgap <val>]\033[0m" << std::endl;
+                std::cout << "\033[34m[info] Uso: configurarSolver --DummyLp|--Gurobi|--Cbc|--Cplex|--Highs [--timeout <seg>] [--mipgap <val>]\033[0m" << std::endl;
             }
         } else if (args[0] == "relajarVariablesBinarias") {
             if (args.size() != 1) {

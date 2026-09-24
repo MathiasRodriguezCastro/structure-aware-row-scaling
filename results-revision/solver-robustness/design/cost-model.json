@@ -1,0 +1,56 @@
+{
+  "salt": "solver-robustness-v1",
+  "families": {
+    "Simple": {
+      "cap_s": 1800.0,
+      "calibration": 10,
+      "evaluation": 490,
+      "multiseed": 50,
+      "base_completion_at_cap_gap_1pct": 1.0,
+      "base_completion_at_cap_gap_0.1pct": 1.0,
+      "primary_runs_per_solver": 3920,
+      "primary_expected_cpu_h_per_solver": 34.8,
+      "primary_worst_cpu_h_per_solver": 1970.9,
+      "multiseed_runs_per_solver": 1600,
+      "multiseed_expected_cpu_h_per_solver": 11.4,
+      "multiseed_worst_cpu_h_per_solver": 804.4
+    },
+    "SG-Ter-Mer": {
+      "cap_s": 1800.0,
+      "calibration": 10,
+      "evaluation": 490,
+      "multiseed": 50,
+      "base_completion_at_cap_gap_1pct": 0.982,
+      "base_completion_at_cap_gap_0.1pct": 0.965,
+      "primary_runs_per_solver": 3920,
+      "primary_expected_cpu_h_per_solver": 104.6,
+      "primary_worst_cpu_h_per_solver": 1970.9,
+      "multiseed_runs_per_solver": 1600,
+      "multiseed_expected_cpu_h_per_solver": 48.8,
+      "multiseed_worst_cpu_h_per_solver": 804.4
+    },
+    "Full": {
+      "cap_s": 3600.0,
+      "calibration": 30,
+      "evaluation": 120,
+      "multiseed": 20,
+      "base_completion_at_cap_gap_1pct": 0.883,
+      "base_completion_at_cap_gap_0.1pct": 0.767,
+      "primary_runs_per_solver": 960,
+      "primary_expected_cpu_h_per_solver": 274.6,
+      "primary_worst_cpu_h_per_solver": 968.0,
+      "multiseed_runs_per_solver": 640,
+      "multiseed_expected_cpu_h_per_solver": 237.3,
+      "multiseed_worst_cpu_h_per_solver": 645.3
+    }
+  },
+  "totals_per_solver": {
+    "primary_runs_per_solver": 8800,
+    "primary_expected_cpu_h_per_solver": 414.0,
+    "primary_worst_cpu_h_per_solver": 4909.8,
+    "multiseed_runs_per_solver": 3840,
+    "multiseed_expected_cpu_h_per_solver": 297.5,
+    "multiseed_worst_cpu_h_per_solver": 2254.1
+  },
+  "assumption": "every policy and solver costs like historical one-thread Gurobi Base; overhead per run added"
+}

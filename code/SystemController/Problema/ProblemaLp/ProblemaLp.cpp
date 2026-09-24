@@ -4,9 +4,22 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
+#include <limits>
 
 
 using namespace std;
+
+namespace {
+// max_digits10 significant digits preserve the stored binary64 value on readback.
+// Fixed decimal precision can erase small coefficients, RHS values and bounds.
+string numeroLp(double value, bool signoExplicito = false) {
+    ostringstream stream;
+    if (signoExplicito && value > 0) stream << '+';
+    stream << setprecision(numeric_limits<double>::max_digits10) << defaultfloat << value;
+    return stream.str();
+}
+}
 
 // Constructor
 ProblemaLp::ProblemaLp() : archivo("") {}
@@ -22,11 +35,11 @@ void ProblemaLp::procesar(bool flagConstante) {
     resultado += "\n";
     for (size_t i = 0; i < terminosFuncionObjetivo.size(); ++i) {
         const auto& termino = terminosFuncionObjetivo[i];
-        resultado += "  " + to_string_mod(termino->getCoeficiente()) + " " + termino->getVariable();
+        resultado += "  " + numeroLp(termino->getCoeficiente(), true) + " " + termino->getVariable();
         resultado += "\n";
     }
     if (flagConstante && constanteFuncionObjetivo != 0.0) {
-        resultado += "  " + to_string_mod(constanteFuncionObjetivo) + "\n";
+        resultado += "  " + numeroLp(constanteFuncionObjetivo, true) + "\n";
     }
     resultado += "\n";
     
@@ -38,9 +51,9 @@ void ProblemaLp::procesar(bool flagConstante) {
         resultado += "\n";
         const auto& terminos = restriccion->getTerminos();
         for (size_t i = 0; i < terminos.size(); ++i) {
-            resultado += to_string_mod(terminos[i].first) + " " + terminos[i].second + "\n";   
+            resultado += numeroLp(terminos[i].first, true) + " " + terminos[i].second + "\n";
         }
-        resultado += restriccion->getOperador() + " " + to_string(restriccion->getTerminoIndependiente()) + "\n";
+        resultado += restriccion->getOperador() + " " + numeroLp(restriccion->getTerminoIndependiente()) + "\n";
     }
     resultado += "\n";
     
@@ -49,11 +62,11 @@ void ProblemaLp::procesar(bool flagConstante) {
     for (const auto& variable : variables) {
         int tipoCota = variable->getTipoCota();
         if (tipoCota == 0) { // ambas cotas
-            resultado += "  " + to_string(variable->getCotaInf()) + " <= " + variable->getNombre() + " <= " + to_string(variable->getCotaSup()) + "\n";
+            resultado += "  " + numeroLp(variable->getCotaInf()) + " <= " + variable->getNombre() + " <= " + numeroLp(variable->getCotaSup()) + "\n";
         } else if (tipoCota == 1) { // sin cota inferior
-            resultado += "  -inf <= " + variable->getNombre() + " <= " + to_string(variable->getCotaSup()) + "\n";
+            resultado += "  -inf <= " + variable->getNombre() + " <= " + numeroLp(variable->getCotaSup()) + "\n";
         } else if (tipoCota == 2) { // sin cota superior  
-            resultado += "  " + to_string(variable->getCotaInf()) + " <= " + variable->getNombre() + " <= +inf\n";
+            resultado += "  " + numeroLp(variable->getCotaInf()) + " <= " + variable->getNombre() + " <= +inf\n";
         } else if (tipoCota == 3) { // sin cotas
             resultado += "  " + variable->getNombre() + " free\n";
         }
