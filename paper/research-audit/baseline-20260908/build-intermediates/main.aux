@@ -1,0 +1,402 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\babel@aux[2]{}
+\@nameuse{bbl@beforestart}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand*\HyPL@Entry[1]{}
+\bibstyle{WileyNJD-AMA}
+\HyPL@Entry{0<</S/D>>}
+\babel@aux{english}{}
+\@writefile{toc}{\contentsline {chapter}{When Does Generator Metadata Help? A Controlled Study of Structure-Aware Row Scaling for Generated Mixed-Integer Programs}{1}{Doc-Start}\protected@file@percent }
+\Newlabel{1}{1}
+\@writefile{toc}{\contentsline {section}{Abstract}{1}{Doc-Start}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Practitioner Points}{2}{Doc-Start}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{1}{2}{Introduction}{section.1}{}}
+\newlabel{sec:introduction@cref}{{[section][1][]1}{[1][2][]2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The proposed layer in one picture. A generator retains each row's role---local to a component or coupling between components---block ownership, and coupling incidence before export. A conventional export (dashed) hands the solver a flat matrix in which this structure is lost. The structure-aware layer instead uses this metadata to assign positive row factors in a local--block--coupling order and exports an \textit  {algebraically equivalent} flat MIP. The solver still receives a single flat matrix; only its numbers change. (The role-blind flat control, and the coverage gap left by an incomplete role map, are analyzed in \cref  {subsec:stage-attribution}.)\relax }}{3}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:overview}{{1}{3}{The proposed layer in one picture. A generator retains each row's role---local to a component or coupling between components---block ownership, and coupling incidence before export. A conventional export (dashed) hands the solver a flat matrix in which this structure is lost. The structure-aware layer instead uses this metadata to assign positive row factors in a local--block--coupling order and exports an \emph {algebraically equivalent} flat MIP. The solver still receives a single flat matrix; only its numbers change. (The role-blind flat control, and the coverage gap left by an incomplete role map, are analyzed in \cref {subsec:stage-attribution}.)\relax }{figure.caption.1}{}}
+\newlabel{fig:overview@cref}{{[figure][1][]1}{[1][3][]3}}
+\citation{risso2025rioNegro,risso2025uruguayRiver,rodriguez2025thesis}
+\citation{wood2013power,conejo2010decision}
+\citation{vielma2015formulation}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related work}{4}{section.2}\protected@file@percent }
+\newlabel{sec:related-work}{{2}{4}{Related work}{section.2}{}}
+\newlabel{sec:related-work@cref}{{[section][2][]2}{[1][4][]4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Hydrothermal dispatch and MIP formulations}{4}{subsection.2.1}\protected@file@percent }
+\citation{risso2025rioNegro}
+\citation{risso2025uruguayRiver}
+\citation{risso2026enriched}
+\citation{rodriguez2025thesis}
+\citation{klotz2013lp,klotz2013mip}
+\citation{klotz2014illconditioning}
+\citation{tomlin1975scaling}
+\citation{curtisreid1972}
+\citation{sinkhorn1967}
+\citation{ruiz2001scaling}
+\citation{achterberg2020presolve}
+\citation{elble2012scaling}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Dispatch models used in this study}{5}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Numerical scaling and solver-facing representation}{5}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Generic equilibration and its limitation for generated models}{5}{subsection.2.4}\protected@file@percent }
+\citation{vielma2015formulation}
+\citation{carrion2006uc,moralesespana2013tight}
+\citation{dolan2002performance}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Formulation quality, generated structure, and decomposition}{6}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Remaining niche}{6}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Materials and methods: generated modular formulation and testbed}{6}{section.3}\protected@file@percent }
+\newlabel{sec:model}{{3}{6}{Materials and methods: generated modular formulation and testbed}{section.3}{}}
+\newlabel{sec:model@cref}{{[section][3][]3}{[1][6][]6}}
+\citation{risso2025rioNegro,risso2025uruguayRiver,rodriguez2025thesis}
+\newlabel{eq:generic-mip}{{1}{7}{Materials and methods: generated modular formulation and testbed}{equation.3.1}{}}
+\newlabel{eq:generic-mip@cref}{{[equation][1][]1}{[1][6][]7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Hydrothermal dispatch testbed and scope}{7}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Block structure}{7}{subsection.3.2}\protected@file@percent }
+\newlabel{eq:compact-dispatch-structure}{{2}{7}{Block structure}{equation.3.2}{}}
+\newlabel{eq:compact-dispatch-structure@cref}{{[equation][2][]2}{[1][7][]7}}
+\newlabel{eq:block-matrix}{{3}{8}{Block structure}{equation.3.3}{}}
+\newlabel{eq:block-matrix@cref}{{[equation][3][]3}{[1][7][]8}}
+\newlabel{eq:role-disjointness}{{4}{8}{Block structure}{equation.3.4}{}}
+\newlabel{eq:role-disjointness@cref}{{[equation][4][]4}{[1][8][]8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Algebraic equivalence and spectral diagnostics}{8}{subsection.3.3}\protected@file@percent }
+\newlabel{subsec:equivalence-diagnostics}{{3.3}{8}{Algebraic equivalence and spectral diagnostics}{subsection.3.3}{}}
+\newlabel{subsec:equivalence-diagnostics@cref}{{[subsection][3][3]3.3}{[1][8][]8}}
+\newlabel{eq:row-scaling}{{5}{8}{Algebraic equivalence and spectral diagnostics}{equation.3.5}{}}
+\newlabel{eq:row-scaling@cref}{{[equation][5][]5}{[1][8][]8}}
+\newlabel{eq:row-scaling-equivalence}{{6}{8}{Algebraic equivalence and spectral diagnostics}{equation.3.6}{}}
+\newlabel{eq:row-scaling-equivalence@cref}{{[equation][6][]6}{[1][8][]8}}
+\newlabel{eq:spectral-condition}{{7}{8}{Algebraic equivalence and spectral diagnostics}{equation.3.7}{}}
+\newlabel{eq:spectral-condition@cref}{{[equation][7][]7}{[1][8][]8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Ideal block scaling}{9}{subsection.3.4}\protected@file@percent }
+\newlabel{subsec:ideal-block-scaling}{{3.4}{9}{Ideal block scaling}{subsection.3.4}{}}
+\newlabel{subsec:ideal-block-scaling@cref}{{[subsection][4][3]3.4}{[1][9][]9}}
+\newlabel{prop:ideal-block-scaling}{{1}{9}{Ideal scalar scaling of block-diagonal matrices}{proposition.1}{}}
+\newlabel{prop:ideal-block-scaling@cref}{{[proposition][1][]1}{[1][9][]9}}
+\newlabel{eq:ideal-block-minimax}{{8}{9}{Ideal scalar scaling of block-diagonal matrices}{equation.3.8}{}}
+\newlabel{eq:ideal-block-minimax@cref}{{[equation][8][]8}{[1][9][]9}}
+\newlabel{eq:ideal-block-factor}{{9}{9}{Ideal scalar scaling of block-diagonal matrices}{equation.3.9}{}}
+\newlabel{eq:ideal-block-factor@cref}{{[equation][9][]9}{[1][9][]9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Effect of global coupling rows}{9}{subsection.3.5}\protected@file@percent }
+\newlabel{subsec:global-coupling-theory}{{3.5}{9}{Effect of global coupling rows}{subsection.3.5}{}}
+\newlabel{subsec:global-coupling-theory@cref}{{[subsection][5][3]3.5}{[1][9][]9}}
+\newlabel{eq:balance-block-matrix}{{10}{9}{Effect of global coupling rows}{equation.3.10}{}}
+\newlabel{eq:balance-block-matrix@cref}{{[equation][10][]10}{[1][9][]9}}
+\newlabel{eq:balance-factorization}{{11}{9}{Effect of global coupling rows}{equation.3.11}{}}
+\newlabel{eq:balance-factorization@cref}{{[equation][11][]11}{[1][9][]9}}
+\newlabel{prop:triangular-coupling}{{2}{9}{Conditioning of a triangular coupling factor}{proposition.2}{}}
+\newlabel{prop:triangular-coupling@cref}{{[proposition][2][]2}{[1][9][]9}}
+\newlabel{eq:link-condition}{{13}{10}{Conditioning of a triangular coupling factor}{equation.3.13}{}}
+\newlabel{eq:link-condition@cref}{{[equation][13][]13}{[1][10][]10}}
+\newlabel{eq:scaled-balance-factorization}{{14}{10}{Effect of global coupling rows}{equation.3.14}{}}
+\newlabel{eq:scaled-balance-factorization@cref}{{[equation][14][]14}{[1][10][]10}}
+\newlabel{prop:attribution}{{3}{10}{Attribution under an exhaustive row map}{proposition.3}{}}
+\newlabel{prop:attribution@cref}{{[proposition][3][]3}{[1][10][]10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}From ideal diagnostics to implementable proxies}{10}{subsection.3.6}\protected@file@percent }
+\newlabel{subsec:ideal-to-proxies}{{3.6}{10}{From ideal diagnostics to implementable proxies}{subsection.3.6}{}}
+\newlabel{subsec:ideal-to-proxies@cref}{{[subsection][6][3]3.6}{[1][10][]10}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Numerical scaling method}{11}{section.4}\protected@file@percent }
+\newlabel{sec:scaling}{{4}{11}{Numerical scaling method}{section.4}{}}
+\newlabel{sec:scaling@cref}{{[section][4][]4}{[1][11][]11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Base formulation}{11}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Augmented structure-aware scaling}{12}{subsection.4.2}\protected@file@percent }
+\newlabel{subsec:strategy-1}{{4.2}{12}{Augmented structure-aware scaling}{subsection.4.2}{}}
+\newlabel{subsec:strategy-1@cref}{{[subsection][2][4]4.2}{[1][12][]12}}
+\newlabel{eq:augmented-set}{{15}{12}{Augmented structure-aware scaling}{equation.4.15}{}}
+\newlabel{eq:augmented-set@cref}{{[equation][15][]15}{[1][12][]12}}
+\newlabel{eq:augmented-extremes}{{16}{12}{Augmented structure-aware scaling}{equation.4.16}{}}
+\newlabel{eq:augmented-extremes@cref}{{[equation][16][]16}{[1][12][]12}}
+\newlabel{eq:alpha-augmented}{{17}{12}{Augmented structure-aware scaling}{equation.4.17}{}}
+\newlabel{eq:alpha-augmented@cref}{{[equation][17][]17}{[1][12][]12}}
+\newlabel{eq:augmented-block-extremes}{{19}{12}{Augmented structure-aware scaling}{equation.4.19}{}}
+\newlabel{eq:augmented-block-extremes@cref}{{[equation][19][]19}{[1][12][]12}}
+\newlabel{eq:augmented-block-scale}{{20}{12}{Augmented structure-aware scaling}{equation.4.20}{}}
+\newlabel{eq:augmented-block-scale@cref}{{[equation][20][]20}{[1][12][]12}}
+\newlabel{eq:free-column-scale}{{21}{12}{Augmented structure-aware scaling}{equation.4.21}{}}
+\newlabel{eq:free-column-scale@cref}{{[equation][21][]21}{[1][12][]12}}
+\newlabel{eq:augmented-coupling-rho}{{22}{12}{Augmented structure-aware scaling}{equation.4.22}{}}
+\newlabel{eq:augmented-coupling-rho@cref}{{[equation][22][]22}{[1][12][]12}}
+\newlabel{eq:augmented-coupling-factor}{{23}{12}{Augmented structure-aware scaling}{equation.4.23}{}}
+\newlabel{eq:augmented-coupling-factor@cref}{{[equation][23][]23}{[1][12][]12}}
+\newlabel{eq:augmented-diagonal-spread}{{24}{12}{Augmented structure-aware scaling}{equation.4.24}{}}
+\newlabel{eq:augmented-diagonal-spread@cref}{{[equation][24][]24}{[1][12][]12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Matrix-only structure-aware scaling}{13}{subsection.4.3}\protected@file@percent }
+\newlabel{subsec:strategy-2}{{4.3}{13}{Matrix-only structure-aware scaling}{subsection.4.3}{}}
+\newlabel{subsec:strategy-2@cref}{{[subsection][3][4]4.3}{[1][13][]13}}
+\newlabel{eq:matrix-row-extremes}{{25}{13}{Matrix-only structure-aware scaling}{equation.4.25}{}}
+\newlabel{eq:matrix-row-extremes@cref}{{[equation][25][]25}{[1][13][]13}}
+\newlabel{eq:matrix-row-factor}{{26}{13}{Matrix-only structure-aware scaling}{equation.4.26}{}}
+\newlabel{eq:matrix-row-factor@cref}{{[equation][26][]26}{[1][13][]13}}
+\newlabel{eq:matrix-block-extremes}{{28}{13}{Matrix-only structure-aware scaling}{equation.4.28}{}}
+\newlabel{eq:matrix-block-extremes@cref}{{[equation][28][]28}{[1][13][]13}}
+\newlabel{eq:matrix-block-scale}{{29}{13}{Matrix-only structure-aware scaling}{equation.4.29}{}}
+\newlabel{eq:matrix-block-scale@cref}{{[equation][29][]29}{[1][13][]13}}
+\newlabel{eq:matrix-coupling-rho}{{30}{13}{Matrix-only structure-aware scaling}{equation.4.30}{}}
+\newlabel{eq:matrix-coupling-rho@cref}{{[equation][30][]30}{[1][13][]13}}
+\newlabel{eq:matrix-coupling-factor}{{31}{13}{Matrix-only structure-aware scaling}{equation.4.31}{}}
+\newlabel{eq:matrix-coupling-factor@cref}{{[equation][31][]31}{[1][13][]13}}
+\newlabel{eq:free-column-scale-mat}{{32}{14}{Matrix-only structure-aware scaling}{equation.4.32}{}}
+\newlabel{eq:free-column-scale-mat@cref}{{[equation][32][]32}{[1][13][]14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Safeguards}{14}{subsection.4.4}\protected@file@percent }
+\newlabel{subsec:safeguards}{{4.4}{14}{Safeguards}{subsection.4.4}{}}
+\newlabel{subsec:safeguards@cref}{{[subsection][4][4]4.4}{[1][14][]14}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  4.4.0.1}Near-identity threshold}{14}{paragraph.4.4.0.1}\protected@file@percent }
+\newlabel{eq:near-identity}{{33}{14}{Near-identity threshold}{equation.4.33}{}}
+\newlabel{eq:near-identity@cref}{{[equation][33][]33}{[1][14][]14}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  4.4.0.2}Admissible coefficient range}{14}{paragraph.4.4.0.2}\protected@file@percent }
+\newlabel{eq:coef-window}{{34}{14}{Admissible coefficient range}{equation.4.34}{}}
+\newlabel{eq:coef-window@cref}{{[equation][34][]34}{[1][14][]14}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  4.4.0.3}Reliability safeguards}{14}{paragraph.4.4.0.3}\protected@file@percent }
+\newlabel{eq:local-floor}{{35}{15}{Reliability safeguards}{equation.4.35}{}}
+\newlabel{eq:local-floor@cref}{{[equation][35][]35}{[1][15][]15}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  4.4.0.4}Verification protocol}{15}{paragraph.4.4.0.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Ruiz-type baselines}{15}{subsection.4.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Three instance classes test the method on progressively different generated hydrothermal models.\relax }}{16}{table.caption.2}\protected@file@percent }
+\newlabel{tab:instance-stats}{{1}{16}{Three instance classes test the method on progressively different generated hydrothermal models.\relax }{table.caption.2}{}}
+\newlabel{tab:instance-stats@cref}{{[table][1][]1}{[1][16][]16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Algorithmic summary}{16}{subsection.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experimental design}{16}{section.5}\protected@file@percent }
+\newlabel{sec:experimental-design}{{5}{16}{Experimental design}{section.5}{}}
+\newlabel{sec:experimental-design@cref}{{[section][5][]5}{[1][16][]16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Instance classes and scenarios}{16}{subsection.5.1}\protected@file@percent }
+\citation{nesmachnow2019clusteruy}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Four solver--tolerance scenarios examine how the observed external-preprocessing effect changes across solver pipelines and MIPGap tolerances.\relax }}{17}{table.caption.4}\protected@file@percent }
+\newlabel{tab:solver-scenarios}{{2}{17}{Four solver--tolerance scenarios examine how the observed external-preprocessing effect changes across solver pipelines and MIPGap tolerances.\relax }{table.caption.4}{}}
+\newlabel{tab:solver-scenarios@cref}{{[table][2][]2}{[1][17][]17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Controlled synthetic block-structured benchmark}{17}{subsection.5.2}\protected@file@percent }
+\newlabel{subsec:synthetic-benchmark}{{5.2}{17}{Controlled synthetic block-structured benchmark}{subsection.5.2}{}}
+\newlabel{subsec:synthetic-benchmark@cref}{{[subsection][2][5]5.2}{[1][17][]17}}
+\newlabel{eq:synthetic-mip}{{37}{17}{Controlled synthetic block-structured benchmark}{equation.5.37}{}}
+\newlabel{eq:synthetic-mip@cref}{{[equation][37][]37}{[1][17][]17}}
+\newlabel{eq:synthetic-row-metadata}{{38}{17}{Controlled synthetic block-structured benchmark}{equation.5.38}{}}
+\newlabel{eq:synthetic-row-metadata@cref}{{[equation][38][]38}{[1][17][]17}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Controlled synthetic benchmark factors isolate the numerical mechanisms targeted by the scaling rule.\relax }}{18}{table.caption.6}\protected@file@percent }
+\newlabel{tab:synthetic-design}{{3}{18}{Controlled synthetic benchmark factors isolate the numerical mechanisms targeted by the scaling rule.\relax }{table.caption.6}{}}
+\newlabel{tab:synthetic-design@cref}{{[table][3][]3}{[1][18][]18}}
+\newlabel{eq:synthetic-row-factor}{{39}{18}{Controlled synthetic block-structured benchmark}{equation.5.39}{}}
+\newlabel{eq:synthetic-row-factor@cref}{{[equation][39][]39}{[1][17][]18}}
+\newlabel{eq:synthetic-severity}{{40}{18}{Controlled synthetic block-structured benchmark}{equation.5.40}{}}
+\newlabel{eq:synthetic-severity@cref}{{[equation][40][]40}{[1][18][]18}}
+\newlabel{eq:synthetic-range-proxy}{{41}{18}{Controlled synthetic block-structured benchmark}{equation.5.41}{}}
+\newlabel{eq:synthetic-range-proxy@cref}{{[equation][41][]41}{[1][18][]18}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Scaling variants}{19}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:variants}{{5.3}{19}{Scaling variants}{subsection.5.3}{}}
+\newlabel{subsec:variants@cref}{{[subsection][3][5]5.3}{[1][19][]19}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Additional controls: internal scaling, sensitivity, and coupling-stage activation}{19}{subsection.5.4}\protected@file@percent }
+\newlabel{subsec:added-controls}{{5.4}{19}{Additional controls: internal scaling, sensitivity, and coupling-stage activation}{subsection.5.4}{}}
+\newlabel{subsec:added-controls@cref}{{[subsection][4][5]5.4}{[1][19][]19}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  5.4.0.1}Solver-internal-scaling baseline}{19}{paragraph.5.4.0.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  5.4.0.2}Hyperparameter sensitivity}{19}{paragraph.5.4.0.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  5.4.0.3}Operational coupling-stage activation audit}{20}{paragraph.5.4.0.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Metrics and reporting conventions}{20}{subsection.5.5}\protected@file@percent }
+\newlabel{subsec:metrics}{{5.5}{20}{Metrics and reporting conventions}{subsection.5.5}{}}
+\newlabel{subsec:metrics@cref}{{[subsection][5][5]5.5}{[1][20][]20}}
+\newlabel{eq:relative-objective-deviation}{{42}{20}{Metrics and reporting conventions}{equation.5.42}{}}
+\newlabel{eq:relative-objective-deviation@cref}{{[equation][42][]42}{[1][20][]20}}
+\newlabel{eq:verified-objective-deviation}{{43}{20}{Metrics and reporting conventions}{equation.5.43}{}}
+\newlabel{eq:verified-objective-deviation@cref}{{[equation][43][]43}{[1][20][]20}}
+\newlabel{eq:static-kappa-ratio}{{44}{20}{Metrics and reporting conventions}{equation.5.44}{}}
+\newlabel{eq:static-kappa-ratio@cref}{{[equation][44][]44}{[1][20][]20}}
+\newlabel{eq:solver-kappa-ratio}{{45}{20}{Metrics and reporting conventions}{equation.5.45}{}}
+\newlabel{eq:solver-kappa-ratio@cref}{{[equation][45][]45}{[1][20][]20}}
+\newlabel{eq:speedup}{{46}{21}{Metrics and reporting conventions}{equation.5.46}{}}
+\newlabel{eq:speedup@cref}{{[equation][46][]46}{[1][21][]21}}
+\newlabel{eq:shifted-geometric-mean}{{47}{21}{Metrics and reporting conventions}{equation.5.47}{}}
+\newlabel{eq:shifted-geometric-mean@cref}{{[equation][47][]47}{[1][21][]21}}
+\newlabel{eq:time-averaged-gap}{{48}{21}{Metrics and reporting conventions}{equation.5.48}{}}
+\newlabel{eq:time-averaged-gap@cref}{{[equation][48][]48}{[1][21][]21}}
+\newlabel{eq:performance-profile-cost}{{49}{22}{Metrics and reporting conventions}{equation.5.49}{}}
+\newlabel{eq:performance-profile-cost@cref}{{[equation][49][]49}{[1][21][]22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Statistical analysis}{22}{subsection.5.6}\protected@file@percent }
+\newlabel{subsec:statistical}{{5.6}{22}{Statistical analysis}{subsection.5.6}{}}
+\newlabel{subsec:statistical@cref}{{[subsection][6][5]5.6}{[1][22][]22}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Computational results}{23}{section.6}\protected@file@percent }
+\newlabel{sec:results}{{6}{23}{Computational results}{section.6}{}}
+\newlabel{sec:results@cref}{{[section][6][]6}{[1][23][]23}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Original-scale numerical verification across the operational campaigns}{24}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:original-scale-audit}{{6.1}{24}{Original-scale numerical verification across the operational campaigns}{subsection.6.1}{}}
+\newlabel{subsec:original-scale-audit@cref}{{[subsection][1][6]6.1}{[1][24][]24}}
+\newlabel{eq:relative-residual}{{50}{25}{Original-scale numerical verification across the operational campaigns}{equation.6.50}{}}
+\newlabel{eq:relative-residual@cref}{{[equation][50][]50}{[1][24][]25}}
+\newlabel{eq:par10-itt-cost}{{51}{25}{Original-scale numerical verification across the operational campaigns}{equation.6.51}{}}
+\newlabel{eq:par10-itt-cost@cref}{{[equation][51][]51}{[1][25][]25}}
+\newlabel{eq:par10-reliability-cost}{{52}{25}{Original-scale numerical verification across the operational campaigns}{equation.6.52}{}}
+\newlabel{eq:par10-reliability-cost@cref}{{[equation][52][]52}{[1][25][]25}}
+\newlabel{eq:par10-readings}{{53}{25}{Original-scale numerical verification across the operational campaigns}{equation.6.53}{}}
+\newlabel{eq:par10-readings@cref}{{[equation][53][]53}{[1][25][]25}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces \ensuremath  {\operatorname  {PAR10}}{} (s) under the three readings---intent-to-treat (ITT), strict absolute, and mixed absolute--relative---for Gurobi on the scenario-specific common operational pool after uniformly excluding instances that meet the documented criterion in Table~S5 (pool size $n$). Every timeout or abort costs $10T_{\qopname  \relax m{max}}=36{,}000$\,s under all readings; a normally terminated run that fails a reliability criterion costs the same under that criterion. Counts distinguish timeouts ($n_{\mathrm {TO}}$), aborts ($n_{\mathrm {ab}}$), and normally terminated runs failing strict or mixed verification ($n_{\mathrm {fail,s}}$, $n_{\mathrm {fail,m}}$). Bold entries are descriptive numerical comparisons with Base within the same reading; they do not denote inferential significance.\relax }}{26}{table.caption.8}\protected@file@percent }
+\newlabel{tab:par10-readings}{{4}{26}{\PARten {} (s) under the three readings---intent-to-treat (ITT), strict absolute, and mixed absolute--relative---for Gurobi on the scenario-specific common operational pool after uniformly excluding instances that meet the documented criterion in Table~S5 (pool size $n$). Every timeout or abort costs $10T_{\max }=36{,}000$\,s under all readings; a normally terminated run that fails a reliability criterion costs the same under that criterion. Counts distinguish timeouts ($n_{\mathrm {TO}}$), aborts ($n_{\mathrm {ab}}$), and normally terminated runs failing strict or mixed verification ($n_{\mathrm {fail,s}}$, $n_{\mathrm {fail,m}}$). Bold entries are descriptive numerical comparisons with Base within the same reading; they do not denote inferential significance.\relax }{table.caption.8}{}}
+\newlabel{tab:par10-readings@cref}{{[table][4][]4}{[1][26][]26}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Gurobi results at both tolerances}{26}{subsection.6.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Pooled completed-run diagnostic audit for original-scale reliability in the four operational campaigns. Each returned solution is evaluated on the original, unscaled constraints (variables are mapped back to original units only for the column-scaling baseline); a run passes if the maximum row violation is at most $10^{-4}$ and the maximum integrality violation at most $10^{-5}$ (\cref  {subsec:metrics}). The ``pass'' column is a \textit  {conditional pass rate among completed runs}: it is not a campaign-wide reliability rate, because solver aborts are excluded from its denominator here (they are instead penalized as failures in the \ensuremath  {\operatorname  {PAR10}}{} readings of \cref  {tab:par10-readings}). Row violations are absolute, in original units; $\Delta z_{\mathrm {rel}}$ is \cref  {eq:relative-objective-deviation} against the base incumbent on the same instance (descriptive; the correctness reference is the verified incumbent $z_i^{\mathrm {ver}}$ of \cref  {eq:verified-objective-deviation}). Pooling can conceal variant heterogeneity and is not used to infer the reliability of a particular method; the per-variant counts are in Table~S2.\relax }}{27}{table.caption.9}\protected@file@percent }
+\newlabel{tab:original-scale-audit}{{5}{27}{Pooled completed-run diagnostic audit for original-scale reliability in the four operational campaigns. Each returned solution is evaluated on the original, unscaled constraints (variables are mapped back to original units only for the column-scaling baseline); a run passes if the maximum row violation is at most $10^{-4}$ and the maximum integrality violation at most $10^{-5}$ (\cref {subsec:metrics}). The ``pass'' column is a \emph {conditional pass rate among completed runs}: it is not a campaign-wide reliability rate, because solver aborts are excluded from its denominator here (they are instead penalized as failures in the \PARten {} readings of \cref {tab:par10-readings}). Row violations are absolute, in original units; $\Delta z_{\mathrm {rel}}$ is \cref {eq:relative-objective-deviation} against the base incumbent on the same instance (descriptive; the correctness reference is the verified incumbent $z_i^{\mathrm {ver}}$ of \cref {eq:verified-objective-deviation}). Pooling can conceal variant heterogeneity and is not used to infer the reliability of a particular method; the per-variant counts are in Table~S2.\relax }{table.caption.9}{}}
+\newlabel{tab:original-scale-audit@cref}{{[table][5][]5}{[1][26][]27}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces At $1\%$ MIPGap, structure-aware variants improve several descriptive completed-run Gurobi efficiency metrics in Simple and SG-Ter-Mer; fixed-pool intent-to-treat and reliability-adjusted \ensuremath  {\operatorname  {PAR10}}{} are reported in \cref  {tab:par10-readings}.\relax }}{27}{table.caption.11}\protected@file@percent }
+\newlabel{tab:robust-gurobi-1pct-mipgap}{{6}{27}{At $1\%$ MIPGap, structure-aware variants improve several descriptive completed-run Gurobi efficiency metrics in Simple and SG-Ter-Mer; fixed-pool intent-to-treat and reliability-adjusted \PARten {} are reported in \cref {tab:par10-readings}.\relax }{table.caption.11}{}}
+\newlabel{tab:robust-gurobi-1pct-mipgap@cref}{{[table][6][]6}{[1][26][]27}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces At $1\%$ MIPGap, the Gurobi total-time speedup distributions place the structure-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. The axis is the logged \textit  {total}-time speedup of the main campaign (\cref  {eq:speedup}, $q=\mathrm {total}$). Its preprocessing component has whole-second resolution: the Ruiz overhead is visible and pulls those medians well below the solver-time and deterministic-effort parity of \cref  {tab:robust-gurobi-1pct-mipgap} and the $\rho ^{\mathrm {solver}}_\kappa $ scatter, whereas the subsecond structure-aware overhead is rounded to zero (\cref  {subsec:metrics}). The figure should therefore not be read as a precise preprocessing-plus-solver comparison for the structure-aware variants; those come from the instrumented control batches of \cref  {subsec:stage-attribution}. Values above the parity line indicate acceleration relative to the unscaled model. In all box plots, boxes span the interquartile range (IQR) and whiskers extend to the most extreme observation within $1.5\times $\,IQR; outliers are omitted, since tail behavior is captured by \ensuremath  {\operatorname  {PAR10}}{} and the performance profiles.\relax }}{28}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:boxplot-speedup-total-gap1}{{2}{28}{At $1\%$ MIPGap, the Gurobi total-time speedup distributions place the structure-aware variants mostly above parity, while Ruiz-type baselines are more dispersed. The axis is the logged \emph {total}-time speedup of the main campaign (\cref {eq:speedup}, $q=\mathrm {total}$). Its preprocessing component has whole-second resolution: the Ruiz overhead is visible and pulls those medians well below the solver-time and deterministic-effort parity of \cref {tab:robust-gurobi-1pct-mipgap} and the $\rho ^{\mathrm {solver}}_\kappa $ scatter, whereas the subsecond structure-aware overhead is rounded to zero (\cref {subsec:metrics}). The figure should therefore not be read as a precise preprocessing-plus-solver comparison for the structure-aware variants; those come from the instrumented control batches of \cref {subsec:stage-attribution}. Values above the parity line indicate acceleration relative to the unscaled model. In all box plots, boxes span the interquartile range (IQR) and whiskers extend to the most extreme observation within $1.5\times $\,IQR; outliers are omitted, since tail behavior is captured by \PARten {} and the performance profiles.\relax }{figure.caption.12}{}}
+\newlabel{fig:boxplot-speedup-total-gap1@cref}{{[figure][2][]2}{[1][27][]28}}
+\newlabel{fig:scatter-kappa-speedup-gap1}{{3a}{28}{Static coefficient-range ratio.\relax }{figure.caption.13}{}}
+\newlabel{fig:scatter-kappa-speedup-gap1@cref}{{[subfigure][1][3]3a}{[1][27][]28}}
+\newlabel{sub@fig:scatter-kappa-speedup-gap1}{{a}{28}{Static coefficient-range ratio.\relax }{figure.caption.13}{}}
+\newlabel{sub@fig:scatter-kappa-speedup-gap1@cref}{{[subfigure][1][3]3a}{[1][27][]28}}
+\newlabel{fig:scatter-kappa-solver-speedup-gap1}{{3b}{28}{Solver-level conditioning ratio.\relax }{figure.caption.13}{}}
+\newlabel{fig:scatter-kappa-solver-speedup-gap1@cref}{{[subfigure][2][3]3b}{[1][27][]28}}
+\newlabel{sub@fig:scatter-kappa-solver-speedup-gap1}{{b}{28}{Solver-level conditioning ratio.\relax }{figure.caption.13}{}}
+\newlabel{sub@fig:scatter-kappa-solver-speedup-gap1@cref}{{[subfigure][2][3]3b}{[1][27][]28}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces At $1\%$ MIPGap, static coefficient-range compression and solver-level conditioning tell different stories. The contrast between panels shows why exported matrix compression alone should not be treated as evidence of easier branch-and-bound search. In panel (a) every static ratio lies below one, so the $\rho _\kappa =1$ reference sits outside the plotted range.\relax }}{28}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:diagnostic-scatter-gap1}{{3}{28}{At $1\%$ MIPGap, static coefficient-range compression and solver-level conditioning tell different stories. The contrast between panels shows why exported matrix compression alone should not be treated as evidence of easier branch-and-bound search. In panel (a) every static ratio lies below one, so the $\rho _\kappa =1$ reference sits outside the plotted range.\relax }{figure.caption.13}{}}
+\newlabel{fig:diagnostic-scatter-gap1@cref}{{[figure][3][]3}{[1][27][]28}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces At $1\%$ MIPGap, fixed-pool Dolan--Mor\'e profiles use the common denominators and $36{,}000$-s individual failure cost of \cref  {eq:performance-profile-cost}. Curves farther toward the upper-left indicate variants that more often lie close to the best admissible time.\relax }}{29}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:profile-gurobi-gap001}{{4}{29}{At $1\%$ MIPGap, fixed-pool Dolan--Mor\'e profiles use the common denominators and $36{,}000$-s individual failure cost of \cref {eq:performance-profile-cost}. Curves farther toward the upper-left indicate variants that more often lie close to the best admissible time.\relax }{figure.caption.14}{}}
+\newlabel{fig:profile-gurobi-gap001@cref}{{[figure][4][]4}{[1][27][]29}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Structure-aware variants are associated with lower own-incumbent path-specific fixed-LP conditioning diagnostics under Gurobi at $0.1\%$ MIPGap, whereas static coefficient compression alone is not.\relax }}{29}{table.caption.15}\protected@file@percent }
+\newlabel{tab:gurobi-gap0001-relative-conditioning}{{7}{29}{Structure-aware variants are associated with lower own-incumbent path-specific fixed-LP conditioning diagnostics under Gurobi at $0.1\%$ MIPGap, whereas static coefficient compression alone is not.\relax }{table.caption.15}{}}
+\newlabel{tab:gurobi-gap0001-relative-conditioning@cref}{{[table][7][]7}{[1][29][]29}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  6.2.0.1}A fixed-basis conditioning check.}{29}{paragraph.6.2.0.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Paired Gurobi tests show a distributional runtime shift for both structure-aware variants relative to the unscaled base formulation, especially in Simple and SG-Ter-Mer. The contrast that isolates metadata selectivity is against the role-blind controls, not against Base, and is reported in \cref  {subsec:stage-attribution}.\relax }}{30}{table.caption.16}\protected@file@percent }
+\newlabel{tab:wilcoxon-structured-gurobi}{{8}{30}{Paired Gurobi tests show a distributional runtime shift for both structure-aware variants relative to the unscaled base formulation, especially in Simple and SG-Ter-Mer. The contrast that isolates metadata selectivity is against the role-blind controls, not against Base, and is reported in \cref {subsec:stage-attribution}.\relax }{table.caption.16}{}}
+\newlabel{tab:wilcoxon-structured-gurobi@cref}{{[table][8][]8}{[1][30][]30}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Across the pooled scaling family, the own-incumbent path-specific fixed-LP diagnostic is more associated with Gurobi speedup than the exported-range proxy; within the structure-aware variants the association is essentially null.\relax }}{31}{table.caption.17}\protected@file@percent }
+\newlabel{tab:gurobi-conditioning-correlations}{{9}{31}{Across the pooled scaling family, the own-incumbent path-specific fixed-LP diagnostic is more associated with Gurobi speedup than the exported-range proxy; within the structure-aware variants the association is essentially null.\relax }{table.caption.17}{}}
+\newlabel{tab:gurobi-conditioning-correlations@cref}{{[table][9][]9}{[1][30][]31}}
+\newlabel{fig:boxplot-speedup-total-cplex1}{{5a}{31}{Total-time speedup distribution.\relax }{figure.caption.19}{}}
+\newlabel{fig:boxplot-speedup-total-cplex1@cref}{{[subfigure][1][5]5a}{[1][31][]31}}
+\newlabel{sub@fig:boxplot-speedup-total-cplex1}{{a}{31}{Total-time speedup distribution.\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:boxplot-speedup-total-cplex1@cref}{{[subfigure][1][5]5a}{[1][31][]31}}
+\newlabel{fig:profile-cplex-gap001}{{5b}{31}{Fixed-pool performance profile.\relax }{figure.caption.19}{}}
+\newlabel{fig:profile-cplex-gap001@cref}{{[subfigure][2][5]5b}{[1][31][]31}}
+\newlabel{sub@fig:profile-cplex-gap001}{{b}{31}{Fixed-pool performance profile.\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:profile-cplex-gap001@cref}{{[subfigure][2][5]5b}{[1][31][]31}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces At $1\%$ MIPGap, the CPLEX distributional view and the common-pool, failure-penalized profile of \cref  {eq:performance-profile-cost} break the Gurobi pattern. The plots therefore serve as a solver contrast.\relax }}{31}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:cplex-gap1-visual-summary}{{5}{31}{At $1\%$ MIPGap, the CPLEX distributional view and the common-pool, failure-penalized profile of \cref {eq:performance-profile-cost} break the Gurobi pattern. The plots therefore serve as a solver contrast.\relax }{figure.caption.19}{}}
+\newlabel{fig:cplex-gap1-visual-summary@cref}{{[figure][5][]5}{[1][31][]31}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}CPLEX results at both tolerances}{31}{subsection.6.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces At $1\%$ MIPGap, CPLEX does not reproduce the Gurobi structure-aware acceleration pattern.\relax }}{32}{table.caption.18}\protected@file@percent }
+\newlabel{tab:robust-cplex-1pct-mipgap}{{10}{32}{At $1\%$ MIPGap, CPLEX does not reproduce the Gurobi structure-aware acceleration pattern.\relax }{table.caption.18}{}}
+\newlabel{tab:robust-cplex-1pct-mipgap@cref}{{[table][10][]10}{[1][31][]32}}
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Paired CPLEX tests do not support a robust positive runtime effect for the structure-aware variants.\relax }}{32}{table.caption.20}\protected@file@percent }
+\newlabel{tab:wilcoxon-structured-cplex}{{11}{32}{Paired CPLEX tests do not support a robust positive runtime effect for the structure-aware variants.\relax }{table.caption.20}{}}
+\newlabel{tab:wilcoxon-structured-cplex@cref}{{[table][11][]11}{[1][31][]32}}
+\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Controlled synthetic benchmark: median global coefficient-and-right-hand-side magnitude-range proxy before scaling and after each variant, with worst original-scale violations across the selected cells.\relax }}{33}{table.caption.21}\protected@file@percent }
+\newlabel{tab:synthetic_compact}{{12}{33}{Controlled synthetic benchmark: median global coefficient-and-right-hand-side magnitude-range proxy before scaling and after each variant, with worst original-scale violations across the selected cells.\relax }{table.caption.21}{}}
+\newlabel{tab:synthetic_compact@cref}{{[table][12][]12}{[1][33][]33}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Controlled synthetic mechanism check}{33}{subsection.6.4}\protected@file@percent }
+\newlabel{subsec:synthetic-results}{{6.4}{33}{Controlled synthetic mechanism check}{subsection.6.4}{}}
+\newlabel{subsec:synthetic-results@cref}{{[subsection][4][6]6.4}{[1][33][]33}}
+\newlabel{fig:synthetic-kappa-pre}{{6a}{34}{Pre-scaling global magnitude-range proxy by pattern and severity.\relax }{figure.caption.22}{}}
+\newlabel{fig:synthetic-kappa-pre@cref}{{[subfigure][1][6]6a}{[1][33][]34}}
+\newlabel{sub@fig:synthetic-kappa-pre}{{a}{34}{Pre-scaling global magnitude-range proxy by pattern and severity.\relax }{figure.caption.22}{}}
+\newlabel{sub@fig:synthetic-kappa-pre@cref}{{[subfigure][1][6]6a}{[1][33][]34}}
+\newlabel{fig:synthetic-log-reduction}{{6b}{34}{Median reduction in $\log _{10}\widehat \kappa _{\rm range}$.\relax }{figure.caption.22}{}}
+\newlabel{fig:synthetic-log-reduction@cref}{{[subfigure][2][6]6b}{[1][33][]34}}
+\newlabel{sub@fig:synthetic-log-reduction}{{b}{34}{Median reduction in $\log _{10}\widehat \kappa _{\rm range}$.\relax }{figure.caption.22}{}}
+\newlabel{sub@fig:synthetic-log-reduction@cref}{{[subfigure][2][6]6b}{[1][33][]34}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows recovery of the global coefficient-and-right-hand-side magnitude-range proxy by the four scaling variants and the role-blind flat control on the four imbalance patterns at $S\in \{3,6\}$. The Base variant is omitted because its reduction is zero by construction; the \textit  {none} pattern is omitted from this panel for readability and reported in \cref  {tab:synthetic_compact}, where, unlike Base, some rules \textit  {worsen} the proxy on that negative control. The coupling-uniform group pools both directions of the shared factor; \cref  {tab:synthetic_compact} splits them. Bars are hatched by variant and outlined with a thin/thick edge (and a lighter/darker fill) for $S=3$/$S=6$, so the grouping reads without color.\relax }}{34}{figure.caption.22}\protected@file@percent }
+\newlabel{fig:synthetic-mechanism-summary}{{6}{34}{Controlled synthetic mechanism check. Panel (a) verifies that the injected scale imbalance is controlled by the pattern and severity parameters. Panel (b) shows recovery of the global coefficient-and-right-hand-side magnitude-range proxy by the four scaling variants and the role-blind flat control on the four imbalance patterns at $S\in \{3,6\}$. The Base variant is omitted because its reduction is zero by construction; the \textit {none} pattern is omitted from this panel for readability and reported in \cref {tab:synthetic_compact}, where, unlike Base, some rules \emph {worsen} the proxy on that negative control. The coupling-uniform group pools both directions of the shared factor; \cref {tab:synthetic_compact} splits them. Bars are hatched by variant and outlined with a thin/thick edge (and a lighter/darker fill) for $S=3$/$S=6$, so the grouping reads without color.\relax }{figure.caption.22}{}}
+\newlabel{fig:synthetic-mechanism-summary@cref}{{[figure][6][]6}{[1][33][]34}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Direct spectral audit of the synthetic grid}{35}{subsection.6.5}\protected@file@percent }
+\newlabel{subsec:spectral-audit}{{6.5}{35}{Direct spectral audit of the synthetic grid}{subsection.6.5}{}}
+\newlabel{subsec:spectral-audit@cref}{{[subsection][5][6]6.5}{[1][35][]35}}
+\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Median $\kappa _2^{+}$ of the exported constraint matrix over $20$ seeds, at the most severe disturbance level ($S=6$; the None pattern applies no disturbance, so severity is inert for it). Every rule improves on Base wherever imbalance is present, but the role-blind control Flat matches SA-Aug{} on three patterns and beats it on the two coupling-dominated ones.\relax }}{35}{table.caption.23}\protected@file@percent }
+\newlabel{tab:spectral-audit}{{13}{35}{Median $\kappa _2^{+}$ of the exported constraint matrix over $20$ seeds, at the most severe disturbance level ($S=6$; the None pattern applies no disturbance, so severity is inert for it). Every rule improves on Base wherever imbalance is present, but the role-blind control Flat matches \methodAug {} on three patterns and beats it on the two coupling-dominated ones.\relax }{table.caption.23}{}}
+\newlabel{tab:spectral-audit@cref}{{[table][13][]13}{[1][35][]35}}
+\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Kernel-matched metadata sweep: median $\kappa _2^{+}$ ratio $SA-Mat{}/\mathrm {Flat\text  {-}Mat}$ (both coefficient-only, so the gap is the block metadata alone) as the block-scale heterogeneity and the disturbance severity vary, $30$ seeds per cell. A ratio below one favors the structure-aware rule. The advantage is negligible when the blocks are near-homogeneous, grows by about an order of magnitude per unit of exponent range, and is essentially independent of the severity $S$ and of which coupling pattern is used. Every $[-2,2]$ and $[-3,3]$ cell is significant at $p<10^{-8}$ ($30/30$ instances); no $[-1,1]$ cell is.\relax }}{37}{table.caption.24}\protected@file@percent }
+\newlabel{tab:metadata-grid}{{14}{37}{Kernel-matched metadata sweep: median $\kappa _2^{+}$ ratio $\methodMat {}/\mathrm {Flat\text {-}Mat}$ (both coefficient-only, so the gap is the block metadata alone) as the block-scale heterogeneity and the disturbance severity vary, $30$ seeds per cell. A ratio below one favors the structure-aware rule. The advantage is negligible when the blocks are near-homogeneous, grows by about an order of magnitude per unit of exponent range, and is essentially independent of the severity $S$ and of which coupling pattern is used. Every $[-2,2]$ and $[-3,3]$ cell is significant at $p<10^{-8}$ ($30/30$ instances); no $[-1,1]$ cell is.\relax }{table.caption.24}{}}
+\newlabel{tab:metadata-grid@cref}{{[table][14][]14}{[1][37][]37}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\rm  6.5.0.1}Why the advantage grows by an order of magnitude per unit of range.}{37}{paragraph.6.5.0.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Solver-internal-scaling baseline}{37}{subsection.6.6}\protected@file@percent }
+\newlabel{subsec:internal-scaling}{{6.6}{37}{Solver-internal-scaling baseline}{subsection.6.6}{}}
+\newlabel{subsec:internal-scaling@cref}{{[subsection][6][6]6.6}{[1][37][]37}}
+\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces Operational coupling-stage activation audit under Gurobi (1\% MIPGap). Counts are over eligible diagnostic/export pairs. No coupling factor is applied, and every full/local-only export pair is byte-identical; the operational transformation therefore reduces to local-row normalization.\relax }}{38}{table.caption.25}\protected@file@percent }
+\newlabel{tab:coupling-activation-audit}{{15}{38}{Operational coupling-stage activation audit under Gurobi (1\% MIPGap). Counts are over eligible diagnostic/export pairs. No coupling factor is applied, and every full/local-only export pair is byte-identical; the operational transformation therefore reduces to local-row normalization.\relax }{table.caption.25}{}}
+\newlabel{tab:coupling-activation-audit@cref}{{[table][15][]15}{[1][38][]38}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}Operational coupling-stage activation audit and local-row attribution}{38}{subsection.6.7}\protected@file@percent }
+\newlabel{subsec:stage-attribution}{{6.7}{38}{Operational coupling-stage activation audit and local-row attribution}{subsection.6.7}{}}
+\newlabel{subsec:stage-attribution@cref}{{[subsection][7][6]6.7}{[1][38][]38}}
+\@writefile{lot}{\contentsline {table}{\numberline {16}{\ignorespaces Direct coverage-versus-selectivity comparison under Gurobi for both per-row kernels: structure-aware (SA) versus role-blind Flat reruns from the same dedicated class--tolerance batch, on the exploratory endpoint hierarchy of Section~\ref  {subsec:statistical}. Endpoints: \textit  {prototype} preprocessing-plus-solver time $T_{\mathrm {pre+solve}}^{\mathrm {prototype}}=T_{\rm  preproc}+T_{\rm  solver}$, which charges the prototype's metadata reconstruction, and capped solver time (decomposition). The generator-integrated counterpart is the cached-metadata sensitivity of Table~S17. The paired variable is $d_i=\qopname  \relax o{log}(T_{\mathrm {Flat},i}/T_{\mathrm {SA},i})$; median ratios are SA/Flat, negative $r_{\mathrm {rb}}$ favors Flat, and $q_{6}$ is the BH value within the six-test tolerance family of each endpoint.\relax }}{42}{table.caption.26}\protected@file@percent }
+\newlabel{tab:flat-control}{{16}{42}{Direct coverage-versus-selectivity comparison under Gurobi for both per-row kernels: structure-aware (SA) versus role-blind Flat reruns from the same dedicated class--tolerance batch, on the exploratory endpoint hierarchy of Section~\ref {subsec:statistical}. Endpoints: \emph {prototype} preprocessing-plus-solver time $T_{\mathrm {pre+solve}}^{\mathrm {prototype}}=T_{\rm preproc}+T_{\rm solver}$, which charges the prototype's metadata reconstruction, and capped solver time (decomposition). The generator-integrated counterpart is the cached-metadata sensitivity of Table~S17. The paired variable is $d_i=\log (T_{\mathrm {Flat},i}/T_{\mathrm {SA},i})$; median ratios are SA/Flat, negative $r_{\mathrm {rb}}$ favors Flat, and $q_{6}$ is the BH value within the six-test tolerance family of each endpoint.\relax }{table.caption.26}{}}
+\newlabel{tab:flat-control@cref}{{[table][16][]16}{[1][41][]42}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{43}{section.7}\protected@file@percent }
+\newlabel{sec:discussion}{{7}{43}{Discussion}{section.7}{}}
+\newlabel{sec:discussion@cref}{{[section][7][]7}{[1][43][]43}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}External preprocessing beyond solver-internal scaling}{43}{subsection.7.1}\protected@file@percent }
+\newlabel{subsec:disc-external}{{7.1}{43}{External preprocessing beyond solver-internal scaling}{subsection.7.1}{}}
+\newlabel{subsec:disc-external@cref}{{[subsection][1][7]7.1}{[1][43][]43}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}When metadata adds numerical value}{43}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:disc-metadata}{{7.2}{43}{When metadata adds numerical value}{subsection.7.2}{}}
+\newlabel{subsec:disc-metadata@cref}{{[subsection][2][7]7.2}{[1][43][]43}}
+\citation{elble2012scaling}
+\citation{miltenberger2018numerics}
+\citation{bergner2015automatic}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Conditioning versus runtime}{44}{subsection.7.3}\protected@file@percent }
+\newlabel{subsec:disc-conditioning}{{7.3}{44}{Conditioning versus runtime}{subsection.7.3}{}}
+\newlabel{subsec:disc-conditioning@cref}{{[subsection][3][7]7.3}{[1][44][]44}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Reliability and the recommended variant}{44}{subsection.7.4}\protected@file@percent }
+\newlabel{subsec:disc-reliability}{{7.4}{44}{Reliability and the recommended variant}{subsection.7.4}{}}
+\newlabel{subsec:disc-reliability@cref}{{[subsection][4][7]7.4}{[1][44][]44}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Deployability and downstream effects}{44}{subsection.7.5}\protected@file@percent }
+\newlabel{subsec:deployability}{{7.5}{44}{Deployability and downstream effects}{subsection.7.5}{}}
+\newlabel{subsec:deployability@cref}{{[subsection][5][7]7.5}{[1][44][]44}}
+\newlabel{eq:dual-recovery}{{54}{45}{Deployability and downstream effects}{equation.7.54}{}}
+\newlabel{eq:dual-recovery@cref}{{[equation][54][]54}{[1][45][]45}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Strengths, limitations, and reproducibility}{45}{section.8}\protected@file@percent }
+\newlabel{sec:validity}{{8}{45}{Strengths, limitations, and reproducibility}{section.8}{}}
+\newlabel{sec:validity@cref}{{[section][8][]8}{[1][45][]45}}
+\citation{lodi2013variability}
+\citation{gleixner2021miplib}
+\citation{lodi2013variability}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{47}{section.9}\protected@file@percent }
+\newlabel{sec:conclusion}{{9}{47}{Conclusion}{section.9}{}}
+\newlabel{sec:conclusion@cref}{{[section][9][]9}{[1][47][]47}}
+\citation{nesmachnow2019clusteruy}
+\@writefile{toc}{\contentsline {section}{Author Contributions}{48}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Acknowledgments}{48}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Funding}{48}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Conflicts of Interest}{48}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Ethics Statement}{48}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Data Availability Statement}{48}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Supporting Information}{48}{section.9}\protected@file@percent }
+\bibdata{references}
+\bibcite{risso2025rioNegro}{{1}{}{{}}{{}}}
+\bibcite{risso2025uruguayRiver}{{2}{}{{}}{{}}}
+\bibcite{rodriguez2025thesis}{{3}{}{{}}{{}}}
+\bibcite{wood2013power}{{4}{}{{}}{{}}}
+\bibcite{conejo2010decision}{{5}{}{{}}{{}}}
+\bibcite{vielma2015formulation}{{6}{}{{}}{{}}}
+\bibcite{risso2026enriched}{{7}{}{{}}{{}}}
+\bibcite{klotz2013lp}{{8}{}{{}}{{}}}
+\bibcite{klotz2013mip}{{9}{}{{}}{{}}}
+\bibcite{klotz2014illconditioning}{{10}{}{{}}{{}}}
+\bibcite{tomlin1975scaling}{{11}{}{{}}{{}}}
+\bibcite{curtisreid1972}{{12}{}{{}}{{}}}
+\bibcite{sinkhorn1967}{{13}{}{{}}{{}}}
+\bibcite{ruiz2001scaling}{{14}{}{{}}{{}}}
+\bibcite{achterberg2020presolve}{{15}{}{{}}{{}}}
+\bibcite{elble2012scaling}{{16}{}{{}}{{}}}
+\bibcite{carrion2006uc}{{17}{}{{}}{{}}}
+\bibcite{moralesespana2013tight}{{18}{}{{}}{{}}}
+\bibcite{dolan2002performance}{{19}{}{{}}{{}}}
+\bibcite{nesmachnow2019clusteruy}{{20}{}{{}}{{}}}
+\bibcite{miltenberger2018numerics}{{21}{}{{}}{{}}}
+\bibcite{bergner2015automatic}{{22}{}{{}}{{}}}
+\bibcite{lodi2013variability}{{23}{}{{}}{{}}}
+\bibcite{gleixner2021miplib}{{24}{}{{}}{{}}}
+\FirstPg{1}\LastPg{49}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\@writefile{toc}{\contentsline {section}{References\markboth  {\MakeUppercase  {References}}{\MakeUppercase  {References}}}{49}{section.9}\protected@file@percent }
+\gdef \@abspage@last{49}

@@ -1,0 +1,25 @@
+The fresh replication reproduces this attribution on 180 new instances
+(\cref{fig:identifiability}). All 1,080 exports pass the whole-row proportionality check at
+relative tolerance $10^{-13}$. SA-Mat and Role-Hybrid are byte-identical on 136 of the 180
+instances, and SA-Mat and its permuted-scale counterpart on 165. Where they differ, the
+implemented coefficient-window vetoes and filtered block extrema lie outside the hypotheses of
+\cref{prop:audit-collapse}, and the effect is small: the SA-Mat/Role-Hybrid spectral ratio lies
+between 0.939 and 1.079 (median one), and the permutation ratio between 0.99962 and 1.00022.
+By contrast, the median SA-Mat/Flat-GM ratio falls from 0.937 to 0.102 and 0.00973 as the
+exponent range grows from $[-1,1]$ to $[-3,3]$. The large, heterogeneity-dependent advantage
+is therefore a coupling-kernel effect; ownership information accounts at most for the small,
+implementation-dependent differences in panel (b). Flat-L2 attains the smallest diagnostic in
+the archived cell because it also changes local normalization, and on the dispatch bases of
+\cref{subsec:results-fixed-basis} the same kernel leaves conditioning essentially unchanged:
+kernel rankings on synthetic matrices need not transfer.
+
+\begin{figure}[tb]
+\centering\includegraphics[width=\linewidth]{identifiability.pdf}
+\caption{Fresh matrix audit. Each exponent range contains 60 generated instances. Panel (a)
+changes the coupling kernel; panel (b) holds the kernels fixed and removes (Role-Hybrid) or
+permutes (SA-Mat-permB) the block-scale information. Marks are individual ratios with
+deterministic horizontal jitter; short horizontal segments are medians. The panels use different
+vertical scales. Unscaled matrices, whose estimates approach binary64 resolution, enter no ratio;
+all paired scaled diagnostics are below $6.5\times10^6$.}
+\label{fig:identifiability}
+\end{figure}
