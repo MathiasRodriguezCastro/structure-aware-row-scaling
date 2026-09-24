@@ -1,18 +1,22 @@
 {
-  "runs": 160,
+  "runs": 4542,
   "stages": {
-    "pilot": 152,
-    "smoke": 8
+    "primary": 3974,
+    "multiseed": 393,
+    "pilot": 155,
+    "smoke": 18,
+    "i077": 2
   },
   "outcomes": {
-    "COMPLETED": 129,
-    "TIME_LIMIT": 16,
+    "COMPLETED": 4503,
+    "TIME_LIMIT": 22,
     "SOLVER_OTHER_OTRO": 11,
-    "TIME_LIMIT_NO_SOLUTION": 4
+    "TIME_LIMIT_NO_SOLUTION": 6
   },
   "infrastructure_failures": 0,
   "solvers": [
     "cplex",
+    "gurobi",
     "highs"
   ],
   "families": [
@@ -20,19 +24,34 @@
     "SG-Ter-Mer",
     "Simple"
   ],
+  "contradictions": {
+    "runs_flagged": 77,
+    "optimality_claims_contradicted_strict": 25,
+    "invalid_dual_bounds_strict": 76,
+    "optimality_claims_contradicted": 25,
+    "invalid_dual_bounds": 77,
+    "by_policy": {
+      "Role-Hybrid": 30,
+      "Flat-GM": 28,
+      "Flat-L2": 13,
+      "Base": 6
+    }
+  },
   "objective_equivalence": {
-    "instances_compared": 1,
-    "above_target_gap": 0,
-    "max_rel_objective_gap": 1.5573031405760908e-15
+    "instances_compared": 1087,
+    "above_target_gap": 11,
+    "max_rel_objective_gap": 1.211309375372809
   },
   "audit": {
-    "i077|absent: not yet executed": 160,
+    "i077|absent: not yet executed": 158,
+    "i077|present: solver outcome": 2,
     "i077hist|absent: not yet executed": 8,
-    "multiseed|absent: not yet executed": 7680,
-    "pilot|absent: not yet executed": 48,
-    "pilot|present: solver outcome": 152,
-    "primary|absent: not yet executed": 17600,
-    "smoke|absent: not yet executed": 10,
-    "smoke|present: solver outcome": 8
+    "multiseed|absent: not yet executed": 7287,
+    "multiseed|present: solver outcome": 393,
+    "pilot|absent: not yet executed": 45,
+    "pilot|present: solver outcome": 155,
+    "primary|absent: not yet executed": 13626,
+    "primary|present: solver outcome": 3974,
+    "smoke|present: solver outcome": 18
   }
 }
