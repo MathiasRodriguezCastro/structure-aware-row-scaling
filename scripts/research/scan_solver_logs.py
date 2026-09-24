@@ -14,6 +14,8 @@ from pathlib import Path
 HIGHS = re.compile(r"\[HIGHS\] model_status=(.+?) run_status=(-?\d+)")
 SELFCHECK = re.compile(r"MIP solver claims optimality, but with num/max/sum primal\(([^)]*)\)")
 GRB_WARN = re.compile(r"Warning: Model contains (.+)")
+ROOT_LP = re.compile(r"Root relaxation: objective ([-\d.e+]+)")
+GRB_FINAL = re.compile(r"Best objective ([-\d.e+]+), best bound ([-\d.e+]+)")
 
 
 def scan(path):
@@ -24,7 +26,12 @@ def scan(path):
         return None
     m = HIGHS.search(text)
     s = SELFCHECK.search(text)
-    return {"highs_model_status": m.group(1) if m else None,
+    r = ROOT_LP.search(text)
+    f = GRB_FINAL.search(text)
+    return {"root_relaxation": float(r.group(1)) if r else None,
+            "final_objective": float(f.group(1)) if f else None,
+            "final_bound": float(f.group(2)) if f else None,
+            "highs_model_status": m.group(1) if m else None,
             "highs_run_status": int(m.group(2)) if m else None,
             "solver_self_check_rejected": bool(s),
             "solver_self_check_infeasibilities": s.group(1) if s else None,
@@ -46,7 +53,8 @@ def main():
         raise SystemExit(f"no logs under {args.runs}")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["run_id", "highs_model_status", "highs_run_status",
+        w = csv.DictWriter(fh, fieldnames=["run_id", "root_relaxation", "final_objective",
+                                           "final_bound", "highs_model_status", "highs_run_status",
                                            "solver_self_check_rejected",
                                            "solver_self_check_infeasibilities", "model_warnings"])
         w.writeheader()
