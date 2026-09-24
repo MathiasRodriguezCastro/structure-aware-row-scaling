@@ -206,6 +206,10 @@ void ProblemaGurobi::resolverMonolitico() {
             try { int nh = std::stoi(h); if (nh > 0) modelo->set(GRB_IntParam_Threads, nh); }
             catch (...) {}
         }
+        if (config.tolFactibilidad > 0.0)
+            modelo->set(GRB_DoubleParam_FeasibilityTol, config.tolFactibilidad);
+        if (config.tolIntegralidad > 0.0)
+            modelo->set(GRB_DoubleParam_IntFeasTol, config.tolIntegralidad);
 
         // Callback de solo lectura: métricas del nodo raíz + integral primal–dual.
         MonitorCallback cbMonitor;
@@ -216,6 +220,18 @@ void ProblemaGurobi::resolverMonolitico() {
         modelo->setCallback(nullptr);
 
         if (modelo->get(GRB_IntAttr_SolCount) <= 0) {
+            const int st = modelo->get(GRB_IntAttr_Status);
+            double cota = 0.0, nodos = -1.0;
+            try { cota = modelo->get(GRB_DoubleAttr_ObjBound); } catch (...) {}
+            try { nodos = modelo->get(GRB_DoubleAttr_NodeCount); } catch (...) {}
+            std::ostringstream m;
+            m << std::setprecision(std::numeric_limits<double>::max_digits10)
+              << "[NOSOL] status="
+              << ((st == GRB_TIME_LIMIT) ? "TIME_LIMIT" : (st == GRB_INFEASIBLE) ? "INFEASIBLE" :
+                  (st == GRB_INF_OR_UNBD) ? "INF_OR_UNBD" : (st == GRB_NUMERIC) ? "NUMERIC" : "OTRO")
+              << " tiempo_solver_s=" << modelo->get(GRB_DoubleAttr_Runtime)
+              << " best_bound=" << cota << " nodos=" << nodos;
+            std::cout << m.str() << std::endl;
             throw std::runtime_error(
                 "ProblemaGurobi::resolverMonolitico - Sin solución feasible. "
                 "Status Gurobi: " + std::to_string(modelo->get(GRB_IntAttr_Status)));
@@ -235,7 +251,7 @@ void ProblemaGurobi::resolverMonolitico() {
         // Esta medición ocurre DESPUÉS del cronómetro del solver, así que no altera T_solver.
         double kappaSolver = -1.0, kappaExact = -1.0;
         int esMip = 0;
-        try {
+        if (config.diagnosticoKappa || config.reportarDuales) try {
             esMip = modelo->get(GRB_IntAttr_IsMIP);
             // KappaExact factoriza la base: solo en modelos no demasiado grandes.
             const long tamano = static_cast<long>(modelo->get(GRB_IntAttr_NumVars)) +
@@ -341,13 +357,22 @@ void ProblemaGurobi::resolverMonolitico() {
                     try { kappaExact = modelo->get(GRB_DoubleAttr_KappaExact); } catch (...) {}
             }
         } catch (GRBException&) { /* sin κ del solver: queda -1 */ }
-        std::cout << "[NUM-KAPPA] kappa_solver=" << kappaSolver
-                  << " kappa_exact=" << kappaExact
-                  << " is_mip=" << esMip << std::endl;
+        // Los reportes de preprocesamiento pueden dejar cout en fixed/precision(0).
+        // Los marcadores para análisis deben conservar toda la precisión sin
+        // depender del formato usado por reportes anteriores.
+        {
+            std::ostringstream metricas;
+            metricas << std::setprecision(std::numeric_limits<double>::max_digits10)
+                     << "[NUM-KAPPA] kappa_solver=" << kappaSolver
+                     << " kappa_exact=" << kappaExact
+                     << " is_mip=" << esMip;
+            std::cout << metricas.str() << std::endl;
+        }
 
         // --- Métricas robustas de eficiencia ---
-        // work: unidades de trabajo deterministas de Gurobi (independientes del hardware y del
-        // número de hilos) → speedup reproducible. root_gap/root_time: gap relativo y tiempo al
+        // work: esfuerzo determinista para el mismo modelo, hardware y parámetros.
+        // No se identifica con segundos ni se asume invariante al número de hilos.
+        // root_gap/root_time: gap relativo y tiempo al
         // final del nodo raíz (best-effort, vía CapturaRaizCallback).
         double work = -1.0;
         try { work = modelo->get(GRB_DoubleAttr_Work); } catch (...) {}
@@ -357,9 +382,14 @@ void ProblemaGurobi::resolverMonolitico() {
         if (std::isfinite(rb) && std::isfinite(rbst) &&
             std::fabs(rb) < 1e30 && std::fabs(rbst) < 1e30 && std::fabs(rbst) > 1e-12)
             rootGap = std::fabs(rbst - rb) / std::fabs(rbst);
-        std::cout << "[NUM-EFIC] work=" << work
-                  << " root_gap=" << rootGap
-                  << " root_time=" << cbMonitor.rootTime << std::endl;
+        {
+            std::ostringstream metricas;
+            metricas << std::setprecision(std::numeric_limits<double>::max_digits10)
+                     << "[NUM-EFIC] work=" << work
+                     << " root_gap=" << rootGap
+                     << " root_time=" << cbMonitor.rootTime;
+            std::cout << metricas.str() << std::endl;
+        }
 
         // Estadísticas solver-agnósticas de la resolución (las emite SystemController en [SOLVE]).
         {

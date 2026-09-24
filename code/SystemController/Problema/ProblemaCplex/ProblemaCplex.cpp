@@ -7,6 +7,7 @@
 #include <set>
 #include <stdexcept>
 #include <cstdlib>
+#include <iomanip>
 
 using namespace std;
 
@@ -164,10 +165,14 @@ void ProblemaCplex::resolverMonolitico() {
             try { int nh = std::stoi(h); if (nh > 0) solver.setParam(IloCplex::Param::Threads, nh); }
             catch (...) {}
         }
+        if (config.tolFactibilidad > 0.0)
+            solver.setParam(IloCplex::Param::Simplex::Tolerances::Feasibility, config.tolFactibilidad);
+        if (config.tolIntegralidad > 0.0)
+            solver.setParam(IloCplex::Param::MIP::Tolerances::Integrality, config.tolIntegralidad);
         // Condicionamiento a lo largo del árbol B&B (KappaStats): muestrea las bases de los
         // subproblemas para reportar κ_max, atención y fracciones de estabilidad. SAMPLE es el
         // modo práctico (FULL computa κ en cada nodo y frena la resolución).
-        try {
+        if (config.diagnosticoKappa) try {
             solver.setParam(IloCplex::Param::MIP::Strategy::KappaStats, CPX_MIPKAPPA_SAMPLE);
         } catch (...) { /* sin KappaStats: las qualities de árbol quedarán en -1 */ }
 
@@ -176,9 +181,23 @@ void ProblemaCplex::resolverMonolitico() {
         solver.use(MonitorCplexCB(modelo.getEnv(), mon));
 
         const double detIni = solver.getDetTime();   // marca de tiempo determinista (ticks)
+        const double tIni = solver.getCplexTime();
 
-        if (!solver.solve())
+        if (!solver.solve()) {
+            const IloCplex::CplexStatus cs = solver.getCplexStatus();
+            double cota = 0.0;
+            try { cota = solver.getBestObjValue(); } catch (...) {}
+            std::ostringstream m;
+            m << std::setprecision(17) << "[NOSOL] status="
+              << ((cs == IloCplex::AbortTimeLim || cs == IloCplex::AbortDetTimeLim) ? "TIME_LIMIT" :
+                  (cs == IloCplex::Infeasible || cs == IloCplex::InfOrUnbd) ? "INFEASIBLE" : "OTRO")
+              << " cplex_status=" << static_cast<int>(cs)
+              << " tiempo_solver_s=" << (solver.getCplexTime() - tIni)
+              << " dettime=" << (solver.getDetTime() - detIni)
+              << " best_bound=" << cota << " nodos=" << solver.getNnodes();
+            cout << m.str() << endl;
             throw std::runtime_error("ProblemaCplex::resolverMonolitico - No se pudo resolver el modelo.");
+        }
 
         const double detFin = solver.getDetTime();
 
@@ -195,8 +214,8 @@ void ProblemaCplex::resolverMonolitico() {
             try { return solver.getQuality(qq); } catch (...) { return -1.0; }
         };
         const int esMip = solver.isMIP() ? 1 : 0;
-        const double kappaSolver = q(IloCplex::Kappa);
-        const double kappaExact  = q(IloCplex::ExactKappa);
+        const double kappaSolver = config.diagnosticoKappa ? q(IloCplex::Kappa) : -1.0;
+        const double kappaExact  = config.diagnosticoKappa ? q(IloCplex::ExactKappa) : -1.0;
         cout << "[NUM-KAPPA] kappa_solver=" << kappaSolver
              << " kappa_exact=" << kappaExact
              << " is_mip=" << esMip << endl;

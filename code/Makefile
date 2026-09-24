@@ -2,7 +2,7 @@
 # Build for the cleaned reproducibility platform (monolithic MIP + preprocessing).
 #
 # Solver toggles (1 = compile & link, 0 = exclude that backend entirely):
-#   USE_GUROBI, USE_CPLEX, USE_CBC, USE_HEXALY
+#   USE_GUROBI, USE_CPLEX, USE_CBC, USE_HEXALY, USE_HIGHS
 #
 # Examples:
 #   make                                  # Gurobi + CPLEX + Cbc (Hexaly off)
@@ -16,12 +16,14 @@
 CPLEX_HOME  ?= /opt/ibm/ILOG/CPLEX_Studio2212
 GUROBI_HOME ?= $(HOME)/solvers/gurobi1301/linux64
 HEXALY_HOME ?= /opt/hexaly_14_5
+HIGHS_HOME  ?= $(HOME)/solvers/highs-1.15.1
 
 # Solver toggles
 USE_GUROBI ?= 1
 USE_CPLEX  ?= 1
 USE_CBC    ?= 1
 USE_HEXALY ?= 0
+USE_HIGHS  ?= 0
 
 CXX := g++
 .DEFAULT_GOAL := all
@@ -73,6 +75,15 @@ else
   EXCLUDES += -not -path './SystemController/Problema/ProblemaHexaly/*'
 endif
 
+# ---- HiGHS (open source; static library built from the 1.15.1 release) ----
+ifeq ($(USE_HIGHS),1)
+  CXXFLAGS += -I$(HIGHS_HOME)/include/highs
+  LDLIBS   += -L$(HIGHS_HOME)/lib -lhighs -lpthread
+else
+  CXXFLAGS += -DNO_HIGHS
+  EXCLUDES += -not -path './SystemController/Problema/ProblemaHighs/*'
+endif
+
 BUILD_DIR := build
 TARGET    := $(BUILD_DIR)/SistemaElectrico
 
@@ -84,7 +95,7 @@ DEPS := $(OBJS:.o=.d)
 .PHONY: all clean run show-config
 
 all: $(TARGET)
-	@echo "Build done: $(TARGET)  (GUROBI=$(USE_GUROBI) CPLEX=$(USE_CPLEX) CBC=$(USE_CBC) HEXALY=$(USE_HEXALY))"
+	@echo "Build done: $(TARGET)  (GUROBI=$(USE_GUROBI) CPLEX=$(USE_CPLEX) CBC=$(USE_CBC) HEXALY=$(USE_HEXALY) HIGHS=$(USE_HIGHS))"
 
 $(BUILD_DIR)/%.o: ./%.cpp Makefile
 	@mkdir -p $(dir $@)
@@ -100,6 +111,6 @@ run: $(TARGET)
 	./$(TARGET)
 
 show-config:
-	@echo "USE_GUROBI=$(USE_GUROBI) USE_CPLEX=$(USE_CPLEX) USE_CBC=$(USE_CBC) USE_HEXALY=$(USE_HEXALY)"
+	@echo "USE_GUROBI=$(USE_GUROBI) USE_CPLEX=$(USE_CPLEX) USE_CBC=$(USE_CBC) USE_HEXALY=$(USE_HEXALY) USE_HIGHS=$(USE_HIGHS)"
 	@echo "CXXFLAGS=$(CXXFLAGS)"
 	@echo "LDLIBS=$(LDLIBS)"

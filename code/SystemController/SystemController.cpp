@@ -361,6 +361,11 @@ void SystemController::configurarSolver(const std::string& tipoSolver,
         problema = new ProblemaHexaly();
     }
     #endif
+    #ifndef NO_HIGHS
+    else if (tipoSolver == "Highs") {
+        problema = new ProblemaHighs();
+    }
+    #endif
     else {
         throw std::invalid_argument("SystemController::configurarSolver - Tipo de solver desconocido: " + tipoSolver);
     }

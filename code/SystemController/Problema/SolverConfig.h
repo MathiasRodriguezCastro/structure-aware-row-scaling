@@ -52,6 +52,13 @@ struct SolverConfig {
     /// demanda y continuidad de embalse. Opt-in; sin el flag es byte-idéntico (no se extraen ni
     /// emiten duales). Requiere --verificar-original (para el snapshot) y Gurobi.
     bool reportarDuales = false;
+    /// Tolerancias explícitas de factibilidad primal y de integralidad (<= 0 ⇒ default del
+    /// solver). HiGHS usa una sola tolerancia MIP y toma tolFactibilidad.
+    double tolFactibilidad = -1.0;
+    double tolIntegralidad = -1.0;
+    /// Diagnóstico de condicionamiento del solver (KappaStats de CPLEX, LP fijo de Gurobi para
+    /// κ). false ⇒ se omite y no agrega tiempo de solver ni de pared.
+    bool diagnosticoKappa = true;
 };
 
 #endif // SOLVERCONFIG_H

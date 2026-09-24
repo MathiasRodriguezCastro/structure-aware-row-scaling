@@ -32,6 +32,9 @@
 #ifndef NO_HEXALY
 #include "SystemController/Problema/ProblemaHexaly/ProblemaHexaly.h"
 #endif
+#ifndef NO_HIGHS
+#include "SystemController/Problema/ProblemaHighs/ProblemaHighs.h"
+#endif
 
 #include "SystemController/Problema/SolverConfig.h"
 
