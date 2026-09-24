@@ -41,6 +41,18 @@ is free; only its postprocessing job remains and that one is pure Python. The Gu
 with a low array throttle and the runner classifies any licence error as an infrastructure
 failure, which is the only class of run that may be repeated.
 
+## Finding under verification (exploratory)
+
+On `v1_simple_000344` (Simple), Gurobi on the **unscaled** model reports OPTIMAL after one node
+at objective -2.4206e8 with a dual bound equal to it, while Flat-GM, Flat-L2 and Role-Hybrid all
+return points at about -4.55e8 that the verifier accepts against the **original** model
+(activity-normalised violation 1e-13, integrality 0, no missing values). A verified point 47%
+better than a claimed optimum means the Base run is wrong, not merely slow. Reproduced locally
+bit for bit, same instance hash. Pending: a direct solve of the exported model outside the C++
+pipeline, under default, NumericFocus, presolve-off and scaling settings, to attribute the
+failure. The campaign-wide counter lives in `analysis/contradictions.csv`; it is an exploratory
+check built on the registered verification endpoint, not a registered endpoint itself.
+
 ## Known local findings before the cluster run
 
 - HiGHS did not find any feasible solution for a Simple Base model within a 300 s cap (1,454
