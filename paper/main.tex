@@ -515,7 +515,10 @@ applies to continuous rows and to constraints admitting no such reduction.
 
 \paragraph{Solver acceptance and effort are properties of the pipeline.} The same
 representation reduced completed-run work and caused a timeout, the same factors were accepted
-differently by the three solvers, and a one-ulp change in a factor changed HiGHS outcomes.
+differently by the three pipelines, and a one-ulp change in a factor changed outcomes in one of
+them. Pipeline, not solver: presolve, internal scaling, tolerances and finite precision all sit
+between the exported row and the point that comes back, and the experiments here cannot
+separate their contributions.
 
 \subsection{Scope and limitations}
 The operational evidence comes from one application: two instance classes, one solver, one seed
