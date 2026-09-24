@@ -48,7 +48,12 @@ def load(root):
     return d
 
 
-def cells(d):
+def cells(d, bad=None):
+    """Per cell counts and endpoints; `bad` adds the contradicted-run counts."""
+    flags = {}
+    if bad is not None and len(bad):
+        for k, g in bad.groupby(["stage", "family", "solver", "gap", "seed", "policy"]):
+            flags[k] = (int(g.optimality_claim_contradicted.sum()), int(g.dual_bound_invalid.sum()))
     out = []
     for (stage, fam, solver, gap, seed), g in d.groupby(["stage", "family", "solver", "gap", "seed"]):
         for policy, gp in g.groupby("policy"):
@@ -69,6 +74,10 @@ def cells(d):
                 "median_nonsolver_overhead_s": round(float((gp.wall_s - gp.tiempo_solver_s).median()), 2)
                     if gp.wall_s.notna().any() else None,
                 "infrastructure_failures": int(gp.infrastructure_failure.astype(bool).sum()),
+                "optimality_claims_contradicted":
+                    flags.get((stage, fam, solver, gap, seed, policy), (0, 0))[0],
+                "invalid_dual_bounds":
+                    flags.get((stage, fam, solver, gap, seed, policy), (0, 0))[1],
             })
     return pd.DataFrame(out)
 
@@ -269,15 +278,15 @@ def main():
     d = load(args.runs)
     args.out.mkdir(parents=True, exist_ok=True)
     d.to_csv(args.out / "runs.csv", index=False)
-    cells(d).to_csv(args.out / "cells.csv", index=False)
+    bad = contradictions(d)
+    bad.to_csv(args.out / "contradictions.csv", index=False)
+    cells(d, bad).to_csv(args.out / "cells.csv", index=False)
     paired(d, seed=1).to_csv(args.out / "paired-primary.csv", index=False)
     paired(d).to_csv(args.out / "paired-all-seeds.csv", index=False)
     seed_stability(d).to_csv(args.out / "seed-stability.csv", index=False)
     clustered(d).to_csv(args.out / "paired-clustered.csv", index=False)
     eq = equivalence(d)
     eq.to_csv(args.out / "objective-equivalence.csv", index=False)
-    bad = contradictions(d)
-    bad.to_csv(args.out / "contradictions.csv", index=False)
     if len(bad):
         drop = set(map(tuple, bad[["family", "instance"]].drop_duplicates().values))
         paired(d, seed=1, drop=drop).to_csv(args.out / "paired-primary-sensitivity.csv", index=False)
