@@ -21,6 +21,11 @@ What this round changes, and which claims are confirmatory and which exploratory
    tables and the runs stay in `results-revision/solver-robustness/` for a separate study, and
    the article and supplement no longer mention them.
 
+4. **The residual contract stated on the application.** Interpretable tolerances are declared
+   for the rows of a real instance and Proposition 5.1 is applied to its 4,320 rows
+   (`results-revision/research-audit/application-budgets/`). It needs no solver and adds no
+   experiment: the budgets are declared by the modeller, which the limitations say plainly.
+
 ## Confirmatory (registered before the data were seen)
 
 - C5 stress experiment under CPLEX: budgeted versus budget-free paired discordance. This is the
@@ -40,6 +45,12 @@ Everything below comes from the descoped campaign and is kept in the repository 
 
 Everything already listed as exploratory in the September 14 record still applies to the
 manuscript.
+
+## Illustrative, not measured
+
+The dispatch budgets of Table 5 are stated by us to show what the contract implies. No operator
+tolerance was supplied or validated, and the paper says so where the table is introduced and
+again in the limitations.
 
 ## Not claimed
 
