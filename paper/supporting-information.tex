@@ -447,6 +447,10 @@ make research-fixed-basis-check  # rebuild all 1,530 bases from LP text
 make research-robustness-analysis # campaign aggregates, audit and tables
 make paper                  # article and this supplement
 \end{lstlisting}
+The reproducibility archive carries the analyses, the aggregates and the inputs they read, and
+lists in \path{EXCLUDED.txt} the bulk files it leaves out: the exported LP text and bases of the
+fixed-basis audit and the per-run records of the campaign, about 5~GB that stay in the
+repository. The fixed-basis rebuild reads those exports and therefore needs them.
 The full export check needs GNU Make and a C++17 compiler. PDF compilation uses
 pdfLaTeX, BibTeX and standard TeX packages, without the old proprietary-font
 requirements. Figures are generated with matplotlib from stored data or explicit
