@@ -183,6 +183,31 @@ def clustered(d, policies=None):
     return pd.DataFrame(rows)
 
 
+
+def equivalence(d):
+    """Objective agreement across policies on the same instance, against the MIP gap.
+
+    Two policies may stop at different incumbents within the target gap, so the check is
+    whether the spread exceeds what the gap allows, not whether it is zero.
+    """
+    done = d[d.completed & d.objetivo_solver.notna()]
+    rows = []
+    for (fam, solver, gap, seed, instance), g in done.groupby(
+            ["family", "solver", "gap", "seed", "instance"]):
+        obj = g.groupby("policy").objetivo_solver.first()
+        if "Base" not in obj or len(obj) < 2:
+            continue
+        base = obj["Base"]
+        scale = max(abs(base), 1.0)
+        rel = (obj.drop("Base") - base).abs() / scale
+        rows.append({"family": fam, "solver": solver, "gap": gap, "seed": seed,
+                     "instance": instance, "policies": len(obj),
+                     "max_rel_objective_gap": float(rel.max()),
+                     "worst_policy": str(rel.idxmax()),
+                     "above_target_gap": bool(rel.max() > float(gap) + 1e-6)})
+    return pd.DataFrame(rows)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--runs", type=Path, default=BASE / "runs-raw")
@@ -197,12 +222,17 @@ def main():
     paired(d).to_csv(args.out / "paired-all-seeds.csv", index=False)
     seed_stability(d).to_csv(args.out / "seed-stability.csv", index=False)
     clustered(d).to_csv(args.out / "paired-clustered.csv", index=False)
+    eq = equivalence(d)
+    eq.to_csv(args.out / "objective-equivalence.csv", index=False)
     a = audit(d, args.tables)
     a.to_csv(args.out / "audit.csv", index=False)
     summary = {"runs": len(d), "stages": d.stage.value_counts().to_dict(),
                "outcomes": d.outcome.value_counts().to_dict(),
                "infrastructure_failures": int(d.infrastructure_failure.astype(bool).sum()),
                "solvers": sorted(set(d.solver)), "families": sorted(set(d.family)),
+               "objective_equivalence": {"instances_compared": int(len(eq)),
+                   "above_target_gap": int(eq.above_target_gap.sum()) if len(eq) else 0,
+                   "max_rel_objective_gap": float(eq.max_rel_objective_gap.max()) if len(eq) else None},
                "audit": {f"{k[0]}|{k[1]}": int(v)
                          for k, v in a.groupby(["stage", "status"]).size().items()}}
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
