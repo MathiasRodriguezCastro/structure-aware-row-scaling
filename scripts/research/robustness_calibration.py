@@ -67,7 +67,8 @@ def main():
     pilot = pilot_completion(args.pilot_runs)
     hist = history_completion(args.history)
     # Diagnostic only, never read by the rule: is the calibration subset as hard as its pool?
-    calib = set(pd.read_csv(args.split).query("role == 'calibration'").instance)
+    split = pd.read_csv(args.split)
+    calib = set(split.query("role == 'calibration'").instance)
     subset = history_completion(args.history, calibration=calib, label="gurobi-calibration-subset")
     table = pd.concat([hist, pilot, subset], ignore_index=True)
     decision = {}
@@ -91,10 +92,15 @@ def main():
                          "rule": "R1", "fallback_used": chosen is None, "checks": reason}
         highs = table[(table.family == fam) & (table.solver == "highs") & (table.gap == "0.01")]
         cap = decision[fam]["cap_s"]
+        expected = int(split[(split.family == fam) & (split.role == "calibration")].shape[0])
+        got = int(highs.iloc[0]["n"]) if not highs.empty else 0
         rate = float(highs.iloc[0][f"completed_by_{int(cap)}s"]) if not highs.empty else None
         decision[fam]["highs_base_completion_at_cap_gap_1pct"] = rate
-        decision[fam]["highs_scope"] = ("full evaluation set" if rate is not None and rate >= 0.5
-                                        else "multiseed subset only (rule R2)")
+        decision[fam]["highs_pilot_runs"] = f"{got}/{expected}"
+        # An unfinished HiGHS pilot must not be read as a failure to complete.
+        decision[fam]["highs_scope"] = ("undecided: HiGHS pilot incomplete" if got < expected else
+                                        "full evaluation set" if rate >= 0.5 else
+                                        "multiseed subset only (rule R2)")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     table.to_csv(args.out.with_name("calibration-completion.csv"), index=False)
     args.out.write_text(json.dumps({"thresholds": THRESHOLD, "caps_considered": CAPS,

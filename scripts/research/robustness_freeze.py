@@ -77,6 +77,9 @@ def main():
     if args.decision:
         decision = json.loads(args.decision.read_text())["decision"]
         caps = {fam: float(d["cap_s"]) for fam, d in decision.items()}
+        undecided = {fam for fam, d in decision.items() if d["highs_scope"].startswith("undecided")}
+        if undecided and "highs" in solvers:
+            raise SystemExit(f"HiGHS scope undecided for {sorted(undecided)}: finish its pilot first")
         restricted = {fam for fam, d in decision.items() if d["highs_scope"] != "full evaluation set"}
     split = list(csv.DictReader(args.split.open()))
     inst = lambda fam, role=None, ms=None: [
