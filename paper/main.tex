@@ -424,6 +424,38 @@ accepts per solver and abstains on the other 144, including many that other poli
 correctly. Its abstentions certify that the requested uniform contract cannot be asserted; they
 are not solved instances, and \cref{fig:budget-verification} counts them separately.
 
+\paragraph{The same contract on the application.} The 0.01 of the stress family is a test
+parameter, but the dispatch rows carry interpretable units, so a budget can be stated in them.
+Suppose the operator declares 0.1\,MW for the rows that account for generation and cap it by
+demand, 0.1\,MW for the piecewise-linear production envelopes, and 1{,}000\,m\textsuperscript{3}
+--- a thousandth of a cubic hectometre --- for the reservoir water balances.
+\Cref{tab:application-budget} applies \cref{prop:budget} to the 4,320 rows of caso46e that carry
+those meanings, with $\epsilon=10^{-6}$ and the coefficient window $[10^{-9},10^{9}]$. The
+admissible interval is wide, the geometric-mean factor lies inside it on every row, and the
+residual the tolerance allows in original units stays five to nine orders of magnitude below the
+declared budget. On this model the contract does not restrict the factor at all.
+
+Its content is in the reading of a residual. One family is written pre-scaled: the Baygorria
+generation definition carries a coefficient of $10^7$ on the generation variable, so the same
+0.1\,MW becomes a budget of $10^{6}$ in the units of that row. It is the family on which the
+accepted Flat-L2 run of \cref{subsec:results-operational} leaves its largest residual, 4.97,
+which against the row's own budget is a generation error of $5\times10^{-7}$\,MW. The residual
+as written and the quantity it stands for differ by the seven orders of magnitude of that
+coefficient, and only a budget carried with the row distinguishes them.
+
+\begin{table}[tb]
+\centering\small
+\caption{A declared residual contract on the dispatch model, applied to the 4,320 rows of
+caso46e whose units are interpretable. Budgets are stated by the modeller, not measured or
+supplied by the operator. Admissible factors are the interval of \cref{prop:budget} for
+$\epsilon=10^{-6}$ and coefficient limits $[10^{-9},10^{9}]$; the last column is
+$\epsilon$ divided by the geometric-mean factor, the original-unit residual that the tolerance
+allows. The last group is written pre-scaled, with a coefficient of $10^7$ on the generation
+variable, so 0.1\,MW there is $10^{6}$ in the units of the row as written.}
+\label{tab:application-budget}
+\input{tables/application-budget}
+\end{table}
+
 \section{Discussion}
 \label{sec:discussion}
 \subsection{What we learned}
@@ -444,7 +476,9 @@ that generator information improves preprocessing needs a kernel-matched control
 \paragraph{Residual budgets are a meaningful invariant quantity.} A budget carried with its row
 is unchanged by consistent re-emission, determines the admissible factors exactly, and in the
 stress test repaired the verification losses of coefficient centering on two of three solvers
-without introducing new ones on any of them. GCD division with RHS flooring verified every stress configuration, but it
+without introducing new ones on any of them. On the dispatch model the same contract is easy to
+satisfy --- every policy's factor is admissible with orders of magnitude to spare --- and its
+work is in the reading of a residual, which without a stated unit says nothing. GCD division with RHS flooring verified every stress configuration, but it
 answers a different question: it is an integer-aware reformulation that exploits the activity
 lattice of integer rows, whereas a residual budget is a contract in original units that also
 applies to continuous rows and to constraints admitting no such reduction.
@@ -456,8 +490,9 @@ differently by the three solvers, and a one-ulp change in a factor changed HiGHS
 \subsection{Scope and limitations}
 The operational evidence comes from one application, with two classes in the solver campaign,
 one solver, one seed and 15 fixed instances per class. The stress instances are small and
-deliberately adversarial; their budget of 0.01 is a numerical test parameter, and engineering
-budgets for the dispatch models have not been supplied or validated. Solver outcomes depend on
+deliberately adversarial; their budget of 0.01 is a numerical test parameter, and the dispatch
+budgets of \cref{tab:application-budget} are stated by us to show what the contract implies,
+not supplied or validated by the operator. Solver outcomes depend on
 the solver, its version and its settings. The collapse result concerns the extrema-based block
 statistic after GM normalization; other block statistics, other kernels and physical scale
 information are outside it, and on the operational models the coupling rows receive the same
