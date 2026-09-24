@@ -1,0 +1,74 @@
+[32m[success] SystemController creado[0m
+> [32m[success] El programa se ha iniciado correctamente[0m
+> [info] RioNegro: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Río Negro' exitosamente[0m
+> [34m[info] Agregando agente Demanda Fija[0m
+[34m[info] Ingrese demandas en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el agente 'Demanda Fija' exitosamente[0m
+> [32m[success] Se ha creado el despacho fijo exitosamente[0m
+> > [32m[success] Solver 'DummyLp' configurado | timeout=1800s | mipgap=0.0001[0m
+> [DEBUG Despacho] j=0 idGen=1 coefParticipacionDespacho=1
+
+[DEBUG Despacho] Cantidad de generadores = 1
+[DEBUG Despacho] j=0 puntero=0x64e8fda9bcd0 idGen=1 coefParticipacionDespacho=1
+[PREPROC PHASES] metadata_s=0.130911045 diagnostico_s=0.042824607 aplicacion_s=9.087298176
+
+------------------------------------------------------------
+  PREPROCESAMIENTO MIP - Diagnostico Numerico
+------------------------------------------------------------
+Rango de coeficientes (toda la matriz):
+  max |coef| = 7.578e+04
+  min |coef| = 1.418e-05
+  proxy rango= 5.345e+09
+
+Diagnostico por bloque:
+Bloque              max|coef|      min|coef|      kappa_aprox   vars    alpha     beta      cols      disc_omit aux_omit  escalado
+------------------------------------------------------------------------------------------------------------------------------
+a1_                 7.578e+04      1.418e-05      5.35e+09      9360    4.00e-02  1.87e+04  0         2160      0         SI  (filas=25194, alpha_min=1.37e-05, alpha_max=5.00e-01)  (discretas/binarias omitidas=2160)  (Ruiz it=4)  (normalizado entre bloques)
+sin_agente          1.000e+00      1.000e+00      1.00e+00      0       1.00e+00  1.00e+00  0         0         1440      no  (continuas auxiliares omitidas=1440)  (Ruiz it=4)
+
+Restriccion(es) global(es): 720 fila(s)
+  acoplamiento balance = 360 fila(s)
+  global no acoplante  = 360 fila(s)
+  rho aprox (solo acoplamiento) = 9.647e-01
+  gamma acoplamiento   = 1.000000
+  gamma candidato      = 0.000016
+  Phi(gamma=1)         = 1.356e+10
+  Phi(gamma cand.)     = 5.345e+09
+  filas acop. escaladas= no
+  filas normaliz. fisica= 0
+  motivo gamma=1       = rho bajo; no se escala la fila de acoplamiento
+
+ADVERTENCIAS:
+  [!] Rango de coeficientes elevado (5345068400). Riesgo de sensibilidad numerica.
+  [!] Bloque 'a1_' internamente mal escalado (kappa~5345068400). Conviene comparar equilibrado interno por filas/columnas.
+------------------------------------------------------------
+
+------------------------------------------------------------
+  COMPARACION NUMERICA ANTES / DESPUES
+------------------------------------------------------------
+Indicador                   antes           despues         despues/antes
+----------------------------------------------------------------------------
+rango global                2.341e+12       5.345e+09       2.283e-03
+rho acoplamiento            2.863e-04       9.647e-01       3.370e+03
+gamma aplicado              1.000000        1.000000        1.000000
+
+Bloques locales:
+Bloque              kappa antes     kappa despues   alpha       beta        filas       cols        disc_omit   aux_omit    escalado
+------------------------------------------------------------------------------------------------------------------------------------
+a1_                 2.341e+12       5.345e+09       3.998e-02   1.869e+04   25194       0           2160        0           SI
+sin_agente          1.000e+00       1.000e+00       1.000e+00   1.000e+00   0           0           0           1440        no
+
+Interpretacion: valores despues/antes menores que 1 indican mejora del proxy.
+rho se calcula solo con filas de acoplamiento; las cotas de demanda sobre g quedan fuera.
+El escalamiento local activo fue Ruiz aproximado: filas internas iterativas.
+------------------------------------------------------------
+
+[PREPROC TIME] variante=ruiz tiempo_s=9.261240604 u=2 K=4 epsMin=1e-09 epsMax=1000000000
+[32m[success] Preprocesamiento aplicado.[0m
+> [pipeline] Preprocesamiento seleccionado: Ninguno
+[pipeline] Modelo interno sin modificaciones de preprocesamiento.
+Archivo LP guardado en: /home/mathiasr/Escritorio/generator-aware-row-scaling/results-revision/research-audit/fixed-basis-recovery-20260914-v2/fresh/simple/caso01a/Ruiz.lp
+[32m[success] Se ha guardado el modelo exitosamente[0m
+> [32m[success] Saliendo del programa...[0m
+[32m[success] SystemController destruido[0m

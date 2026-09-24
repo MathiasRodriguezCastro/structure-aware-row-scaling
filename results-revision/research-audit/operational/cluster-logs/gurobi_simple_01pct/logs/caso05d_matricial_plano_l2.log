@@ -1,0 +1,272 @@
+[32m[success] SystemController creado[0m
+> [32m[success] El programa se ha iniciado correctamente[0m
+> [info] RioNegro: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Río Negro' exitosamente[0m
+> [34m[info] Agregando agente Demanda Fija[0m
+[34m[info] Ingrese demandas en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el agente 'Demanda Fija' exitosamente[0m
+> [32m[success] Se ha creado el despacho fijo exitosamente[0m
+> > Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+[32m[success] Solver 'Gurobi' configurado | timeout=1800s | mipgap=0.001[0m
+> [DEBUG Despacho] j=0 idGen=1 coefParticipacionDespacho=1
+
+[DEBUG Despacho] Cantidad de generadores = 1
+[DEBUG Despacho] j=0 puntero=0x2176300 idGen=1 coefParticipacionDespacho=1
+[PREPROC] modo plano: 14400 filas tratadas como un unico bloque sin roles (kernel geomean por fila)
+[PREPROC PHASES] metadata_s=0.000125144 diagnostico_s=0.00151927 aplicacion_s=0.00172765
+
+------------------------------------------------------------
+  PREPROCESAMIENTO MIP - Diagnostico Numerico
+------------------------------------------------------------
+Rango de coeficientes (toda la matriz):
+  max |coef| = 2.414e+09
+  min |coef| = 1.389e-04
+  proxy rango= 1.738e+13
+
+Diagnostico por bloque:
+Bloque              max|coef|      min|coef|      kappa_aprox   vars    alpha     beta      cols      disc_omit aux_omit  escalado
+------------------------------------------------------------------------------------------------------------------------------
+plano               2.414e+09      1.389e-04      1.74e+13      0       2.46e-03  1.00e+00  0         0         0         SI  (filas=5760, alpha_min=1.39e-04, alpha_max=5.00e-01)
+
+Restriccion(es) global(es): 0 fila(s)
+  acoplamiento balance = 0 fila(s)
+  global no acoplante  = 0 fila(s)
+  rho aprox (solo acoplamiento) = 0.000e+00
+  gamma acoplamiento   = 1.000000
+  gamma candidato      = 1.000000
+  filas acop. escaladas= no
+  filas normaliz. fisica= 0
+  motivo gamma=1       = rho bajo; no se escala la fila de acoplamiento
+
+ADVERTENCIAS:
+  [!] Rango de coeficientes elevado (17381512148891). Riesgo de sensibilidad numerica.
+  [!] Bloque 'plano' internamente mal escalado (kappa~17381512148891). Conviene comparar equilibrado interno por filas/columnas.
+------------------------------------------------------------
+
+------------------------------------------------------------
+  COMPARACION NUMERICA ANTES / DESPUES
+------------------------------------------------------------
+Indicador                   antes           despues         despues/antes
+----------------------------------------------------------------------------
+rango global                2.068e+12       1.738e+13       8.407e+00
+rho acoplamiento            0.000e+00       0.000e+00       0.000e+00
+gamma aplicado              1.000000        1.000000        1.000000
+
+Bloques locales:
+Bloque              kappa antes     kappa despues   alpha       beta        filas       cols        disc_omit   aux_omit    escalado
+------------------------------------------------------------------------------------------------------------------------------------
+plano               2.068e+12       1.738e+13       2.461e-03   1.000e+00   5760        0           0           0           SI
+
+Interpretacion: valores despues/antes menores que 1 indican mejora del proxy.
+rho se calcula solo con filas de acoplamiento; las cotas de demanda sobre g quedan fuera.
+El escalamiento local activo fue solo por fila: alpha_r = 1/sqrt(M_r*m_r).
+------------------------------------------------------------
+
+[PREPROC TIME] variante=matricial_plano_l2 tiempo_s=0.007611415 u=2 K=4 epsMin=1e-09 epsMax=1000000000
+[32m[success] Preprocesamiento aplicado.[0m
+> [MODELO] rows=14400 cols=10800 nnz=35590
+[pipeline] Preprocesamiento seleccionado: Ninguno
+[pipeline] Modelo interno sin modificaciones de preprocesamiento.
+[pipeline] Estrategia de resolucion seleccionada: Monolitica
+[pipeline] Resolviendo monoliticamente.
+Set parameter TimeLimit to value 1800
+Set parameter MIPGap to value 0.001
+Set parameter Seed to value 42
+Set parameter Threads to value 16
+Gurobi Optimizer version 13.0.1 build v13.0.1rc0 (linux64 - "Debian GNU/Linux 12 (bookworm)")
+
+CPU model: Intel(R) Xeon(R) Gold 6138 CPU @ 2.00GHz, instruction set [SSE2|AVX|AVX2|AVX512]
+Thread count: 40 physical cores, 40 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  1800
+MIPGap  0.001
+Seed  42
+Threads  16
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 14400 rows, 10800 columns and 35590 nonzeros (Min)
+Model fingerprint: 0x334a5578
+Model has 362 linear objective coefficients
+Variable types: 8640 continuous, 2160 integer (2160 binary)
+Coefficient statistics:
+  Matrix range     [1e-04, 2e+09]
+  Objective range  [3e-03, 2e+03]
+  Bounds range     [1e+00, 1e+10]
+  RHS range        [1e-02, 2e+09]
+Warning: Model contains large matrix coefficient range
+Warning: Model contains large rhs
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Presolve removed 4936 rows and 2989 columns
+Presolve time: 0.22s
+Presolved: 9464 rows, 7811 columns, 25709 nonzeros
+Variable types: 6410 continuous, 1401 integer (1401 binary)
+Found heuristic solution: objective -1.91764e+08
+
+Root relaxation: objective -2.763982e+08, 10072 iterations, 0.75 seconds (0.96 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -2.764e+08    0  923 -1.918e+08 -2.764e+08  44.1%     -    1s
+     0     0 -2.764e+08    0  924 -1.918e+08 -2.764e+08  44.1%     -    1s
+     0     0 -2.764e+08    0  924 -1.918e+08 -2.764e+08  44.1%     -    1s
+     0     0 -2.764e+08    0  924 -1.918e+08 -2.764e+08  44.1%     -    1s
+H    0     0                    -2.57273e+08 -2.764e+08  7.43%     -    1s
+     0     0 -2.764e+08    0  923 -2.573e+08 -2.764e+08  7.43%     -    2s
+     0     0 -2.764e+08    0  923 -2.573e+08 -2.764e+08  7.43%     -    2s
+     0     0 -2.764e+08    0  923 -2.573e+08 -2.764e+08  7.43%     -    2s
+     0     0 -2.764e+08    0  923 -2.573e+08 -2.764e+08  7.43%     -    2s
+H    0     0                    -2.57273e+08 -2.764e+08  7.43%     -    2s
+     0     0 -2.764e+08    0  916 -2.573e+08 -2.764e+08  7.43%     -    2s
+     0     0 -2.764e+08    0  916 -2.573e+08 -2.764e+08  7.43%     -    2s
+H    0     0                    -2.57289e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    2s
+     0     0 -2.764e+08    0  828 -2.573e+08 -2.764e+08  7.42%     -    3s
+     0     0 -2.764e+08    0  824 -2.573e+08 -2.764e+08  7.42%     -    3s
+     0     2 -2.764e+08    0  824 -2.573e+08 -2.764e+08  7.42%     -    3s
+    15     2 -2.764e+08    8  816 -2.573e+08 -2.764e+08  7.42%   670    5s
+H   88     8                    -2.57539e+08 -2.764e+08  7.31%   713    9s
+   113     8 -2.764e+08   44  764 -2.575e+08 -2.764e+08  7.31%   628   10s
+H  136     8                    -2.57539e+08 -2.764e+08  7.31%   659   10s
+H 1444   260                    -2.57691e+08 -2.764e+08  7.25%  99.2   12s
+H 1493   271                    -2.57694e+08 -2.764e+08  7.25%  96.5   12s
+H 1502   271                    -2.57699e+08 -2.764e+08  7.24%  96.5   12s
+H 1505   271                    -2.57700e+08 -2.764e+08  7.24%  96.3   12s
+H 1885   573                    -2.57748e+08 -2.764e+08  7.22%  81.2   13s
+H 2193   726                    -2.57931e+08 -2.764e+08  7.15%  72.7   13s
+H 2626   942                    -2.57958e+08 -2.764e+08  7.14%  65.7   14s
+H 2643   942                    -2.58038e+08 -2.764e+08  7.10%  65.3   14s
+  2835   894 -2.694e+08   57  630 -2.580e+08 -2.764e+08  7.10%  63.9   15s
+H 2836   894                    -2.58062e+08 -2.764e+08  7.09%  63.9   15s
+H 2841   894                    -2.58611e+08 -2.764e+08  6.87%  64.0   15s
+  2854   466 -2.701e+08  105  775 -2.586e+08 -2.764e+08  6.86%  63.8   20s
+  2884   463 -2.763e+08   26  800 -2.586e+08 -2.763e+08  6.86%  72.7   25s
+  3235   605 -2.627e+08   69  248 -2.586e+08 -2.763e+08  6.83%  75.1   30s
+H 3644   727                    -2.58622e+08 -2.763e+08  6.83%  67.9   31s
+H 3869   782                    -2.58622e+08 -2.763e+08  6.83%  67.2   32s
+* 3918   890             170    -2.58622e+08 -2.763e+08  6.83%  66.5   32s
+H 4508  1134                    -2.58634e+08 -2.763e+08  6.82%  62.5   33s
+* 5266  1693             211    -2.58639e+08 -2.763e+08  6.82%  56.3   34s
+* 5267  1693             211    -2.58639e+08 -2.763e+08  6.82%  56.3   34s
+* 5323  1666             234    -2.58665e+08 -2.763e+08  6.81%  56.0   34s
+H 5782  1829                    -2.58688e+08 -2.763e+08  6.80%  53.6   34s
+  5791  2146 infeasible  163      -2.587e+08 -2.763e+08  6.80%  53.6   36s
+* 5992  2111             267    -2.58764e+08 -2.763e+08  6.77%  52.8   36s
+H 6228  2142                    -2.58814e+08 -2.763e+08  6.75%  54.0   36s
+* 6446  2465             308    -2.58869e+08 -2.763e+08  6.72%  52.5   36s
+* 6780  2517             309    -2.58869e+08 -2.763e+08  6.72%  51.0   36s
+H 6808  2284                    -2.58928e+08 -2.763e+08  6.70%  51.1   36s
+H 6819  2252                    -2.58957e+08 -2.763e+08  6.69%  51.1   36s
+  7663  3265 -2.632e+08   75  533 -2.590e+08 -2.763e+08  6.69%  49.1   41s
+* 7724  3055             404    -2.59170e+08 -2.763e+08  6.60%  48.9   41s
+* 7725  3055             404    -2.59170e+08 -2.763e+08  6.60%  48.9   41s
+H 8140  2941                    -2.59183e+08 -2.763e+08  6.59%  51.3   42s
+H 8151  2848                    -2.59420e+08 -2.763e+08  6.50%  51.2   42s
+H 8154  2769                    -2.62436e+08 -2.763e+08  5.27%  51.2   42s
+H 8168  2344                    -2.63751e+08 -2.763e+08  4.75%  51.4   42s
+H 8174  2342                    -2.64045e+08 -2.763e+08  4.63%  51.6   42s
+H 8189  2342                    -2.64109e+08 -2.763e+08  4.61%  51.7   42s
+* 9112  2898             536    -2.66441e+08 -2.763e+08  3.69%  49.4   43s
+* 9339  2890             538    -2.66458e+08 -2.763e+08  3.68%  48.4   43s
+* 9810  3107             578    -2.66803e+08 -2.763e+08  3.55%  47.5   43s
+* 9811  2848             578    -2.67532e+08 -2.763e+08  3.26%  47.5   43s
+*10257  2505             569    -2.68937e+08 -2.762e+08  2.70%  46.9   44s
+*10391  1233             581    -2.69454e+08 -2.762e+08  2.50%  46.6   44s
+*10648  1261             590    -2.69917e+08 -2.762e+08  2.32%  47.0   44s
+ 11061  1771 -2.724e+08  109  491 -2.699e+08 -2.762e+08  2.31%  46.4   45s
+H11769  1733                    -2.69920e+08 -2.762e+08  2.31%  44.6   45s
+H11784  1722                    -2.69923e+08 -2.761e+08  2.30%  44.7   45s
+H11787  1662                    -2.69939e+08 -2.761e+08  2.30%  44.7   45s
+*13177  2751             367    -2.70065e+08 -2.761e+08  2.25%  41.7   46s
+*13480  2919             379    -2.70221e+08 -2.761e+08  2.19%  41.2   46s
+*13484  2919             380    -2.70221e+08 -2.761e+08  2.19%  41.2   46s
+*13485  2919             380    -2.70221e+08 -2.761e+08  2.19%  41.2   46s
+*13644  2894             431    -2.70278e+08 -2.761e+08  2.17%  40.8   46s
+*14139  2894             428    -2.70278e+08 -2.761e+08  2.17%  39.9   46s
+*14140  2894             428    -2.70278e+08 -2.761e+08  2.17%  39.9   46s
+*14410  3026             413    -2.70335e+08 -2.761e+08  2.15%  40.4   47s
+*14875  3315             512    -2.70345e+08 -2.761e+08  2.12%  40.7   47s
+*15187  3298             361    -2.70389e+08 -2.761e+08  2.11%  40.7   47s
+*15305  3235             423    -2.70524e+08 -2.761e+08  2.05%  40.8   48s
+*16218  3321             396    -2.70565e+08 -2.760e+08  2.02%  43.0   49s
+*16227  3313             401    -2.70566e+08 -2.760e+08  2.02%  43.0   49s
+*16230  3313             401    -2.70566e+08 -2.760e+08  2.02%  43.0   49s
+*16900  3718             401    -2.70566e+08 -2.760e+08  2.02%  42.8   49s
+*17183  4193             404    -2.70706e+08 -2.760e+08  1.96%  43.2   49s
+ 17974  4083     cutoff  305      -2.707e+08 -2.760e+08  1.96%  42.3   50s
+*18000  3678             409    -2.70830e+08 -2.760e+08  1.91%  42.6   50s
+*18525  3499             365    -2.70938e+08 -2.760e+08  1.87%  43.8   50s
+*18866  3686             365    -2.70938e+08 -2.760e+08  1.86%  44.5   51s
+*18918  3640             352    -2.70945e+08 -2.760e+08  1.85%  44.6   51s
+*19761  4223             364    -2.71022e+08 -2.759e+08  1.81%  44.7   51s
+*19884  4487             325    -2.71097e+08 -2.759e+08  1.79%  44.6   52s
+*20301  2577             480    -2.72856e+08 -2.759e+08  1.13%  44.5   52s
+*20666  2074             385    -2.72946e+08 -2.759e+08  1.09%  46.9   53s
+*20667  2074             385    -2.72946e+08 -2.759e+08  1.09%  46.9   53s
+*20669  2074             382    -2.72946e+08 -2.759e+08  1.09%  46.9   53s
+ 20869  3344     cutoff  177      -2.729e+08 -2.759e+08  1.09%  49.0   55s
+*20987  2111             690    -2.75835e+08 -2.759e+08  0.03%  49.8   55s
+*22167  2111             691    -2.75835e+08 -2.759e+08  0.02%  50.9   55s
+
+Cutting planes:
+  Implied bound: 4
+  MIR: 134
+  Flow cover: 112
+  RLT: 30
+  Relax-and-lift: 2
+
+Explored 23137 nodes (1210834 simplex iterations) in 55.32 seconds (65.50 work units)
+Thread count was 16 (of 40 available processors)
+
+Solution count 10: -2.75835e+08 -2.75835e+08 -2.72946e+08 ... -2.70938e+08
+
+Optimal solution found (tolerance 1.00e-03)
+Best objective -2.758353820371e+08, best bound -2.758937037047e+08, gap 0.0211%
+
+User-callback calls 56509, time in user-callback 0.01 sec
+[NUM-KAPPA] kappa_solver=673938 kappa_exact=-1 is_mip=1
+[NUM-EFIC] work=65 root_gap=0 root_time=4
+[pipeline] Tiempo de resolucion: 55.678402 s
+[SOLVE] tiempo_solver_s=55.678416986000002 status=OPTIMAL gap=0.021143649959734 obj=-275835382.037052273750305 best_bound=-275893703.704695284366608 nodos=23137.000000000000000 iter=1210834.000000000000000 primal_integral=0.071132066424816
+[VERIF ORIGINAL] etapa=solver_desescalado max_le=7.27595761418343e-12 (a1_discretizacion_palmar_restriccion_3i(30)) max_ge=0 () max_eq=1.56066380441189e-05 (a1_v3h_din(78)) max_lb=0 () max_ub=0 () max_int=0 () avg_viol=1.42009454450884e-08 p95_viol=3.72529029846191e-09 p99_viol=3.63374128937725e-07 max_viol_rel=1.18487514555454e-06 max_viol_relact=1.1549748135081e-13 viol_le_count=0 viol_ge_count=0 viol_eq_count=10 viol_lb_count=0 viol_ub_count=0 viol_int_count=0 missing_values=0 obj_original_recalc=-275835382.037052
+[32m[success] Resultados guardados correctamente en /clusteruy/home/mathiasr/generator-aware-row-scaling/results-revision/final-variants/gurobi_simple_01pct/resultados/caso05d_matricial_plano_l2.csv[0m
+[32m[success] Archivo CSV generado correctamente[0m
+
+[POST DEBUG] ===== INICIO POSTPROCESAMIENTO GLOBAL =====
+[POST DEBUG] --- DESPUÉS DE AGENTES ---
+[POST DEBUG] Agentes | g1 antes=160869.173723847 despues=160986.543379662 delta=117.369655815681
+[POST DEBUG] Agentes | g2 antes=0 despues=0 delta=0
+[POST DEBUG] Agentes | g antes=160869.173723847 despues=160869.173723847 delta=0
+[POST DEBUG] Agentes | costoFalla antes=0 despues=0 delta=0
+[POST DEBUG] --- DESPUÉS DE DESPACHO ---
+[POST DEBUG] Despacho | g1 antes=160986.543379662 despues=160986.543379662 delta=0
+[POST DEBUG] Despacho | g2 antes=0 despues=0 delta=0
+[POST DEBUG] Despacho | g antes=160869.173723847 despues=160986.543379662 delta=117.369655815681
+[POST DEBUG] Despacho | costoFalla antes=0 despues=0 delta=0
+[POST DEBUG] --- TOTAL ANTES VS FINAL ---
+[POST DEBUG] Final | g1 antes=160869.173723847 despues=160986.543379662 delta=117.369655815681
+[POST DEBUG] Final | g2 antes=0 despues=0 delta=0
+[POST DEBUG] Final | g antes=160869.173723847 despues=160986.543379662 delta=117.369655815681
+[POST DEBUG] Final | costoFalla antes=0 despues=0 delta=0
+[POST DEBUG] valorFOOriginal = -275835382.037052
+[POST DEBUG] valorFOPostProcesado = -276023173.486357
+[POST DEBUG] deltaFO = -187791.449304998
+[POST DEBUG] ===== FIN POSTPROCESAMIENTO GLOBAL =====
+
+[32m[success] Post-procesamiento completado. Nuevo valor F.O.: -276023173.486357271671295[0m
+[VERIF ORIGINAL] etapa=postprocesado max_le=1012.205026569 (a1_discretizacion_palmar_restriccion_3i(358)) max_ge=0 () max_eq=725822122.907335 (a1_g2h_def(227)) max_lb=0 () max_ub=0 () max_int=0 () avg_viol=1054419.58863557 p95_viol=6.18715339036739 p99_viol=14720968.6433466 max_viol_rel=725822122.907335 max_viol_relact=0.749407240028856 viol_le_count=161 viol_ge_count=0 viol_eq_count=1063 viol_lb_count=0 viol_ub_count=0 viol_int_count=0 missing_values=0 obj_original_recalc=-276023173.486357
+[32m[success] Resultados guardados correctamente en /clusteruy/home/mathiasr/generator-aware-row-scaling/results-revision/final-variants/gurobi_simple_01pct/resultados/caso05d_matricial_plano_l2_postprocesado.csv[0m
+> [32m[success] Saliendo del programa...[0m
+[32m[success] SystemController destruido[0m

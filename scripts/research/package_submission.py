@@ -9,7 +9,7 @@ OUT = ROOT/'paper/submission'
 # Bulk inputs of the fixed-basis audit: 4.6 GB of exported LP text and bases. They are the
 # input of `make research-fixed-basis-check`, not something to attach to a submission, so the
 # archive lists them with their hashes instead of carrying them.
-BULK_DIRS = {'fresh', 'runs-raw', 'solver-robustness'}
+BULK_DIRS = {'fresh', 'runs-raw', 'solver-robustness', 'benchmark-v1'}
 MAX_FILE_BYTES = 20 * 1024 * 1024
 EXCLUDED = []
 

@@ -1,0 +1,142 @@
+{
+  "selection": "first five lexicographic archived names whose input exists per class, frozen before exports or solves",
+  "selected": {
+    "simple": [
+      "caso01a.txt",
+      "caso01b.txt",
+      "caso01c.txt",
+      "caso01d.txt",
+      "caso01e.txt"
+    ],
+    "full": [
+      "instance001.txt",
+      "instance002.txt",
+      "instance003.txt",
+      "instance004.txt",
+      "instance005.txt"
+    ],
+    "sgtm": [
+      "instance001.txt",
+      "instance002.txt",
+      "instance003.txt",
+      "instance004.txt",
+      "instance005.txt"
+    ]
+  },
+  "variants": {
+    "Base": "--solodiagnostico",
+    "SA-Aug": "--local-estructurado",
+    "Flat-Aug": "--local-estructurado --plano",
+    "SA-Mat": "--local-matricial",
+    "Flat-Mat": "--local-matricial --plano",
+    "Ruiz": "--local-ruiz --ruiz-iters 4"
+  },
+  "reference_basis": "Base LP relaxation, no MIP, HiGHS simplex default presolve",
+  "slacks": "unscaled unit columns",
+  "condition": "estimated 1-norm condition from sparse LU and onenormest(t=4)",
+  "estimator_seeds": [
+    0,
+    1,
+    2
+  ],
+  "lp_time_limit_s": 60.0,
+  "threads": 1,
+  "reader_small_matrix_value": 1e-12,
+  "row_scaling_check_relative_tolerance": 2e-13,
+  "versions": {
+    "python": "3.10.12",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "highspy": "1.15.1"
+  },
+  "exe": "/home/mathiasr/Escritorio/generator-aware-row-scaling/code/build-audit/SistemaElectrico",
+  "exe_sha256": "ea05fdc43c7cda2b3cb70374dfcea246bd16a7f4fd0a32414976548a2e61c8d1",
+  "sources": [
+    {
+      "path": "scripts/research/audit_fixed_basis.py",
+      "sha256": "56ab05c9d637f9da014e125ae6b38f9cbf63a1c9fdc2a7957983c7abdb6a1683"
+    },
+    {
+      "path": "scripts/validar_preprocesamiento.py",
+      "sha256": "b60464911dc52b9a4c63303cb452446c69eb3cc53fef0a79729fa15b668fa609"
+    },
+    {
+      "path": "scripts/fixed_basis_diagnostic.py",
+      "sha256": "10f8f6edd922448ba6e528265610eb826b6e81c827ef39326641a1457ba544c2"
+    },
+    {
+      "path": "scripts/fixed_basis_analysis.py",
+      "sha256": "bf098a80d48edef9db947c17ff36065a51119963c2b4002153363cca3646a58e"
+    },
+    {
+      "path": "cluster/run_fixed_basis.slurm",
+      "sha256": "8766ba87a2a47d0581e73d9c7742fff62154b48f0c2f58560bd7cebe280057bc"
+    },
+    {
+      "path": "code/SystemController/Problema/ProblemaLp/ProblemaLp.cpp",
+      "sha256": "3a5b162cdc11b732d54b8da5ad07507bab4414f69bcace7feb18c79aab5ddd25"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/entradas/entrada-modelo-simple/caso01a.txt",
+      "sha256": "977dbcbdeb57dc61840639321d8ed5e438411e7a08abd3fc4a34cba517818a56"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-simple/caso01b.txt",
+      "sha256": "8eb649a099a0e504ed195a6985f27c7cf34d92ee8a4bd6383f55e469d9699786"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-simple/caso01c.txt",
+      "sha256": "dc03e812106b14155b6456b844f1f900502375fb20f5aac759631f1c260f182f"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-simple/caso01d.txt",
+      "sha256": "43e303a8d7a8bec1854bcc2c4b27ce192a167102432dea344ff5b89d32589bf2"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-simple/caso01e.txt",
+      "sha256": "91816879a37a9bb02c1f261f84da61388ff2b3568800f74a5dfb81ef3862a867"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-completo/instance001.txt",
+      "sha256": "d0a76bdaaa65559ecbd287012078b81f2a30cdd1ca683c2f00cbbaa47a3df30c"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-completo/instance002.txt",
+      "sha256": "fb6ae0e2abe49931e54090f372e0da78421ad1b93bf24e4649087a41af491e89"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-completo/instance003.txt",
+      "sha256": "e4fef717ff1a49d347dfa5989da5fd036b8c831e53a660f351eeb0918aa6543b"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-completo/instance004.txt",
+      "sha256": "3c023af5d6e0e105225f73d67e7f740c8addee7460c5f2a7cdd36e991f6df16b"
+    },
+    {
+      "path": "data/entradas/entrada-modelo-completo/instance005.txt",
+      "sha256": "b13d78f22d4434954a7bca214af6d09cf45ae4923ff528c26e10394db105175e"
+    },
+    {
+      "path": "data/entradas/entrada-SG-Ter-Mer/instance001.txt",
+      "sha256": "b0fb3f63981e2e2bc5dd7d75a8193acd5efa3bd6b36c0431cde33ac04a5c7859"
+    },
+    {
+      "path": "data/entradas/entrada-SG-Ter-Mer/instance002.txt",
+      "sha256": "e4520b222c17e4fbeb50dc9c5a034c49171f8d8fd5538531627fc4bd2d19a01c"
+    },
+    {
+      "path": "data/entradas/entrada-SG-Ter-Mer/instance003.txt",
+      "sha256": "bd7c7d0c9b9a973354439749eeee619e247164d6f6e8339e0b50be143b87c9ca"
+    },
+    {
+      "path": "data/entradas/entrada-SG-Ter-Mer/instance004.txt",
+      "sha256": "59218a6c9451b8bbe615482baeff85cab84a9bbb8d5dcc21766d75ade3fb28d9"
+    },
+    {
+      "path": "data/entradas/entrada-SG-Ter-Mer/instance005.txt",
+      "sha256": "344fef81b3da85cfa0d4be936b0af8227788be6b6f9086da24343442bed417e7"
+    }
+  ]
+}
