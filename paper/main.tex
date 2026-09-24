@@ -36,18 +36,19 @@
 \begin{abstract}
 Multiplying a row of a mixed-integer program by a positive number preserves it exactly and
 changes the numbers a solver sees. This paper asks what that change buys, and what it still
-guarantees. On 306 generated hydrothermal-dispatch models, with one LP basis held fixed,
-geometric-mean row scaling lowers its condition number on every model, by six to eight orders
-of magnitude in the median of each class. A gain of that size does not identify the information
+guarantees. On 306 generated hydrothermal-dispatch models, holding one LP basis fixed across
+the representations of each model, geometric-mean row scaling lowers its condition number on
+every model, by six to eight orders of magnitude in the median of each class. A gain of that size does not identify the information
 behind it. We show that an apparent block-metadata effect was a coupling-kernel effect:
 geometric-mean centering makes the block statistic identically one, so the block-relative rule
 becomes Euclidean normalization, which a control without ownership information reproduces, and
 the idealized coupling problem has the closed-form optimal factor $(1+\rho^2)^{-1/2}$. Residual
 budgets stated in application units, by contrast, survive consistent re-emission, and we
 characterize exactly which row factors a budget and coefficient limits admit. The evidence then
-separates what improves from what is guaranteed. In reconstructed dispatch runs, scaling used
-30--32\% less solver work on the instances every policy completed, while one scaled-policy
-timeout reversed the failure-sensitive ordering. In an exactly enumerated stress test, plain
+separates what improves from what is guaranteed. In reconstructed dispatch runs with Gurobi,
+scaling used 30--32\% less solver work on the 14 SG-Ter-Mer instances that every policy
+completed, while one instance timed out under every scaled policy, reversing the
+failure-sensitive ordering. In an exactly enumerated stress test, plain
 centering lost verified optima on all three solvers tested, adding the budget to the same rule
 lost none, and whether scaling helped depended on the solver. A representation can be
 numerically better without being operationally safer, unless what safer means is stated in the
@@ -332,6 +333,13 @@ Because the coupling rows of these models receive identical factors under Flat-G
 SA-Mat, this identity does not test ownership; the ownership comparison requires the synthetic
 matrices of the next subsection.
 
+Flat-L2 is worth pausing on, because it is the same kernel that the matched synthetic control
+will show to be the strong one. On generated dispatch bases it is the weak policy, better than
+Base on 44 of 306 models; on the synthetic coupling matrices it reproduces the entire advantage
+attributed to block metadata. A kernel ranking obtained from one matrix diagnostic therefore
+does not transfer to another family, still less to solver behaviour, and the endpoints of
+\cref{tab:endpoints} have to be measured where they are claimed.
+
 \subsection{A kernel effect mistaken for a block effect}
 \label{subsec:results-kernel}
 In the archived heterogeneous headline cell, the median spectral diagnostic is
@@ -389,6 +397,10 @@ $B$.}\label{tab:budget-paired}
 \input{tables/budget-paired}
 \end{table}
 
+These models are small, adversarial and built so that an integer point sits a fixed distance
+from the continuous boundary, so the counts below compare policies on a deliberately hard
+family; they are not estimates of how often a solver fails in practice.
+
 The residual budget has a consistent effect within each scaling rule
 (\cref{tab:budget-paired}). Plain GM centering loses verified optima relative to Base on all
 three solvers, 26 configurations on HiGHS, 16 on Gurobi and 10 on CPLEX, with no gains. At
@@ -403,7 +415,9 @@ centering improves the numbers in the exported file and loses verified optima; t
 with a budget attached loses none. A representation can be numerically better without being
 operationally safer, unless what safer means is stated in the units of the original model.
 
-Relative to the unscaled model, the outcome depends on the solver. On HiGHS, Budget-only
+Relative to the unscaled model, the outcome depends on the pipeline: presolve, internal
+scaling, tolerances and finite precision all intervene between the exported row and the
+accepted point. On HiGHS, Budget-only
 verifies 191 of 192 configurations and Budget-GM 182, against 167 for Base and 141 for GM;
 Budget-only gains 24 configurations over Base and loses none. On Gurobi, Budget-only verifies
 151, Budget-GM 152 and Base 156. On CPLEX every scaled policy verifies 140 and Base 150: the
@@ -411,7 +425,7 @@ budget changes nothing there, and the ten configurations lost to scaling are los
 without it. On both commercial solvers, tightening the two tolerances to $10^{-9}$ (GM-tight,
 166 configurations on each of the three solvers) is the more effective intervention. The same
 stored models and row factors thus lead to different acceptance in three pipelines, and the
-budget helps where the solver's own handling of the exported coefficients is weakest.
+budget helps where this experiment shows the greater sensitivity to the exported coefficients.
 
 The gap between Budget-only and Budget-GM on HiGHS is informative in its own right. At
 multipliers $10^6$ and $10^9$, the only ones at which their outcomes differ, the budget endpoint
@@ -435,8 +449,8 @@ are not solved instances, and \cref{fig:budget-verification} counts them separat
 
 \paragraph{The same contract on the application.} The 0.01 of the stress family is a test
 parameter, but the dispatch rows carry interpretable units, so a budget can be stated in them.
-Suppose the operator declares 0.1\,MW for the rows that account for generation and cap it by
-demand, 0.1\,MW for the piecewise-linear production envelopes, and 1{,}000\,m\textsuperscript{3}
+For illustration, suppose the modeller declares 0.1\,MW for the rows that account for
+generation and cap it by demand, 0.1\,MW for the piecewise-linear production envelopes, and 1{,}000\,m\textsuperscript{3}
 --- a thousandth of a cubic hectometre --- for the reservoir water balances.
 \Cref{tab:application-budget} applies \cref{prop:budget} to the 4,320 rows of caso46e that carry
 those meanings, with $\epsilon=10^{-6}$ and the coefficient window $[10^{-9},10^{9}]$. The
@@ -475,7 +489,9 @@ in the median, and the kernel decides whether it does.
 \paragraph{The mechanism is simpler than the metadata explanation.} Under exact GM local
 normalization, the extrema-based post-local block statistic carries no block-scale information
 (\cref{prop:audit-collapse}), so the block-relative rule becomes Euclidean normalization of the
-coupling rows, the optimal common factor of the idealized triangular model.
+coupling rows. Separately, on a locally whitened triangular structure the optimal common factor
+is $(1+\rho^2)^{-1/2}$ (\cref{prop:audit-triangular-optimum}); the two coincide when the
+structure has a single coupling row.
 
 \paragraph{Matching kernels is essential for attribution.} The original comparison changed the
 coupling kernel together with the information used, and the fixed-basis audit shows how much a
@@ -483,11 +499,13 @@ kernel alone can change: identical coverage, representations orders of magnitude
 that generator information improves preprocessing needs a kernel-matched control.
 
 \paragraph{Residual budgets are a meaningful invariant quantity.} A budget carried with its row
-is unchanged by consistent re-emission, determines the admissible factors exactly, and in the
-stress test repaired the verification losses of coefficient centering on two of three solvers
-without introducing new ones on any of them. On the dispatch model the same contract is easy to
-satisfy --- every policy's factor is admissible with orders of magnitude to spare --- and its
-work is in the reading of a residual, which without a stated unit says nothing. GCD division with RHS flooring verified every stress configuration, but it
+is unchanged by consistent re-emission and determines the admissible factors exactly. In the
+stress test, measured against the corresponding unbudgeted rule, it repaired the verification
+losses of coefficient centering on two of the three solvers and cost nothing on the third;
+measured against the unscaled model the outcome still depends on the pipeline. On the dispatch
+model the same contract is easy to satisfy --- all three kernels the four policies use are
+admissible on each of its 4,320 interpretable rows, with orders of magnitude to spare --- and
+its work is in the reading of a residual, which without a stated unit says nothing. GCD division with RHS flooring verified every stress configuration, but it
 answers a different question: it is an integer-aware reformulation that exploits the activity
 lattice of integer rows, whereas a residual budget is a contract in original units that also
 applies to continuous rows and to constraints admitting no such reduction.
@@ -518,8 +536,8 @@ while preserving the MILP in exact arithmetic, and the kernel determines whether
 Correct attribution changes the explanation of the gain. The advantage originally attributed to
 block metadata is a coupling-kernel effect: exact GM local normalization erases the
 extrema-based post-local block statistic, and the closed-form coupling factor of the idealized
-triangular model, which reduces to Euclidean normalization in the single-row case, accounts for
-the improvement without ownership information.
+triangular model, which reduces to Euclidean normalization in the single-row case, provides a
+spectral explanation for it that uses no ownership information.
 
 Residual budgets provide a constructive way to encode information that keeps its meaning in
 original application units. They come with exact feasibility and incompatibility conditions, a
