@@ -50,11 +50,12 @@ def load(root):
 
 def cells(d):
     out = []
-    for (fam, solver, gap, seed), g in d.groupby(["family", "solver", "gap", "seed"]):
+    for (stage, fam, solver, gap, seed), g in d.groupby(["stage", "family", "solver", "gap", "seed"]):
         for policy, gp in g.groupby("policy"):
             done = gp[gp.completed]
             out.append({
-                "family": fam, "solver": solver, "gap": gap, "seed": seed, "policy": policy,
+                "stage": stage, "family": fam, "solver": solver, "gap": gap, "seed": seed,
+                "policy": policy,
                 "n": len(gp), "completed": int(gp.completed.sum()), "censored": int(gp.censored.sum()),
                 "failed": int(gp.failed.sum()),
                 "censored_without_incumbent": int(gp.no_incumbent.sum()),
@@ -73,7 +74,7 @@ def paired(d, seed=None, boot=2000, rng_seed=20260916):
     """Ratios policy/Base on instances completed by every policy, within each cell."""
     rows = []
     sub = d if seed is None else d[d.seed.eq(seed)]
-    for (fam, solver, gap, s), g in sub.groupby(["family", "solver", "gap", "seed"]):
+    for (stage, fam, solver, gap, s), g in sub.groupby(["stage", "family", "solver", "gap", "seed"]):
         wide_t = g.pivot_table(index="instance", columns="policy", values="tiempo_solver_s")
         wide_c = g.pivot_table(index="instance", columns="policy", values="completed")
         eff_col = EFFORT[solver]
@@ -93,7 +94,8 @@ def paired(d, seed=None, boot=2000, rng_seed=20260916):
                 logs = np.log(r.values)
                 idx = rng.integers(0, len(logs), size=(boot, len(logs)))
                 gm_boot = np.exp(logs[idx].mean(axis=1))
-                rows.append({"family": fam, "solver": solver, "gap": gap, "seed": s, "policy": policy,
+                rows.append({"stage": stage, "family": fam, "solver": solver, "gap": gap,
+                             "seed": s, "policy": policy,
                              "endpoint": label, "n_pairs": len(r),
                              "geometric_mean_ratio": round(float(np.exp(logs.mean())), 4),
                              "median_ratio": round(float(r.median()), 4),
@@ -194,15 +196,15 @@ def equivalence(d):
     """
     done = d[d.completed & d.objetivo_solver.notna()]
     rows = []
-    for (fam, solver, gap, seed, instance), g in done.groupby(
-            ["family", "solver", "gap", "seed", "instance"]):
+    for (stage, fam, solver, gap, seed, instance), g in done.groupby(
+            ["stage", "family", "solver", "gap", "seed", "instance"]):
         obj = g.groupby("policy").objetivo_solver.first()
         if "Base" not in obj or len(obj) < 2:
             continue
         base = obj["Base"]
         scale = max(abs(base), 1.0)
         rel = (obj.drop("Base") - base).abs() / scale
-        rows.append({"family": fam, "solver": solver, "gap": gap, "seed": seed,
+        rows.append({"stage": stage, "family": fam, "solver": solver, "gap": gap, "seed": seed,
                      "instance": instance, "policies": len(obj),
                      "max_rel_objective_gap": float(rel.max()),
                      "worst_policy": str(rel.idxmax()),
