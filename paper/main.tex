@@ -236,7 +236,8 @@ each of the Simple and SG-Ter-Mer classes with Gurobi at relative MIP gaps of 1\
 hashes were retrieved from the cluster. The subsets were fixed before outcomes were inspected. Nine
 of the 15 SG-Ter-Mer instances, including instance077, carry a scenario defect that makes them
 unfaithful market cases without affecting their validity as MILPs or the comparison of
-representations of one model (Online Resource 1).
+representations of one model; Online Resource 1 repeats the endpoints on the six instances
+without the defect.
 The pre-specified primary endpoint is failure-sensitive performance: the arithmetic-mean PAR10
 over all 15 instances of a cell, with 18,000 seconds assigned to a non-completion. Solver effort,
 the secondary endpoint, is Gurobi's work measure, recovered from the native logs at a common
@@ -364,9 +365,10 @@ intervals $[0.486,0.944]$ and $[0.470,0.925]$): about 30--32\% less work on that
 fifteenth instance, instance077, completes under Base and times out under every scaled policy
 at both gaps. Under PAR10 this single failure dominates: Base averages 116 and 134 seconds,
 while every scaled policy averages between 1,216 and 1,218 seconds (Online Resource 1,
-Table~S3). Scaling
-therefore produced a sizeable completed-run efficiency gain in this class, but the gain was not
-robust to failure-sensitive aggregation. The Simple class has no uniform ordering: Flat-GM
+Table~S4). Scaling therefore produced a sizeable completed-run efficiency gain in this class,
+but the gain was not robust to failure-sensitive aggregation. On the six instances of the class
+that are free of the scenario defect the conditional gain is larger and, since instance077 is
+not among them, the reversal disappears (Online Resource 1, Table~S3). The Simple class has no uniform ordering: Flat-GM
 lowers mean PAR10 from 11.9 to 2.1 seconds at 1\% gap and raises it from 52.0 to 73.0 seconds
 at 0.1\%. Role-Hybrid stays within one second of Flat-GM in all four cells.
 
