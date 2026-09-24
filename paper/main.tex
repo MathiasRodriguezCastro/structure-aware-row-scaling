@@ -24,9 +24,9 @@
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\argmin}{\operatorname*{arg\,min}}
 \newcommand{\nnz}{\operatorname{nnz}}
-\hypersetup{pdftitle={Pre-Export Row Scaling for Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts},pdfauthor={Mathias Rodr\'iguez Castro}}
+\hypersetup{pdftitle={Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts},pdfauthor={Mathias Rodr\'iguez Castro}}
 \graphicspath{{figs/research/}{figs/}}
-\title{Pre-Export Row Scaling for Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts}
+\title{Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts}
 \author{Mathias Rodr\'iguez Castro\\
 \small Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay\\
 \small\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
@@ -34,26 +34,24 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Positive row scaling preserves a mixed-integer program in exact arithmetic while changing its
-numerical representation. On 306 generated hydrothermal-dispatch models, with one
-LP basis held fixed, row scaling with geometric-mean local normalization lowers the basis
-condition number on every model, by six to eight orders of magnitude in the median of each
-class. Such a gain does not identify which preprocessing information caused it. We show that an
-apparent block-metadata effect was a coupling-kernel effect: geometric-mean normalization makes
-an extrema-based block statistic identically one, so a block-relative coupling rule reduces to
-Euclidean normalization, and a control without ownership information reproduces its spectral
-gain. After local whitening, an idealized coupling problem has the closed-form optimal factor
-$(1+\rho^2)^{-1/2}$, which needs no ownership map. Residual budgets in application units, by
-contrast, survive consistent row re-emission. We characterize exactly the factors compatible
-with a budget and coefficient limits, with an incompatibility certificate, the constrained
-logarithmic minimax factor, the integer-rounding term that scaling cannot remove, and exact
-binary64 export with power-of-two factors. In reconstructed dispatch runs, scaling used
-30--32\% less solver work on instances completed by every policy, but one scaled-policy timeout
-reversed the PAR10 ordering. In an exactly enumerated stress test, adding the budget to a
-centering rule never lost a verified configuration on any of three solvers, while gains over
-the unscaled model appeared with HiGHS, not with Gurobi, and not with CPLEX, where tightening
-the solver tolerances was the effective intervention. Scaling effects are real; their
-attribution and guarantees must be made explicit.
+Multiplying a row of a mixed-integer program by a positive number preserves it exactly and
+changes the numbers a solver sees. This paper asks what that change buys, and what it still
+guarantees. On 306 generated hydrothermal-dispatch models, with one LP basis held fixed,
+geometric-mean row scaling lowers its condition number on every model, by six to eight orders
+of magnitude in the median of each class. A gain of that size does not identify the information
+behind it. We show that an apparent block-metadata effect was a coupling-kernel effect:
+geometric-mean centering makes the block statistic identically one, so the block-relative rule
+becomes Euclidean normalization, which a control without ownership information reproduces, and
+the idealized coupling problem has the closed-form optimal factor $(1+\rho^2)^{-1/2}$. Residual
+budgets stated in application units, by contrast, survive consistent re-emission, and we
+characterize exactly which row factors a budget and coefficient limits admit. The evidence then
+separates what improves from what is guaranteed. In reconstructed dispatch runs, scaling used
+30--32\% less solver work on the instances every policy completed, while one scaled-policy
+timeout reversed the failure-sensitive ordering. In an exactly enumerated stress test, plain
+centering lost verified optima on all three solvers tested, adding the budget to the same rule
+lost none, and whether scaling helped depended on the solver. A representation can be
+numerically better without being operationally safer, unless what safer means is stated in the
+units of the original model.
 \end{abstract}
 \noindent\textbf{Keywords:} mixed-integer linear programming; row scaling; numerical
 reliability; equilibration; residual budgets; computational reproducibility.
@@ -71,14 +69,21 @@ application units \cite{gurobiExternalScaling,idaesScaling}.
 The numerical effect of external row scaling can be large. On 306 dispatch models from a
 hydrothermal generator, holding one LP basis fixed across representations, geometric-mean
 row scaling lowers the 1-norm condition number of that basis on every model, by six to eight
-orders of magnitude in the median of each class (\cref{subsec:results-fixed-basis}). A gain of
-this kind leaves two questions open. Which information is responsible for it? And what does
-the chosen representation guarantee once a solver returns a point? Representation quality,
-solver effort, failure-sensitive performance and verified accuracy are different endpoints,
-and evidence for one does not transfer to another.
+orders of magnitude in the median of each class (\cref{subsec:results-fixed-basis}). A gain of this
+kind leaves one question open, in two halves:
+\begin{quote}
+\emph{when external preprocessing changes a generated MILP, what caused the numerical
+improvement, and what guarantee about the original model survives the change?}
+\end{quote}
+Both halves are about the same thing, the information the generator holds: which part of it
+explains the gain, and which part of it can be turned into a guarantee. The first half is
+answered by identifying the mechanism, the second by stating a contract in the units of the
+original model and checking it against what a solver returns. Representation quality, solver
+effort, failure-sensitive performance and verified accuracy are different endpoints, and
+evidence for one does not transfer to another.
 
-This paper answers both questions for external row scaling of generated MILPs. Its
-contributions are the following.
+This paper answers both halves for external row scaling of generated MILPs. Its contributions
+are the following.
 \begin{enumerate}[label=(\Alph*),leftmargin=*,itemsep=2pt,topsep=3pt]
 \item \emph{Attribution.} A comparison identifies the effect of block ownership only when
 coverage, row roles, kernels and safeguards are matched. With such controls, the
@@ -101,7 +106,8 @@ enumerated stress experiment with 4,752 optimizer calls on three solvers
 (\cref{sec:experiments,sec:results}).
 \end{enumerate}
 
-The results progress from the representation to the solver. Scaling changes the numerical
+Contributions (A) and (B) answer the first half of the question, (C) the second, and (D) is the
+evidence for both. The results progress from the representation to the solver. Scaling changes the numerical
 representation by orders of magnitude, and the kernel determines how much. The apparent
 metadata effect is a kernel effect with a simpler explanation. Residual budgets have
 measurable consequences: adding them to a centering rule never lost a verified stress
@@ -392,7 +398,10 @@ on CPLEX) return points that satisfy the exported tolerance while violating the 
 more than the budget. Adding the budget to the same rule never lost a verified configuration on
 any solver. It recovered 41 of them on HiGHS and 12 on Gurobi, and none on CPLEX, where a rule
 and its budgeted version verify exactly the same configurations; the dyadic pair shows the same
-pattern, 19, 13 and 0.
+pattern, 19, 13 and 0. The two comparisons say different things about the same factors. Plain
+centering improves the numbers in the exported file and loses verified optima; the same rule
+with a budget attached loses none. A representation can be numerically better without being
+operationally safer, unless what safer means is stated in the units of the original model.
 
 Relative to the unscaled model, the outcome depends on the solver. On HiGHS, Budget-only
 verifies 191 of 192 configurations and Budget-GM 182, against 167 for Base and 141 for GM;

@@ -1,15 +1,19 @@
 \section{Residual-budget contracts}
 \label{sec:contract}
 
-Block ownership is one kind of generator information; a tolerance stated in application
-units is another. A residual budget says how much violation of an original constraint is
+The first half of the question asked which generator information explains the numerical gain,
+and the answer was that block ownership does not. This half asks which generator information
+can be turned into a guarantee. Ownership is one kind of generator information; a tolerance
+stated in application units is another. A residual budget says how much violation of an original constraint is
 acceptable. It must be supplied by the application or declared as a numerical test
 parameter; it cannot be inferred from a block label or a zero right-hand side. Scaling rows
 so that solver tolerances correspond to negligible application-unit violations is
 established practice \cite{gurobiScaling,gurobiExternalScaling,idaesScaling}. The results
 below make its combination with coefficient limits exact: they characterize every admissible
 factor, certify when none exists, select the centered one, and identify what row scaling
-cannot control.
+cannot control. Individually the steps are elementary algebra; what the section contributes is
+that the contract is complete, in the sense that a factor is admissible exactly when the
+conditions hold, and that each consequence is stated in the units the application uses.
 
 For a nonconstant row $a^Tx\le b$, define the original residual $v(x)=(a^Tx-b)_+$ and a
 budget $\delta>0$. Let $\epsilon>0$ bound the residual of the \emph{exported} row. This is a
