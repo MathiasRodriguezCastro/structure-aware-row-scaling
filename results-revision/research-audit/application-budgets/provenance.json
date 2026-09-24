@@ -1,0 +1,13 @@
+{
+  "instance": "data/entradas/entrada-modelo-simple/caso46e.txt",
+  "instance_sha256": "e3d419836e0d4bd7facd5cec362750072a933f7bc1739098bb19244f27de60a1",
+  "export_command": "printf '<instance body>\\nconfigurarSolver --Gurobi --timeout 60 --mipgap 0.01\\ngrabar <out>/original.lp --noConstante\\nsalir\\n' | code/build-robust/SistemaElectrico",
+  "exported_lp_sha256": "df5f19d463dfca6728a3c597877099ed3a15623a094f6b3787885a383820a368",
+  "binary_sha256": "81eb74e0bb12618b1cb45263c5605dda8c0e6653036c6da9690440e3a40dc15c",
+  "analysis": "scripts/research/application_budgets.py --lp <out>/original.lp --budgets declared-budgets.json",
+  "epsilon": 1e-06,
+  "coefficient_floor": 1e-09,
+  "coefficient_ceiling": 1000000000.0,
+  "note": "budgets are declared by the modeller; no operator tolerance was supplied",
+  "git_commit": "21389965d90013479da74922a1bcbbb38a6a6d24"
+}
