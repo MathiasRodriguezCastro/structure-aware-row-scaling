@@ -8,7 +8,7 @@ results and the completed negative comparison with a classical lattice reformula
 See [research status](research-audit/research-status-20260913.md) for unresolved
 scientific requirements. Run `make rounding-note` from the repository root to build it.
 
-The preserved unpublished manuscript is **Pre-Export Row Scaling for Mixed-Integer Programs:
+The preserved unpublished manuscript is **Pre-Export Row Scaling for Generated Mixed-Integer Programs:
 Mechanism Attribution and Residual-Budget Contracts**, by Mathias Rodríguez Castro.
 It develops an attribution result for post-normalization block summaries and
 conditional residual-budget constructions, with independently checked computational
