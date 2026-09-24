@@ -53,6 +53,16 @@ pipeline, under default, NumericFocus, presolve-off and scaling settings, to att
 failure. The campaign-wide counter lives in `analysis/contradictions.csv`; it is an exploratory
 check built on the registered verification endpoint, not a registered endpoint itself.
 
+## HiGHS rejects its own optimality claims
+
+Eleven pilot runs end with HiGHS reporting `Solve error` after its own check finds that the
+point it had called optimal violates the model (max primal infeasibility 1e-6 to 7e-5). They
+are all Base runs, but the pilot only runs Base, so that says nothing about policies yet; the
+primary arm will. Scanned by `scripts/research/scan_solver_logs.py` into
+`analysis/solver-log-scan.csv`. Three pipelines, three behaviours on the same models: Gurobi
+returned two wrong answers with a zero gap, CPLEX reported dual bounds above verified points,
+and HiGHS refuses to return the point at all.
+
 ## Known local findings before the cluster run
 
 - HiGHS did not find any feasible solution for a Simple Base model within a 300 s cap (1,454
