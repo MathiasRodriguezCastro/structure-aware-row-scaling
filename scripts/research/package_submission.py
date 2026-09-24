@@ -6,6 +6,12 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT/'paper/submission'
+# Bulk inputs of the fixed-basis audit: 4.6 GB of exported LP text and bases. They are the
+# input of `make research-fixed-basis-check`, not something to attach to a submission, so the
+# archive lists them with their hashes instead of carrying them.
+BULK_DIRS = {'fresh', 'runs-raw'}
+MAX_FILE_BYTES = 20 * 1024 * 1024
+EXCLUDED = []
 
 
 def collect(folder, suffixes=None):
@@ -13,9 +19,11 @@ def collect(folder, suffixes=None):
         rel = p.relative_to(ROOT)
         if not p.is_file() or p.is_symlink():
             continue
-        if any(x.startswith('build') or x in {'__pycache__', '.git', '.pytest_cache', 'rendered',
-                                              'runs-raw'}
+        if any(x.startswith('build') or x in {'__pycache__', '.git', '.pytest_cache', 'rendered'}
                for x in rel.parts):
+            continue
+        if set(rel.parts) & BULK_DIRS or p.stat().st_size > MAX_FILE_BYTES:
+            EXCLUDED.append((rel, p.stat().st_size))
             continue
         if suffixes is None or p.suffix in suffixes or p.name in {'Makefile', 'README.md'}:
             yield rel
@@ -30,6 +38,13 @@ def archive(name, paths):
             z.writestr(str(p),content)
             hashes.append(f'{hashlib.sha256(content).hexdigest()}  {p}')
         z.writestr('CONTENTS.sha256','\n'.join(hashes)+'\n')
+        if EXCLUDED:
+            total=sum(s for _,s in EXCLUDED)
+            z.writestr('EXCLUDED.txt',
+                       f'{len(EXCLUDED)} files, {total/1e9:.2f} GB, left out of this archive.\n'
+                       'They are bulk inputs (exported LP text, bases, per-run logs) kept in the\n'
+                       'repository and the data record; the analyses here read their summaries.\n\n'
+                       + '\n'.join(f'{s:>12}  {q}' for q,s in sorted(EXCLUDED)) + '\n')
     return len(paths)
 
 
