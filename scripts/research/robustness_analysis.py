@@ -226,7 +226,9 @@ def contradictions(d, tol=1e-6):
     is wrong.
     """
     rows = []
-    for (fam, instance), g in d.groupby(["family", "instance"]):
+    key = ["family", "instance", "instance_sha256"] if "instance_sha256" in d else ["family", "instance"]
+    for k, g in d.groupby(key):
+        fam, instance = k[0], k[1]
         ok = g[g.verified & g.verif_solver_obj_original.notna()]
         if ok.empty:
             continue
