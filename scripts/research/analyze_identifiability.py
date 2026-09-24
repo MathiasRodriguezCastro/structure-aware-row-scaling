@@ -41,7 +41,7 @@ def main():
         ax.axhline(1,color='black',ls='--',lw=.8)
         ax.set_xticks([1,2,3],['[-1,1]','[-2,2]','[-3,3]'])
         ax.set_xlabel('Original block exponent range')
-        ax.set_ylabel('SA-Mat / control: condition-number ratio')
+        ax.set_ylabel(r'SA-Mat / control $\kappa_2^+$ ratio')
         ax.legend(title='Control',loc='best',fontsize=10)
     axes[0].set_yscale('log');axes[0].set_title('(a) Different coupling kernels')
     axes[1].set_ylim(.92,1.1);axes[1].set_title('(b) Matched kernels')

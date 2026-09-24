@@ -136,30 +136,38 @@ def main():
     lines += [r'\bottomrule',r'\end{tabular}']
     (args.tables/'budget-results.tex').write_text('\n'.join(lines)+'\n')
     plt.rcParams.update({'font.size':11, 'pdf.fonttype':42, 'ps.fonttype':42})
-    fig, axes = plt.subplots(1,len(solvers),figsize=(4.5*len(solvers),5.5),sharey=True,layout='constrained')
+    # One blank row separates the scaling policies from the integer-aware control.
+    layout = methods[:-1] + [None] + methods[-1:]
+    fig, axes = plt.subplots(1,len(solvers),figsize=(4.3*len(solvers),5.6),sharey=True,layout='constrained')
     for ax, solver in zip(np.atleast_1d(axes),solvers):
         a = d[d.solver.eq(solver)]
-        grid = np.empty((len(methods),4))
-        for i, method in enumerate(methods):
+        grid = np.full((len(layout),4), np.nan)
+        for i, method in enumerate(layout):
+            if method is None:
+                continue
             for j, e in enumerate([0,3,6,9]):
                 s = a[a.method.eq(method)&a.exponent.eq(e)]
                 grid[i,j] = 100*s.rounded_optimal.mean()
-        ax.imshow(grid,cmap='Blues',vmin=0,vmax=100,aspect='auto')
-        for i,method in enumerate(methods):
+        ax.imshow(np.ma.masked_invalid(grid),cmap='Blues',vmin=0,vmax=100,aspect='auto')
+        for i, method in enumerate(layout):
+            if method is None:
+                continue
             for j,e in enumerate([0,3,6,9]):
                 s = a[a.method.eq(method)&a.exponent.eq(e)]
                 if s.abstained.all():
                     ax.add_patch(Rectangle((j-.5,i-.5),1,1,facecolor='#eeeeee',edgecolor='#aaaaaa',hatch='//'))
-                    label, color = 'abstain', 'black'
+                    label, color = '--', 'black'
                 else:
-                    label = f'{int(s.rounded_optimal.sum())}/{len(s)}'
+                    label = str(int(s.rounded_optimal.sum()))
                     color = 'white' if grid[i,j]>65 else 'black'
                 ax.text(j,i,label,ha='center',va='center',fontsize=11,color=color)
         ax.set_xticks(range(4),[r'$10^0$',r'$10^3$',r'$10^6$',r'$10^9$'])
-        ax.set_yticks(range(len(methods)),methods)
-        ax.axhline(len(methods)-1.5,color='black',linewidth=1.2)
+        ax.set_yticks(range(len(layout)),[m or '' for m in layout])
         ax.set_xlabel('Coefficient multiplier')
         ax.set_title(f'({"abc"[solvers.index(solver)]}) {SOLVER_LABELS[solver]}')
+        ax.tick_params(left=False)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
     fig.savefig(args.figures/'budget-verification.pdf',bbox_inches='tight')
     fig.savefig(args.figures/'budget-verification.png',dpi=180,bbox_inches='tight')
     plt.close(fig)
