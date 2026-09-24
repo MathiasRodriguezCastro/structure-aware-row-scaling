@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """What a declared residual budget implies for the rows of a real dispatch model.
 
+The LP it reads is the unscaled export of an instance, produced by the C++ pipeline with
+`grabar <path> --noConstante` after `configurarSolver`; provenance.json beside the results
+records the instance, the binary and the hash of the export used here.
+
 Reads an exported LP, groups its rows by the generator's own names, and asks, per group:
 given a tolerance stated in the units of that constraint, which row factors are admissible
 (Proposition 5.1), where does the plain geometric-mean factor fall, and what does the solver's
