@@ -1,0 +1,151 @@
+[32m[success] SystemController creado[0m
+> [32m[success] El programa se ha iniciado correctamente[0m
+> > 
+========== DEBUG CONSTRUCTOR RioNegroBoneteNoLineal ==========
+volumenesBonete.size()         = 118
+valoresBellman.size()          = 118
+derivadasValoresBellman.size() = 118
+volumenesBonete.front() = 1487
+volumenesBonete.back()  = 10239.8139534883
+==============================================================
+
+[info] RioNegroNoLineal: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Río Negro Bonete No Lineal' exitosamente[0m
+> > [34m[info] Agregando agente Salto Grande[0m
+[34m[info] Ingrese costo de agua de Salto Grande:[0m
+[34m[info] Ingrese volumen inicial de Salto Grande:[0m
+[34m[info] Ingrese aportes de Salto Grande en una sola línea (360 valores):[0m
+[info] SaltoGrande: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Salto Grande' exitosamente[0m
+> > [34m[info] Agregando agente Unidad Térmica Simple[0m
+[34m[info] Ingrese potencia máxima de la unidad térmica simple:[0m
+[34m[info] Ingrese costo variable de la unidad térmica simple:[0m
+[32m[success] Se ha creado el agente 'Unidad Térmica Simple' exitosamente[0m
+> > [34m[info] Agregando agente Demanda Fija[0m
+[34m[info] Ingrese demandas en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el agente 'Demanda Fija' exitosamente[0m
+> > [34m[info] Creando despacho de mercado[0m
+[34m[info] Modo: despacho de mercado con demanda total explícita[0m
+[34m[info] Ingrese cantidad de tramos del despacho de mercado:[0m
+[34m[info] Ingrese porcentajes acumulados de los tramos en una sola línea (4 valores):[0m
+[34m[info] Ingrese costos marginales de los tramos en una sola línea (4 valores):[0m
+[34m[info] Ingrese demanda total en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el despacho de mercado exitosamente[0m
+> > [32m[success] Solver 'DummyLp' configurado | timeout=1800s | mipgap=0.0001[0m
+> 
+========== DEBUG RANGO BONETE ==========
+volumenInicialBonete [m3] = 4763108000
+v0 [hm3]                  = 4763.108
+vRef1 [hm3]               = 4048.6418
+vRef2 [hm3]               = 4763.108
+vRef3 [hm3]               = 5477.5742
+min volumen Bellman [hm3] = 1487
+max volumen Bellman [hm3] = 10239.8139534883
+========================================
+
+
+========== DEBUG Bonete Bellman ==========
+volumenesBonete.size()          = 118
+valoresBellman.size()           = 118
+derivadasValoresBellman.size()  = 118
+v0 [hm3]       = 4763.108
+i0             = 44
+vCorte0 [hm3]  = 4778.65652951699
+B0 = B(vCorte0)= 66423093.3311453
+Corte 1:
+  vRef1 [hm3]       = 4048.6418
+  i1                = 34
+  vCorte1 [hm3]     = 4030.55277280859
+  B1                = 64259018.1422833
+  q1 [costo/hm3]    = 3469.87588513065
+  coef1 [costo/m3]  = 0.00346987588513065
+  rhs1              = 16149593.058977
+Corte 2:
+  vRef2 [hm3]       = 4763.108
+  i2                = 44
+  vCorte2 [hm3]     = 4778.65652951699
+  B2                = 66423093.3311453
+  q2 [costo/hm3]    = 2427.789982481
+  coef2 [costo/m3]  = 0.002427789982481
+  rhs2              = 11601574.4520788
+Corte 3:
+  vRef3 [hm3]       = 5477.5742
+  i3                = 53
+  vCorte3 [hm3]     = 5451.94991055456
+  B3                = 67860706.5577002
+  q3 [costo/hm3]    = 1842.60169830303
+  coef3 [costo/m3]  = 0.00184260169830303
+  rhs3              = 8608158.93769598
+Variable final usada: a1_v1h(360)
+Variable delta usada: a1_delta1h
+Restriccion 1 esperada: a1_delta1h + (0.00346987588513065) * a1_v1h(360) >= 16149593.058977
+Restriccion 2 esperada: a1_delta1h + (0.002427789982481) * a1_v1h(360) >= 11601574.4520788
+Restriccion 3 esperada: a1_delta1h + (0.00184260169830303) * a1_v1h(360) >= 8608158.93769598
+==========================================
+
+[DEBUG Despacho] j=0 idGen=1 coefParticipacionDespacho=1
+[DEBUG Despacho] j=1 idGen=2 coefParticipacionDespacho=0.5
+[DEBUG Despacho] j=2 idGen=3 coefParticipacionDespacho=1
+
+[DEBUG Despacho] Cantidad de generadores = 3
+[DEBUG Despacho] j=0 puntero=0x565d7434d2e0 idGen=1 coefParticipacionDespacho=1
+[DEBUG Despacho] j=1 puntero=0x565d74347a80 idGen=2 coefParticipacionDespacho=0.5
+[DEBUG Despacho] j=2 puntero=0x565d74348780 idGen=3 coefParticipacionDespacho=1
+[PREPROC] modo plano: 23763 filas tratadas como un unico bloque sin roles (kernel geomean por fila)
+[PREPROC PHASES] metadata_s=0.001066566 diagnostico_s=0.030804054 aplicacion_s=0.034380216
+
+------------------------------------------------------------
+  PREPROCESAMIENTO MIP - Diagnostico Numerico
+------------------------------------------------------------
+Rango de coeficientes (toda la matriz):
+  max |coef| = 1.078e+10
+  min |coef| = 1.018e-09
+  proxy rango= 1.059e+19
+
+Diagnostico por bloque:
+Bloque              max|coef|      min|coef|      kappa_aprox   vars    alpha     beta      cols      disc_omit aux_omit  escalado
+------------------------------------------------------------------------------------------------------------------------------
+plano               1.078e+10      1.018e-09      1.06e+19      0       2.96e-03  1.00e+00  0         0         0         SI  (filas=9720, alpha_min=7.07e-08, alpha_max=5.00e-01)
+
+Restriccion(es) global(es): 0 fila(s)
+  acoplamiento balance = 0 fila(s)
+  global no acoplante  = 0 fila(s)
+  rho aprox (solo acoplamiento) = 0.000e+00
+  gamma acoplamiento   = 1.000000
+  gamma candidato      = 1.000000
+  filas acop. escaladas= no
+  filas normaliz. fisica= 0
+  motivo gamma=1       = rho bajo; no se escala la fila de acoplamiento
+
+ADVERTENCIAS:
+  [!] Rango de coeficientes elevado (-9223372036854775808). Riesgo de sensibilidad numerica.
+  [!] Bloque 'plano' internamente mal escalado (kappa~-9223372036854775808). Conviene comparar equilibrado interno por filas/columnas.
+------------------------------------------------------------
+
+------------------------------------------------------------
+  COMPARACION NUMERICA ANTES / DESPUES
+------------------------------------------------------------
+Indicador                   antes           despues         despues/antes
+----------------------------------------------------------------------------
+rango global                3.798e+13       1.059e+19       2.788e+05
+rho acoplamiento            0.000e+00       0.000e+00       0.000e+00
+gamma aplicado              1.000000        1.000000        1.000000
+
+Bloques locales:
+Bloque              kappa antes     kappa despues   alpha       beta        filas       cols        disc_omit   aux_omit    escalado
+------------------------------------------------------------------------------------------------------------------------------------
+plano               3.798e+13       1.059e+19       2.963e-03   1.000e+00   9720        0           0           0           SI
+
+Interpretacion: valores despues/antes menores que 1 indican mejora del proxy.
+rho se calcula solo con filas de acoplamiento; las cotas de demanda sobre g quedan fuera.
+El escalamiento local activo fue solo por fila: alpha_r = 1/sqrt(M_r*m_r).
+------------------------------------------------------------
+
+[PREPROC TIME] variante=matricial_plano_l2 tiempo_s=0.066454817 u=2 K=4 epsMin=1e-09 epsMax=1000000000
+[32m[success] Preprocesamiento aplicado.[0m
+> [pipeline] Preprocesamiento seleccionado: Ninguno
+[pipeline] Modelo interno sin modificaciones de preprocesamiento.
+Archivo LP guardado en: /home/mathiasr/Escritorio/generator-aware-row-scaling/results-revision/research-audit/fixed-basis-final-20260914/fresh/full/instance027/Flat-L2.lp
+[32m[success] Se ha guardado el modelo exitosamente[0m
+> [32m[success] Saliendo del programa...[0m
+[32m[success] SystemController destruido[0m

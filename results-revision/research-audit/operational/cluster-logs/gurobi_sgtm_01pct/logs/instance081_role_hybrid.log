@@ -1,0 +1,224 @@
+[32m[success] SystemController creado[0m
+> [32m[success] El programa se ha iniciado correctamente[0m
+> > [34m[info] Agregando agente Salto Grande[0m
+[34m[info] Ingrese costo de agua de Salto Grande:[0m
+[34m[info] Ingrese volumen inicial de Salto Grande:[0m
+[34m[info] Ingrese aportes de Salto Grande en una sola línea (360 valores):[0m
+[info] SaltoGrande: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Salto Grande' exitosamente[0m
+> > [34m[info] Agregando agente Unidad Térmica Simple[0m
+[34m[info] Ingrese potencia máxima de la unidad térmica simple:[0m
+[34m[info] Ingrese costo variable de la unidad térmica simple:[0m
+[32m[success] Se ha creado el agente 'Unidad Térmica Simple' exitosamente[0m
+> > [34m[info] Agregando agente Demanda Fija[0m
+[34m[info] Ingrese demandas en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el agente 'Demanda Fija' exitosamente[0m
+> > [34m[info] Creando despacho de mercado[0m
+[34m[info] Modo: despacho de mercado con demanda total explícita[0m
+[34m[info] Ingrese cantidad de tramos del despacho de mercado:[0m
+[34m[info] Ingrese porcentajes acumulados de los tramos en una sola línea (4 valores):[0m
+[34m[info] Ingrese costos marginales de los tramos en una sola línea (4 valores):[0m
+[34m[info] Ingrese demanda total en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el despacho de mercado exitosamente[0m
+> > Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+[32m[success] Solver 'Gurobi' configurado | timeout=1800s | mipgap=0.001[0m
+> [DEBUG Despacho] j=0 idGen=1 coefParticipacionDespacho=0.5
+[DEBUG Despacho] j=1 idGen=2 coefParticipacionDespacho=1
+
+[DEBUG Despacho] Cantidad de generadores = 2
+[DEBUG Despacho] j=0 puntero=0xc64300 idGen=1 coefParticipacionDespacho=0.5
+[DEBUG Despacho] j=1 puntero=0xc64510 idGen=2 coefParticipacionDespacho=1
+[PREPROC PHASES] metadata_s=0.005625696 diagnostico_s=0.001204665 aplicacion_s=0.001729247
+
+------------------------------------------------------------
+  PREPROCESAMIENTO MIP - Diagnostico Numerico
+------------------------------------------------------------
+Rango de coeficientes (toda la matriz):
+  max |coef| = 4.221e+07
+  min |coef| = 9.335e-06
+  proxy rango= 4.522e+12
+
+Diagnostico por bloque:
+Bloque              max|coef|      min|coef|      kappa_aprox   vars    alpha     beta      cols      disc_omit aux_omit  escalado
+------------------------------------------------------------------------------------------------------------------------------
+a1_                 4.221e+07      9.335e-06      4.52e+12      5040    1.21e-01  1.00e+00  0         0         0         SI  (filas=6480, alpha_min=9.33e-06, alpha_max=3.82e+01)
+a2_                 sin filas      sin filas      N/A           360     1.00e+00  1.00e+00  0         0         0         no  (sin filas locales; aporta g2 al despacho)
+
+Restriccion(es) global(es): 2160 fila(s)
+  acoplamiento balance = 360 fila(s)
+  global no acoplante  = 1800 fila(s)
+  rho aprox (solo acoplamiento) = 1.000e+00
+  gamma acoplamiento   = 1.000000
+  gamma candidato      = 1.000000
+  filas acop. escaladas= no
+  filas normaliz. fisica= 0
+  motivo gamma=1       = rho bajo; no se escala la fila de acoplamiento
+
+ADVERTENCIAS:
+  [!] Rango de coeficientes elevado (4522160939238). Riesgo de sensibilidad numerica.
+  [!] Bloque 'a1_' internamente mal escalado (kappa~4522160939238). Conviene comparar equilibrado interno por filas/columnas.
+------------------------------------------------------------
+
+------------------------------------------------------------
+  COMPARACION NUMERICA ANTES / DESPUES
+------------------------------------------------------------
+Indicador                   antes           despues         despues/antes
+----------------------------------------------------------------------------
+rango global                1.677e+13       4.522e+12       2.697e-01
+rho acoplamiento            1.000e+00       1.000e+00       1.000e+00
+gamma aplicado              1.000000        1.000000        1.000000
+
+Bloques locales:
+Bloque              kappa antes     kappa despues   alpha       beta        filas       cols        disc_omit   aux_omit    escalado
+------------------------------------------------------------------------------------------------------------------------------------
+a1_                 1.677e+13       4.522e+12       1.215e-01   1.000e+00   6480        0           0           0           SI
+a2_                 N/A             N/A             1.000e+00   1.000e+00   0           0           0           0           no
+
+Interpretacion: valores despues/antes menores que 1 indican mejora del proxy.
+rho se calcula solo con filas de acoplamiento; las cotas de demanda sobre g quedan fuera.
+El escalamiento local activo fue estructurado: alpha_r interno y beta_i entre bloques.
+------------------------------------------------------------
+
+[PREPROC TIME] variante=role_hybrid tiempo_s=0.011859743 u=2 K=4 epsMin=1e-09 epsMax=1000000000
+[32m[success] Preprocesamiento aplicado.[0m
+> [MODELO] rows=10080 cols=6120 nnz=22679
+[pipeline] Preprocesamiento seleccionado: Ninguno
+[pipeline] Modelo interno sin modificaciones de preprocesamiento.
+[pipeline] Estrategia de resolucion seleccionada: Monolitica
+[pipeline] Resolviendo monoliticamente.
+Set parameter TimeLimit to value 1800
+Set parameter MIPGap to value 0.001
+Set parameter Seed to value 42
+Set parameter Threads to value 16
+Gurobi Optimizer version 13.0.1 build v13.0.1rc0 (linux64 - "Debian GNU/Linux 12 (bookworm)")
+
+CPU model: Intel(R) Xeon(R) Gold 6138 CPU @ 2.00GHz, instruction set [SSE2|AVX|AVX2|AVX512]
+Thread count: 40 physical cores, 40 logical processors, using up to 16 threads
+
+Non-default parameters:
+TimeLimit  1800
+MIPGap  0.001
+Seed  42
+Threads  16
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0xc3ca26e2
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [9e-06, 1e+05]
+  Objective range  [6e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [9e+01, 4e+07]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 4.505644e+08
+Presolve removed 1400 rows and 403 columns
+Presolve time: 0.10s
+Presolved: 8680 rows, 5717 columns, 20867 nonzeros
+Variable types: 4299 continuous, 1418 integer (1418 binary)
+
+Root relaxation: objective -2.087873e+06, 8252 iterations, 0.21 seconds (0.26 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -2087872.5    0  324 4.5056e+08 -2087872.5   100%     -    0s
+H    0     0                    -1938233.311 -2087872.5  7.72%     -    0s
+     0     0 -2083876.6    0  474 -1938233.3 -2083876.6  7.51%     -    0s
+     0     0 -2079350.5    0  403 -1938233.3 -2079350.5  7.28%     -    0s
+H    0     0                    -1958217.096 -2079350.5  6.19%     -    0s
+     0     0 -2079272.3    0  404 -1958217.1 -2079272.3  6.18%     -    0s
+     0     0 -2063155.3    0  279 -1958217.1 -2063155.3  5.36%     -    0s
+     0     0 -2062137.0    0  261 -1958217.1 -2062137.0  5.31%     -    0s
+     0     0 -2062128.5    0  261 -1958217.1 -2062128.5  5.31%     -    0s
+     0     0 -2062124.9    0  261 -1958217.1 -2062124.9  5.31%     -    0s
+     0     0 -2062107.0    0  266 -1958217.1 -2062107.0  5.31%     -    0s
+     0     0 -2062068.3    0  265 -1958217.1 -2062068.3  5.30%     -    0s
+     0     0 -2062068.3    0  264 -1958217.1 -2062068.3  5.30%     -    0s
+     0     0 -2062068.3    0  264 -1958217.1 -2062068.3  5.30%     -    1s
+     0     0 -2062068.3    0  264 -1958217.1 -2062068.3  5.30%     -    1s
+     0     2 -2062068.3    0  264 -1958217.1 -2062068.3  5.30%     -    1s
+H  599   418                    -1958898.570 -2061694.1  5.25%   4.2    1s
+H  685   458                    -2044364.038 -2061694.1  0.85%   4.1    2s
+H 1768    12                    -2046096.905 -2049366.5  0.16%   3.7    2s
+* 1832     1             122    -2048223.715 -2048780.6  0.03%   3.7    2s
+
+Cutting planes:
+  Gomory: 241
+  Implied bound: 176
+  MIR: 21
+  Flow cover: 134
+  RLT: 31
+  Relax-and-lift: 30
+  BQP: 1
+
+Explored 1847 nodes (16792 simplex iterations) in 2.88 seconds (2.72 work units)
+Thread count was 16 (of 40 available processors)
+
+Solution count 7: -2.04822e+06 -2.0461e+06 -2.04436e+06 ... 4.50564e+08
+No other solutions better than -2.04822e+06
+
+Optimal solution found (tolerance 1.00e-03)
+Best objective -2.048223715260e+06, best bound -2.048223715260e+06, gap 0.0000%
+
+User-callback calls 5012, time in user-callback 0.00 sec
+[NUM-KAPPA] kappa_solver=189436 kappa_exact=-1 is_mip=1
+[NUM-EFIC] work=3 root_gap=0 root_time=1
+[pipeline] Tiempo de resolucion: 2.943650 s
+[SOLVE] tiempo_solver_s=2.943662864000000 status=OPTIMAL gap=0.000000000000000 obj=-2048223.715260256547481 best_bound=-2048223.715260256547481 nodos=1847.000000000000000 iter=16792.000000000000000 primal_integral=0.155520295658564
+[VERIF ORIGINAL] etapa=solver_desescalado max_le=2.27373675443232e-13 (a1_salto_grande_tangente_3(2)) max_ge=0 () max_eq=6.70552253723145e-07 (a1_balance(2)) max_lb=0 () max_ub=0 () max_int=0 () avg_viol=6.58818627212256e-09 p95_viol=7.8714812445922e-14 p99_viol=2.57045030593872e-07 max_viol_rel=2.95319324550292e-13 max_viol_relact=1.55405860123664e-16 viol_le_count=0 viol_ge_count=0 viol_eq_count=0 viol_lb_count=0 viol_ub_count=0 viol_int_count=0 missing_values=0 obj_original_recalc=-2048223.71526026
+[32m[success] Resultados guardados correctamente en /clusteruy/home/mathiasr/generator-aware-row-scaling/results-revision/final-variants/gurobi_sgtm_01pct/resultados/instance081_role_hybrid.csv[0m
+[32m[success] Archivo CSV generado correctamente[0m
+
+[POST DEBUG] ===== INICIO POSTPROCESAMIENTO GLOBAL =====
+
+[SG POST] ===== Diagnóstico SaltoGrande =====
+[SG POST] periodos = 360
+[SG POST] periodosPotenciaRealMayorMIP = 360
+[SG POST] periodosPotenciaRealMenorMIP = 0
+[SG POST] periodosConWhile = 360
+[SG POST] cantidadWhile = 2735768
+[SG POST] periodosConErrorFinal = 0
+[SG POST] sumaGMip = 271263
+[SG POST] sumaGRealInicial = 277713.518847619
+[SG POST] sumaGRealFinal = 271298.58943103
+[SG POST] sumaDeltaGInicial = 6450.51884761857
+[SG POST] sumaDeltaGFinal = 35.5894310300044
+[SG POST] maxAbsDeltaGInicial = 28.7629416438479
+[SG POST] maxAbsDeltaGFinal = 0.0999966334137525
+[SG POST] sumaDeltaX = -27357.6800005971
+[SG POST] sumaDeltaY = 27357.6800000014
+[SG POST] ===================================
+
+[POST DEBUG] --- DESPUÉS DE AGENTES ---
+[POST DEBUG] Agentes | g1 antes=271263 despues=271263 delta=0
+[POST DEBUG] Agentes | g2 antes=0 despues=0 delta=0
+[POST DEBUG] Agentes | g antes=135631.5 despues=135631.5 delta=0
+[POST DEBUG] Agentes | costoFalla antes=0 despues=0 delta=0
+[POST DEBUG] --- DESPUÉS DE DESPACHO ---
+[POST DEBUG] Despacho | g1 antes=271263 despues=271263 delta=0
+[POST DEBUG] Despacho | g2 antes=0 despues=0 delta=0
+[POST DEBUG] Despacho | g antes=135631.5 despues=135631.5 delta=0
+[POST DEBUG] Despacho | costoFalla antes=0 despues=0 delta=0
+[POST DEBUG] --- TOTAL ANTES VS FINAL ---
+[POST DEBUG] Final | g1 antes=271263 despues=271263 delta=0
+[POST DEBUG] Final | g2 antes=0 despues=0 delta=0
+[POST DEBUG] Final | g antes=135631.5 despues=135631.5 delta=0
+[POST DEBUG] Final | costoFalla antes=0 despues=0 delta=0
+[POST DEBUG] valorFOOriginal = -2048223.71526026
+[POST DEBUG] valorFOPostProcesado = -2048223.71526026
+[POST DEBUG] deltaFO = 0
+[POST DEBUG] ===== FIN POSTPROCESAMIENTO GLOBAL =====
+
+[32m[success] Post-procesamiento completado. Nuevo valor F.O.: -2048223.715260256547481[0m
+[VERIF ORIGINAL] etapa=postprocesado max_le=21.2467106774304 (a1_salto_grande_tangente_2(359)) max_ge=0 () max_eq=9.73418354988098e-06 (a1_balance(12)) max_lb=0 () max_ub=0 () max_int=0 () avg_viol=0.591915513250832 p95_viol=2.8621023002973 p99_viol=15.359347898958 max_viol_rel=3.9916643594855 max_viol_relact=0.017949725037184 viol_le_count=1913 viol_ge_count=0 viol_eq_count=360 viol_lb_count=0 viol_ub_count=0 viol_int_count=0 missing_values=0 obj_original_recalc=-2048223.71526026
+[32m[success] Resultados guardados correctamente en /clusteruy/home/mathiasr/generator-aware-row-scaling/results-revision/final-variants/gurobi_sgtm_01pct/resultados/instance081_role_hybrid_postprocesado.csv[0m
+> [32m[success] Saliendo del programa...[0m
+[32m[success] SystemController destruido[0m

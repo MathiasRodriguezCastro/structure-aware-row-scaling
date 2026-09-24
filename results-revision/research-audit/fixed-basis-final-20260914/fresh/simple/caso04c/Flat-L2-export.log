@@ -1,0 +1,71 @@
+[32m[success] SystemController creado[0m
+> [32m[success] El programa se ha iniciado correctamente[0m
+> [info] RioNegro: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Río Negro' exitosamente[0m
+> [34m[info] Agregando agente Demanda Fija[0m
+[34m[info] Ingrese demandas en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el agente 'Demanda Fija' exitosamente[0m
+> [32m[success] Se ha creado el despacho fijo exitosamente[0m
+> > [32m[success] Solver 'DummyLp' configurado | timeout=1800s | mipgap=0.0001[0m
+> [DEBUG Despacho] j=0 idGen=1 coefParticipacionDespacho=1
+
+[DEBUG Despacho] Cantidad de generadores = 1
+[DEBUG Despacho] j=0 puntero=0x58b29301ec50 idGen=1 coefParticipacionDespacho=1
+[PREPROC] modo plano: 14400 filas tratadas como un unico bloque sin roles (kernel geomean por fila)
+[PREPROC PHASES] metadata_s=0.000623868 diagnostico_s=0.019640856 aplicacion_s=0.0174652
+
+------------------------------------------------------------
+  PREPROCESAMIENTO MIP - Diagnostico Numerico
+------------------------------------------------------------
+Rango de coeficientes (toda la matriz):
+  max |coef| = 2.838e+09
+  min |coef| = 1.389e-04
+  proxy rango= 2.043e+13
+
+Diagnostico por bloque:
+Bloque              max|coef|      min|coef|      kappa_aprox   vars    alpha     beta      cols      disc_omit aux_omit  escalado
+------------------------------------------------------------------------------------------------------------------------------
+plano               2.838e+09      1.389e-04      2.04e+13      0       2.46e-03  1.00e+00  0         0         0         SI  (filas=5760, alpha_min=1.39e-04, alpha_max=5.00e-01)
+
+Restriccion(es) global(es): 0 fila(s)
+  acoplamiento balance = 0 fila(s)
+  global no acoplante  = 0 fila(s)
+  rho aprox (solo acoplamiento) = 0.000e+00
+  gamma acoplamiento   = 1.000000
+  gamma candidato      = 1.000000
+  filas acop. escaladas= no
+  filas normaliz. fisica= 0
+  motivo gamma=1       = rho bajo; no se escala la fila de acoplamiento
+
+ADVERTENCIAS:
+  [!] Rango de coeficientes elevado (20431706160530). Riesgo de sensibilidad numerica.
+  [!] Bloque 'plano' internamente mal escalado (kappa~20431706160530). Conviene comparar equilibrado interno por filas/columnas.
+------------------------------------------------------------
+
+------------------------------------------------------------
+  COMPARACION NUMERICA ANTES / DESPUES
+------------------------------------------------------------
+Indicador                   antes           despues         despues/antes
+----------------------------------------------------------------------------
+rango global                2.133e+12       2.043e+13       9.579e+00
+rho acoplamiento            0.000e+00       0.000e+00       0.000e+00
+gamma aplicado              1.000000        1.000000        1.000000
+
+Bloques locales:
+Bloque              kappa antes     kappa despues   alpha       beta        filas       cols        disc_omit   aux_omit    escalado
+------------------------------------------------------------------------------------------------------------------------------------
+plano               2.133e+12       2.043e+13       2.459e-03   1.000e+00   5760        0           0           0           SI
+
+Interpretacion: valores despues/antes menores que 1 indican mejora del proxy.
+rho se calcula solo con filas de acoplamiento; las cotas de demanda sobre g quedan fuera.
+El escalamiento local activo fue solo por fila: alpha_r = 1/sqrt(M_r*m_r).
+------------------------------------------------------------
+
+[PREPROC TIME] variante=matricial_plano_l2 tiempo_s=0.037903365 u=2 K=4 epsMin=1e-09 epsMax=1000000000
+[32m[success] Preprocesamiento aplicado.[0m
+> [pipeline] Preprocesamiento seleccionado: Ninguno
+[pipeline] Modelo interno sin modificaciones de preprocesamiento.
+Archivo LP guardado en: /home/mathiasr/Escritorio/generator-aware-row-scaling/results-revision/research-audit/fixed-basis-final-20260914/fresh/simple/caso04c/Flat-L2.lp
+[32m[success] Se ha guardado el modelo exitosamente[0m
+> [32m[success] Saliendo del programa...[0m
+[32m[success] SystemController destruido[0m

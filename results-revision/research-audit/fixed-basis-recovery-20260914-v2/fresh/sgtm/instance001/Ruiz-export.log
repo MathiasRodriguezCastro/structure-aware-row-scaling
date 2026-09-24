@@ -1,0 +1,90 @@
+[32m[success] SystemController creado[0m
+> [32m[success] El programa se ha iniciado correctamente[0m
+> > [34m[info] Agregando agente Salto Grande[0m
+[34m[info] Ingrese costo de agua de Salto Grande:[0m
+[34m[info] Ingrese volumen inicial de Salto Grande:[0m
+[34m[info] Ingrese aportes de Salto Grande en una sola línea (360 valores):[0m
+[info] SaltoGrande: activación de tramos de altura horaria
+[32m[success] Se ha creado el agente 'Salto Grande' exitosamente[0m
+> > [34m[info] Agregando agente Unidad Térmica Simple[0m
+[34m[info] Ingrese potencia máxima de la unidad térmica simple:[0m
+[34m[info] Ingrese costo variable de la unidad térmica simple:[0m
+[32m[success] Se ha creado el agente 'Unidad Térmica Simple' exitosamente[0m
+> > [34m[info] Agregando agente Demanda Fija[0m
+[34m[info] Ingrese demandas en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el agente 'Demanda Fija' exitosamente[0m
+> > [34m[info] Creando despacho de mercado[0m
+[34m[info] Modo: despacho de mercado con demanda total explícita[0m
+[34m[info] Ingrese cantidad de tramos del despacho de mercado:[0m
+[34m[info] Ingrese porcentajes acumulados de los tramos en una sola línea (4 valores):[0m
+[34m[info] Ingrese costos marginales de los tramos en una sola línea (4 valores):[0m
+[34m[info] Ingrese demanda total en una sola línea (360 valores):[0m
+[32m[success] Se ha creado el despacho de mercado exitosamente[0m
+> > [32m[success] Solver 'DummyLp' configurado | timeout=1800s | mipgap=0.0001[0m
+> [DEBUG Despacho] j=0 idGen=1 coefParticipacionDespacho=0.5
+[DEBUG Despacho] j=1 idGen=2 coefParticipacionDespacho=1
+
+[DEBUG Despacho] Cantidad de generadores = 2
+[DEBUG Despacho] j=0 puntero=0x5d1ab3babf00 idGen=1 coefParticipacionDespacho=0.5
+[DEBUG Despacho] j=1 puntero=0x5d1ab3bac110 idGen=2 coefParticipacionDespacho=1
+[PREPROC PHASES] metadata_s=0.072649207 diagnostico_s=0.016324987 aplicacion_s=1.979676864
+
+------------------------------------------------------------
+  PREPROCESAMIENTO MIP - Diagnostico Numerico
+------------------------------------------------------------
+Rango de coeficientes (toda la matriz):
+  max |coef| = 3.224e+06
+  min |coef| = 8.748e-06
+  proxy rango= 3.686e+11
+
+Diagnostico por bloque:
+Bloque              max|coef|      min|coef|      kappa_aprox   vars    alpha     beta      cols      disc_omit aux_omit  escalado
+------------------------------------------------------------------------------------------------------------------------------
+a1_                 1.143e+05      8.748e-06      1.31e+10      5040    2.53e-02  2.67e+04  0         1440      0         SI  (filas=11880, alpha_min=8.75e-06, alpha_max=4.82e-01)  (discretas/binarias omitidas=1440)  (Ruiz it=4)  (normalizado entre bloques)
+a2_                 sin filas      sin filas      N/A           360     1.00e+00  1.00e+00  0         0         0         no  (sin filas locales; aporta g2 al despacho)
+
+Restriccion(es) global(es): 2160 fila(s)
+  acoplamiento balance = 360 fila(s)
+  global no acoplante  = 1800 fila(s)
+  rho aprox (solo acoplamiento) = 1.118e+00
+  gamma acoplamiento   = 1.000000
+  gamma candidato      = 0.000010
+  Phi(gamma=1)         = 3.798e+10
+  Phi(gamma cand.)     = 1.307e+10
+  filas acop. escaladas= no
+  filas normaliz. fisica= 0
+  motivo gamma=1       = rho bajo; no se escala la fila de acoplamiento
+
+ADVERTENCIAS:
+  [!] Rango de coeficientes elevado (368593897322). Riesgo de sensibilidad numerica.
+  [!] Bloque 'a1_' internamente mal escalado (kappa~13068483050). Conviene comparar equilibrado interno por filas/columnas.
+------------------------------------------------------------
+
+------------------------------------------------------------
+  COMPARACION NUMERICA ANTES / DESPUES
+------------------------------------------------------------
+Indicador                   antes           despues         despues/antes
+----------------------------------------------------------------------------
+rango global                1.838e+13       3.686e+11       2.005e-02
+rho acoplamiento            1.000e+00       1.118e+00       1.118e+00
+gamma aplicado              1.000000        1.000000        1.000000
+
+Bloques locales:
+Bloque              kappa antes     kappa despues   alpha       beta        filas       cols        disc_omit   aux_omit    escalado
+------------------------------------------------------------------------------------------------------------------------------------
+a1_                 1.838e+13       1.307e+10       2.529e-02   2.666e+04   11880       0           1440        0           SI
+a2_                 N/A             N/A             1.000e+00   1.000e+00   0           0           0           0           no
+
+Interpretacion: valores despues/antes menores que 1 indican mejora del proxy.
+rho se calcula solo con filas de acoplamiento; las cotas de demanda sobre g quedan fuera.
+El escalamiento local activo fue Ruiz aproximado: filas internas iterativas.
+------------------------------------------------------------
+
+[PREPROC TIME] variante=ruiz tiempo_s=2.068935996 u=2 K=4 epsMin=1e-09 epsMax=1000000000
+[32m[success] Preprocesamiento aplicado.[0m
+> [pipeline] Preprocesamiento seleccionado: Ninguno
+[pipeline] Modelo interno sin modificaciones de preprocesamiento.
+Archivo LP guardado en: /home/mathiasr/Escritorio/generator-aware-row-scaling/results-revision/research-audit/fixed-basis-recovery-20260914-v2/fresh/sgtm/instance001/Ruiz.lp
+[32m[success] Se ha guardado el modelo exitosamente[0m
+> [32m[success] Saliendo del programa...[0m
+[32m[success] SystemController destruido[0m

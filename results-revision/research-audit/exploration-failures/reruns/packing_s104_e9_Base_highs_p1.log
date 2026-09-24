@@ -1,0 +1,78 @@
+Running HiGHS 1.15.1 (git hash: 04024d7): Copyright (c) 2026 under MIT licence terms
+Includes third-party software components, see THIRD_PARTY_NOTICES.md for full details
+MIP has 3 rows; 12 cols; 36 nonzeros; 12 integer variables (12 binary)
+Coefficient ranges:
+  Matrix  [1e+09, 9e+09]
+  Cost    [8e+00, 3e+01]
+  Bound   [1e+00, 1e+00]
+  RHS     [2e+10, 4e+10]
+WARNING: Problem has some excessively large row bounds
+WARNING:    Consider scaling the    bounds by 1e-5, or setting the user_bound_scale option to -16
+Presolving model
+3 rows, 12 cols, 36 nonzeros 0s
+3 rows, 12 cols, 36 nonzeros 0s
+Presolve reductions: rows 3(-0); columns 12(-0); nonzeros 36(-0) - Not reduced
+Objective function is integral with scale 1
+
+Solving MIP model with:
+   3 rows
+   12 cols (12 binary, 0 integer, 0 implied int., 0 continuous, 0 domain fixed)
+   36 nonzeros
+   Thread count 1 (of 16 threads). Using 1 max workers. Parallel search off
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic;
+     I => Shifting; J => Feasibility jump; L => Sub-MIP; P => Empty MIP; R => Randomized rounding;
+     S => Solve LP; T => Evaluate node; U => Unbounded; X => User solution; Y => HiGHS solution;
+     Z => ZI Round; l => Trivial lower; p => Trivial point; u => Trivial upper; z => Trivial zero
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+ z       0       0         0   0.00%   -inf            0                  Large        0      0      0         0     0.0s
+ J       0       0         0   0.00%   -inf            -30                Large        0      0      0         0     0.0s
+ S       0       0         0   0.00%   -198            -128              54.69%        0      0      0         0     0.0s
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 0; row = 0.1
+         0       0         0   0.00%   -144.2054795    -128              12.66%        0      0      0         3     0.0s
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 0; row = 0.1
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 0; row = 0.1
+
+8.3% inactive integer columns, restarting
+Model after restart has 3 rows, 11 cols (11 bin., 0 int., 0 impl., 0 cont., 0 dom.fix.), and 33 nonzeros
+
+         0       0         0   0.00%   -140            -128               9.37%        4      0      0        13     0.0s
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 6.02e-15; row = 0.1
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 0; row = 0.1
+         0       0         0   0.00%   -140            -128               9.37%        4      4      0        20     0.0s
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 0; row = 0.1
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 5.551e-16; row = 0.09999
+WARNING: Solution with objective -140 has untransformed violations: bound = 0; integrality = 6.02e-15; row = 0.1
+         0       0         1 100.00%   -128            -128               0.00%        5      4      0        21     0.0s
+
+Solving report
+  Status            Optimal
+  Primal bound      -128
+  Dual bound        -128
+  Gap               0%
+  P-D integral      0.0025686334053
+  Solution status   feasible
+                    -128 (objective)
+                    0 (bound viol.)
+                    0 (int. viol.)
+                    0 (row viol.)
+  Timing            0.02
+                    0.00 (Presolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.00 [2]
+                    0.02 (Solve)
+                        MIP    time [calls] = 0.01 [1]
+                        subMIP time [calls] = 0.01 [2]
+                    0.00 (Postsolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.00 [2]
+  Max sub-MIP depth 2
+  Nodes             0
+  Repair LPs        8 (0 feasible; 0 iterations)
+  LP iterations     21
+                    0 (strong br.)
+                    9 (separation)
+                    2 (heuristics)

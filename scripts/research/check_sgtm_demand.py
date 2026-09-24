@@ -59,6 +59,8 @@ def main():
         "historical instances": sorted(hist.glob("instance*.txt")),
         "benchmark instance077 (corrected)": [Path("data/benchmark-v1/instance077-corrected/instance077.txt")],
     }
+    # A reduced copy of the repository may not carry every pool.
+    sets = {name: [q for q in paths if q.exists()] for name, paths in sets.items()}
     result = {name: scan(paths) for name, paths in sets.items() if paths}
     for name, r in result.items():
         if len(r["instances"]) > 20:
