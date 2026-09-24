@@ -13,7 +13,8 @@ FIXED_BASIS_OUT ?= $(AUDIT_ROOT)/reruns/fixed-basis
         research-fixed-basis-analysis research-fixed-basis-check research-fixed-basis \
         research-fixed-basis-precision \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
-        research-rounding-check research-rounding-analysis rounding-note
+        research-rounding-check research-rounding-analysis rounding-note \
+        research-robustness-analysis
 
 help:
 	@echo "Active rounding-safety investigation (not submission-ready):"
@@ -62,7 +63,12 @@ research-check: audit-build research-check-python
 	$(PYTHON) -m pytest -q tests/test_export_roundtrip.py
 
 research-analysis: research-budget-analysis research-matrix-analysis research-operational-analysis \
-                   research-fixed-basis-analysis
+                   research-fixed-basis-analysis research-robustness-analysis
+
+# Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
+research-robustness-analysis:
+	$(PYTHON) scripts/research/robustness_analysis.py || true
+	$(PYTHON) scripts/research/robustness_tables.py
 
 research-fixed-basis-analysis:
 	$(PYTHON) scripts/research/analyze_fixed_basis.py --root $(FIXED_BASIS_ROOT)
@@ -80,7 +86,9 @@ research-fixed-basis: audit-build
 	OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 $(PYTHON) scripts/research/fixed_basis_campaign.py --out "$(FIXED_BASIS_OUT)" --workers 6
 
 research-budget-analysis:
-	$(PYTHON) scripts/research/analyze_budget_experiment.py --root $(AUDIT_ROOT)/budget-final
+	$(PYTHON) scripts/research/analyze_budget_experiment.py --root $(AUDIT_ROOT)/budget-final \
+	    --extra-root $(AUDIT_ROOT)/budget-final-cplex \
+	    --extra-classical-root $(AUDIT_ROOT)/exploration-lattice-cplex
 
 research-matrix-analysis:
 	$(PYTHON) scripts/research/analyze_identifiability.py
