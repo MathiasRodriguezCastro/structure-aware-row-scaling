@@ -73,10 +73,16 @@ def cells(d):
     return pd.DataFrame(out)
 
 
-def paired(d, seed=None, boot=2000, rng_seed=20260916):
-    """Ratios policy/Base on instances completed by every policy, within each cell."""
+def paired(d, seed=None, boot=2000, rng_seed=20260916, drop=None):
+    """Ratios policy/Base on instances completed by every policy, within each cell.
+
+    `drop` removes instances whose runs were contradicted by a verified solution, as a
+    sensitivity check: a run that finishes fast with a wrong answer is not a fair term.
+    """
     rows = []
     sub = d if seed is None else d[d.seed.eq(seed)]
+    if drop:
+        sub = sub[~sub.set_index(["family", "instance"]).index.isin(drop)]
     for (stage, fam, solver, gap, s), g in sub.groupby(["stage", "family", "solver", "gap", "seed"]):
         wide_t = g.pivot_table(index="instance", columns="policy", values="tiempo_solver_s")
         wide_c = g.pivot_table(index="instance", columns="policy", values="completed")
@@ -272,6 +278,9 @@ def main():
     eq.to_csv(args.out / "objective-equivalence.csv", index=False)
     bad = contradictions(d)
     bad.to_csv(args.out / "contradictions.csv", index=False)
+    if len(bad):
+        drop = set(map(tuple, bad[["family", "instance"]].drop_duplicates().values))
+        paired(d, seed=1, drop=drop).to_csv(args.out / "paired-primary-sensitivity.csv", index=False)
     a = audit(d, args.tables)
     a.to_csv(args.out / "audit.csv", index=False)
     summary = {"runs": len(d), "stages": d.stage.value_counts().to_dict(),
