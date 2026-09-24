@@ -66,9 +66,13 @@ def main():
                     help="calibration-decision.json: caps and the HiGHS scope of rule R2")
     ap.add_argument("--primary-seed", type=int, default=1)
     ap.add_argument("--extra-seeds", default="2,3,4,5")
+    ap.add_argument("--solvers", default=",".join(SOLVERS),
+                    help="emit tables only for these solvers (the rest stay unfrozen)")
     ap.add_argument("--out", type=Path, default=BASE / "runs")
     args = ap.parse_args()
     caps = {k: float(v) for k, v in (x.split("=") for x in args.caps.split(","))}
+    solvers = [s for s in SOLVERS if s in args.solvers.split(",")]
+    assert solvers, args.solvers
     restricted = set()
     if args.decision:
         decision = json.loads(args.decision.read_text())["decision"]
@@ -85,7 +89,7 @@ def main():
                 ("SG-Ter-Mer", "instance001", "data/entradas/entrada-SG-Ter-Mer/instance001.txt"),
                 ("Full", "instance001", "data/entradas/entrada-modelo-completo/instance001.txt")]
         smoke_caps = {"Simple": 300.0, "SG-Ter-Mer": 300.0, "Full": 300.0}
-        for solver in SOLVERS:
+        for solver in solvers:
             rows = []
             groups = [(0, [hist[0]], "0.01", args.primary_seed, POLICIES),
                       (0, hist[1:], "0.01", args.primary_seed, ["Base"])]
@@ -93,7 +97,7 @@ def main():
             tables[f"smoke-{solver}"] = rows
     elif args.stage == "pilot":
         pilot_caps = {k: 7200.0 for k in caps}
-        for solver in ["cplex", "highs"]:
+        for solver in [s for s in solvers if s != "gurobi"]:
             rows, groups = [], []
             for fam in KEY:
                 for item in inst(fam, "calibration"):
@@ -103,7 +107,7 @@ def main():
             tables[f"pilot-{solver}"] = rows
     elif args.stage in ("primary", "multiseed"):
         seeds = [args.primary_seed] if args.stage == "primary" else [int(s) for s in args.extra_seeds.split(",")]
-        for solver in SOLVERS:
+        for solver in solvers:
             rows, groups = [], []
             for fam in KEY:
                 pool = inst(fam, "evaluation") if args.stage == "primary" else inst(fam, "evaluation", "True")
@@ -120,7 +124,7 @@ def main():
         versions = [("SG-Ter-Mer", "instance077", "data/entradas/entrada-SG-Ter-Mer/instance077.txt"),
                     ("SG-Ter-Mer", "instance077c", "data/benchmark-v1/instance077-corrected/instance077.txt")]
         seeds = [args.primary_seed] + [int(s) for s in args.extra_seeds.split(",")]
-        for solver in SOLVERS:
+        for solver in solvers:
             rows, groups = [], []
             for item in versions:
                 for seed in seeds:
@@ -128,11 +132,12 @@ def main():
                         groups.append(((item[1], gap, seed), [item], gap, seed, None))
             emit(rows, "i077", solver, groups, caps)
             tables[f"i077-{solver}"] = rows
-        # Historical condition of the reported timeout: Gurobi, 16 threads, seed 42.
-        rows = []
-        emit(rows, "i077hist", "gurobi", [((gap,), versions[:1], gap, 42, None) for gap in GAPS],
-             caps, threads=16)
-        tables["i077hist-gurobi"] = rows
+        if "gurobi" in solvers:
+            # Historical condition of the reported timeout: Gurobi, 16 threads, seed 42.
+            rows = []
+            emit(rows, "i077hist", "gurobi", [((gap,), versions[:1], gap, 42, None) for gap in GAPS],
+                 caps, threads=16)
+            tables["i077hist-gurobi"] = rows
     args.out.mkdir(parents=True, exist_ok=True)
     summary = {}
     for name, rows in tables.items():
