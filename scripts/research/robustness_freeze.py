@@ -66,6 +66,8 @@ def main():
                     help="calibration-decision.json: caps and the HiGHS scope of rule R2")
     ap.add_argument("--primary-seed", type=int, default=1)
     ap.add_argument("--extra-seeds", default="2,3,4,5")
+    ap.add_argument("--families", default=",".join(KEY),
+                    help="emit only these families (a family whose rule is still open waits)")
     ap.add_argument("--solvers", default=",".join(SOLVERS),
                     help="emit tables only for these solvers (the rest stay unfrozen)")
     ap.add_argument("--out", type=Path, default=BASE / "runs")
@@ -73,11 +75,15 @@ def main():
     caps = {k: float(v) for k, v in (x.split("=") for x in args.caps.split(","))}
     solvers = [s for s in SOLVERS if s in args.solvers.split(",")]
     assert solvers, args.solvers
+    families = [f for f in KEY if f in args.families.split(",")]
+    assert families, args.families
+    suffix = "" if len(families) == len(KEY) else "-" + "".join(KEY[f][0] for f in families)
     restricted = set()
     if args.decision:
         decision = json.loads(args.decision.read_text())["decision"]
         caps = {fam: float(d["cap_s"]) for fam, d in decision.items()}
-        undecided = {fam for fam, d in decision.items() if d["highs_scope"].startswith("undecided")}
+        undecided = {fam for fam, d in decision.items() if d["highs_scope"].startswith("undecided")
+                     and fam in families}
         if undecided and "highs" in solvers:
             raise SystemExit(f"HiGHS scope undecided for {sorted(undecided)}: finish its pilot first")
         restricted = {fam for fam, d in decision.items() if d["highs_scope"] != "full evaluation set"}
@@ -112,7 +118,7 @@ def main():
         seeds = [args.primary_seed] if args.stage == "primary" else [int(s) for s in args.extra_seeds.split(",")]
         for solver in solvers:
             rows, groups = [], []
-            for fam in KEY:
+            for fam in families:
                 pool = inst(fam, "evaluation") if args.stage == "primary" else inst(fam, "evaluation", "True")
                 if solver == "highs" and fam in restricted:
                     # Rule R2: HiGHS keeps only the replication subset where it barely completes.
@@ -122,7 +128,7 @@ def main():
                         for block in chunks(pool, PER_SHARD[fam]):
                             groups.append(((fam, gap, seed, block[0][1]), block, gap, seed, None))
             emit(rows, args.stage, solver, groups, caps)
-            tables[f"{args.stage}-{solver}"] = rows
+            tables[f"{args.stage}-{solver}{suffix}"] = rows
     else:
         versions = [("SG-Ter-Mer", "instance077", "data/entradas/entrada-SG-Ter-Mer/instance077.txt"),
                     ("SG-Ter-Mer", "instance077c", "data/benchmark-v1/instance077-corrected/instance077.txt")]
