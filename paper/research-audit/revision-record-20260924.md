@@ -13,35 +13,38 @@ What this round changes, and which claims are confirmatory and which exploratory
    the operational campaign, carry a total-demand series that falls below local demand in some
    hours. The models stay valid MILPs and no reported comparison is affected; the new campaign
    uses the corrected pool. Check: `scripts/research/check_sgtm_demand.py`.
-3. **Solver-robustness campaign.** Pre-registered in `campaign-manifest.json`, described in
-   Section 6 of the article and in the supplement: three solvers, four policies, two gaps, a
-   hash-based split of 1,500 instances, family time limits from a registered rule, a replication
-   subset with four further seeds, and an audit that reconciles every planned run.
+3. **Solver-robustness campaign: prepared, partly run, then descoped.** It was pre-registered
+   in `campaign-manifest.json`, its time limits were fixed by rule R1 from the calibration
+   pilot, and 9,057 runs were executed before it was stopped. It is **not** part of this
+   manuscript: the paper argues that solver effort and acceptance are pipeline-dependent, and a
+   benchmark of tens of thousands of runs would not change that thesis. The protocol, the frozen
+   tables and the runs stay in `results-revision/solver-robustness/` for a separate study, and
+   the article and supplement no longer mention them.
 
 ## Confirmatory (registered before the data were seen)
 
-- C1 Flat-GM/Base completed-run effort ratio.
-- C2 PAR10 difference Flat-GM minus Base.
-- C3 completion-rate difference Flat-GM minus Base.
-- C4 sign stability of C1 and C2 across seeds.
-- C5 stress experiment under CPLEX: budgeted versus budget-free paired discordance.
-- Rules R1 (family time limits) and R2 (HiGHS scope), with their thresholds.
+- C5 stress experiment under CPLEX: budgeted versus budget-free paired discordance. This is the
+  only registered contrast of the campaign that the manuscript reports, because the CPLEX arm
+  of the stress experiment is part of the paper.
+- C1 to C4 and the rules R1 and R2 concerned the descoped campaign and are not reported.
 
-## Exploratory (post hoc, labelled as such wherever reported)
+## Exploratory (post hoc, and not reported in the manuscript)
 
-- Contradicted optimality claims and invalid dual bounds across runs of one instance. It is built
-  on the registered verification endpoint but was added after a discordance appeared in the first
-  records. Reported with a strict feasibility tier so that a barely infeasible point cannot
-  manufacture a contradiction, and with a per-instance attribution for the one large case
+Everything below comes from the descoped campaign and is kept in the repository only:
+
+- Contradicted optimality claims and invalid dual bounds across runs of one instance, with a
+  strict feasibility tier and a per-instance attribution for the two large cases
   (`results-revision/solver-robustness/diagnostics/`).
 - The diagnostic comparing the calibration subset with its pool (the subset is easier on Full).
-- The HiGHS observation that a policy can decide whether any incumbent is found at all.
-- Everything already listed as exploratory in the September 14 record.
+- The HiGHS self-check that rejects its own optimality claims.
+
+Everything already listed as exploratory in the September 14 record still applies to the
+manuscript.
 
 ## Not claimed
 
-- No causal claim that scaling improves solver correctness in general: one instance is one
-  instance, and the campaign reports the rate rather than a mechanism for all models.
+- No claim, in the manuscript, about how often a solver returns a point contradicted by a
+  verified solution: that evidence exists in the repository but the paper does not use it.
 - No cross-solver comparison of effort: work units, deterministic ticks and nodes are not
-  commensurable and are only compared within a solver.
-- No pooling of the two gap settings or of seeds as independent replications.
+  commensurable.
+- No universal solver speedup or reliability improvement.

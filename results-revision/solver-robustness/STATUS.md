@@ -1,7 +1,20 @@
-# Solver-robustness campaign — status
+# Solver-robustness campaign — stopped by decision, 2026-09-24
 
 Campaign id `solver-robustness-v1`. Design and pre-registration:
 `paper/research-audit/solver-robustness-design-20260916.md` and `campaign-manifest.json`.
+
+**Status: descoped from the manuscript and stopped mid-flight.** The paper it was meant to
+support argues that solver effort and acceptance are pipeline-dependent; a benchmark of tens of
+thousands of runs would not change that, and it would turn a paper about mechanism and
+guarantees into a benchmarking paper. The cluster jobs were cancelled with 9,057 runs done:
+primary Gurobi 3,447 of 8,800, primary CPLEX 3,582 of 8,800, primary HiGHS 65 of 4,320,
+multi-seed CPLEX 1,751 of 3,840, instance077 CPLEX 27 of 80, pilots 167, smoke 18. No licence or
+infrastructure failure occurred.
+
+Everything is resumable: the run tables are frozen, the runner skips a run whose `run.json`
+already exists, and `cluster/submit_robustness.sh <table.csv> <throttle>` re-submits a stage.
+The findings it produced are recorded below and in `diagnostics/`; none of them is used in the
+manuscript.
 
 ## Frozen artefacts
 

@@ -63,7 +63,7 @@ research-check: audit-build research-check-python
 	$(PYTHON) -m pytest -q tests/test_export_roundtrip.py
 
 research-analysis: research-budget-analysis research-matrix-analysis research-operational-analysis \
-                   research-fixed-basis-analysis research-robustness-analysis
+                   research-fixed-basis-analysis
 
 # Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
 research-robustness-analysis:

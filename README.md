@@ -1,15 +1,15 @@
 # Pre-Export Row Scaling for Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 
-**Research status, 24 September 2026: final experimental round in progress.**
-The manuscript has been reframed around mechanism attribution and residual-budget contracts,
-and the last piece of evidence it waits for is a pre-registered solver-robustness campaign on
-ClusterUY (three solvers, four policies, two MIP gaps, 1,100 evaluation instances, a
-replication subset with four further seeds). Its protocol, split and run tables are frozen in
-[`results-revision/solver-robustness/`](results-revision/solver-robustness/) and described in
-[the design document](paper/research-audit/solver-robustness-design-20260916.md); progress is
-tracked in [STATUS.md](results-revision/solver-robustness/STATUS.md). What changed in this
-round, and which claims are confirmatory rather than exploratory, is recorded in
-[the revision record](paper/research-audit/revision-record-20260924.md).
+**Research status, 24 September 2026: revision complete, consistency audit done.**
+The manuscript has been reframed around mechanism attribution and residual-budget contracts.
+What changed in this round, and which claims are confirmatory rather than exploratory, is
+recorded in [the revision record](paper/research-audit/revision-record-20260924.md).
+
+A pre-registered solver-robustness campaign was prepared and partly run on ClusterUY, then
+descoped from this manuscript to keep it about mechanism and guarantees rather than
+benchmarking. Its protocol, split, frozen run tables and the 9,057 runs completed before it was
+stopped remain in [`results-revision/solver-robustness/`](results-revision/solver-robustness/)
+for a separate study; nothing in the paper depends on them.
 
 Research manuscript and reproducibility materials by Mathias Rodríguez Castro.
 The current manuscript is **unpublished**. No journal acceptance, submission, or
@@ -40,7 +40,6 @@ python3 -m venv .venv-research
 python3 -m pip install -r environment/research-requirements.txt
 make research-check-python
 make research-analysis
-make research-robustness-analysis
 make paper
 ```
 
