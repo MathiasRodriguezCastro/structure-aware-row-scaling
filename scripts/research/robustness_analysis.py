@@ -40,6 +40,12 @@ def load(root):
     d["no_incumbent"] = d.outcome.eq("TIME_LIMIT_NO_SOLUTION")
     # PAR10 cost: measured solver time when completed, ten times the cap otherwise.
     d["par10_s"] = np.where(d.completed, d.tiempo_solver_s.fillna(d.cap_s), 10.0 * d.cap_s)
+    strict = ((d.get("verif_solver_max_viol_relact", pd.Series(np.nan, index=d.index)) <= 1e-9)
+              & (d.get("verif_solver_max_lb", pd.Series(np.nan, index=d.index)) <= 1e-9)
+              & (d.get("verif_solver_max_ub", pd.Series(np.nan, index=d.index)) <= 1e-9)
+              & (d.get("verif_solver_max_int", pd.Series(np.nan, index=d.index)) <= 1e-9)
+              & (d.get("verif_solver_missing", pd.Series(np.nan, index=d.index)) == 0))
+    d["verified_strict"] = strict
     d["verified"] = ((d.get("verif_solver_max_viol_relact", pd.Series(np.nan, index=d.index)) <= 1e-6)
                      & (d.get("verif_solver_max_lb", pd.Series(np.nan, index=d.index)) <= 1e-6)
                      & (d.get("verif_solver_max_ub", pd.Series(np.nan, index=d.index)) <= 1e-6)
@@ -251,6 +257,10 @@ def contradictions(d, tol=1e-6):
         best = float(ok.loc[i, "verif_solver_obj_original"])
         source = f'{ok.loc[i, "solver"]}/{ok.loc[i, "policy"]}/{ok.loc[i, "stage"]}'
         scale = max(abs(best), 1.0)
+        # A point accepted at the campaign tolerance can still be slightly infeasible, so the
+        # strict tier only trusts points whose residuals are at the level of round-off.
+        ok_strict = g[g.verified_strict & g.verif_solver_obj_original.notna()]
+        best_strict = float(ok_strict.verif_solver_obj_original.min()) if not ok_strict.empty else None
         for _, r in g.iterrows():
             obj = r.get("verif_solver_obj_original")
             excess = (float(obj) - best) / scale if pd.notna(obj) else None
@@ -258,6 +268,12 @@ def contradictions(d, tol=1e-6):
             bound_excess = (float(bound) - best) / scale if pd.notna(bound) else None
             claimed = bool(r.completed) and excess is not None and excess > float(r.gap) + tol
             invalid = bound_excess is not None and bound_excess > tol
+            s_excess = ((float(obj) - best_strict) / max(abs(best_strict), 1.0)
+                        if best_strict is not None and pd.notna(obj) else None)
+            s_bound = ((float(bound) - best_strict) / max(abs(best_strict), 1.0)
+                       if best_strict is not None and pd.notna(bound) else None)
+            claimed_strict = bool(r.completed) and s_excess is not None and s_excess > float(r.gap) + tol
+            invalid_strict = s_bound is not None and s_bound > tol
             if claimed or invalid:
                 rows.append({"stage": r.stage, "family": fam, "solver": r.solver, "gap": r.gap,
                              "seed": r.seed, "instance": instance, "policy": r.policy,
@@ -265,7 +281,9 @@ def contradictions(d, tol=1e-6):
                              "relative_excess": excess, "best_bound": bound,
                              "bound_relative_excess": bound_excess,
                              "optimality_claim_contradicted": claimed, "dual_bound_invalid": invalid,
-                             "best_known_from": source})
+                             "optimality_claim_contradicted_strict": claimed_strict,
+                             "dual_bound_invalid_strict": invalid_strict,
+                             "best_known_strict": best_strict, "best_known_from": source})
     return pd.DataFrame(rows)
 
 
@@ -297,6 +315,8 @@ def main():
                "infrastructure_failures": int(d.infrastructure_failure.astype(bool).sum()),
                "solvers": sorted(set(d.solver)), "families": sorted(set(d.family)),
                "contradictions": {"runs_flagged": int(len(bad)),
+                   "optimality_claims_contradicted_strict": int(bad.optimality_claim_contradicted_strict.sum()) if len(bad) else 0,
+                   "invalid_dual_bounds_strict": int(bad.dual_bound_invalid_strict.sum()) if len(bad) else 0,
                    "optimality_claims_contradicted": int(bad.optimality_claim_contradicted.sum()) if len(bad) else 0,
                    "invalid_dual_bounds": int(bad.dual_bound_invalid.sum()) if len(bad) else 0,
                    "by_policy": {k: int(v) for k, v in bad.policy.value_counts().items()} if len(bad) else {}},
