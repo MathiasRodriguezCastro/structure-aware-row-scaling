@@ -13,6 +13,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullFormatter, ScalarFormatter
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +56,13 @@ def main():
                        label=f"{LABEL.get(r.solver, r.solver)}, {r.family}")
         ax.axhline(1, color="black", lw=.8, ls="--"); ax.axvline(1, color="black", lw=.8, ls="--")
         ax.set_xscale("log"); ax.set_yscale("log")
+        # Log axes around one: a handful of readable ticks, no minor labels.
+        for axis, setter in ((ax.xaxis, ax.set_xticks), (ax.yaxis, ax.set_yticks)):
+            axis.set_major_formatter(ScalarFormatter())
+            axis.set_minor_formatter(NullFormatter())
+        ticks = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5, 10]
+        ax.set_xticks(ticks, [str(v) for v in ticks])
+        ax.set_yticks(ticks, [str(v) for v in ticks])
         ax.set_title(f"{policy} vs Base")
         ax.set_xlabel("paired time ratio (completed by all)")
     axes[0].set_ylabel("PAR10 ratio (assigned pool)")
