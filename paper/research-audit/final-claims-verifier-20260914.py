@@ -39,7 +39,8 @@ for path in sorted((AUDIT/'budget-final/models').glob('*.npz')):
 
 result = {'models_independently_enumerated': len(models), 'campaigns': {}, 'hashes': {}}
 export_equivalence_rows = []
-for name in ('budget-final', 'exploration-lattice'):
+for name in ('budget-final', 'budget-final-cplex', 'exploration-lattice',
+             'exploration-lattice-cplex'):
     path = AUDIT/name/'runs.csv'
     data = rows(path)
     keys = set()
@@ -90,6 +91,11 @@ for name in ('budget-final', 'exploration-lattice'):
                                 'actual_binary64_export_equivalence': dict(exact_export_equivalence)}
     result['hashes'][str(path.relative_to(ROOT))] = sha(path)
     protocol = json.loads((AUDIT/name/'protocol.json').read_text())
+    if name.endswith('-cplex') and (AUDIT/name/'models').is_dir():
+        # The later solver arm must reuse the stored models byte for byte.
+        stored = {q.name: sha(q) for q in sorted((AUDIT/name/'models').glob('*.npz'))}
+        assert stored == {q.name: sha(q) for q in sorted((AUDIT/'budget-final/models').glob('*.npz'))}
+        result['campaigns'][name]['models_identical_to_budget_final'] = len(stored)
     if name == 'exploration-lattice':
         for filename, expected in protocol['model_sha256'].items():
             assert sha(AUDIT/'budget-final/models'/filename) == expected
