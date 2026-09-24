@@ -19,10 +19,13 @@ Campaign id `solver-robustness-v1`. Design and pre-registration:
 - [x] Code: HiGHS backend, explicit tolerances, `--sin-kappa`, no-solution marker.
 - [x] Stress experiment: CPLEX arm and CPLEX lattice controls (local, same 96 stored models).
 - [x] Cluster build (job 5807818).
-- [ ] Smoke on the cluster: CPLEX (5807824) and HiGHS (5807825) submitted; Gurobi deferred.
-- [ ] Pilot (Base only, CPLEX and HiGHS, calibration set, cap 7200 s).
+- [x] Smoke on the cluster: CPLEX (5807824) clean, 5 completed + 1 Full timeout at the 300 s
+      smoke cap; HiGHS (5807825) exercises both censored outcomes. Gurobi deferred.
+- [ ] Pilot (Base only, calibration set, cap 7200 s): CPLEX 5807908, HiGHS 5807909, throttle 10.
 - [ ] Cap decision by rules R1/R2 (`scripts/research/robustness_calibration.py`).
 - [ ] Primary campaign, multiseed, instance077 audit.
+- [x] Analysis: job audit against the frozen tables, clustered multi-seed inference.
+- [x] Paper: three-solver stress results and the campaign design subsection written.
 
 ## Licence coordination (blocking for the Gurobi arm)
 
@@ -33,8 +36,10 @@ do not touch that licence and run meanwhile.
 
 ## Known local findings before the cluster run
 
-- HiGHS did not find any feasible solution for a Simple Base model within a 300 s cap, while
-  Gurobi and CPLEX complete the same instance in seconds. The pilot at 7200 s quantifies this;
+- HiGHS did not find any feasible solution for a Simple Base model within a 300 s cap (1,454
+  nodes, 188k simplex iterations, dual bound 0.012% from the optimum), while Gurobi and CPLEX
+  complete the same instance in seconds. Under Flat-GM it did find an incumbent in the same
+  budget, so the policy changes which runs produce a solution at all. The pilot at 7200 s quantifies this;
   rule R2 then fixes the HiGHS scope.
 - In the stress experiment, adding the residual budget to a centering rule never lost a verified
   configuration under CPLEX either, but it recovered none (0-0), against 41-0 on HiGHS and 12-0
