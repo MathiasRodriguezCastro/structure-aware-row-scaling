@@ -157,6 +157,21 @@ the specified stopping criteria. It is not an exact primal or optimality certifi
 In particular, a solver-completed point with a concerning original residual is still
 counted as completed, with feasibility diagnostics reported separately.
 
+\paragraph{Scenario defect in the SG-Ter-Mer instances.}
+The market dispatch of this family reads a local demand series and a total demand series. In
+the historical instances the total series was rebuilt from a noisy rescaling of residual
+demand, and in 39 of the 68 instances it falls below the local demand in at least one hour: 9
+of the 15 instances assigned above, among them instance077, where the inversion occurs in 22
+hours and reaches 259 units. The exported models remain well-posed MILPs and every comparison
+in this paper is between representations of the same model, so no reported equivalence,
+residual or effort measurement is affected. What the defect does mean is that those instances
+are not faithful market scenarios and that the physical reading of their solutions is
+unreliable. The pool used by the solver-robustness campaign is the corrected one, built from
+the authoritative demand series, in which no instance shows the inversion (0 of 500, against
+291 of 500 in the uncorrected release). The counts are produced by
+\path{scripts/research/check_sgtm_demand.py} and stored in
+\path{results-revision/solver-robustness/inventory/sgtm-demand-check.json}.
+
 \paragraph{Work and uncertainty.}
 The old runner's scaled-policy Work markers inherited a fixed, zero-decimal stream
 format. Native Gurobi summaries instead retain two decimals. The reconstruction uses
