@@ -62,11 +62,18 @@ def main():
     ap.add_argument("--stage", required=True, choices=["smoke", "pilot", "primary", "multiseed", "i077"])
     ap.add_argument("--split", type=Path, default=BASE / "design/instance-split.csv")
     ap.add_argument("--caps", default="Simple=1800,SG-Ter-Mer=1800,Full=3600")
+    ap.add_argument("--decision", type=Path, default=None,
+                    help="calibration-decision.json: caps and the HiGHS scope of rule R2")
     ap.add_argument("--primary-seed", type=int, default=1)
     ap.add_argument("--extra-seeds", default="2,3,4,5")
     ap.add_argument("--out", type=Path, default=BASE / "runs")
     args = ap.parse_args()
     caps = {k: float(v) for k, v in (x.split("=") for x in args.caps.split(","))}
+    restricted = set()
+    if args.decision:
+        decision = json.loads(args.decision.read_text())["decision"]
+        caps = {fam: float(d["cap_s"]) for fam, d in decision.items()}
+        restricted = {fam for fam, d in decision.items() if d["highs_scope"] != "full evaluation set"}
     split = list(csv.DictReader(args.split.open()))
     inst = lambda fam, role=None, ms=None: [
         (fam, r["instance"], f"data/benchmark-v1/{KEY[fam]}/{r['instance']}.txt") for r in split
@@ -100,6 +107,9 @@ def main():
             rows, groups = [], []
             for fam in KEY:
                 pool = inst(fam, "evaluation") if args.stage == "primary" else inst(fam, "evaluation", "True")
+                if solver == "highs" and fam in restricted:
+                    # Rule R2: HiGHS keeps only the replication subset where it barely completes.
+                    pool = inst(fam, "evaluation", "True")
                 for seed in seeds:
                     for gap in GAPS:
                         for block in chunks(pool, PER_SHARD[fam]):
