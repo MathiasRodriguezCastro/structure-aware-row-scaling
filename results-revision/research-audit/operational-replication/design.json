@@ -1,0 +1,33 @@
+{
+  "purpose": "replication of the operational reconstruction under one changed factor at a time",
+  "instances": "the same 15 Simple and 15 SG-Ter-Mer instances of the reconstruction",
+  "policies": [
+    "Base",
+    "Flat-GM",
+    "Flat-L2",
+    "Role-Hybrid"
+  ],
+  "gaps": [
+    "0.01",
+    "0.001"
+  ],
+  "cap_s": 1800.0,
+  "threads": 16,
+  "arms": {
+    "seed7": "Gurobi, seed 7 (reconstruction used seed 42)",
+    "cplex": "CPLEX, seed 42 (reconstruction used Gurobi)"
+  },
+  "frozen_before_running": true,
+  "tables": {
+    "seed7": {
+      "runs": 240,
+      "shards": 30,
+      "sha256": "ba26f53bc2e3f3127f8874c3910daddc3447e00aa97e3b7b5bd415f0da6766e9"
+    },
+    "cplex": {
+      "runs": 240,
+      "shards": 30,
+      "sha256": "7590ae665b68bcb5d7a31c381f1af4049c59483ff23493c2554723fa989b40de"
+    }
+  }
+}
