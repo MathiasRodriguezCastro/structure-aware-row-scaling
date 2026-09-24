@@ -37,18 +37,20 @@ def pilot_completion(runs):
     return pd.DataFrame(out)
 
 
-def history_completion(path):
+def history_completion(path, calibration=None, label="gurobi"):
     """Historical one-thread Gurobi Base: time to 1% from the log trajectory, to 0.1% from
     termination. Runs censored at the historical 3600 s limit count as not completed, so the
     7200 s column is unknown and left empty."""
     h = pd.read_csv(path)
     h = h[h.pool_version.isin(["sealed release", "corrected pool"])]
     h = h[~((h.family == "SG-Ter-Mer") & (h.pool_version == "sealed release"))]
+    if calibration is not None:
+        h = h[h.instance.isin(calibration)]
     rows = []
     for fam, g in h.groupby("family"):
         for gap, col in (("0.01", "t_gap1"), ("0.001", "t_gap01")):
             t = pd.to_numeric(g[col], errors="coerce").fillna(np.inf).to_numpy()
-            rec = {"family": fam, "solver": "gurobi", "gap": gap, "n": len(g)}
+            rec = {"family": fam, "solver": label, "gap": gap, "n": len(g)}
             for cap in CAPS:
                 rec[f"completed_by_{int(cap)}s"] = round(float((t <= cap).mean()), 4) if cap <= 3600 else None
             rows.append(rec)
@@ -59,11 +61,15 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--pilot-runs", type=Path, default=BASE / "runs-raw/pilot")
     ap.add_argument("--history", type=Path, default=BASE / "inventory/historical-base-times.csv")
+    ap.add_argument("--split", type=Path, default=BASE / "design/instance-split.csv")
     ap.add_argument("--out", type=Path, default=BASE / "design/calibration-decision.json")
     args = ap.parse_args()
     pilot = pilot_completion(args.pilot_runs)
     hist = history_completion(args.history)
-    table = pd.concat([hist, pilot], ignore_index=True)
+    # Diagnostic only, never read by the rule: is the calibration subset as hard as its pool?
+    calib = set(pd.read_csv(args.split).query("role == 'calibration'").instance)
+    subset = history_completion(args.history, calibration=calib, label="gurobi-calibration-subset")
+    table = pd.concat([hist, pilot, subset], ignore_index=True)
     decision = {}
     for fam in FAMILY_KEY:
         chosen, reason = None, []
