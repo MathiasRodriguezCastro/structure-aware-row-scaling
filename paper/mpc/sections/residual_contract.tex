@@ -1,0 +1,171 @@
+\section{Residual-budget contracts}
+\label{sec:contract}
+
+The first half of the question asked which generator information explains the numerical gain,
+and the answer was that block ownership does not. This half asks which generator information
+can be turned into a guarantee. Ownership is one kind of generator information; a tolerance
+stated in application units is another. A residual budget says how much violation of an original constraint is
+acceptable. It must be supplied by the application or declared as a numerical test
+parameter; it cannot be inferred from a block label or a zero right-hand side. Scaling rows
+so that solver tolerances correspond to negligible application-unit violations is
+established practice \cite{gurobiScaling,gurobiExternalScaling,idaesScaling}. The results
+below make its combination with coefficient limits exact: they characterize every admissible
+factor, certify when none exists, select the centered one, and identify what row scaling
+cannot control. Individually the steps are elementary algebra; what the section contributes is
+that the contract is complete, in the sense that a factor is admissible exactly when the
+conditions hold, and that each consequence is stated in the units the application uses.
+
+For a nonconstant row $a^Tx\le b$, define the original residual $v(x)=(a^Tx-b)_+$ and a
+budget $\delta>0$. Let $\epsilon>0$ bound the residual of the \emph{exported} row. This is a
+hypothesis about the returned point rather than a consequence of a solver parameter:
+presolve, internal scaling and finite precision intervene between the two. For a positive
+row factor $\alpha$,
+\begin{equation}\label{eq:residual-transfer}
+ (\alpha a^Tx-\alpha b)_+=\alpha v(x)
+\end{equation}
+in exact arithmetic, so an exported residual at most $\epsilon$ implies $v(x)\le\delta$
+whenever $\alpha\ge\epsilon/\delta$. Absolute residuals give the same identity for
+equalities. Write $m=\min_{a_j\ne0}|a_j|$ and $M=\max_j|a_j|$, and let $0<\ell\le U$ limit
+the exported coefficient magnitudes. An additional RHS limit $U_b$ intersects the upper
+endpoint below with $U_b/|b|$ for $b\ne0$.
+
+\begin{proposition}[Admissible factors and constrained centering]
+\label{prop:budget}
+The factors that place every nonzero coefficient in $[\ell,U]$ and satisfy
+$\epsilon/\alpha\le\delta$ form exactly the interval
+\begin{equation}\label{eq:budget-interval}
+ \mathcal I=[L,H],\qquad
+ L=\max\{\epsilon/\delta,\ell/m\},\qquad H=U/M.
+\end{equation}
+The interval is nonempty if and only if
+\begin{equation}\label{eq:budget-feasibility}
+ M/m\le U/\ell\quad\text{and}\quad \delta\ge\epsilon M/U.
+\end{equation}
+When it is nonempty, the unique minimizer of
+\begin{equation}\label{eq:budget-objective}
+ \min_{\alpha\in\mathcal I}\;\max_{a_j\ne0}|\log(\alpha|a_j|)|
+\end{equation}
+is
+\begin{equation}\label{eq:budget-optimum}
+ \alpha^*=\min\{H,\max\{L,(mM)^{-1/2}\}\}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The coefficient bounds are equivalent to $\alpha m\ge\ell$ and $\alpha M\le U$.
+Together with $\alpha\delta\ge\epsilon$ they give \eqref{eq:budget-interval}.
+The condition $L\le H$ is equivalent to the two inequalities in
+\eqref{eq:budget-feasibility}. To solve the objective, put $t=\log\alpha$,
+$q=(\log m+\log M)/2$ and $h=(\log M-\log m)/2$. Since the extreme absolute
+logarithms occur at an endpoint,
+\[
+ \max_j|t+\log|a_j||=\max\{|t+\log m|,|t+\log M|\}=h+|t+q|.
+\]
+The unique minimizer on $[\log L,\log H]$ is the projection of $-q$ onto that
+interval. Exponentiating gives \eqref{eq:budget-optimum}.
+\end{proof}
+
+\paragraph{Incompatibility certificate.}
+When $L>H$, \eqref{eq:budget-feasibility} names the violated requirement. A within-row
+spread $M/m>U/\ell$ cannot be repaired by any row factor; a budget $\delta<\epsilon M/U$
+conflicts with the coefficient ceiling even for a perfectly balanced row. In both cases the
+certificate concerns the numerical specification, not the optimization model: exporting the
+unscaled row does not meet the contract, and resolving the conflict requires revising units,
+limits or the formulation. The factor $\alpha^*$ optimizes coefficient centering subject to
+the contract; it is not a condition-number minimizer.
+
+\begin{corollary}[Invariance under consistent re-emission]
+\label{cor:budget-invariance}
+Replace $(a,b,\delta)$ by $(qa,qb,q\delta)$ for any $q>0$, keeping
+$\epsilon,\ell,U$ fixed. The interval becomes $\mathcal I/q$, abstention is
+unchanged, and the selected factor becomes $\alpha^*/q$. The exported row and the
+budget-normalized original residual $v(x)/\delta$ are therefore unchanged.
+\end{corollary}
+\begin{proof}
+Both coefficient extremes and the original budget acquire the factor $q$.
+Each term defining $L$, $H$ and $(mM)^{-1/2}$ is divided by $q$.
+Equation~\eqref{eq:residual-transfer} gives the residual statement.
+\end{proof}
+
+A budget is therefore information that survives preprocessing: generators that emit the same
+constraint in different units, each with the budget expressed in its own units, obtain the
+same exported row and the same contract. The invariance is lost if a row is re-emitted
+without transforming its budget, and a fixed cutoff on the factor itself does not have it.
+Restricting factors to powers of two \cite{berthold2021scaling} retains it for power-of-two
+re-emissions, subject to the representability conditions of \cref{prop:dyadic}.
+
+\subsection{The integer-rounding term}
+Let $J$ be the integer columns and let $\bar x$ be obtained by rounding only these
+coordinates of $x$. Suppose $|\bar x_j-x_j|\le\eta_j$ for $j\in J$ and put
+$E=\sum_{j\in J}|a_j|\eta_j$. The triangle inequality and \eqref{eq:residual-transfer} give
+\begin{equation}\label{eq:rounding-budget}
+ v(\bar x)\le \epsilon/\alpha+E,
+\end{equation}
+also for equalities with absolute residuals. Changing the row factor reduces the
+exported-residual term but leaves the rounding term, which is measured in original units,
+unchanged. Normalizing a big-$M$ row therefore cannot remove the effect of an integrality
+tolerance on that row.
+
+For a contract on the rounded assignment, \cref{prop:budget} applies with $\delta$ replaced by
+$\delta-E$ when $\delta>E$; if $\delta\le E$, no positive factor certifies it. The bound is
+a worst case: actual rounding errors may be smaller or cancel, and other rows can exclude
+the worst case, so an empty interval shows that the stated information is insufficient
+rather than that returned points will violate the budget. Under re-emission $E$ becomes $qE$,
+so invariance is retained. A tighter integrality tolerance or a reformulation can reduce $E$;
+row scaling cannot.
+
+\subsection{Exact export on a dyadic grid}
+A factor in the real admissible interval does not guarantee an exactly proportional exported
+row: the products $\operatorname{fl}(\alpha a_j)$ and $\operatorname{fl}(\alpha b)$ are rounded
+independently, and rounding a computed endpoint to nearest can leave the closed interval. Our
+arbitrary-factor implementation forms the endpoints as exact rational numbers in the supplied
+binary64 inputs, rounds them \emph{inward}, and abstains if no positive binary64 factor
+remains. This certifies admissibility of the factor, not exactness of the products.
+
+Powers of two avoid multiplication rounding. The following intersection also accounts for
+subnormal numbers and for the RHS. Assume finite binary64 input data and IEEE arithmetic with
+gradual underflow \cite{ieee2019float}. Write each nonzero datum $z\in\{a_1,\ldots,a_n,b\}$
+uniquely as $z=\operatorname{sign}(z)N_z2^{p_z}$ with $N_z$ a positive odd integer, and put
+$q_z=\lfloor\log_2|z|\rfloor$. Let $[L,H]$ be the desired real factor interval, including any
+rounding allowance from \eqref{eq:rounding-budget}.
+
+\begin{proposition}[Exact dyadic admissibility]
+\label{prop:dyadic}
+A factor $\alpha=2^k$ is positive and representable in binary64, belongs to
+$[L,H]$, and multiplies every nonzero coefficient and the RHS exactly into a
+finite binary64 value if and only if the integer $k$ satisfies
+\begin{align*}
+ K_-&=\max\left\{-1074,\lceil\log_2L\rceil,
+                    \max_z(-1074-p_z)\right\}\le k,\\
+ k&\le K_+=\min\left\{1023,\lfloor\log_2H\rfloor,
+                    \min_z(1023-q_z)\right\}.
+\end{align*}
+If $K_->K_+$ there is no such factor. Otherwise an exponent nearest to
+$-\tfrac12\log_2(mM)$ among the integers in $[K_-,K_+]$ minimizes the
+logarithmic coefficient objective \eqref{eq:budget-objective} on this exact-export
+set; a tie may be resolved by choosing the larger factor.
+\end{proposition}
+\begin{proof}
+The factor itself requires $-1074\le k\le1023$. Since the datum's odd
+significand is unchanged, the product $N_z2^{p_z+k}$ lies on the subnormal grid
+exactly when $p_z+k\ge-1074$; its highest bit stays below overflow exactly when
+$q_z+k\le1023$. The original significand has at most 53 bits, so these two
+conditions are also sufficient. Intersecting them over the row data and with
+$L\le2^k\le H$ gives the interval of integer exponents. The objective is
+$\tfrac12\log(M/m)+|k\log2+\tfrac12\log(mM)|$, proving the nearest-exponent
+claim.
+\end{proof}
+
+The implementation obtains the endpoint exponents from integer ratios and bit lengths,
+compares candidate objectives exactly as rational numbers, and checks the rounded products
+against exact rational products. Writing the row to a text file additionally requires a
+round-trip decimal serializer, since fixed decimal places can discard small values even when
+the multiplication is exact.
+
+\paragraph{Verification after solving.}
+The contract is conditional on the exported residual, so returned points are checked against
+the original rows, bounds and integrality restrictions. On the stress instances of
+\cref{sec:experiments} the check is exact: row residuals are rational expressions in the stored
+binary64 data, and optima are obtained by enumeration. On the dispatch models the archived
+checker uses floating-point residuals, which are diagnostics; certifying branch-and-bound
+results is a stronger task \cite{cheung2017certificates}.
