@@ -112,8 +112,8 @@ Contributions (A) and (B) answer the first half of the question, (C) the second,
 evidence for both. The results progress from the representation to the solver. Scaling changes the numerical
 representation by orders of magnitude, and the kernel determines how much. The apparent
 metadata effect is a kernel effect with a simpler explanation. Residual budgets have
-measurable consequences: adding them to a centering rule never lost a verified stress
-configuration on any of the three solvers tested. Whether a solver accepts the resulting points, and how much
+measurable consequences: adding one to a centering rule never lost a verified stress
+configuration, relative to that same unbudgeted rule, on any of the three solvers tested. Whether a solver accepts the resulting points, and how much
 effort it spends, remain properties of the solver pipeline, to be measured and verified in
 original units.
 
@@ -378,7 +378,7 @@ solver at one seed. The same 30 instances, four policies, two gaps and 1,800-sec
 rerun changing one factor at a time (Online Resource 1, Table~S5). Under Gurobi with seed 7 the
 SG-Ter-Mer effort ratio of Flat-GM is 0.778 at a 1\% gap and 0.777 at 0.1\%, against 0.698 and
 0.682 at seed 42: the conditional gain survives the change of seed. Under CPLEX at the original
-seed, in that solver's own effort units, the same ratio is 1.078 and 1.077: it does not survive
+seed, in its own deterministic effort metric, the same ratio is 1.078 and 1.077: it does not survive
 the change of solver. On the Simple class the three conditions agree in direction, Flat-GM below
 one at the loose gap and between 0.84 and 1.06 at the tight one, Flat-L2 above one in all six
 cells. Instance077 behaves differently in each condition: under Gurobi at seed 7 every policy times
@@ -545,9 +545,9 @@ separate their contributions.
 \subsection{Scope and limitations}
 The operational evidence comes from one application: two instance classes and 15 fixed
 instances per class, from the reconstructed campaign of \cref{subsec:design-operational}. Its
-replication under a second seed and a second solver is enough to show that one of its findings
-belongs to a configuration rather than to the representation, and far too small to describe the
-population of configurations. The stress instances are small and
+replication under a second seed and a second solver is enough to show that at least one finding
+is configuration-dependent rather than a stable property of the representation, and far too
+small to describe the population of configurations. The stress instances are small and
 deliberately adversarial; their budget of 0.01 is a numerical test parameter, and the dispatch
 budgets of \cref{tab:application-budget} are stated by us to show what the contract implies,
 not supplied or validated by the operator. Solver outcomes depend on
