@@ -48,6 +48,31 @@ def archive(name, paths):
     return len(paths)
 
 
+def mpc_bundle():
+    """Everything an MPC editor needs in one archive: sources, class files, PDF, letter."""
+    mpc = ROOT/'paper/mpc'
+    paths = [mpc/n for n in ['main_mpc.tex', 'abstract.tex', 'research-references.bib',
+                             'main_mpc.bbl', 'main_mpc.pdf', 'cover-letter.pdf',
+                             'cover-letter.tex', 'MPC_NOTES.md',
+                             'svjour3.cls', 'svglov3.clo', 'spmpsci.bst', 'spbasic.bst']]
+    paths += sorted(mpc.glob('sections/*.tex')) + sorted(mpc.glob('tables/*.tex'))
+    paths += sorted(mpc.glob('figs/*.pdf'))
+    paths += [ROOT/'paper/supporting-information.pdf']          # Online Resource 1
+    missing = [p for p in paths if not p.exists()]
+    if missing:
+        raise SystemExit('missing for the MPC bundle: ' + ', '.join(str(m) for m in missing))
+    with zipfile.ZipFile(OUT/'mpc-submission.zip', 'w', compression=zipfile.ZIP_DEFLATED,
+                         compresslevel=9) as z:
+        hashes = []
+        for p in paths:
+            rel = p.relative_to(mpc) if mpc in p.parents else Path(p.name)
+            content = p.read_bytes()
+            z.writestr(str(rel), content)
+            hashes.append(f'{hashlib.sha256(content).hexdigest()}  {rel}')
+        z.writestr('CONTENTS.sha256', '\n'.join(hashes)+'\n')
+    return len(paths)
+
+
 def main():
     OUT.mkdir(exist_ok=True)
     paper=[Path('paper')/x for x in ['main.tex','main.bbl','supporting-information.tex',
@@ -69,7 +94,10 @@ def main():
     artifact += list(collect('paper/research-audit/baseline-20260908',{'.tex','.pdf','.bib','.cpp'}))
     artifact += [Path('paper/submission/README.md'), Path('paper/submission/cover-letter.txt')]
     n2=archive('reproducibility-artifact.zip',artifact)
+    n3=mpc_bundle()
+    print(f'Prepared {n3} files for the MPC submission bundle')
     paths=[OUT/'manuscript-sources.zip', OUT/'reproducibility-artifact.zip',
+           OUT/'mpc-submission.zip',
            ROOT/'paper/main.pdf',ROOT/'paper/supporting-information.pdf',OUT/'cover-letter.txt']
     (OUT/'SHA256SUMS').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(ROOT)}\n' for p in paths))
     print(f'Prepared {n1} manuscript files and {n2} artifact files in {OUT}')

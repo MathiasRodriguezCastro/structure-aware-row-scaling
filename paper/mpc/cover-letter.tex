@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[colorlinks=true,allcolors=black]{hyperref}
+\pagestyle{empty}
+\begin{document}
+\noindent Mathias Rodr\'iguez Castro\\
+Facultad de Ingenier\'ia, Universidad de la Rep\'ublica\\
+Montevideo, Uruguay\\
+\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}
+
+\bigskip
+\noindent To the Editors of \emph{Mathematical Programming Computation}
+
+\bigskip
+\noindent Dear Editors,
+
+\medskip
+Please consider the manuscript ``Pre-Export Row Scaling for Generated Mixed-Integer Programs:
+Mechanism Attribution and Residual-Budget Contracts'' for publication in \emph{Mathematical
+Programming Computation}.
+
+Multiplying a row of a mixed-integer program by a positive number preserves it exactly while
+changing the numbers a solver sees. The paper asks what that change buys and what it still
+guarantees. The first half attributes an observed gain: holding one LP basis fixed per model
+across representations, geometric-mean row scaling lowers the basis condition number on all 306
+generated dispatch models by six to eight orders of magnitude, and an advantage previously read
+as evidence for block metadata proves to be a coupling-kernel effect that a control using no
+ownership information reproduces. The second half states what a representation can guarantee:
+residual budgets in application units survive consistent re-emission, and the factors compatible
+with a budget and coefficient limits are characterized exactly, together with an incompatibility
+certificate, the integer-rounding term that scaling cannot remove, and exact binary64 export.
+
+The submission fits this journal because the computations, not only their summaries, are part of
+what is offered: a fixed-basis audit of 306 models with an independent reconstruction of all
+1{,}530 bases and certified rational bounds on a stress sample; 1{,}080 matched matrix exports;
+240 operational solver runs with two matched sensitivity reruns of the same size, changing one
+factor at a time; and 4{,}752 optimizer calls across HiGHS, Gurobi and CPLEX in which every
+reported optimum is verified against an independent enumeration of the stored models.
+
+The paper claims no universal scaling advantage, and several results run against the convenient
+reading. The completed-run gain measured on one dispatch class survives a change of seed and
+disappears under a change of solver. The single instance that reverses the failure-sensitive
+ordering behaves differently in every configuration tested. Plain coefficient centering loses
+verified optima relative to the unscaled model on all three solvers, attaching a residual budget
+to the same rule loses none relative to that rule, and whether scaling helps at all differs
+across the three pipelines.
+
+Online Resource~1 holds the proof for the triangular model, the audit protocols and complete
+ranges, the reconstruction and experiment protocols, and the reproduction instructions. Online
+Resource~2 is the source and data archive: exporter, analysis and verification scripts, stored
+experiment data with manifests and checksums, and tests. The figures, the fixed-basis audit, the
+verification of the saved binary solutions and the HiGHS stress arm need no commercial licence;
+only the Gurobi and CPLEX arms do.
+
+I am the sole author, received no external funding and declare no competing interests. The
+manuscript discloses the use of AI assistance and states that the reported numbers come from the
+stored runs and that I am responsible for the scientific content. It is not under consideration
+elsewhere and has not been published before.
+
+\bigskip
+\noindent Sincerely,
+
+\medskip
+\noindent Mathias Rodr\'iguez Castro
+\end{document}

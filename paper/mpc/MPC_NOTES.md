@@ -84,7 +84,8 @@ are Springer's own files, kept for provenance.
 ## Abstract
 
 MPC asks for roughly 150--250 words. The manuscript abstract was **272 words**; the MPC abstract
-is **249**. All nine required messages are kept: the fixed-basis audit on 306 models; six to eight
+is **241**, deliberately short of the limit because an editorial system that splits hyphenated
+terms would count more. All nine required messages are kept: the fixed-basis audit on 306 models; six to eight
 orders of magnitude; the coupling-kernel rather than block-metadata explanation; the optimal
 factor $(1+\rho^2)^{-1/2}$; residual-budget contracts; the SG-Ter-Mer solver-work result; the
 seed and solver sensitivity; the stress test with verified optima; and the distinction between a
@@ -96,24 +97,30 @@ identify its cause", "holding one LP basis fixed across the representations of e
 "holding each model's LP basis fixed across its representations", "which row factors a budget and
 coefficient limits admit" became "the row factors compatible with a budget and coefficient
 limits", the redundant second mention of the unbudgeted comparator was dropped (the clause still
-says "adding the budget to that same rule"), and "on all three solvers tested" became "on all
-three solvers".
+says "adding the budget to that same rule"), "on all three solvers tested" became "on all three
+solvers", and the hinge sentence "Such a gain does not identify its cause" was removed because
+the sentence that follows it makes the same point.
 
 ## MSC 2020 codes proposed
 
 ```
-\subclass{90C11 \and 65F35 \and 90-08 \and 65K05}
+\subclass{90C11 \and 65F35 \and 90-08 \and 65G50}
 ```
 
+Checked against the AMS list (`mathscinet.ams.org/msnhtml/msc2020.pdf`), where each title below
+appears verbatim:
+
 - **90C11** Mixed integer programming.
-- **65F35** Matrix norms, conditioning, scaling.
+- **65F35** Numerical computation of matrix norms, conditioning, scaling.
 - **90-08** Computational methods for problems pertaining to operations research and
   mathematical programming.
-- **65K05** Numerical mathematical programming methods.
+- **65G50** Roundoff error.
 
-A fifth plausible code is **90C06** (large-scale problems in mathematical programming), left out
-because the paper is not about problem size. The line carries a `% TODO: confirm the MSC 2020
-codes with the editor.` comment; they are a proposal, not a verified requirement.
+The first draft used **65K05** (numerical mathematical programming methods) as the fourth code.
+The review replaced it with 65G50: the paper proposes no solution method, while the rounding
+term, the binary64 export conditions and the residual budgets are squarely about roundoff.
+**90C06** (large-scale problems) was considered and left out, since the paper is not about
+problem size. Editors sometimes adjust these, but they are now verified rather than guessed.
 
 ## Remaining warnings
 
@@ -122,8 +129,23 @@ codes with the editor.` comment; they are a proposal, not a verified requirement
   content and are usual in a float-heavy article.
 - 25 pages in the Springer layout, against 21 in the original.
 
+## Submission package
+
+`paper/submission/mpc-submission.zip` carries everything an editor needs: `main_mpc.tex` and
+`abstract.tex`, the sections, tables and vector figures, the bibliography and `main_mpc.bbl`,
+the four Springer class and style files, the compiled manuscript, the cover letter, these notes,
+and the supplement as Online Resource~1. Online Resource~2 is
+`paper/submission/reproducibility-artifact.zip`. Rebuild both with
+`python3 scripts/research/package_submission.py`, then check them with
+`python3 scripts/research/validate_submission.py`, which extracts each archive, verifies its
+checksums and recompiles the manuscript from the bundle alone. The last run: checksums verified
+for all three archives, and the bundle rebuilt to 25 pages with no overfull boxes and no
+undefined references, using only the class files it ships.
+
 ## Decisions that need your approval
 
+0. **The MSC codes are now verified rather than proposed** (see above), and the fourth changed
+   from 65K05 to 65G50. Tell me if you prefer the original four.
 1. **The two `envcount` class options.** You asked for `\documentclass[smallextended]{svjour3}`
    and for the numbering to be preserved; those two requirements conflict, and I chose to keep
    the numbering. If you prefer the bare option line, the propositions renumber continuously and
@@ -133,4 +155,4 @@ codes with the editor.` comment; they are a proposal, not a verified requirement
 3. **The MSC codes**, which are a proposal.
 4. **The scaled tables**, which are the least invasive way to fit the narrower measure. The
    alternative is to typeset them at `\footnotesize` in a full-width `table*`.
-5. **The abstract**, at 249 words, for you to compare with the 272-word original.
+5. **The abstract**, at 241 words, for you to compare with the 272-word original.

@@ -1,9 +1,12 @@
 # Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 
-**Research status, 24 September 2026: revision complete, consistency audit done.**
-The manuscript has been reframed around mechanism attribution and residual-budget contracts.
-What changed in this round, and which claims are confirmatory rather than exploratory, is
-recorded in [the revision record](paper/research-audit/revision-record-20260924.md).
+**Research status, 25 September 2026: prepared for submission to Mathematical Programming
+Computation.** The manuscript is in `paper/` in a journal-neutral layout and in `paper/mpc/` in
+Springer's `svjour3` format, the version intended for MPC; `paper/mpc/MPC_NOTES.md` records
+every change the format required and the checks that the two versions agree. The submission
+package, and the script that verifies it, are in `paper/submission/`. What changed in the last
+revision round, and which claims are confirmatory rather than exploratory, is recorded in
+[the revision record](paper/research-audit/revision-record-20260924.md).
 
 A pre-registered solver-robustness campaign was prepared and partly run on ClusterUY, then
 descoped from this manuscript to keep it about mechanism and guarantees rather than
