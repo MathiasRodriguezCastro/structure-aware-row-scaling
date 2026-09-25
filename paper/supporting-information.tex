@@ -233,14 +233,13 @@ policy order within an instance is seeded by the instance digest, and the record
 verification as the campaign. Table~\ref{tab:replication} reports the paired effort ratio
 against Base on the instances every policy completed. Effort is each solver's own measure, work
 units for Gurobi and deterministic ticks for CPLEX, so a column is read within its solver and
-never across. All 480 planned runs are present: 470 completed and 10 reached the limit. Runs classified as
-infrastructure failures were repeated and solver timeouts were not; there were two such
+never across. Runs classified as infrastructure failures were repeated and solver timeouts were not; there were two such
 episodes, the eight Gurobi runs of one instance that failed while the licence server was
 saturated, and the eight CPLEX runs of instance077, repeated with more memory after one of them
 was killed by the cgroup limit. Instance077 is the instance that reverses the PAR10 ordering in
 the reconstruction, and it behaves differently in every condition: under Gurobi at seed 7 all
-eight of its runs reach the limit, Base included, and under CPLEX the run that reaches the limit
-is Base at the 1\% gap and Role-Hybrid at 0.1\%.
+eight of its runs reach the limit, Base included, while under CPLEX at the 1\% gap only Base
+does.
 
 \begin{table}[tb]
 \centering\small
