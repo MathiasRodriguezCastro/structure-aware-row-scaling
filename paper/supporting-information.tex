@@ -224,6 +224,27 @@ completed runs. All rows concern Gurobi.}\label{tab:si-operational}
 \input{tables/operational-results}
 \end{table}
 
+\paragraph{Replication under a second seed and a second solver.}
+The reconstruction fixes the solver, the seed and the thread count. To separate what is stable
+from what belongs to that configuration, the same 30 instances, four policies, two gaps,
+1,800-second limit and 16 threads were rerun twice, changing one factor at a time: Gurobi with
+seed 7, and CPLEX with the original seed 42. The run tables were frozen before the runs, the
+policy order within an instance is seeded by the instance digest, and the records carry the same
+verification as the campaign. Table~\ref{tab:replication} reports the paired effort ratio
+against Base on the instances every policy completed. Effort is each solver's own measure, work
+units for Gurobi and deterministic ticks for CPLEX, so a column is read within its solver and
+never across. Runs classified as infrastructure failures, namely eight Gurobi runs that lost the
+licence and one CPLEX run killed by the memory limit, were repeated; solver timeouts were not.
+
+\begin{table}[tb]
+\centering\small
+\caption{Paired effort ratio against Base on the instances completed by every policy, with
+bootstrap intervals, for the reconstruction and its two replications. Values below one favour
+the scaled policy.}
+\label{tab:replication}
+\input{tables/replication}
+\end{table}
+
 \paragraph{Original residual normalization.}
 For an equality, the absolute residual is $|a_r^Tx-b_r|$. The RHS-normalized
 residual divides by $1+|b_r|$, whereas the activity-normalized residual divides by
