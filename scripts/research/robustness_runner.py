@@ -65,6 +65,10 @@ def classify(rc, text, parsed, nosol, external_timeout):
         return "INFRASTRUCTURE_FAILURE", True
     if external_timeout:
         return "WRAPPER_TIMEOUT", False
+    # Killed by a signal with nothing from the solver: a resource limit or a node event,
+    # not an outcome of the solve.
+    if rc < 0 and not nosol and not parsed.get("status_solver"):
+        return "KILLED_BY_SIGNAL", True
     if nosol:
         status = nosol[0]
         if status == "TIME_LIMIT":
