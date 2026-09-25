@@ -66,8 +66,11 @@ Residual-Budget Contracts}
 %%ABSTRACT%%
 \keywords{Mixed-integer linear programming \and Row scaling \and Numerical reliability \and
 Equilibration \and Residual budgets \and Computational reproducibility}
-% TODO: confirm the MSC 2020 codes with the editor.
-\subclass{90C11 \and 65F35 \and 90-08 \and 65K05}
+%% MSC 2020, checked against the AMS list (mathscinet.ams.org/msnhtml/msc2020.pdf):
+%% 90C11 Mixed integer programming; 65F35 Numerical computation of matrix norms, conditioning,
+%% scaling; 90-08 Computational methods for problems pertaining to operations research and
+%% mathematical programming; 65G50 Roundoff error.
+\subclass{90C11 \and 65F35 \and 90-08 \and 65G50}
 \end{abstract}
 """
 

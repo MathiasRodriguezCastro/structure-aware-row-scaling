@@ -1,51 +1,50 @@
 {
-  "clean_extraction_validation": {
-    "archive_sha256": "9b3bf44a0cd84f752fdc262143ffc01874414bdb6fe30c3f70386b961c9fe1d3",
-    "extraction": "/tmp/row-scaling-final-cr5zfcjy",
-    "commands": [
-      {
-        "command": [
-          "sha256sum",
-          "--quiet",
-          "-c",
-          "CONTENTS.sha256"
-        ],
-        "returncode": 0
-      },
-      {
-        "command": [
-          "make",
-          "research-check"
-        ],
-        "returncode": 0
-      },
-      {
-        "command": [
-          "make",
-          "research-analysis"
-        ],
-        "returncode": 0
-      },
-      {
-        "command": [
-          "make",
-          "paper"
-        ],
-        "returncode": 0
-      }
-    ],
-    "passed": true
+  "archives": [
+    {
+      "archive": "mpc-submission.zip",
+      "sha256": "48fcc5bea5abf97e266767fa06986ced706b3535704dc152353225b3a33be9ad",
+      "files": 31,
+      "checksums_verified": true,
+      "checksum_output": ""
+    },
+    {
+      "archive": "manuscript-sources.zip",
+      "sha256": "073c7f0a1771f953be5efaa8b175bd0554023f8b93cd1ef5368c05d0a746facc",
+      "files": 24,
+      "checksums_verified": true,
+      "checksum_output": ""
+    },
+    {
+      "archive": "reproducibility-artifact.zip",
+      "sha256": "a5d88570bc649a64ff7bcc7183118adc99127910152468322ac4cc1f81621c82",
+      "files": 3975,
+      "checksums_verified": true,
+      "checksum_output": ""
+    }
+  ],
+  "mpc_bundle_build": {
+    "rebuilt_from_bundle_alone": true,
+    "shipped_pdf_sha256": "c26c5b28092034f756fb0e2d42bbfb8afbb568387e3ef6bacba96b29a387a40d",
+    "pages": 25,
+    "overfull_boxes": 0,
+    "undefined_references": 0
   },
-  "delivered_artifact_sha256": "cee3f13c844238535a81fa2b20bda10280e2d12b02e3367df0cc3286e69d402b",
-  "source_and_input_files_identical_to_tested_extraction": 3127,
-  "changed_source_or_inputs": [],
-  "main_pages": 15,
-  "supplement_pages": 6,
-  "implementation_tests_passed": 13,
-  "saved_models_verified": 96,
-  "saved_configurations_verified": 3456,
-  "optimizer_calls": 3168,
-  "abstentions": 288,
-  "matrix_exports": 1080,
-  "operational_runs": 240
+  "documents": {
+    "main": {
+      "pages": 21,
+      "sha256": "b4a75dc92c338b06296603d483fe9bb700be2948efbefebf0ff8dacb82933b8d"
+    },
+    "supplement": {
+      "pages": 11,
+      "sha256": "fbf0549f0a781923e66cde08b617b0f6788e5019fee08f8d9f051dd8509f7684"
+    },
+    "mpc_manuscript": {
+      "pages": 25,
+      "sha256": "c26c5b28092034f756fb0e2d42bbfb8afbb568387e3ef6bacba96b29a387a40d"
+    },
+    "cover_letter": {
+      "pages": 1,
+      "sha256": "7f80df4a34bc0c9f9b1828253d25b657783424ed13e81b110036fbfc706161f8"
+    }
+  }
 }

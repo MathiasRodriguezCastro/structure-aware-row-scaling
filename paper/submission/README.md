@@ -1,23 +1,37 @@
-# Submission preparation
+# Submission package
 
-**Research status, 13 September 2026: not recommended for submission yet.**
-New classical GCD/RHS-strengthening controls solve every case of the earlier stress experiment. The previously packaged manuscript remains a preserved candidate; substantive research is continuing. See `paper/research-audit/research-status-20260913.md`.
+Target venue: **Mathematical Programming Computation** (Springer). Its scope is computational
+mathematical programming, and it reviews the software and data alongside the manuscript, which
+is why the artifact below is part of the submission rather than an afterthought. The journal's
+author instructions ask for an abstract of 150--250 words, 4--6 keywords, MSC codes, author and
+contact information, declarations and editable sources; all are provided. Nothing here has been
+submitted or accepted anywhere.
 
-Prospective first venue: **Optimization Letters**. Its stated scope includes optimization theory, algorithms and computational studies, and it seeks communications of approximately 15 journal pages. The current main PDF is 15 manuscript pages; the eventual typeset length is the journal's decision. Source: [official aims and scope](https://link.springer.com/journal/11590/aims-and-scope), checked 9 September 2026.
+## What to upload
 
-The [author instructions](https://link.springer.com/journal/11590/submission-guidelines) request an abstract of 150–250 words, 4–6 keywords, author/contact information, declarations, and editable sources. This draft provides those items and an explicit AI-assistance declaration. The supplement is Online Resource 1; the reproducibility archive is Online Resource 2. The journal name in the supplement indicates the intended destination, not submission or acceptance.
+| File | Role |
+|---|---|
+| `mpc-submission.zip` | the manuscript in Springer's `svjour3` format, with its class files, sections, tables, vector figures, bibliography, compiled PDF, cover letter, and the supplement as Online Resource 1 |
+| `../supporting-information.pdf` | Online Resource 1, also inside the bundle |
+| `reproducibility-artifact.zip` | Online Resource 2: code, experiment data, manifests, checksums, tests and reproduction instructions |
+| `../mpc/cover-letter.pdf` | cover letter, also inside the bundle |
 
-Files prepared locally:
+`manuscript-sources.zip` holds the sources of the original, journal-neutral layout in `paper/`;
+it is not part of the MPC upload and is kept so the two layouts stay comparable.
 
-- `../main.pdf`: main manuscript.
-- `../supporting-information.pdf`: Online Resource 1.
-- `manuscript-sources.zip`: current LaTeX sources, bibliography and vector figures.
-- `reproducibility-artifact.zip`: code, experiment data, manifests and verification/analysis instructions.
-- `cover-letter.txt`: editable cover letter.
-- `SHA256SUMS`: checksums for the local package.
+## How it is produced and checked
 
-`python3 scripts/research/package_submission.py` rebuilds the two archives and package checksums from the current files. It performs no upload or submission. `../research-audit/final-review.md` records internal checks and scientific limits.
+```bash
+python3 scripts/research/build_mpc.py          # regenerate the MPC manuscript from paper/main.tex
+make -C paper && make -C paper si              # rebuild the original layout and the supplement
+python3 scripts/research/package_submission.py # rebuild the three archives and the checksums
+python3 scripts/research/validate_submission.py# extract each archive, verify it, rebuild the bundle
+```
 
-The main contribution is a specific information-loss theorem and its bounded extension, integrated with explicit row-factor admissibility and arithmetic checks. The interval projection itself is elementary and tolerance scaling and power-of-two scaling have clear precedents. The case for publication rests on the combined characterization, counterexamples and reproducible controls; editorial assessment of originality and significance remains uncertain.
+`VALIDATION.json` records the last check: every archive's checksums verified, and the MPC bundle
+recompiled from its own contents alone, with no overfull boxes and no undefined references.
+`SHA256SUMS` covers the archives and the PDFs. `paper/mpc/MPC_NOTES.md` lists every change the
+journal format required, the fidelity checks against the original manuscript, the abstract word
+counts, the MSC codes and the decisions left for the author.
 
-Before an actual submission, the author needs to review and take responsibility for the final mathematical claims, code, figures and AI disclosure, and confirm the submission-system statements about prior publication, exclusive consideration and institutional approval. The cover letter does not presume those unconfirmed facts. Authorship, no external funding and no competing interests were explicitly confirmed. Nothing has been submitted, sent to editors, uploaded or released by this workflow.
+Neither script uploads or submits anything.

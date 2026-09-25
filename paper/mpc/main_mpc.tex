@@ -52,7 +52,7 @@ Multiplying a row of a mixed-integer program by a positive number preserves it e
 changes the numbers a solver sees. We ask what that change buys and what it still guarantees.
 On 306 generated hydrothermal-dispatch models, holding each model's LP basis fixed across its
 representations, geometric-mean row scaling lowers its condition number on every
-model, by six to eight orders of magnitude in the median of each class. Such a gain does not identify its cause. An apparent block-metadata effect is a coupling-kernel effect:
+model, by six to eight orders of magnitude in the median of each class. An apparent block-metadata effect is a coupling-kernel effect:
 geometric-mean centering makes the extrema-based block statistic identically one, so the
 block-relative rule becomes Euclidean normalization, which a control without ownership
 information reproduces; the idealized coupling problem has optimal factor
@@ -66,8 +66,11 @@ pipelines. A representation can be numerically better without being operationall
 what safer means is stated in the units of the original model.
 \keywords{Mixed-integer linear programming \and Row scaling \and Numerical reliability \and
 Equilibration \and Residual budgets \and Computational reproducibility}
-% TODO: confirm the MSC 2020 codes with the editor.
-\subclass{90C11 \and 65F35 \and 90-08 \and 65K05}
+%% MSC 2020, checked against the AMS list (mathscinet.ams.org/msnhtml/msc2020.pdf):
+%% 90C11 Mixed integer programming; 65F35 Numerical computation of matrix norms, conditioning,
+%% scaling; 90-08 Computational methods for problems pertaining to operations research and
+%% mathematical programming; 65G50 Roundoff error.
+\subclass{90C11 \and 65F35 \and 90-08 \and 65G50}
 \end{abstract}
 
 \section{Introduction}
