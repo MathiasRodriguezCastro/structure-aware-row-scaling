@@ -103,8 +103,9 @@ compatibility conditions, an incompatibility certificate, the constrained logari
 factor, the integer-rounding term that scaling cannot remove, and exact binary64 export with
 power-of-two factors (\cref{sec:contract}).
 \item \emph{Validation.} A fixed-basis audit of 306 dispatch models, a fresh audit of 1,080
-matched matrix exports, a reconstruction of 240 operational solver runs, and an exactly
-enumerated stress experiment with 4,752 optimizer calls on three solvers
+matched matrix exports, a reconstruction of 240 operational solver runs with two
+matched sensitivity reruns of the same size, and an exactly enumerated stress experiment with
+4,752 optimizer calls on three solvers
 (\cref{sec:experiments,sec:results}).
 \end{enumerate}
 
@@ -390,8 +391,9 @@ instance either.
 
 The two endpoints answer different questions: completed-run effort describes how a
 representation affects the runs that finish, and PAR10 whether it changes which runs finish.
-With one seed and 15 fixed instances per class, the evidence is a measured conditional gain,
-not a population estimate of acceleration. The same runs also show why a stated budget is
+For the reconstructed campaign itself, with one seed and 15 fixed instances per class, the
+result is a measured conditional gain, not a population estimate of acceleration; the two
+sensitivity reruns reinforce that caution rather than providing population-level replication. The same runs also show why a stated budget is
 needed to read residuals: an absolute residual of 4.97 on a zero-RHS equality of caso46e has an
 activity-normalized value of $1.15\times10^{-7}$, and without an application budget neither
 number establishes acceptance; \cref{tab:application-budget} supplies one.
@@ -497,8 +499,8 @@ $\epsilon$ divided by the geometric-mean factor, the original-unit residual that
 allows, in the units of that group's budget. The last group is written pre-scaled, with a coefficient of $10^7$ on the generation
 variable, so 0.1\,MW there is $10^{6}$ in the units of the row as written. The admissibility
 check covers the three kernels the four policies use --- the unit factor, the geometric-mean
-factor shown here and $1/\|a_r\|_2$ --- and every one of them is admissible on every row; the
-recorded table gives the counts for each.}
+factor shown here and $1/\|a_r\|_2$ --- and every one of them is admissible on every row. The
+archived admissibility check records the corresponding counts for each kernel.}
 \label{tab:application-budget}
 \input{tables/application-budget}
 \end{table}
