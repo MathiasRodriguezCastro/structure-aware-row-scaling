@@ -44,11 +44,11 @@ geometric-mean centering makes the extrema-based block statistic identically one
 block-relative rule becomes Euclidean normalization, which a control without ownership information reproduces, and
 the idealized coupling problem has the closed-form optimal factor $(1+\rho^2)^{-1/2}$. Residual
 budgets stated in application units, by contrast, survive consistent re-emission, and we
-characterize exactly which row factors a budget and coefficient limits admit. The evidence then
-separates what improves from what is guaranteed. In reconstructed dispatch runs with Gurobi,
+characterize exactly which row factors a budget and coefficient limits admit. In reconstructed dispatch runs with Gurobi,
 scaling used 30--32\% less solver work on the 14 SG-Ter-Mer instances that every policy
 completed, while one instance timed out under every scaled policy, reversing the
-failure-sensitive ordering. In an exactly enumerated stress test, plain
+failure-sensitive ordering; a replication on the same instances reproduces the gain with a
+second seed and not with a second solver. In an exactly enumerated stress test, plain
 centering lost verified optima on all three solvers tested, adding the budget to the same rule
 lost none relative to that same rule, and whether scaling helped at all differed across the
 three pipelines. A representation can be
@@ -373,6 +373,20 @@ not among them, the reversal disappears (Online Resource 1, Table~S3). The Simpl
 lowers mean PAR10 from 11.9 to 2.1 seconds at 1\% gap and raises it from 52.0 to 73.0 seconds
 at 0.1\%. Role-Hybrid stays within one second of Flat-GM in all four cells.
 
+\paragraph{Replication under a second seed and a second solver.} The reconstruction is one
+solver at one seed. The same 30 instances, four policies, two gaps and 1,800-second limit were
+rerun changing one factor at a time (Online Resource 1, Table~S5). Under Gurobi with seed 7 the
+SG-Ter-Mer effort ratio of Flat-GM is 0.778 at a 1\% gap and 0.777 at 0.1\%, against 0.698 and
+0.682 at seed 42: the conditional gain survives the change of seed. Under CPLEX at the original
+seed, in that solver's own effort units, the same ratio is 1.078 and 1.077: it does not survive
+the change of solver. On the Simple class the three conditions agree in direction, Flat-GM below
+one at the loose gap and between 0.84 and 1.06 at the tight one, Flat-L2 above one in all six
+cells. Instance077 behaves differently in each condition: at seed 7 every policy times out, Base
+included, and under CPLEX the timeout falls on Base at the 1\% gap and on Role-Hybrid at 0.1\%.
+The completed-run gain of this class is therefore a property of a representation together with a
+pipeline, and the failure that reversed the PAR10 ordering is not a stable property of the
+instance either.
+
 The two endpoints answer different questions: completed-run effort describes how a
 representation affects the runs that finish, and PAR10 whether it changes which runs finish.
 With one seed and 15 fixed instances per class, the evidence is a measured conditional gain,
@@ -529,9 +543,11 @@ between the exported row and the point that comes back, and the experiments here
 separate their contributions.
 
 \subsection{Scope and limitations}
-The operational evidence comes from one application: two instance classes, one solver, one seed
-and 15 fixed instances per class, all from the reconstructed campaign of
-\cref{subsec:design-operational}. The stress instances are small and
+The operational evidence comes from one application: two instance classes and 15 fixed
+instances per class, from the reconstructed campaign of \cref{subsec:design-operational}. Its
+replication under a second seed and a second solver is enough to show that one of its findings
+belongs to a configuration rather than to the representation, and far too small to describe the
+population of configurations. The stress instances are small and
 deliberately adversarial; their budget of 0.01 is a numerical test parameter, and the dispatch
 budgets of \cref{tab:application-budget} are stated by us to show what the contract implies,
 not supplied or validated by the operator. Solver outcomes depend on
