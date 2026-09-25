@@ -42,8 +42,13 @@ def archive(name, paths):
             total=sum(s for _,s in EXCLUDED)
             z.writestr('EXCLUDED.txt',
                        f'{len(EXCLUDED)} files, {total/1e9:.2f} GB, left out of this archive.\n'
-                       'They are bulk inputs (exported LP text, bases, per-run logs) kept in the\n'
-                       'repository and the data record; the analyses here read their summaries.\n\n'
+                       'They are bulk inputs, not results: exported LP text, bases and per-run\n'
+                       'records that the analyses here read only through their summaries. They are\n'
+                       'deposited as a single archive, fixed-basis-exports.tar.zst (337 MB\n'
+                       'compressed, 5.18 GB in 11,585 files), whose checksum and contents are listed\n'
+                       'in data-deposit/MANIFEST.json beside this package. Only\n'
+                       '`make research-fixed-basis-check`, which rebuilds all 1,530 bases from the\n'
+                       'LP text, needs the files themselves.\n\n'
                        + '\n'.join(f'{s:>12}  {q}' for q,s in sorted(EXCLUDED)) + '\n')
     return len(paths)
 

@@ -73,13 +73,17 @@ takes longer than the Python-only check.
 | Location under `results-revision/research-audit/` | Role |
 |---|---|
 | `identifiability-final/` | Authoritative matrix audit: 180 generated instances, six policies, 1,080 LP exports using the corrected round-trip serializer; named comparisons, whole-row checks, spectra at a common reference rank, and hashes. |
-| `budget-final/` | Authoritative binary stress experiment: 96 models, nine policies, two solvers and two presolve settings; 3,456 planned configurations, including 288 abstentions and 3,168 optimizer calls. Models, factors, returned points, protocol and source snapshots are retained. |
+| `budget-final/` | Authoritative binary stress experiment, HiGHS and Gurobi arms: 96 models, nine policies, two presolve settings; 3,456 planned configurations, including 288 abstentions and 3,168 optimizer calls. Models, factors, returned points, protocol and source snapshots are retained. |
+| `budget-final-cplex/` | The third solver of the same experiment: the identical 96 stored models and row factors under CPLEX, 1,728 configurations. Together with `budget-final/` this is the three-solver experiment the manuscript reports, 4,752 optimizer calls in total. The models are byte-identical to `budget-final/models/`, which the claims verifier asserts. |
+| `exploration-lattice/`, `exploration-lattice-cplex/` | The integer-aware GCD controls of that experiment, 576 configurations per solver. |
+| `operational-replication/` | The two matched sensitivity reruns of the operational reconstruction: the same 30 instances, policies, gaps and limit under a second seed and under a second solver, 240 runs each, with frozen run tables and the comparison against the reconstruction. |
+| `application-budgets/` | The declared residual contract applied to the 4,320 interpretable rows of one dispatch instance, with the provenance of the exported model. |
 | `operational/` | Authoritative reconstruction of 240 historical dispatch runs, with recovered native logs, input hashes, fixed-pool PAR10, conditional completed-run Work summaries, and residual diagnostics. These are reconstructed observations, not new optimizer runs. |
 | `budget-pilot/`, `budget-confirmatory/`, `budget-confirmatory-v2/` | Earlier stress runs, retained for provenance. The initial endpoint implementation and later correction give different results; these folders must not be substituted for `budget-final/`. |
 | `identifiability-confirmatory/` | Earlier matrix export with the old serializer; retained to expose the effect of representation changes. |
 
-`budget-final/protocol.json` records versions, seeds, settings, methods and source
-hashes. The independent checker verifies the complete Cartesian configuration grid,
+`budget-final/protocol.json` and `budget-final-cplex/protocol.json` record versions, seeds,
+settings, methods and source hashes. The independent checker verifies the complete Cartesian configuration grid,
 all 96 enumerated optima and stored acceptance labels, 768 exact dyadic exports, and
 288 justified abstentions. Its current saved-data SHA-256 is
 `f0cfa86aa97e60dcca6985dd66b235883ecabafb1fe1f4de40a3b70b39840aa2`

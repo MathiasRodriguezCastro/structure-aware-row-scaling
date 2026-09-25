@@ -19,6 +19,20 @@ submitted or accepted anywhere.
 `manuscript-sources.zip` holds the sources of the original, journal-neutral layout in `paper/`;
 it is not part of the MPC upload and is kept so the two layouts stay comparable.
 
+## The bulk data behind the fixed-basis audit
+
+The reproducibility archive carries the analyses and the summaries they read, and leaves out the
+bulk inputs: the exported LP text and bases of the fixed-basis audit, its two earlier recovery
+runs, and the benchmark of the descoped campaign. Those are deposited as one archive,
+`data-deposit/fixed-basis-exports.tar.zst` -- 337 MB compressed, 5.18 GB in 11,585 files, with
+its checksum and contents in `data-deposit/MANIFEST.json`. Only
+`make research-fixed-basis-check`, which rebuilds all 1,530 bases from the LP text, needs the
+files themselves; every number in the manuscript is reproducible from the summaries in the
+reproducibility archive without them.
+
+The archives and the deposit are build products: they are rebuilt by the packaging script and
+attached to the tagged release, not carried in the repository history.
+
 ## How it is produced and checked
 
 ```bash
