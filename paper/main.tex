@@ -50,7 +50,8 @@ scaling used 30--32\% less solver work on the 14 SG-Ter-Mer instances that every
 completed, while one instance timed out under every scaled policy, reversing the
 failure-sensitive ordering. In an exactly enumerated stress test, plain
 centering lost verified optima on all three solvers tested, adding the budget to the same rule
-lost none, and whether scaling helped at all differed across the three pipelines. A representation can be
+lost none relative to that same rule, and whether scaling helped at all differed across the
+three pipelines. A representation can be
 numerically better without being operationally safer, unless what safer means is stated in the
 units of the original model.
 \end{abstract}
@@ -459,7 +460,9 @@ generation and cap it by demand, 0.1\,MW for the piecewise-linear production env
 those meanings, with $\epsilon=10^{-6}$ and the coefficient window $[10^{-9},10^{9}]$. The
 admissible interval is wide, the geometric-mean factor lies inside it on every row, and the
 residual the tolerance allows in original units stays five to nine orders of magnitude below the
-declared budget. On this model the contract does not restrict the factor at all.
+declared budget. On this model the contract leaves the geometric-mean factor unchanged on
+every row: it restricts which factors are admissible, as it must, but the choice a modeller
+would make already lies well inside that restriction.
 
 Its content is in the reading of a residual. One family is written pre-scaled: the Baygorria
 generation definition carries a coefficient of $10^7$ on the generation variable, so the same
@@ -477,7 +480,10 @@ supplied by the operator. Admissible factors are the interval of \cref{prop:budg
 $\epsilon=10^{-6}$ and coefficient limits $[10^{-9},10^{9}]$; the last column is
 $\epsilon$ divided by the geometric-mean factor, the original-unit residual that the tolerance
 allows. The last group is written pre-scaled, with a coefficient of $10^7$ on the generation
-variable, so 0.1\,MW there is $10^{6}$ in the units of the row as written.}
+variable, so 0.1\,MW there is $10^{6}$ in the units of the row as written. The admissibility
+check covers the three kernels the four policies use --- the unit factor, the geometric-mean
+factor shown here and $1/\|a_r\|_2$ --- and every one of them is admissible on every row; the
+recorded table gives the counts for each.}
 \label{tab:application-budget}
 \input{tables/application-budget}
 \end{table}
@@ -501,8 +507,10 @@ coupling kernel together with the information used, and the fixed-basis audit sh
 kernel alone can change: identical coverage, representations orders of magnitude apart. A claim
 that generator information improves preprocessing needs a kernel-matched control.
 
-\paragraph{Residual budgets are a meaningful invariant quantity.} A budget carried with its row
-is unchanged by consistent re-emission and determines the admissible factors exactly. In the
+\paragraph{Residual budgets are a meaningful invariant quantity.} A residual budget carried
+consistently with its row defines a contract that is invariant under consistent re-emission ---
+the number changes with the row, the meaning does not --- and determines the admissible factors
+exactly. In the
 stress test, measured against the corresponding unbudgeted rule, it repaired the verification
 losses of coefficient centering on two of the three solvers and cost nothing on the third;
 measured against the unscaled model the outcome still depends on the pipeline. On the dispatch
@@ -549,7 +557,8 @@ Residual budgets provide a constructive way to encode information that keeps its
 original application units. They come with exact feasibility and incompatibility conditions, a
 centered factor, invariance under re-emission, and explicit rounding and binary64 export
 conditions, and in the stress experiment adding the residual budget to the same scaling rule
-never reduced verification on any of the three solvers tested.
+never reduced verification against that same unbudgeted rule, on any of the three solvers
+tested.
 
 What a solver does with a scaled representation still has to be measured, and its output still
 has to be verified. The practical lesson is therefore not to avoid external scaling, but to make
