@@ -92,13 +92,14 @@ def main():
     artifact += [p.relative_to(ROOT) for p in (ROOT/'results-revision/final-variants').glob('*/resumen.csv')]
     artifact += list(collect('paper/research-audit',{'.md','.json','.csv','.txt'}))
     artifact += list(collect('paper/research-audit/baseline-20260908',{'.tex','.pdf','.bib','.cpp'}))
-    artifact += [Path('paper/submission/README.md'), Path('paper/submission/cover-letter.txt')]
+    artifact += [Path('paper/submission/README.md'), Path('paper/mpc/cover-letter.tex')]
     n2=archive('reproducibility-artifact.zip',artifact)
     n3=mpc_bundle()
     print(f'Prepared {n3} files for the MPC submission bundle')
     paths=[OUT/'manuscript-sources.zip', OUT/'reproducibility-artifact.zip',
            OUT/'mpc-submission.zip',
-           ROOT/'paper/main.pdf',ROOT/'paper/supporting-information.pdf',OUT/'cover-letter.txt']
+           ROOT/'paper/main.pdf',ROOT/'paper/supporting-information.pdf',
+           ROOT/'paper/mpc/main_mpc.pdf',ROOT/'paper/mpc/cover-letter.pdf']
     (OUT/'SHA256SUMS').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(ROOT)}\n' for p in paths))
     print(f'Prepared {n1} manuscript files and {n2} artifact files in {OUT}')
 
