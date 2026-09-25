@@ -39,6 +39,12 @@ What this round changes, and which claims are confirmatory and which exploratory
 6. **Sensitivity to the scenario defect** (supplement): both endpoints repeated on the six
    SG-Ter-Mer instances without the demand inversion.
 
+7. **Operational replication.** The reconstruction was rerun on the same 30 instances with a
+   second seed and with a second solver, one factor at a time, on tables frozen beforehand
+   (`results-revision/research-audit/operational-replication/`). It is reported in the results,
+   the limitations and the supplement, including the finding that goes against the earlier
+   reading: the SG-Ter-Mer conditional gain does not transfer to CPLEX.
+
 ## Confirmatory (registered before the data were seen)
 
 - C5 stress experiment under CPLEX: budgeted versus budget-free paired discordance. This is the
@@ -71,4 +77,5 @@ again in the limitations.
   verified solution: that evidence exists in the repository but the paper does not use it.
 - No cross-solver comparison of effort: work units, deterministic ticks and nodes are not
   commensurable.
-- No universal solver speedup or reliability improvement.
+- No universal solver speedup or reliability improvement. The one conditional gain the paper
+  measures is now known not to transfer to a second solver, and the paper says so.
