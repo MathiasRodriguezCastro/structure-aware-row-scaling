@@ -6,6 +6,8 @@ of the declarations, the bibliography style and three tables scaled to the narro
 measure. The body is copied verbatim, so a diff against paper/main.tex shows exactly what the
 journal format required. See paper/mpc/MPC_NOTES.md.
 """
+import re
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -81,7 +83,7 @@ def main():
     src = SRC.read_text()
     body = src[src.index("\\section{Introduction}"):]
 
-    declarations = body[body.index("\\section*{Statements and Declarations}"):
+    declarations = body[body.index("\\section*{Acknowledgements}"):
                         body.index("\\section*{Supplementary information}")].rstrip() + "\n"
     body = body.replace(declarations + "\n", "").replace(declarations, "")
 
@@ -103,6 +105,42 @@ def main():
 
     OUT.write_text(PREAMBLE.replace("%%ABSTRACT%%", ABSTRACT.read_text().strip()) + "\n" + body)
     print("wrote", OUT.relative_to(ROOT), OUT.read_text().count("\n"), "lines")
+    sync_assets(body)
+
+
+def sync_assets(body):
+    """Copy every input the generated file needs, so the bundle cannot drift from the sources.
+
+    The submission directory is self-contained (the editor compiles it alone), which means the
+    sections, tables, figures and bibliography exist twice. Refreshing them here keeps the copy
+    byte-identical to paper/.
+    """
+    src_dir, out_dir = SRC.parent, OUT.parent
+    wanted = {"research-references.bib"}
+    wanted |= {name + ".tex" for name in re.findall(r"\\input\{([^}]+)\}", body)}
+    figures = set(re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", body))
+    for name in sorted(name + ".tex" for name in re.findall(r"\\input\{([^}]+)\}", body)):
+        figures |= set(re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}",
+                                  (src_dir / name).read_text()))
+
+    copied = 0
+    for name in sorted(wanted):
+        dst = out_dir / name
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        src = src_dir / name
+        if not dst.exists() or dst.read_bytes() != src.read_bytes():
+            shutil.copy2(src, dst)
+            copied += 1
+    for fig in sorted(figures):
+        # main.tex resolves figures through \graphicspath; mirror that search here.
+        src = next(c for d in ("figs/research", "figs") if (c := src_dir / d / fig).exists())
+        dst = out_dir / "figs" / fig
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.exists() or dst.read_bytes() != src.read_bytes():
+            shutil.copy2(src, dst)
+            copied += 1
+    print("synced %d of %d inputs into %s" % (copied, len(wanted) + len(figures),
+                                              out_dir.relative_to(ROOT)))
 
 
 if __name__ == "__main__":

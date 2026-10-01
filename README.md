@@ -14,7 +14,15 @@ benchmarking. Its protocol, split, frozen run tables and the 9,057 runs complete
 stopped remain in [`results-revision/solver-robustness/`](results-revision/solver-robustness/)
 for a separate study; nothing in the paper depends on them.
 
-Research manuscript and reproducibility materials by Mathias Rodríguez Castro.
+## Online Resource 2
+
+This repository is **Online Resource 2** of the manuscript above, submitted to *Mathematical
+Programming Computation*. Online Resource 1 is the supplement,
+[`paper/supporting-information.pdf`](paper/supporting-information.pdf).
+
+Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la República,
+Montevideo, Uruguay — <mathiasr@fing.edu.uy>.
+
 The current manuscript is **unpublished**. No journal acceptance, submission, or
 upload of this revision to an external archive is claimed.
 
