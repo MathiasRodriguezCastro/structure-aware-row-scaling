@@ -7,11 +7,15 @@ BUDGET_OUT ?= $(AUDIT_ROOT)/reruns/budget
 BUDGET_SOLVERS ?= highs gurobi
 FIXED_BASIS_ROOT := $(AUDIT_ROOT)/fixed-basis-final-20260914
 FIXED_BASIS_OUT ?= $(AUDIT_ROOT)/reruns/fixed-basis
+APP_BUDGET_DIR := $(AUDIT_ROOT)/application-budgets
+APP_BUDGET_LP ?= $(APP_BUDGET_DIR)/caso46e-dummylp.lp.gz
+APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
 
 .PHONY: help paper audit-build research-check-python research-check research-analysis \
         research-budget-analysis research-matrix-analysis research-operational-analysis \
         research-fixed-basis-analysis research-fixed-basis-check research-fixed-basis \
-        research-fixed-basis-precision \
+        research-fixed-basis-precision research-application-budgets \
+        research-application-export \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
         research-rounding-check research-rounding-analysis rounding-note \
         research-robustness-analysis
@@ -25,6 +29,8 @@ help:
 	@echo "  make research-check-python  - mathematical tests, saved binary audit, LP hashes"
 	@echo "  make research-check         - also build and test the C++ LP serializer"
 	@echo "  make research-analysis      - regenerate current tables, figures and summaries"
+	@echo "  make research-application-budgets - declared-budget table and its delta sweep"
+	@echo "  make research-application-export  - re-export that model and compare byte by byte"
 	@echo "  make paper                  - build main and supplement PDFs with pdfLaTeX"
 	@echo "  make audit-build            - isolated solver-free C++ build in code/build-audit"
 	@echo "Optional fresh experiments (new output directories only):"
@@ -63,7 +69,7 @@ research-check: audit-build research-check-python
 	$(PYTHON) -m pytest -q tests/test_export_roundtrip.py
 
 research-analysis: research-budget-analysis research-matrix-analysis research-operational-analysis \
-                   research-fixed-basis-analysis
+                   research-fixed-basis-analysis research-application-budgets
 
 # Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
 research-robustness-analysis:
@@ -92,6 +98,27 @@ research-budget-analysis:
 
 research-matrix-analysis:
 	$(PYTHON) scripts/research/analyze_identifiability.py
+
+# The declared residual contract on one dispatch model, and how far the budgets can be
+# tightened before a kernel stops being admissible. Reads the stored LP; no solver.
+research-application-budgets:
+	$(PYTHON) scripts/research/application_budgets.py --lp $(APP_BUDGET_LP) \
+	    --budgets $(APP_BUDGET_DIR)/declared-budgets.json --out $(APP_BUDGET_DIR)/caso46e.csv
+	$(PYTHON) scripts/research/application_budget_sensitivity.py --lp $(APP_BUDGET_LP) \
+	    --budgets $(APP_BUDGET_DIR)/declared-budgets.json --exponents -16 2 \
+	    --out $(APP_BUDGET_DIR)/caso46e-sensitivity.csv
+	$(PYTHON) scripts/research/application_budget_table.py
+	$(PYTHON) scripts/research/application_budget_sensitivity_table.py
+
+# Re-exports that LP from the instance with the solver-free build and checks it against the
+# stored copy, so the input of the table above is traceable to the generator.
+research-application-export: audit-build
+	sed '/^configurarSolver/,$$d' $(APP_BUDGET_INSTANCE) > $(APP_BUDGET_DIR)/.export.in
+	printf 'configurarSolver --DummyLp --timeout 60 --mipgap 0.01\ngrabar $(APP_BUDGET_DIR)/.export.lp --noConstante\nsalir\n' >> $(APP_BUDGET_DIR)/.export.in
+	code/build-audit/SistemaElectrico < $(APP_BUDGET_DIR)/.export.in > /dev/null
+	gzip -dc $(APP_BUDGET_LP) | cmp - $(APP_BUDGET_DIR)/.export.lp \
+	    && echo "re-export matches $(APP_BUDGET_LP)"
+	rm -f $(APP_BUDGET_DIR)/.export.in $(APP_BUDGET_DIR)/.export.lp
 
 research-operational-analysis:
 	$(PYTHON) scripts/audit_operational_evidence.py --source results-revision/final-variants --output $(AUDIT_ROOT)/operational --timeout 1800 --bootstrap 10000

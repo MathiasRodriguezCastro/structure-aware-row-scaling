@@ -403,6 +403,46 @@ the dashed line ordinary GM already satisfies it. This diagram concerns the cond
 row contract, before reserving any integer-rounding allowance.}\label{fig:budget-compatibility}
 \end{figure}
 
+\section{The declared budgets of the application table}
+The budgets of the application table in the main text are declared by a modeller, not measured
+from an operating tolerance, so the natural objection is that admissibility was read off a
+convenient choice. Table~S7 scales all six declared budgets by a common multiplier and reports,
+per constraint group, the tightest multiplier at which each kernel is still admissible on every
+row of the group. Admissibility is monotone in the budget --- a larger $\delta$ only widens the
+interval of Proposition~5.1 --- so the tightest multiplier with full coverage is the point at
+which the contract starts to bind, and the data confirm the monotonicity on every group and
+kernel.
+
+All three kernels remain admissible on all 4,320 rows down to a multiplier of $10^{-4}$: the
+declared budgets could be tightened ten thousandfold before any of them loses a row. The two
+kernels the main text compares, the unit factor of Base and the geometric mean of Flat-GM,
+survive to $10^{-5}$. Below that the groups separate in the way the proposition predicts: the
+water balances, whose coefficients span the widest range, keep admitting the unit factor down to
+$10^{-9}$, while the Euclidean kernel of Flat-L2 is the first to leave the admissible interval
+on the four groups written in megawatts. The conclusion of the main text is therefore not an
+artifact of the particular numbers declared; it would take a tolerance four orders of magnitude
+tighter than a tenth of a megawatt to make the choice of kernel a question of admissibility
+rather than of conditioning.
+
+\begin{table}[tb]
+\centering\small
+\caption{Tightening the declared budgets of the application table. For each constraint group of
+caso46e, the smallest common multiplier of the declared budgets at which the kernel is still
+admissible on every row of the group, with $\epsilon=10^{-6}$ and the coefficient window
+$[10^{-9},10^{9}]$. A multiplier of one is the budget declared in the main text; smaller means a
+tighter tolerance. The sweep covers $10^{-16}$ to $10^{2}$.}
+\label{tab:application-budget-sensitivity}
+\input{tables/application-budget-sensitivity}
+\end{table}
+
+The analysis is reproducible without an optimizer. The exported LP it reads is stored beside the
+results, \path{results-revision/research-audit/application-budgets/caso46e-dummylp.lp.gz}, and
+\texttt{make research-application-export} re-exports it from the instance with the solver-free
+build and compares the two byte by byte; \texttt{make research-application-budgets} regenerates
+both tables from it. That export is written by the repository's own serializer rather than by
+Gurobi, as the archived one was: the two differ in the last digits of their decimal output, which
+moves the reported quantities of one group by a relative $10^{-15}$ and nothing in either table.
+
 \section{Independent verification and arithmetic checks}
 The independent script \path{scripts/research/verify_saved_experiment.py} imports
 neither the experiment runner nor an optimizer. For each of the 96 stored models it

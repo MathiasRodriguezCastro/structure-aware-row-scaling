@@ -1,0 +1,1576 @@
+
+########## 0/6 clone ##########
+2026-10-01T16:35:59-03:00
+[TIMING] clone exit=0 12s
+HEAD 0c0a0e8f43e19ed71e105bdf6752860bdf0d5b13
+5,3G	.
+
+########## 1/6 research-check-python ##########
+2026-10-01T16:36:11-03:00
+python3 -m pytest -q tests/test_budget_scaling.py tests/test_robustness_analysis.py
+..................                                                       [100%]
+18 passed in 0.68s
+python3 scripts/research/verify_saved_experiment.py --root results-revision/research-audit/budget-final
+{
+  "models_independently_enumerated": 96,
+  "configurations_audited": 3456,
+  "exact_dyadic_exports_checked": 768,
+  "abstentions_verified": 288,
+  "runs_sha256": "f0cfa86aa97e60dcca6985dd66b235883ecabafb1fe1f4de40a3b70b39840aa2",
+  "checker_sha256": "743ff0f6abf8d0eda3b7cc77e84088114bf771c873831bb361547bb9aa28adfa"
+}
+cd results-revision/research-audit/identifiability-final && sha256sum --quiet -c checksums.sha256
+[TIMING] check-python exit=0 2s
+
+########## 2/6 research-check (serializador C++) ##########
+2026-10-01T16:36:13-03:00
+make -C code BUILD_DIR=build-audit USE_GUROBI=0 USE_CPLEX=0 USE_CBC=0 USE_HEXALY=0
+make[1]: se entra en el directorio '/tmp/claude-1000/-home-mathiasr-Escritorio-proyectoTesis/87f05615-1c88-4221-805c-2e6480a4ce98/scratchpad/cleanroom/repo/code'
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c synthetic/ComandoBenchmarkSintetico.cpp -o build-audit/synthetic/ComandoBenchmarkSintetico.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c synthetic/GeneradorBenchmarkSintetico.cpp -o build-audit/synthetic/GeneradorBenchmarkSintetico.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c synthetic/RunnerBenchmarkSintetico.cpp -o build-audit/synthetic/RunnerBenchmarkSintetico.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/SystemController.cpp -o build-audit/SystemController/SystemController.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Agentes/Demanda/Demandas/DemandaFija.cpp -o build-audit/SystemController/Agentes/Demanda/Demandas/DemandaFija.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.cpp -o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Problema/Problema.cpp -o build-audit/SystemController/Problema/Problema.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Problema/ProblemaLp/ProblemaLp.cpp -o build-audit/SystemController/Problema/ProblemaLp/ProblemaLp.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.cpp -o build-audit/SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Despacho/Despacho.cpp -o build-audit/SystemController/Despacho/Despacho.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Despacho/DespachoMercado/DespachoMercado.cpp -o build-audit/SystemController/Despacho/DespachoMercado/DespachoMercado.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Despacho/DespachoFijo/DespachoFijo.cpp -o build-audit/SystemController/Despacho/DespachoFijo/DespachoFijo.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c SystemController/Despacho/DespachoProporcional/DespachoProporcional.cpp -o build-audit/SystemController/Despacho/DespachoProporcional/DespachoProporcional.o
+g++ -I. -Wall -Wextra -std=c++17 -g  -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c 1_SistemaElectrico.cpp -o build-audit/1_SistemaElectrico.o
+g++ build-audit/synthetic/ComandoBenchmarkSintetico.o build-audit/synthetic/GeneradorBenchmarkSintetico.o build-audit/synthetic/RunnerBenchmarkSintetico.o build-audit/SystemController/SystemController.o build-audit/SystemController/Agentes/Demanda/Demandas/DemandaFija.o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.o build-audit/SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.o build-audit/SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.o build-audit/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.o build-audit/SystemController/Problema/Problema.o build-audit/SystemController/Problema/ProblemaLp/ProblemaLp.o build-audit/SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.o build-audit/SystemController/Despacho/Despacho.o build-audit/SystemController/Despacho/DespachoMercado/DespachoMercado.o build-audit/SystemController/Despacho/DespachoFijo/DespachoFijo.o build-audit/SystemController/Despacho/DespachoProporcional/DespachoProporcional.o build-audit/1_SistemaElectrico.o -o build-audit/SistemaElectrico 
+Build done: build-audit/SistemaElectrico  (GUROBI=0 CPLEX=0 CBC=0 HEXALY=0 HIGHS=0)
+make[1]: se sale del directorio '/tmp/claude-1000/-home-mathiasr-Escritorio-proyectoTesis/87f05615-1c88-4221-805c-2e6480a4ce98/scratchpad/cleanroom/repo/code'
+python3 -m pytest -q tests/test_budget_scaling.py tests/test_robustness_analysis.py
+..................                                                       [100%]
+18 passed in 0.48s
+python3 scripts/research/verify_saved_experiment.py --root results-revision/research-audit/budget-final
+{
+  "models_independently_enumerated": 96,
+  "configurations_audited": 3456,
+  "exact_dyadic_exports_checked": 768,
+  "abstentions_verified": 288,
+  "runs_sha256": "f0cfa86aa97e60dcca6985dd66b235883ecabafb1fe1f4de40a3b70b39840aa2",
+  "checker_sha256": "743ff0f6abf8d0eda3b7cc77e84088114bf771c873831bb361547bb9aa28adfa"
+}
+cd results-revision/research-audit/identifiability-final && sha256sum --quiet -c checksums.sha256
+python3 -m pytest -q tests/test_export_roundtrip.py
+.                                                                        [100%]
+1 passed in 0.41s
+[TIMING] check-cpp exit=0 13s
+
+########## 3/6 research-analysis ##########
+2026-10-01T16:36:26-03:00
+python3 scripts/research/analyze_budget_experiment.py --root results-revision/research-audit/budget-final \
+    --extra-root results-revision/research-audit/budget-final-cplex \
+    --extra-classical-root results-revision/research-audit/exploration-lattice-cplex
+{
+  "discordant_counts": {
+    "Budget-GM vs GM (highs)": [
+      41,
+      0
+    ],
+    "Budget-GM vs GM (gurobi)": [
+      12,
+      0
+    ],
+    "Budget-dyadic vs Dyadic-GM (highs)": [
+      19,
+      0
+    ],
+    "Budget-dyadic vs Dyadic-GM (gurobi)": [
+      13,
+      0
+    ],
+    "Budget-only vs GM (highs)": [
+      50,
+      0
+    ],
+    "Budget-only vs GM (gurobi)": [
+      11,
+      0
+    ],
+    "GM vs Base (highs)": [
+      0,
+      26
+    ],
+    "GM vs Base (gurobi)": [
+      0,
+      16
+    ],
+    "Budget-only vs Base (highs)": [
+      24,
+      0
+    ],
+    "Budget-only vs Base (gurobi)": [
+      1,
+      6
+    ],
+    "Budget-GM vs Base (highs)": [
+      15,
+      0
+    ],
+    "Budget-GM vs Base (gurobi)": [
+      1,
+      5
+    ],
+    "Budget-dyadic vs Base (highs)": [
+      2,
+      8
+    ],
+    "Budget-dyadic vs Base (gurobi)": [
+      1,
+      4
+    ],
+    "GM-tight vs GM (highs)": [
+      25,
+      0
+    ],
+    "GM-tight vs GM (gurobi)": [
+      26,
+      0
+    ],
+    "Budget-only vs GM-tight (highs)": [
+      25,
+      0
+    ],
+    "Budget-only vs GM-tight (gurobi)": [
+      4,
+      19
+    ],
+    "Budget-only vs Budget-GM (highs)": [
+      9,
+      0
+    ],
+    "Budget-only vs Budget-GM (gurobi)": [
+      0,
+      1
+    ]
+  },
+  "budget_only_vs_budget_gm": {
+    "discordant_configurations": 10,
+    "max_factor_ulp_distance_on_discordant": 1,
+    "exponents_with_discordant_outcomes": [
+      6,
+      9
+    ],
+    "max_factor_ulp_distance_for_exponent_6_and_9": 1
+  }
+}
+{
+  "discordant_counts": {
+    "Budget-GM vs GM (cplex)": [
+      0,
+      0
+    ],
+    "Budget-dyadic vs Dyadic-GM (cplex)": [
+      0,
+      0
+    ],
+    "Budget-only vs GM (cplex)": [
+      0,
+      0
+    ],
+    "GM vs Base (cplex)": [
+      0,
+      10
+    ],
+    "Budget-only vs Base (cplex)": [
+      0,
+      10
+    ],
+    "Budget-GM vs Base (cplex)": [
+      0,
+      10
+    ],
+    "Budget-dyadic vs Base (cplex)": [
+      0,
+      10
+    ],
+    "GM-tight vs GM (cplex)": [
+      26,
+      0
+    ],
+    "Budget-only vs GM-tight (cplex)": [
+      0,
+      26
+    ],
+    "Budget-only vs Budget-GM (cplex)": [
+      0,
+      0
+    ]
+  },
+  "budget_only_vs_budget_gm": {
+    "discordant_configurations": 0,
+    "max_factor_ulp_distance_on_discordant": null,
+    "exponents_with_discordant_outcomes": [],
+    "max_factor_ulp_distance_for_exponent_6_and_9": 1
+  }
+}
+                        n  attempted  abstained  exact_optimal  failed
+solver method                                                         
+highs  L2             192        192          0            141      51
+gurobi L2             192        192          0            139      53
+highs  Budget-GM      192        192          0            182      10
+gurobi Budget-GM      192        192          0            152      40
+highs  GM             192        192          0            141      51
+gurobi GM             192        192          0            140      52
+highs  Dyadic-GM      192        192          0            142      50
+gurobi Dyadic-GM      192        192          0            140      52
+highs  Base           192        192          0            167      25
+gurobi Base           192        192          0            156      36
+highs  Budget-round   192         48        144             48       0
+gurobi Budget-round   192         48        144             48       0
+highs  Budget-only    192        192          0            191       1
+gurobi Budget-only    192        192          0            151      41
+highs  GM-tight       192        192          0            166      26
+gurobi GM-tight       192        192          0            166      26
+highs  Budget-dyadic  192        192          0            161      31
+gurobi Budget-dyadic  192        192          0            153      39
+cplex  L2             192        192          0            140      52
+       Budget-GM      192        192          0            140      52
+       GM             192        192          0            140      52
+       Dyadic-GM      192        192          0            140      52
+       Base           192        192          0            150      42
+       Budget-round   192         48        144             48       0
+       Budget-only    192        192          0            140      52
+       GM-tight       192        192          0            166      26
+       Budget-dyadic  192        192          0            140      52
+highs  GCD-floor      192        192          0            192       0
+gurobi GCD-floor      192        192          0            192       0
+cplex  GCD-floor      192        192          0            192       0
+python3 scripts/research/analyze_identifiability.py
+     control  block_range  n  ratio_min  ratio_median  ratio_max  byte_equal
+     Flat-GM            1 60   0.721482      0.936971   1.583883         0.0
+     Flat-GM            2 60   0.073950      0.101525   0.176784         0.0
+     Flat-GM            3 60   0.006735      0.009726   0.017689         0.0
+ Role-Hybrid            1 60   0.943340      1.000000   1.059112        44.0
+ Role-Hybrid            2 60   0.939004      1.000000   1.016773        46.0
+ Role-Hybrid            3 60   0.956750      1.000000   1.079492        46.0
+SA-Mat-permB            1 60   0.999619      1.000000   1.000212        55.0
+SA-Mat-permB            2 60   0.999999      1.000000   1.000001        55.0
+SA-Mat-permB            3 60   1.000000      1.000000   1.000000        55.0
+     Flat-L2            1 60   2.070910      2.700764   4.470116         NaN
+     Flat-L2            2 60   1.830469      2.689414   4.224945         NaN
+     Flat-L2            3 60   1.968636      2.610504   4.471790         NaN
+python3 scripts/audit_operational_evidence.py --source results-revision/final-variants --output results-revision/research-audit/operational --timeout 1800 --bootstrap 10000
+Audited 240 runs; wrote /tmp/claude-1000/-home-mathiasr-Escritorio-proyectoTesis/87f05615-1c88-4221-805c-2e6480a4ce98/scratchpad/cleanroom/repo/results-revision/research-audit/operational
+cp results-revision/research-audit/operational/main_table_four_cells.tex paper/tables/operational-results.tex
+python3 scripts/research/analyze_fixed_basis.py --root results-revision/research-audit/fixed-basis-final-20260914
+{
+  "attempts": {
+    "complete": 306
+  },
+  "classes": {
+    "Simple": {
+      "n": 204,
+      "median_base_kappa1": 8.842908576565504e+18,
+      "min_base_kappa1": 6.650101573901239e+17,
+      "max_base_kappa1": 9.251235234952672e+19,
+      "Flat-GM": {
+        "median_ratio": 2.3671739216977932e-07,
+        "min_ratio": 1.8698370312023577e-08,
+        "max_ratio": 0.0016813442186058795,
+        "improved": 204,
+        "median_kappa1": 1597700202190.1484,
+        "max_kappa1": 1.676712708989365e+16,
+        "median_log10_ratio": -6.625796304666242
+      },
+      "Flat-L2": {
+        "median_ratio": 1.5689918365767923,
+        "min_ratio": 0.00032580986976481755,
+        "max_ratio": 273.737621057848,
+        "improved": 32,
+        "median_kappa1": 1.3701127836344715e+19,
+        "max_kappa1": 2.729835705723487e+21,
+        "median_log10_ratio": 0.19562056913694903
+      },
+      "Role-Hybrid": {
+        "median_ratio": 2.3671739216977932e-07,
+        "min_ratio": 1.8698370312023577e-08,
+        "max_ratio": 0.0016813442186058795,
+        "improved": 204,
+        "median_kappa1": 1597700202190.1484,
+        "max_kappa1": 1.676712708989365e+16,
+        "median_log10_ratio": -6.625796304666242
+      },
+      "SA-Mat": {
+        "median_ratio": 2.3671739216977932e-07,
+        "min_ratio": 1.8698370312023577e-08,
+        "max_ratio": 0.0016813442186058795,
+        "improved": 204,
+        "median_kappa1": 1597700202190.1484,
+        "max_kappa1": 1.676712708989365e+16,
+        "median_log10_ratio": -6.625796304666242
+      },
+      "identical_basis_matrices": {
+        "SA-Mat = Role-Hybrid": 204,
+        "SA-Mat = Flat-GM": 204,
+        "Role-Hybrid = Flat-GM": 204,
+        "Flat-GM = Flat-L2": 0
+      },
+      "max_scaled_kappa1": 2.729835705723487e+21,
+      "min_orders_of_magnitude_improvement": -2.437334488659771,
+      "max_estimator_spread": 2.0972771819126383,
+      "max_lu_backward_error": 1.9321073608960906e-08,
+      "max_row_scaling_relative_error": 2.1750018314792822e-16
+    },
+    "SG-Ter-Mer": {
+      "n": 68,
+      "median_base_kappa1": 2.9384777001796777e+20,
+      "min_base_kappa1": 2976722679.529262,
+      "max_base_kappa1": 1.1798831437606604e+21,
+      "Flat-GM": {
+        "median_ratio": 7.336841151670575e-09,
+        "min_ratio": 1.5072353264439894e-09,
+        "max_ratio": 0.012162173774867193,
+        "improved": 68,
+        "median_kappa1": 1455842654810.475,
+        "max_kappa1": 7370750773362786.0,
+        "median_log10_ratio": -8.134490935939825
+      },
+      "Flat-L2": {
+        "median_ratio": 1.510873989651321,
+        "min_ratio": 0.0008138896962530548,
+        "max_ratio": 18.605234006793808,
+        "improved": 10,
+        "median_kappa1": 4.721557660033949e+20,
+        "max_kappa1": 2.1952001990338625e+22,
+        "median_log10_ratio": 0.17922824469564305
+      },
+      "Role-Hybrid": {
+        "median_ratio": 7.336841151670575e-09,
+        "min_ratio": 1.5072353264439894e-09,
+        "max_ratio": 0.5675889452950487,
+        "improved": 68,
+        "median_kappa1": 1455842654810.475,
+        "max_kappa1": 7370750773362786.0,
+        "median_log10_ratio": -8.134490935939825
+      },
+      "SA-Mat": {
+        "median_ratio": 7.336841151670575e-09,
+        "min_ratio": 1.5072353264439894e-09,
+        "max_ratio": 0.5675889452950487,
+        "improved": 68,
+        "median_kappa1": 1455842654810.475,
+        "max_kappa1": 7370750773362786.0,
+        "median_log10_ratio": -8.134490935939825
+      },
+      "identical_basis_matrices": {
+        "SA-Mat = Role-Hybrid": 68,
+        "SA-Mat = Flat-GM": 0,
+        "Role-Hybrid = Flat-GM": 0,
+        "Flat-GM = Flat-L2": 0
+      },
+      "max_scaled_kappa1": 2.1952001990338625e+22,
+      "min_orders_of_magnitude_improvement": -1.2696351367182175,
+      "max_estimator_spread": 1.0,
+      "max_lu_backward_error": 2.392363326978873e-10,
+      "max_row_scaling_relative_error": 1.545701637747107e-16
+    },
+    "Full": {
+      "n": 34,
+      "median_base_kappa1": 4.2888591281824006e+20,
+      "min_base_kappa1": 7.706571739049237e+19,
+      "max_base_kappa1": 1.154879618719341e+22,
+      "Flat-GM": {
+        "median_ratio": 3.5417689913828563e-07,
+        "min_ratio": 9.319547990307655e-09,
+        "max_ratio": 3.0546337845066452e-06,
+        "improved": 34,
+        "median_kappa1": 152341713680098.88,
+        "max_kappa1": 3.5277343003782524e+16,
+        "median_log10_ratio": -6.451966435378484
+      },
+      "Flat-L2": {
+        "median_ratio": 1.4913210476400163,
+        "min_ratio": 0.8537146022908018,
+        "max_ratio": 146.89909585431212,
+        "improved": 2,
+        "median_kappa1": 6.313739798621445e+20,
+        "max_kappa1": 2.4750840767360918e+23,
+        "median_log10_ratio": 0.17353216938848745
+      },
+      "Role-Hybrid": {
+        "median_ratio": 3.5417689913828563e-07,
+        "min_ratio": 9.319547990307655e-09,
+        "max_ratio": 3.0546337845066452e-06,
+        "improved": 34,
+        "median_kappa1": 152341713680098.88,
+        "max_kappa1": 3.5277343003782524e+16,
+        "median_log10_ratio": -6.451966435378484
+      },
+      "SA-Mat": {
+        "median_ratio": 3.5417689913828563e-07,
+        "min_ratio": 9.319547990307655e-09,
+        "max_ratio": 3.0546337845066452e-06,
+        "improved": 34,
+        "median_kappa1": 152341713680098.88,
+        "max_kappa1": 3.5277343003782524e+16,
+        "median_log10_ratio": -6.451966435378484
+      },
+      "identical_basis_matrices": {
+        "SA-Mat = Role-Hybrid": 34,
+        "SA-Mat = Flat-GM": 0,
+        "Role-Hybrid = Flat-GM": 0,
+        "Flat-GM = Flat-L2": 0
+      },
+      "max_scaled_kappa1": 2.4750840767360918e+23,
+      "min_orders_of_magnitude_improvement": -2.1670191227698923,
+      "max_estimator_spread": 2.388062629142419,
+      "max_lu_backward_error": 4.7880109944342125e-09,
+      "max_row_scaling_relative_error": 2.4973069363109213e-16
+    }
+  },
+  "precision_check": [
+    {
+      "class": "simple",
+      "instance": "caso32e.txt",
+      "enclosure_width": 0.00014893282513295247,
+      "ratio_estimate": 2.405260639143927e-06,
+      "ratio_upper_bound": 2.4052693195005535e-06,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "simple",
+      "instance": "caso05f.txt",
+      "enclosure_width": 0.003714353213867483,
+      "ratio_estimate": 0.00168134421860588,
+      "ratio_upper_bound": 0.001681368868191822,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "simple",
+      "instance": "caso27f.txt",
+      "enclosure_width": 1.861054540142071e-05,
+      "ratio_estimate": 1.0765227948168026e-07,
+      "ratio_upper_bound": 1.0765227968357147e-07,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance067.txt",
+      "enclosure_width": 0.0040772501410786255,
+      "ratio_estimate": 6.247017607074098e-06,
+      "ratio_upper_bound": 6.247035429747434e-06,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance028.txt",
+      "enclosure_width": 1.5344453485610643e-06,
+      "ratio_estimate": 0.012162173774867193,
+      "ratio_upper_bound": 0.012162173788696861,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance074.txt",
+      "enclosure_width": 9.507589468982225e-05,
+      "ratio_estimate": 2.2765253332985323e-09,
+      "ratio_upper_bound": 2.2765253345084903e-09,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "full",
+      "instance": "instance014.txt",
+      "enclosure_width": 0.006016880617454312,
+      "ratio_estimate": 3.0546337845066452e-06,
+      "ratio_upper_bound": 3.0546968916351256e-06,
+      "estimates_inside_enclosure": 3
+    },
+    {
+      "class": "full",
+      "instance": "instance046.txt",
+      "enclosure_width": 0.00027485113614145185,
+      "ratio_estimate": 6.045850171795517e-07,
+      "ratio_upper_bound": 6.045850824272256e-07,
+      "estimates_inside_enclosure": 2
+    }
+  ],
+  "independent_verification": {
+    "records": 1530,
+    "source_coefficients_checked": 53797010,
+    "basis_coefficients_reconstructed": 53454365,
+    "all_exact_basis_matches": true,
+    "max_alternative_route_relative_difference": 0.22599843264173008,
+    "max_alternative_route_componentwise_backward_error": 0.00023062829413651563,
+    "max_alternative_route_test_solution_relative_difference": 1.0418299349118387e-12,
+    "independent_of_driver_and_highs_reader": true,
+    "fresh_results_sha256": "8575e5fd3312b9512cab91125c29dfef0b2c8c472c5a8bbb3e3e31e1dfc86862",
+    "verifier_sha256": "e0d39609e66eb97ae47c5ba09dd68d0961cf4bf77c185bf2554f9297f805fc03",
+    "text_parser_sha256": "7ff25f9eb29161dbcb99ee940dd97005a390bc47bb0ec4de0e346b5adfb083bf"
+  }
+}
+[TIMING] analysis exit=0 6s
+
+########## 4/6 research-fixed-basis-check (1530 bases desde el texto LP) ##########
+2026-10-01T16:36:32-03:00
+OPENBLAS_NUM_THREADS=1 python3 scripts/research/verify_fixed_basis.py results-revision/research-audit/fixed-basis-final-20260914
+simple caso01a.txt Base verified route_relative_difference 0.0
+simple caso01a.txt Flat-GM verified route_relative_difference 2.2427239466371236e-14
+simple caso01a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso01a.txt Role-Hybrid verified route_relative_difference 2.2427239466371236e-14
+simple caso01a.txt SA-Mat verified route_relative_difference 2.2427239466371236e-14
+simple caso01b.txt Base verified route_relative_difference 1.2095250193140509e-14
+simple caso01b.txt Flat-GM verified route_relative_difference 1.2725255782833414e-14
+simple caso01b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso01b.txt Role-Hybrid verified route_relative_difference 1.2725255782833414e-14
+simple caso01b.txt SA-Mat verified route_relative_difference 1.2725255782833414e-14
+simple caso01c.txt Base verified route_relative_difference 2.3792520769214983e-16
+simple caso01c.txt Flat-GM verified route_relative_difference 3.461054347057271e-14
+simple caso01c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso01c.txt Role-Hybrid verified route_relative_difference 3.461054347057271e-14
+simple caso01c.txt SA-Mat verified route_relative_difference 3.461054347057271e-14
+simple caso01d.txt Base verified route_relative_difference 1.1896260384607491e-16
+simple caso01d.txt Flat-GM verified route_relative_difference 1.4175158964584427e-14
+simple caso01d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso01d.txt Role-Hybrid verified route_relative_difference 1.4175158964584427e-14
+simple caso01d.txt SA-Mat verified route_relative_difference 1.4175158964584427e-14
+simple caso01e.txt Base verified route_relative_difference 0.0
+simple caso01e.txt Flat-GM verified route_relative_difference 3.531185650781184e-14
+simple caso01e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso01e.txt Role-Hybrid verified route_relative_difference 3.531185650781184e-14
+simple caso01e.txt SA-Mat verified route_relative_difference 3.531185650781184e-14
+simple caso01f.txt Base verified route_relative_difference 1.1896260384607491e-16
+simple caso01f.txt Flat-GM verified route_relative_difference 1.7776362825172178e-15
+simple caso01f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso01f.txt Role-Hybrid verified route_relative_difference 1.7776362825172178e-15
+simple caso01f.txt SA-Mat verified route_relative_difference 1.7776362825172178e-15
+simple caso02a.txt Base verified route_relative_difference 0.0
+simple caso02a.txt Flat-GM verified route_relative_difference 3.36701586447641e-14
+simple caso02a.txt Flat-L2 verified route_relative_difference 6.580091845805488e-16
+simple caso02a.txt Role-Hybrid verified route_relative_difference 3.36701586447641e-14
+simple caso02a.txt SA-Mat verified route_relative_difference 3.36701586447641e-14
+simple caso02b.txt Base verified route_relative_difference 3.400113438708131e-14
+simple caso02b.txt Flat-GM verified route_relative_difference 3.2858283759130105e-14
+simple caso02b.txt Flat-L2 verified route_relative_difference 1.331146563310148e-14
+simple caso02b.txt Role-Hybrid verified route_relative_difference 3.2858283759130105e-14
+simple caso02b.txt SA-Mat verified route_relative_difference 3.2858283759130105e-14
+simple caso02c.txt Base verified route_relative_difference 0.0
+simple caso02c.txt Flat-GM verified route_relative_difference 2.8258274906310252e-14
+simple caso02c.txt Flat-L2 verified route_relative_difference 2.5112710010565966e-16
+simple caso02c.txt Role-Hybrid verified route_relative_difference 2.8258274906310252e-14
+simple caso02c.txt SA-Mat verified route_relative_difference 2.8258274906310252e-14
+simple caso02d.txt Base verified route_relative_difference 2.266561484692978e-16
+simple caso02d.txt Flat-GM verified route_relative_difference 2.0203070322938584e-14
+simple caso02d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso02d.txt Role-Hybrid verified route_relative_difference 2.0203070322938584e-14
+simple caso02d.txt SA-Mat verified route_relative_difference 2.0203070322938584e-14
+simple caso02e.txt Base verified route_relative_difference 0.0
+simple caso02e.txt Flat-GM verified route_relative_difference 0.12057279064356247
+simple caso02e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso02e.txt Role-Hybrid verified route_relative_difference 0.12057279064356247
+simple caso02e.txt SA-Mat verified route_relative_difference 0.12057279064356247
+simple caso02f.txt Base verified route_relative_difference 0.0
+simple caso02f.txt Flat-GM verified route_relative_difference 3.5088727252884567e-14
+simple caso02f.txt Flat-L2 verified route_relative_difference 1.4122978083769602e-16
+simple caso02f.txt Role-Hybrid verified route_relative_difference 3.5088727252884567e-14
+simple caso02f.txt SA-Mat verified route_relative_difference 3.5088727252884567e-14
+simple caso03a.txt Base verified route_relative_difference 2.2267118606876385e-16
+simple caso03a.txt Flat-GM verified route_relative_difference 3.1123802135708355e-16
+simple caso03a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso03a.txt Role-Hybrid verified route_relative_difference 3.1123802135708355e-16
+simple caso03a.txt SA-Mat verified route_relative_difference 3.1123802135708355e-16
+simple caso03b.txt Base verified route_relative_difference 0.0
+simple caso03b.txt Flat-GM verified route_relative_difference 3.8765908849779505e-15
+simple caso03b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso03b.txt Role-Hybrid verified route_relative_difference 3.8765908849779505e-15
+simple caso03b.txt SA-Mat verified route_relative_difference 3.8765908849779505e-15
+simple caso03c.txt Base verified route_relative_difference 0.0
+simple caso03c.txt Flat-GM verified route_relative_difference 9.262687468391049e-15
+simple caso03c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso03c.txt Role-Hybrid verified route_relative_difference 9.262687468391049e-15
+simple caso03c.txt SA-Mat verified route_relative_difference 9.262687468391049e-15
+simple caso03d.txt Base verified route_relative_difference 1.1133554871284139e-16
+simple caso03d.txt Flat-GM verified route_relative_difference 1.1375464566535326e-14
+simple caso03d.txt Flat-L2 verified route_relative_difference 1.629848199965699e-15
+simple caso03d.txt Role-Hybrid verified route_relative_difference 1.1375464566535326e-14
+simple caso03d.txt SA-Mat verified route_relative_difference 1.1375464566535326e-14
+simple caso03e.txt Base verified route_relative_difference 0.0
+simple caso03e.txt Flat-GM verified route_relative_difference 2.577851491448719e-14
+simple caso03e.txt Flat-L2 verified route_relative_difference 2.494017130881885e-16
+simple caso03e.txt Role-Hybrid verified route_relative_difference 2.577851491448719e-14
+simple caso03e.txt SA-Mat verified route_relative_difference 2.577851491448719e-14
+simple caso03f.txt Base verified route_relative_difference 0.0
+simple caso03f.txt Flat-GM verified route_relative_difference 2.5213964546831352e-15
+simple caso03f.txt Flat-L2 verified route_relative_difference 4.826852249810065e-16
+simple caso03f.txt Role-Hybrid verified route_relative_difference 2.5213964546831352e-15
+simple caso03f.txt SA-Mat verified route_relative_difference 2.5213964546831352e-15
+simple caso04a.txt Base verified route_relative_difference 1.3484657515435475e-14
+simple caso04a.txt Flat-GM verified route_relative_difference 3.434316794300042e-14
+simple caso04a.txt Flat-L2 verified route_relative_difference 1.84685250730104e-14
+simple caso04a.txt Role-Hybrid verified route_relative_difference 3.434316794300042e-14
+simple caso04a.txt SA-Mat verified route_relative_difference 3.434316794300042e-14
+simple caso04b.txt Base verified route_relative_difference 2.287662941822364e-14
+simple caso04b.txt Flat-GM verified route_relative_difference 1.5801326748915583e-14
+simple caso04b.txt Flat-L2 verified route_relative_difference 2.128930709634703e-14
+simple caso04b.txt Role-Hybrid verified route_relative_difference 1.5801326748915583e-14
+simple caso04b.txt SA-Mat verified route_relative_difference 1.5801326748915583e-14
+simple caso04c.txt Base verified route_relative_difference 9.712305134548219e-15
+simple caso04c.txt Flat-GM verified route_relative_difference 2.3883891194142753e-14
+simple caso04c.txt Flat-L2 verified route_relative_difference 7.740106552365491e-15
+simple caso04c.txt Role-Hybrid verified route_relative_difference 2.3883891194142753e-14
+simple caso04c.txt SA-Mat verified route_relative_difference 2.3883891194142753e-14
+simple caso04d.txt Base verified route_relative_difference 0.0
+simple caso04d.txt Flat-GM verified route_relative_difference 4.368285955126177e-15
+simple caso04d.txt Flat-L2 verified route_relative_difference 6.135056414133403e-16
+simple caso04d.txt Role-Hybrid verified route_relative_difference 4.368285955126177e-15
+simple caso04d.txt SA-Mat verified route_relative_difference 4.368285955126177e-15
+simple caso04e.txt Base verified route_relative_difference 0.0
+simple caso04e.txt Flat-GM verified route_relative_difference 6.19618242795755e-15
+simple caso04e.txt Flat-L2 verified route_relative_difference 1.632494479731762e-16
+simple caso04e.txt Role-Hybrid verified route_relative_difference 6.19618242795755e-15
+simple caso04e.txt SA-Mat verified route_relative_difference 6.19618242795755e-15
+simple caso04f.txt Base verified route_relative_difference 0.0
+simple caso04f.txt Flat-GM verified route_relative_difference 1.1601776041907789e-14
+simple caso04f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso04f.txt Role-Hybrid verified route_relative_difference 1.1601776041907789e-14
+simple caso04f.txt SA-Mat verified route_relative_difference 1.1601776041907789e-14
+simple caso05a.txt Base verified route_relative_difference 9.815225434880158e-15
+simple caso05a.txt Flat-GM verified route_relative_difference 1.328946599142508e-14
+simple caso05a.txt Flat-L2 verified route_relative_difference 1.9295890688133363e-15
+simple caso05a.txt Role-Hybrid verified route_relative_difference 1.328946599142508e-14
+simple caso05a.txt SA-Mat verified route_relative_difference 1.328946599142508e-14
+simple caso05b.txt Base verified route_relative_difference 8.821171192796704e-15
+simple caso05b.txt Flat-GM verified route_relative_difference 1.68319079596218e-14
+simple caso05b.txt Flat-L2 verified route_relative_difference 4.268717650307058e-15
+simple caso05b.txt Role-Hybrid verified route_relative_difference 1.68319079596218e-14
+simple caso05b.txt SA-Mat verified route_relative_difference 1.68319079596218e-14
+simple caso05c.txt Base verified route_relative_difference 9.596175378541932e-15
+simple caso05c.txt Flat-GM verified route_relative_difference 3.575298943802896e-15
+simple caso05c.txt Flat-L2 verified route_relative_difference 7.700104930667685e-16
+simple caso05c.txt Role-Hybrid verified route_relative_difference 3.575298943802896e-15
+simple caso05c.txt SA-Mat verified route_relative_difference 3.575298943802896e-15
+simple caso05d.txt Base verified route_relative_difference 0.0
+simple caso05d.txt Flat-GM verified route_relative_difference 8.650500777577117e-15
+simple caso05d.txt Flat-L2 verified route_relative_difference 2.9912851749727154e-16
+simple caso05d.txt Role-Hybrid verified route_relative_difference 8.650500777577117e-15
+simple caso05d.txt SA-Mat verified route_relative_difference 8.650500777577117e-15
+simple caso05e.txt Base verified route_relative_difference 2.053657111378894e-16
+simple caso05e.txt Flat-GM verified route_relative_difference 9.582022766470045e-15
+simple caso05e.txt Flat-L2 verified route_relative_difference 4.486927762459073e-16
+simple caso05e.txt Role-Hybrid verified route_relative_difference 9.582022766470045e-15
+simple caso05e.txt SA-Mat verified route_relative_difference 9.582022766470045e-15
+simple caso05f.txt Base verified route_relative_difference 0.0
+simple caso05f.txt Flat-GM verified route_relative_difference 1.3478755113404073e-14
+simple caso05f.txt Flat-L2 verified route_relative_difference 1.670908469120166e-14
+simple caso05f.txt Role-Hybrid verified route_relative_difference 1.3478755113404073e-14
+simple caso05f.txt SA-Mat verified route_relative_difference 1.3478755113404073e-14
+simple caso09a.txt Base verified route_relative_difference 1.783820139354463e-15
+simple caso09a.txt Flat-GM verified route_relative_difference 5.471804847982406e-15
+simple caso09a.txt Flat-L2 verified route_relative_difference 2.3658486228826605e-15
+simple caso09a.txt Role-Hybrid verified route_relative_difference 5.471804847982406e-15
+simple caso09a.txt SA-Mat verified route_relative_difference 5.471804847982406e-15
+simple caso09b.txt Base verified route_relative_difference 1.3537538831595398e-14
+simple caso09b.txt Flat-GM verified route_relative_difference 2.4053082247964286e-14
+simple caso09b.txt Flat-L2 verified route_relative_difference 5.4844571209890315e-14
+simple caso09b.txt Role-Hybrid verified route_relative_difference 2.4053082247964286e-14
+simple caso09b.txt SA-Mat verified route_relative_difference 2.4053082247964286e-14
+simple caso09c.txt Base verified route_relative_difference 2.3784268524726207e-15
+simple caso09c.txt Flat-GM verified route_relative_difference 1.8239349493274672e-15
+simple caso09c.txt Flat-L2 verified route_relative_difference 2.9730434719365305e-15
+simple caso09c.txt Role-Hybrid verified route_relative_difference 1.8239349493274672e-15
+simple caso09c.txt SA-Mat verified route_relative_difference 1.8239349493274672e-15
+simple caso09d.txt Base verified route_relative_difference 2.05615810866121e-16
+simple caso09d.txt Flat-GM verified route_relative_difference 2.2157916837613112e-14
+simple caso09d.txt Flat-L2 verified route_relative_difference 1.7401119116787559e-16
+simple caso09d.txt Role-Hybrid verified route_relative_difference 2.2157916837613112e-14
+simple caso09d.txt SA-Mat verified route_relative_difference 2.2157916837613112e-14
+simple caso09e.txt Base verified route_relative_difference 9.579544357751527e-15
+simple caso09e.txt Flat-GM verified route_relative_difference 2.3645624230102703e-14
+simple caso09e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso09e.txt Role-Hybrid verified route_relative_difference 2.3645624230102703e-14
+simple caso09e.txt SA-Mat verified route_relative_difference 2.3645624230102703e-14
+simple caso09f.txt Base verified route_relative_difference 2.0561581086612095e-16
+simple caso09f.txt Flat-GM verified route_relative_difference 1.9353118610943263e-14
+simple caso09f.txt Flat-L2 verified route_relative_difference 1.3776795328441335e-16
+simple caso09f.txt Role-Hybrid verified route_relative_difference 1.9353118610943263e-14
+simple caso09f.txt SA-Mat verified route_relative_difference 1.9353118610943263e-14
+simple caso10a.txt Base verified route_relative_difference 6.305518080730376e-15
+simple caso10a.txt Flat-GM verified route_relative_difference 2.007476318679003e-14
+simple caso10a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso10a.txt Role-Hybrid verified route_relative_difference 2.007476318679003e-14
+simple caso10a.txt SA-Mat verified route_relative_difference 2.007476318679003e-14
+simple caso10b.txt Base verified route_relative_difference 3.75400908061786e-15
+simple caso10b.txt Flat-GM verified route_relative_difference 1.2014755108589663e-14
+simple caso10b.txt Flat-L2 verified route_relative_difference 1.9535555458315694e-14
+simple caso10b.txt Role-Hybrid verified route_relative_difference 1.2014755108589663e-14
+simple caso10b.txt SA-Mat verified route_relative_difference 1.2014755108589663e-14
+simple caso10c.txt Base verified route_relative_difference 7.205773329941847e-15
+simple caso10c.txt Flat-GM verified route_relative_difference 1.7364118035017127e-14
+simple caso10c.txt Flat-L2 verified route_relative_difference 1.3357534706177805e-16
+simple caso10c.txt Role-Hybrid verified route_relative_difference 1.7364118035017127e-14
+simple caso10c.txt SA-Mat verified route_relative_difference 1.7364118035017127e-14
+simple caso10d.txt Base verified route_relative_difference 0.0
+simple caso10d.txt Flat-GM verified route_relative_difference 1.526612303695548e-14
+simple caso10d.txt Flat-L2 verified route_relative_difference 2.6566507923658433e-16
+simple caso10d.txt Role-Hybrid verified route_relative_difference 1.526612303695548e-14
+simple caso10d.txt SA-Mat verified route_relative_difference 1.526612303695548e-14
+simple caso10e.txt Base verified route_relative_difference 0.0
+simple caso10e.txt Flat-GM verified route_relative_difference 1.3953862460422995e-14
+simple caso10e.txt Flat-L2 verified route_relative_difference 1.4884052232422213e-14
+simple caso10e.txt Role-Hybrid verified route_relative_difference 1.3953862460422995e-14
+simple caso10e.txt SA-Mat verified route_relative_difference 1.3953862460422995e-14
+simple caso10f.txt Base verified route_relative_difference 0.0
+simple caso10f.txt Flat-GM verified route_relative_difference 9.260101474265906e-16
+simple caso10f.txt Flat-L2 verified route_relative_difference 2.6566507923658433e-16
+simple caso10f.txt Role-Hybrid verified route_relative_difference 9.260101474265906e-16
+simple caso10f.txt SA-Mat verified route_relative_difference 9.260101474265906e-16
+simple caso11a.txt Base verified route_relative_difference 2.175855263605026e-15
+simple caso11a.txt Flat-GM verified route_relative_difference 1.3456603017584023e-14
+simple caso11a.txt Flat-L2 verified route_relative_difference 8.83944392447673e-15
+simple caso11a.txt Role-Hybrid verified route_relative_difference 1.3456603017584023e-14
+simple caso11a.txt SA-Mat verified route_relative_difference 1.3456603017584023e-14
+simple caso11b.txt Base verified route_relative_difference 1.508723688285269e-14
+simple caso11b.txt Flat-GM verified route_relative_difference 2.3794929077977204e-14
+simple caso11b.txt Flat-L2 verified route_relative_difference 1.8162842337938214e-16
+simple caso11b.txt Role-Hybrid verified route_relative_difference 2.3794929077977204e-14
+simple caso11b.txt SA-Mat verified route_relative_difference 2.3794929077977204e-14
+simple caso11c.txt Base verified route_relative_difference 1.7569027648404296e-14
+simple caso11c.txt Flat-GM verified route_relative_difference 1.7648627659822768e-14
+simple caso11c.txt Flat-L2 verified route_relative_difference 1.0541454879122501e-14
+simple caso11c.txt Role-Hybrid verified route_relative_difference 1.7648627659822768e-14
+simple caso11c.txt SA-Mat verified route_relative_difference 1.7648627659822768e-14
+simple caso11d.txt Base verified route_relative_difference 0.0
+simple caso11d.txt Flat-GM verified route_relative_difference 4.4401338260929134e-14
+simple caso11d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso11d.txt Role-Hybrid verified route_relative_difference 4.4401338260929134e-14
+simple caso11d.txt SA-Mat verified route_relative_difference 4.4401338260929134e-14
+simple caso11e.txt Base verified route_relative_difference 0.0
+simple caso11e.txt Flat-GM verified route_relative_difference 9.042642902660149e-15
+simple caso11e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso11e.txt Role-Hybrid verified route_relative_difference 9.042642902660149e-15
+simple caso11e.txt SA-Mat verified route_relative_difference 9.042642902660149e-15
+simple caso11f.txt Base verified route_relative_difference 2.454850452472248e-16
+simple caso11f.txt Flat-GM verified route_relative_difference 3.532193361922565e-14
+simple caso11f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso11f.txt Role-Hybrid verified route_relative_difference 3.532193361922565e-14
+simple caso11f.txt SA-Mat verified route_relative_difference 3.532193361922565e-14
+simple caso12a.txt Base verified route_relative_difference 2.115592717825526e-14
+simple caso12a.txt Flat-GM verified route_relative_difference 6.7659940577833515e-15
+simple caso12a.txt Flat-L2 verified route_relative_difference 6.289670457603569e-15
+simple caso12a.txt Role-Hybrid verified route_relative_difference 6.7659940577833515e-15
+simple caso12a.txt SA-Mat verified route_relative_difference 6.7659940577833515e-15
+simple caso12b.txt Base verified route_relative_difference 6.576156740632961e-15
+simple caso12b.txt Flat-GM verified route_relative_difference 2.5759309142422082e-15
+simple caso12b.txt Flat-L2 verified route_relative_difference 1.2264968117497976e-14
+simple caso12b.txt Role-Hybrid verified route_relative_difference 2.5759309142422082e-15
+simple caso12b.txt SA-Mat verified route_relative_difference 2.5759309142422082e-15
+simple caso12c.txt Base verified route_relative_difference 1.2308241512391311e-14
+simple caso12c.txt Flat-GM verified route_relative_difference 4.299550524835376e-15
+simple caso12c.txt Flat-L2 verified route_relative_difference 1.303602854405561e-15
+simple caso12c.txt Role-Hybrid verified route_relative_difference 4.299550524835376e-15
+simple caso12c.txt SA-Mat verified route_relative_difference 4.299550524835376e-15
+simple caso12d.txt Base verified route_relative_difference 1.924782630423938e-16
+simple caso12d.txt Flat-GM verified route_relative_difference 1.6826495422889606e-14
+simple caso12d.txt Flat-L2 verified route_relative_difference 1.576696334850723e-14
+simple caso12d.txt Role-Hybrid verified route_relative_difference 1.6826495422889606e-14
+simple caso12d.txt SA-Mat verified route_relative_difference 1.6826495422889606e-14
+simple caso12e.txt Base verified route_relative_difference 1.924782630423938e-16
+simple caso12e.txt Flat-GM verified route_relative_difference 1.0417275027766162e-14
+simple caso12e.txt Flat-L2 verified route_relative_difference 2.346095234025516e-14
+simple caso12e.txt Role-Hybrid verified route_relative_difference 1.0417275027766162e-14
+simple caso12e.txt SA-Mat verified route_relative_difference 1.0417275027766162e-14
+simple caso12f.txt Base verified route_relative_difference 1.924782630423938e-16
+simple caso12f.txt Flat-GM verified route_relative_difference 1.57226910159956e-15
+simple caso12f.txt Flat-L2 verified route_relative_difference 2.3458718197572497e-14
+simple caso12f.txt Role-Hybrid verified route_relative_difference 1.57226910159956e-15
+simple caso12f.txt SA-Mat verified route_relative_difference 1.57226910159956e-15
+simple caso14a.txt Base verified route_relative_difference 1.8768038256872845e-16
+simple caso14a.txt Flat-GM verified route_relative_difference 4.09451054522271e-14
+simple caso14a.txt Flat-L2 verified route_relative_difference 1.8563874640264693e-14
+simple caso14a.txt Role-Hybrid verified route_relative_difference 4.09451054522271e-14
+simple caso14a.txt SA-Mat verified route_relative_difference 4.09451054522271e-14
+simple caso14b.txt Base verified route_relative_difference 1.8768038256872845e-16
+simple caso14b.txt Flat-GM verified route_relative_difference 1.1996094398981483e-14
+simple caso14b.txt Flat-L2 verified route_relative_difference 1.2110349173702225e-15
+simple caso14b.txt Role-Hybrid verified route_relative_difference 1.1996094398981483e-14
+simple caso14b.txt SA-Mat verified route_relative_difference 1.1996094398981483e-14
+simple caso14c.txt Base verified route_relative_difference 1.8768038256872845e-16
+simple caso14c.txt Flat-GM verified route_relative_difference 4.0223127421254844e-14
+simple caso14c.txt Flat-L2 verified route_relative_difference 1.8927360368219303e-14
+simple caso14c.txt Role-Hybrid verified route_relative_difference 4.0223127421254844e-14
+simple caso14c.txt SA-Mat verified route_relative_difference 4.0223127421254844e-14
+simple caso14d.txt Base verified route_relative_difference 2.353811659905527e-16
+simple caso14d.txt Flat-GM verified route_relative_difference 1.450186138269547e-14
+simple caso14d.txt Flat-L2 verified route_relative_difference 6.701658990388677e-15
+simple caso14d.txt Role-Hybrid verified route_relative_difference 1.450186138269547e-14
+simple caso14d.txt SA-Mat verified route_relative_difference 1.450186138269547e-14
+simple caso14e.txt Base verified route_relative_difference 0.0
+simple caso14e.txt Flat-GM verified route_relative_difference 1.4153765578323826e-14
+simple caso14e.txt Flat-L2 verified route_relative_difference 4.663349040065413e-15
+simple caso14e.txt Role-Hybrid verified route_relative_difference 1.4153765578323826e-14
+simple caso14e.txt SA-Mat verified route_relative_difference 1.4153765578323826e-14
+simple caso14f.txt Base verified route_relative_difference 9.459400773436146e-15
+simple caso14f.txt Flat-GM verified route_relative_difference 1.140164558567185e-14
+simple caso14f.txt Flat-L2 verified route_relative_difference 5.162993579845514e-15
+simple caso14f.txt Role-Hybrid verified route_relative_difference 1.140164558567185e-14
+simple caso14f.txt SA-Mat verified route_relative_difference 1.140164558567185e-14
+simple caso19a.txt Base verified route_relative_difference 0.0
+simple caso19a.txt Flat-GM verified route_relative_difference 1.3432947811110912e-14
+simple caso19a.txt Flat-L2 verified route_relative_difference 2.2932405720818626e-16
+simple caso19a.txt Role-Hybrid verified route_relative_difference 1.3432947811110912e-14
+simple caso19a.txt SA-Mat verified route_relative_difference 1.3432947811110912e-14
+simple caso19b.txt Base verified route_relative_difference 1.4057485297898043e-14
+simple caso19b.txt Flat-GM verified route_relative_difference 1.0217945228670522e-14
+simple caso19b.txt Flat-L2 verified route_relative_difference 2.2932405720818626e-16
+simple caso19b.txt Role-Hybrid verified route_relative_difference 1.0217945228670522e-14
+simple caso19b.txt SA-Mat verified route_relative_difference 1.0217945228670522e-14
+simple caso19c.txt Base verified route_relative_difference 0.0
+simple caso19c.txt Flat-GM verified route_relative_difference 1.5709718626553516e-14
+simple caso19c.txt Flat-L2 verified route_relative_difference 2.2932405720818626e-16
+simple caso19c.txt Role-Hybrid verified route_relative_difference 1.5709718626553516e-14
+simple caso19c.txt SA-Mat verified route_relative_difference 1.5709718626553516e-14
+simple caso19d.txt Base verified route_relative_difference 0.0
+simple caso19d.txt Flat-GM verified route_relative_difference 3.564520569900269e-14
+simple caso19d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso19d.txt Role-Hybrid verified route_relative_difference 3.564520569900269e-14
+simple caso19d.txt SA-Mat verified route_relative_difference 3.564520569900269e-14
+simple caso19e.txt Base verified route_relative_difference 0.0
+simple caso19e.txt Flat-GM verified route_relative_difference 1.5094647158153786e-16
+simple caso19e.txt Flat-L2 verified route_relative_difference 2.2932405720818626e-16
+simple caso19e.txt Role-Hybrid verified route_relative_difference 1.5094647158153786e-16
+simple caso19e.txt SA-Mat verified route_relative_difference 1.5094647158153786e-16
+simple caso19f.txt Base verified route_relative_difference 0.0
+simple caso19f.txt Flat-GM verified route_relative_difference 3.2424736591166436e-15
+simple caso19f.txt Flat-L2 verified route_relative_difference 4.1034483084719145e-16
+simple caso19f.txt Role-Hybrid verified route_relative_difference 3.2424736591166436e-15
+simple caso19f.txt SA-Mat verified route_relative_difference 3.2424736591166436e-15
+simple caso20a.txt Base verified route_relative_difference 0.13044391902196978
+simple caso20a.txt Flat-GM verified route_relative_difference 4.218777484804095e-15
+simple caso20a.txt Flat-L2 verified route_relative_difference 5.132948243842518e-14
+simple caso20a.txt Role-Hybrid verified route_relative_difference 4.218777484804095e-15
+simple caso20a.txt SA-Mat verified route_relative_difference 4.218777484804095e-15
+simple caso20b.txt Base verified route_relative_difference 2.1264958874644953e-14
+simple caso20b.txt Flat-GM verified route_relative_difference 1.266950398085668e-15
+simple caso20b.txt Flat-L2 verified route_relative_difference 7.491913013734817e-15
+simple caso20b.txt Role-Hybrid verified route_relative_difference 1.266950398085668e-15
+simple caso20b.txt SA-Mat verified route_relative_difference 1.266950398085668e-15
+simple caso20c.txt Base verified route_relative_difference 0.010007451674364188
+simple caso20c.txt Flat-GM verified route_relative_difference 0.0
+simple caso20c.txt Flat-L2 verified route_relative_difference 3.9593287304901896e-14
+simple caso20c.txt Role-Hybrid verified route_relative_difference 0.0
+simple caso20c.txt SA-Mat verified route_relative_difference 0.0
+simple caso20d.txt Base verified route_relative_difference 0.0
+simple caso20d.txt Flat-GM verified route_relative_difference 2.8062997160535838e-14
+simple caso20d.txt Flat-L2 verified route_relative_difference 3.944367484066895e-16
+simple caso20d.txt Role-Hybrid verified route_relative_difference 2.8062997160535838e-14
+simple caso20d.txt SA-Mat verified route_relative_difference 2.8062997160535838e-14
+simple caso20e.txt Base verified route_relative_difference 0.0
+simple caso20e.txt Flat-GM verified route_relative_difference 5.483997026495926e-15
+simple caso20e.txt Flat-L2 verified route_relative_difference 2.184301700818253e-16
+simple caso20e.txt Role-Hybrid verified route_relative_difference 5.483997026495926e-15
+simple caso20e.txt SA-Mat verified route_relative_difference 5.483997026495926e-15
+simple caso20f.txt Base verified route_relative_difference 3.0193449025189146e-16
+simple caso20f.txt Flat-GM verified route_relative_difference 2.92675156364171e-14
+simple caso20f.txt Flat-L2 verified route_relative_difference 2.1843017068434283e-16
+simple caso20f.txt Role-Hybrid verified route_relative_difference 2.92675156364171e-14
+simple caso20f.txt SA-Mat verified route_relative_difference 2.92675156364171e-14
+simple caso21a.txt Base verified route_relative_difference 4.930662632659121e-15
+simple caso21a.txt Flat-GM verified route_relative_difference 3.4808270166601965e-14
+simple caso21a.txt Flat-L2 verified route_relative_difference 2.865333905224428e-15
+simple caso21a.txt Role-Hybrid verified route_relative_difference 3.4808270166601965e-14
+simple caso21a.txt SA-Mat verified route_relative_difference 3.4808270166601965e-14
+simple caso21b.txt Base verified route_relative_difference 0.0
+simple caso21b.txt Flat-GM verified route_relative_difference 4.9144389238390165e-15
+simple caso21b.txt Flat-L2 verified route_relative_difference 4.8472103152143304e-15
+simple caso21b.txt Role-Hybrid verified route_relative_difference 4.9144389238390165e-15
+simple caso21b.txt SA-Mat verified route_relative_difference 4.9144389238390165e-15
+simple caso21c.txt Base verified route_relative_difference 0.0
+simple caso21c.txt Flat-GM verified route_relative_difference 2.7496941726950834e-14
+simple caso21c.txt Flat-L2 verified route_relative_difference 3.33863828557072e-15
+simple caso21c.txt Role-Hybrid verified route_relative_difference 2.7496941726950834e-14
+simple caso21c.txt SA-Mat verified route_relative_difference 2.7496941726950834e-14
+simple caso21d.txt Base verified route_relative_difference 0.0
+simple caso21d.txt Flat-GM verified route_relative_difference 1.357035893794244e-14
+simple caso21d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso21d.txt Role-Hybrid verified route_relative_difference 1.357035893794244e-14
+simple caso21d.txt SA-Mat verified route_relative_difference 1.357035893794244e-14
+simple caso21e.txt Base verified route_relative_difference 0.0
+simple caso21e.txt Flat-GM verified route_relative_difference 2.3334131128011193e-15
+simple caso21e.txt Flat-L2 verified route_relative_difference 1.7198464185472587e-16
+simple caso21e.txt Role-Hybrid verified route_relative_difference 2.3334131128011193e-15
+simple caso21e.txt SA-Mat verified route_relative_difference 2.3334131128011193e-15
+simple caso21f.txt Base verified route_relative_difference 0.0
+simple caso21f.txt Flat-GM verified route_relative_difference 7.266121555032467e-15
+simple caso21f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso21f.txt Role-Hybrid verified route_relative_difference 7.266121555032467e-15
+simple caso21f.txt SA-Mat verified route_relative_difference 7.266121555032467e-15
+simple caso22a.txt Base verified route_relative_difference 2.1785124860627125e-16
+simple caso22a.txt Flat-GM verified route_relative_difference 2.9966066156774347e-14
+simple caso22a.txt Flat-L2 verified route_relative_difference 1.491948716667948e-16
+simple caso22a.txt Role-Hybrid verified route_relative_difference 2.9966066156774347e-14
+simple caso22a.txt SA-Mat verified route_relative_difference 2.9966066156774347e-14
+simple caso22b.txt Base verified route_relative_difference 3.295152488108541e-15
+simple caso22b.txt Flat-GM verified route_relative_difference 2.4829382543336422e-14
+simple caso22b.txt Flat-L2 verified route_relative_difference 7.128925409933366e-15
+simple caso22b.txt Role-Hybrid verified route_relative_difference 2.4829382543336422e-14
+simple caso22b.txt SA-Mat verified route_relative_difference 2.4829382543336422e-14
+simple caso22c.txt Base verified route_relative_difference 2.34255763679725e-16
+simple caso22c.txt Flat-GM verified route_relative_difference 1.8647504050067856e-14
+simple caso22c.txt Flat-L2 verified route_relative_difference 1.491948716667948e-16
+simple caso22c.txt Role-Hybrid verified route_relative_difference 1.8647504050067856e-14
+simple caso22c.txt SA-Mat verified route_relative_difference 1.8647504050067856e-14
+simple caso22d.txt Base verified route_relative_difference 2.34255763679725e-16
+simple caso22d.txt Flat-GM verified route_relative_difference 2.2694718970133885e-14
+simple caso22d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso22d.txt Role-Hybrid verified route_relative_difference 2.2694718970133885e-14
+simple caso22d.txt SA-Mat verified route_relative_difference 2.2694718970133885e-14
+simple caso22e.txt Base verified route_relative_difference 0.0
+simple caso22e.txt Flat-GM verified route_relative_difference 1.1683469555549186e-14
+simple caso22e.txt Flat-L2 verified route_relative_difference 7.944963671297029e-15
+simple caso22e.txt Role-Hybrid verified route_relative_difference 1.1683469555549186e-14
+simple caso22e.txt SA-Mat verified route_relative_difference 1.1683469555549186e-14
+simple caso22f.txt Base verified route_relative_difference 2.34255763679725e-16
+simple caso22f.txt Flat-GM verified route_relative_difference 1.070646588076826e-15
+simple caso22f.txt Flat-L2 verified route_relative_difference 1.5422639523175538e-15
+simple caso22f.txt Role-Hybrid verified route_relative_difference 1.070646588076826e-15
+simple caso22f.txt SA-Mat verified route_relative_difference 1.070646588076826e-15
+simple caso23a.txt Base verified route_relative_difference 1.7771427400755717e-16
+simple caso23a.txt Flat-GM verified route_relative_difference 2.4237519227586767e-14
+simple caso23a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso23a.txt Role-Hybrid verified route_relative_difference 2.4237519227586767e-14
+simple caso23a.txt SA-Mat verified route_relative_difference 2.4237519227586767e-14
+simple caso23b.txt Base verified route_relative_difference 0.0
+simple caso23b.txt Flat-GM verified route_relative_difference 4.6366482472414485e-15
+simple caso23b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso23b.txt Role-Hybrid verified route_relative_difference 4.6366482472414485e-15
+simple caso23b.txt SA-Mat verified route_relative_difference 4.6366482472414485e-15
+simple caso23c.txt Base verified route_relative_difference 0.0
+simple caso23c.txt Flat-GM verified route_relative_difference 2.8993779630444174e-14
+simple caso23c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso23c.txt Role-Hybrid verified route_relative_difference 2.8993779630444174e-14
+simple caso23c.txt SA-Mat verified route_relative_difference 2.8993779630444174e-14
+simple caso23d.txt Base verified route_relative_difference 0.0
+simple caso23d.txt Flat-GM verified route_relative_difference 3.697689853326981e-14
+simple caso23d.txt Flat-L2 verified route_relative_difference 3.0488430310757436e-16
+simple caso23d.txt Role-Hybrid verified route_relative_difference 3.697689853326981e-14
+simple caso23d.txt SA-Mat verified route_relative_difference 3.697689853326981e-14
+simple caso23e.txt Base verified route_relative_difference 0.0
+simple caso23e.txt Flat-GM verified route_relative_difference 1.235992534558474e-14
+simple caso23e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso23e.txt Role-Hybrid verified route_relative_difference 1.235992534558474e-14
+simple caso23e.txt SA-Mat verified route_relative_difference 1.235992534558474e-14
+simple caso23f.txt Base verified route_relative_difference 0.0
+simple caso23f.txt Flat-GM verified route_relative_difference 1.1538769868698513e-14
+simple caso23f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso23f.txt Role-Hybrid verified route_relative_difference 1.1538769868698513e-14
+simple caso23f.txt SA-Mat verified route_relative_difference 1.1538769868698513e-14
+simple caso24a.txt Base verified route_relative_difference 4.630891228168204e-16
+simple caso24a.txt Flat-GM verified route_relative_difference 6.1546080141052254e-15
+simple caso24a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso24a.txt Role-Hybrid verified route_relative_difference 6.1546080141052254e-15
+simple caso24a.txt SA-Mat verified route_relative_difference 6.1546080141052254e-15
+simple caso24b.txt Base verified route_relative_difference 0.0
+simple caso24b.txt Flat-GM verified route_relative_difference 1.412595891230981e-14
+simple caso24b.txt Flat-L2 verified route_relative_difference 1.5798378633363307e-16
+simple caso24b.txt Role-Hybrid verified route_relative_difference 1.412595891230981e-14
+simple caso24b.txt SA-Mat verified route_relative_difference 1.412595891230981e-14
+simple caso24c.txt Base verified route_relative_difference 0.0
+simple caso24c.txt Flat-GM verified route_relative_difference 1.1233125614868864e-14
+simple caso24c.txt Flat-L2 verified route_relative_difference 2.630198490723478e-16
+simple caso24c.txt Role-Hybrid verified route_relative_difference 1.1233125614868864e-14
+simple caso24c.txt SA-Mat verified route_relative_difference 1.1233125614868864e-14
+simple caso24d.txt Base verified route_relative_difference 0.0
+simple caso24d.txt Flat-GM verified route_relative_difference 5.9284680896694225e-15
+simple caso24d.txt Flat-L2 verified route_relative_difference 1.5798378633363307e-16
+simple caso24d.txt Role-Hybrid verified route_relative_difference 5.9284680896694225e-15
+simple caso24d.txt SA-Mat verified route_relative_difference 5.9284680896694225e-15
+simple caso24e.txt Base verified route_relative_difference 0.0
+simple caso24e.txt Flat-GM verified route_relative_difference 1.6811086314477052e-14
+simple caso24e.txt Flat-L2 verified route_relative_difference 1.4873033997263603e-16
+simple caso24e.txt Role-Hybrid verified route_relative_difference 1.6811086314477052e-14
+simple caso24e.txt SA-Mat verified route_relative_difference 1.6811086314477052e-14
+simple caso24f.txt Base verified route_relative_difference 0.0
+simple caso24f.txt Flat-GM verified route_relative_difference 5.948600753721282e-16
+simple caso24f.txt Flat-L2 verified route_relative_difference 1.7057816568286642e-15
+simple caso24f.txt Role-Hybrid verified route_relative_difference 5.948600753721282e-16
+simple caso24f.txt SA-Mat verified route_relative_difference 5.948600753721282e-16
+simple caso25a.txt Base verified route_relative_difference 0.0
+simple caso25a.txt Flat-GM verified route_relative_difference 6.9742687371945336e-15
+simple caso25a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso25a.txt Role-Hybrid verified route_relative_difference 6.9742687371945336e-15
+simple caso25a.txt SA-Mat verified route_relative_difference 6.9742687371945336e-15
+simple caso25b.txt Base verified route_relative_difference 0.0
+simple caso25b.txt Flat-GM verified route_relative_difference 3.79174211803158e-15
+simple caso25b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso25b.txt Role-Hybrid verified route_relative_difference 3.79174211803158e-15
+simple caso25b.txt SA-Mat verified route_relative_difference 3.79174211803158e-15
+simple caso25c.txt Base verified route_relative_difference 0.0
+simple caso25c.txt Flat-GM verified route_relative_difference 1.5691631003406927e-14
+simple caso25c.txt Flat-L2 verified route_relative_difference 3.3632267641508095e-16
+simple caso25c.txt Role-Hybrid verified route_relative_difference 1.5691631003406927e-14
+simple caso25c.txt SA-Mat verified route_relative_difference 1.5691631003406927e-14
+simple caso25d.txt Base verified route_relative_difference 1.1896260384607491e-16
+simple caso25d.txt Flat-GM verified route_relative_difference 2.2659375609237262e-14
+simple caso25d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso25d.txt Role-Hybrid verified route_relative_difference 2.2659375609237262e-14
+simple caso25d.txt SA-Mat verified route_relative_difference 2.2659375609237262e-14
+simple caso25e.txt Base verified route_relative_difference 0.0
+simple caso25e.txt Flat-GM verified route_relative_difference 1.5783779764880234e-15
+simple caso25e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso25e.txt Role-Hybrid verified route_relative_difference 1.5783779764880234e-15
+simple caso25e.txt SA-Mat verified route_relative_difference 1.5783779764880234e-15
+simple caso25f.txt Base verified route_relative_difference 2.3792520814995426e-16
+simple caso25f.txt Flat-GM verified route_relative_difference 4.725402457733658e-16
+simple caso25f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso25f.txt Role-Hybrid verified route_relative_difference 4.725402457733658e-16
+simple caso25f.txt SA-Mat verified route_relative_difference 4.725402457733658e-16
+simple caso26a.txt Base verified route_relative_difference 2.3311711261981664e-16
+simple caso26a.txt Flat-GM verified route_relative_difference 1.0815816147803998e-14
+simple caso26a.txt Flat-L2 verified route_relative_difference 3.913913599845605e-15
+simple caso26a.txt Role-Hybrid verified route_relative_difference 1.0815816147803998e-14
+simple caso26a.txt SA-Mat verified route_relative_difference 1.0815816147803998e-14
+simple caso26b.txt Base verified route_relative_difference 1.0973259498656541e-14
+simple caso26b.txt Flat-GM verified route_relative_difference 6.029255287701057e-15
+simple caso26b.txt Flat-L2 verified route_relative_difference 1.2108484697739019e-14
+simple caso26b.txt Role-Hybrid verified route_relative_difference 6.029255287701057e-15
+simple caso26b.txt SA-Mat verified route_relative_difference 6.029255287701057e-15
+simple caso26c.txt Base verified route_relative_difference 0.0
+simple caso26c.txt Flat-GM verified route_relative_difference 0.0
+simple caso26c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso26c.txt Role-Hybrid verified route_relative_difference 0.0
+simple caso26c.txt SA-Mat verified route_relative_difference 0.0
+simple caso26d.txt Base verified route_relative_difference 0.0
+simple caso26d.txt Flat-GM verified route_relative_difference 3.463123610108672e-14
+simple caso26d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso26d.txt Role-Hybrid verified route_relative_difference 3.463123610108672e-14
+simple caso26d.txt SA-Mat verified route_relative_difference 3.463123610108672e-14
+simple caso26e.txt Base verified route_relative_difference 0.0
+simple caso26e.txt Flat-GM verified route_relative_difference 2.6709914884165362e-14
+simple caso26e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso26e.txt Role-Hybrid verified route_relative_difference 2.6709914884165362e-14
+simple caso26e.txt SA-Mat verified route_relative_difference 2.6709914884165362e-14
+simple caso26f.txt Base verified route_relative_difference 2.331171126198166e-16
+simple caso26f.txt Flat-GM verified route_relative_difference 4.158980416306579e-15
+simple caso26f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso26f.txt Role-Hybrid verified route_relative_difference 4.158980416306579e-15
+simple caso26f.txt SA-Mat verified route_relative_difference 4.158980416306579e-15
+simple caso27a.txt Base verified route_relative_difference 0.0
+simple caso27a.txt Flat-GM verified route_relative_difference 1.0998763220660181e-14
+simple caso27a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso27a.txt Role-Hybrid verified route_relative_difference 1.0998763220660181e-14
+simple caso27a.txt SA-Mat verified route_relative_difference 1.0998763220660181e-14
+simple caso27b.txt Base verified route_relative_difference 8.539444953603966e-15
+simple caso27b.txt Flat-GM verified route_relative_difference 6.834297812786794e-15
+simple caso27b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso27b.txt Role-Hybrid verified route_relative_difference 6.834297812786794e-15
+simple caso27b.txt SA-Mat verified route_relative_difference 6.834297812786794e-15
+simple caso27c.txt Base verified route_relative_difference 0.0
+simple caso27c.txt Flat-GM verified route_relative_difference 5.3385329957723854e-15
+simple caso27c.txt Flat-L2 verified route_relative_difference 4.79837279347881e-16
+simple caso27c.txt Role-Hybrid verified route_relative_difference 5.3385329957723854e-15
+simple caso27c.txt SA-Mat verified route_relative_difference 5.3385329957723854e-15
+simple caso27d.txt Base verified route_relative_difference 1.4749406155604072e-16
+simple caso27d.txt Flat-GM verified route_relative_difference 2.928970919424698e-14
+simple caso27d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso27d.txt Role-Hybrid verified route_relative_difference 2.928970919424698e-14
+simple caso27d.txt SA-Mat verified route_relative_difference 2.928970919424698e-14
+simple caso27e.txt Base verified route_relative_difference 0.0
+simple caso27e.txt Flat-GM verified route_relative_difference 2.4983086245900122e-14
+simple caso27e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso27e.txt Role-Hybrid verified route_relative_difference 2.4983086245900122e-14
+simple caso27e.txt SA-Mat verified route_relative_difference 2.4983086245900122e-14
+simple caso27f.txt Base verified route_relative_difference 0.0
+simple caso27f.txt Flat-GM verified route_relative_difference 8.248124516028173e-15
+simple caso27f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso27f.txt Role-Hybrid verified route_relative_difference 8.248124516028173e-15
+simple caso27f.txt SA-Mat verified route_relative_difference 8.248124516028173e-15
+simple caso28a.txt Base verified route_relative_difference 3.5330833372543767e-15
+simple caso28a.txt Flat-GM verified route_relative_difference 8.145602353292461e-15
+simple caso28a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso28a.txt Role-Hybrid verified route_relative_difference 8.145602353292461e-15
+simple caso28a.txt SA-Mat verified route_relative_difference 8.145602353292461e-15
+simple caso28b.txt Base verified route_relative_difference 8.202488632214365e-16
+simple caso28b.txt Flat-GM verified route_relative_difference 3.925818477289084e-15
+simple caso28b.txt Flat-L2 verified route_relative_difference 1.6451768341056862e-15
+simple caso28b.txt Role-Hybrid verified route_relative_difference 3.925818477289084e-15
+simple caso28b.txt SA-Mat verified route_relative_difference 3.925818477289084e-15
+simple caso28c.txt Base verified route_relative_difference 2.251022209503127e-16
+simple caso28c.txt Flat-GM verified route_relative_difference 1.4465978938995632e-15
+simple caso28c.txt Flat-L2 verified route_relative_difference 3.003741135185887e-15
+simple caso28c.txt Role-Hybrid verified route_relative_difference 1.4465978938995632e-15
+simple caso28c.txt SA-Mat verified route_relative_difference 1.4465978938995632e-15
+simple caso28d.txt Base verified route_relative_difference 0.0
+simple caso28d.txt Flat-GM verified route_relative_difference 1.1528102138266458e-14
+simple caso28d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso28d.txt Role-Hybrid verified route_relative_difference 1.1528102138266458e-14
+simple caso28d.txt SA-Mat verified route_relative_difference 1.1528102138266458e-14
+simple caso28e.txt Base verified route_relative_difference 2.4441871596128157e-15
+simple caso28e.txt Flat-GM verified route_relative_difference 6.852417342144245e-16
+simple caso28e.txt Flat-L2 verified route_relative_difference 1.0008897573761519e-14
+simple caso28e.txt Role-Hybrid verified route_relative_difference 6.852417342144245e-16
+simple caso28e.txt SA-Mat verified route_relative_difference 6.852417342144245e-16
+simple caso28f.txt Base verified route_relative_difference 1.1255111015491995e-16
+simple caso28f.txt Flat-GM verified route_relative_difference 2.5475616822838916e-15
+simple caso28f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso28f.txt Role-Hybrid verified route_relative_difference 2.5475616822838916e-15
+simple caso28f.txt SA-Mat verified route_relative_difference 2.5475616822838916e-15
+simple caso29a.txt Base verified route_relative_difference 0.0
+simple caso29a.txt Flat-GM verified route_relative_difference 2.356372246776428e-14
+simple caso29a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso29a.txt Role-Hybrid verified route_relative_difference 2.356372246776428e-14
+simple caso29a.txt SA-Mat verified route_relative_difference 2.356372246776428e-14
+simple caso29b.txt Base verified route_relative_difference 2.873308639260471e-14
+simple caso29b.txt Flat-GM verified route_relative_difference 4.397923251685059e-15
+simple caso29b.txt Flat-L2 verified route_relative_difference 1.8810928341242122e-14
+simple caso29b.txt Role-Hybrid verified route_relative_difference 4.397923251685059e-15
+simple caso29b.txt SA-Mat verified route_relative_difference 4.397923251685059e-15
+simple caso29c.txt Base verified route_relative_difference 0.0
+simple caso29c.txt Flat-GM verified route_relative_difference 2.4156512589545124e-14
+simple caso29c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso29c.txt Role-Hybrid verified route_relative_difference 2.4156512589545124e-14
+simple caso29c.txt SA-Mat verified route_relative_difference 2.4156512589545124e-14
+simple caso29d.txt Base verified route_relative_difference 2.1797739639817475e-16
+simple caso29d.txt Flat-GM verified route_relative_difference 9.068185931968147e-15
+simple caso29d.txt Flat-L2 verified route_relative_difference 1.2195257959402503e-16
+simple caso29d.txt Role-Hybrid verified route_relative_difference 9.068185931968147e-15
+simple caso29d.txt SA-Mat verified route_relative_difference 9.068185931968147e-15
+simple caso29e.txt Base verified route_relative_difference 2.1797748404409112e-16
+simple caso29e.txt Flat-GM verified route_relative_difference 6.879879373735564e-15
+simple caso29e.txt Flat-L2 verified route_relative_difference 0.18497451819857522
+simple caso29e.txt Role-Hybrid verified route_relative_difference 6.879879373735564e-15
+simple caso29e.txt SA-Mat verified route_relative_difference 6.879879373735564e-15
+simple caso29f.txt Base verified route_relative_difference 0.0
+simple caso29f.txt Flat-GM verified route_relative_difference 1.9661047187740987e-14
+simple caso29f.txt Flat-L2 verified route_relative_difference 4.724989720733634e-16
+simple caso29f.txt Role-Hybrid verified route_relative_difference 1.9661047187740987e-14
+simple caso29f.txt SA-Mat verified route_relative_difference 1.9661047187740987e-14
+simple caso30a.txt Base verified route_relative_difference 0.0
+simple caso30a.txt Flat-GM verified route_relative_difference 1.9120347081924513e-14
+simple caso30a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso30a.txt Role-Hybrid verified route_relative_difference 1.9120347081924513e-14
+simple caso30a.txt SA-Mat verified route_relative_difference 1.9120347081924513e-14
+simple caso30b.txt Base verified route_relative_difference 3.9757964161656715e-14
+simple caso30b.txt Flat-GM verified route_relative_difference 8.188988287646648e-15
+simple caso30b.txt Flat-L2 verified route_relative_difference 1.0559736167553423e-14
+simple caso30b.txt Role-Hybrid verified route_relative_difference 8.188988287646648e-15
+simple caso30b.txt SA-Mat verified route_relative_difference 8.188988287646648e-15
+simple caso30c.txt Base verified route_relative_difference 2.133515281711124e-16
+simple caso30c.txt Flat-GM verified route_relative_difference 1.9120347070679696e-14
+simple caso30c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso30c.txt Role-Hybrid verified route_relative_difference 1.9120347070679696e-14
+simple caso30c.txt SA-Mat verified route_relative_difference 1.9120347070679696e-14
+simple caso30d.txt Base verified route_relative_difference 1.716447119279627e-16
+simple caso30d.txt Flat-GM verified route_relative_difference 2.4501547104190204e-14
+simple caso30d.txt Flat-L2 verified route_relative_difference 5.845752213849998e-16
+simple caso30d.txt Role-Hybrid verified route_relative_difference 2.4501547104190204e-14
+simple caso30d.txt SA-Mat verified route_relative_difference 2.4501547104190204e-14
+simple caso30e.txt Base verified route_relative_difference 2.1627980784088462e-16
+simple caso30e.txt Flat-GM verified route_relative_difference 2.2956291028886753e-15
+simple caso30e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso30e.txt Role-Hybrid verified route_relative_difference 2.2956291028886753e-15
+simple caso30e.txt SA-Mat verified route_relative_difference 2.2956291028886753e-15
+simple caso30f.txt Base verified route_relative_difference 0.0
+simple caso30f.txt Flat-GM verified route_relative_difference 4.863138182066384e-14
+simple caso30f.txt Flat-L2 verified route_relative_difference 4.3843141603874995e-16
+simple caso30f.txt Role-Hybrid verified route_relative_difference 4.863138182066384e-14
+simple caso30f.txt SA-Mat verified route_relative_difference 4.863138182066384e-14
+simple caso31a.txt Base verified route_relative_difference 0.0
+simple caso31a.txt Flat-GM verified route_relative_difference 6.951474026167931e-15
+simple caso31a.txt Flat-L2 verified route_relative_difference 2.2338701484409585e-15
+simple caso31a.txt Role-Hybrid verified route_relative_difference 6.951474026167931e-15
+simple caso31a.txt SA-Mat verified route_relative_difference 6.951474026167931e-15
+simple caso31b.txt Base verified route_relative_difference 0.0
+simple caso31b.txt Flat-GM verified route_relative_difference 2.7775187673684192e-15
+simple caso31b.txt Flat-L2 verified route_relative_difference 1.601353164536378e-16
+simple caso31b.txt Role-Hybrid verified route_relative_difference 2.7775187673684192e-15
+simple caso31b.txt SA-Mat verified route_relative_difference 2.7775187673684192e-15
+simple caso31c.txt Base verified route_relative_difference 0.0
+simple caso31c.txt Flat-GM verified route_relative_difference 4.253841259827379e-15
+simple caso31c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso31c.txt Role-Hybrid verified route_relative_difference 4.253841259827379e-15
+simple caso31c.txt SA-Mat verified route_relative_difference 4.253841259827379e-15
+simple caso31d.txt Base verified route_relative_difference 2.9570227329343137e-15
+simple caso31d.txt Flat-GM verified route_relative_difference 2.4284889203761115e-15
+simple caso31d.txt Flat-L2 verified route_relative_difference 1.1808328960103525e-15
+simple caso31d.txt Role-Hybrid verified route_relative_difference 2.4284889203761115e-15
+simple caso31d.txt SA-Mat verified route_relative_difference 2.4284889203761115e-15
+simple caso31e.txt Base verified route_relative_difference 3.680872087458124e-15
+simple caso31e.txt Flat-GM verified route_relative_difference 9.536683905275431e-16
+simple caso31e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso31e.txt Role-Hybrid verified route_relative_difference 9.536683905275431e-16
+simple caso31e.txt SA-Mat verified route_relative_difference 9.536683905275431e-16
+simple caso31f.txt Base verified route_relative_difference 2.1093762889518247e-16
+simple caso31f.txt Flat-GM verified route_relative_difference 1.367486392941056e-14
+simple caso31f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso31f.txt Role-Hybrid verified route_relative_difference 1.367486392941056e-14
+simple caso31f.txt SA-Mat verified route_relative_difference 1.367486392941056e-14
+simple caso32a.txt Base verified route_relative_difference 1.6845208081387074e-15
+simple caso32a.txt Flat-GM verified route_relative_difference 3.0484456890425e-15
+simple caso32a.txt Flat-L2 verified route_relative_difference 7.681082281809632e-16
+simple caso32a.txt Role-Hybrid verified route_relative_difference 3.0484456890425e-15
+simple caso32a.txt SA-Mat verified route_relative_difference 3.0484456890425e-15
+simple caso32b.txt Base verified route_relative_difference 0.0
+simple caso32b.txt Flat-GM verified route_relative_difference 5.740377047374742e-15
+simple caso32b.txt Flat-L2 verified route_relative_difference 1.6387117958060996e-16
+simple caso32b.txt Role-Hybrid verified route_relative_difference 5.740377047374742e-15
+simple caso32b.txt SA-Mat verified route_relative_difference 5.740377047374742e-15
+simple caso32c.txt Base verified route_relative_difference 2.1580155127807679e-16
+simple caso32c.txt Flat-GM verified route_relative_difference 7.83146486073346e-15
+simple caso32c.txt Flat-L2 verified route_relative_difference 1.229033840184555e-16
+simple caso32c.txt Role-Hybrid verified route_relative_difference 7.83146486073346e-15
+simple caso32c.txt SA-Mat verified route_relative_difference 7.83146486073346e-15
+simple caso32d.txt Base verified route_relative_difference 2.1580146586201958e-16
+simple caso32d.txt Flat-GM verified route_relative_difference 0.012331981729503718
+simple caso32d.txt Flat-L2 verified route_relative_difference 2.458067694041705e-16
+simple caso32d.txt Role-Hybrid verified route_relative_difference 0.012331981729503718
+simple caso32d.txt SA-Mat verified route_relative_difference 0.012331981729503718
+simple caso32e.txt Base verified route_relative_difference 6.37562428173424e-15
+simple caso32e.txt Flat-GM verified route_relative_difference 2.3874653356595088e-15
+simple caso32e.txt Flat-L2 verified route_relative_difference 6.021442353519619e-15
+simple caso32e.txt Role-Hybrid verified route_relative_difference 2.3874653356595088e-15
+simple caso32e.txt SA-Mat verified route_relative_difference 2.3874653356595088e-15
+simple caso32f.txt Base verified route_relative_difference 2.1580146586201958e-16
+simple caso32f.txt Flat-GM verified route_relative_difference 4.273338119580145e-15
+simple caso32f.txt Flat-L2 verified route_relative_difference 2.458067694041705e-16
+simple caso32f.txt Role-Hybrid verified route_relative_difference 4.273338119580145e-15
+simple caso32f.txt SA-Mat verified route_relative_difference 4.273338119580145e-15
+simple caso33a.txt Base verified route_relative_difference 0.0
+simple caso33a.txt Flat-GM verified route_relative_difference 2.3859859452955376e-14
+simple caso33a.txt Flat-L2 verified route_relative_difference 1.6007313806164723e-16
+simple caso33a.txt Role-Hybrid verified route_relative_difference 2.3859859452955376e-14
+simple caso33a.txt SA-Mat verified route_relative_difference 2.3859859452955376e-14
+simple caso33b.txt Base verified route_relative_difference 0.0
+simple caso33b.txt Flat-GM verified route_relative_difference 3.737123013929124e-15
+simple caso33b.txt Flat-L2 verified route_relative_difference 1.658398903504949e-16
+simple caso33b.txt Role-Hybrid verified route_relative_difference 3.737123013929124e-15
+simple caso33b.txt SA-Mat verified route_relative_difference 3.737123013929124e-15
+simple caso33c.txt Base verified route_relative_difference 2.1653992268446095e-16
+simple caso33c.txt Flat-GM verified route_relative_difference 5.914870036891953e-15
+simple caso33c.txt Flat-L2 verified route_relative_difference 1.243799177797531e-16
+simple caso33c.txt Role-Hybrid verified route_relative_difference 5.914870036891953e-15
+simple caso33c.txt SA-Mat verified route_relative_difference 5.914870036891953e-15
+simple caso33d.txt Base verified route_relative_difference 2.1653992534130262e-16
+simple caso33d.txt Flat-GM verified route_relative_difference 1.3192712315989801e-14
+simple caso33d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso33d.txt Role-Hybrid verified route_relative_difference 1.3192712315989801e-14
+simple caso33d.txt SA-Mat verified route_relative_difference 1.3192712315989801e-14
+simple caso33e.txt Base verified route_relative_difference 0.0
+simple caso33e.txt Flat-GM verified route_relative_difference 1.1142725534130946e-14
+simple caso33e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso33e.txt Role-Hybrid verified route_relative_difference 1.1142725534130946e-14
+simple caso33e.txt SA-Mat verified route_relative_difference 1.1142725534130946e-14
+simple caso33f.txt Base verified route_relative_difference 0.0
+simple caso33f.txt Flat-GM verified route_relative_difference 1.015579468915808e-15
+simple caso33f.txt Flat-L2 verified route_relative_difference 1.5966763547194038e-15
+simple caso33f.txt Role-Hybrid verified route_relative_difference 1.015579468915808e-15
+simple caso33f.txt SA-Mat verified route_relative_difference 1.015579468915808e-15
+simple caso34a.txt Base verified route_relative_difference 0.0
+simple caso34a.txt Flat-GM verified route_relative_difference 1.7633680616754503e-14
+simple caso34a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso34a.txt Role-Hybrid verified route_relative_difference 1.7633680616754503e-14
+simple caso34a.txt SA-Mat verified route_relative_difference 1.7633680616754503e-14
+simple caso34b.txt Base verified route_relative_difference 0.0
+simple caso34b.txt Flat-GM verified route_relative_difference 2.427331874081212e-15
+simple caso34b.txt Flat-L2 verified route_relative_difference 3.9940636738120463e-16
+simple caso34b.txt Role-Hybrid verified route_relative_difference 2.427331874081212e-15
+simple caso34b.txt SA-Mat verified route_relative_difference 2.427331874081212e-15
+simple caso34c.txt Base verified route_relative_difference 0.0
+simple caso34c.txt Flat-GM verified route_relative_difference 4.7547017863433365e-15
+simple caso34c.txt Flat-L2 verified route_relative_difference 3.9940636738120463e-16
+simple caso34c.txt Role-Hybrid verified route_relative_difference 4.7547017863433365e-15
+simple caso34c.txt SA-Mat verified route_relative_difference 4.7547017863433365e-15
+simple caso34d.txt Base verified route_relative_difference 1.8328042323555675e-16
+simple caso34d.txt Flat-GM verified route_relative_difference 1.4196618047139594e-14
+simple caso34d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso34d.txt Role-Hybrid verified route_relative_difference 1.4196618047139594e-14
+simple caso34d.txt SA-Mat verified route_relative_difference 1.4196618047139594e-14
+simple caso34e.txt Base verified route_relative_difference 0.0
+simple caso34e.txt Flat-GM verified route_relative_difference 9.930758333916687e-15
+simple caso34e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso34e.txt Role-Hybrid verified route_relative_difference 9.930758333916687e-15
+simple caso34e.txt SA-Mat verified route_relative_difference 9.930758333916687e-15
+simple caso34f.txt Base verified route_relative_difference 0.0
+simple caso34f.txt Flat-GM verified route_relative_difference 8.086784568539702e-15
+simple caso34f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso34f.txt Role-Hybrid verified route_relative_difference 8.086784568539702e-15
+simple caso34f.txt SA-Mat verified route_relative_difference 8.086784568539702e-15
+simple caso35a.txt Base verified route_relative_difference 0.0
+simple caso35a.txt Flat-GM verified route_relative_difference 6.556560175967732e-16
+simple caso35a.txt Flat-L2 verified route_relative_difference 3.4127475303345383e-15
+simple caso35a.txt Role-Hybrid verified route_relative_difference 6.556560175967732e-16
+simple caso35a.txt SA-Mat verified route_relative_difference 6.556560175967732e-16
+simple caso35b.txt Base verified route_relative_difference 0.0
+simple caso35b.txt Flat-GM verified route_relative_difference 5.615703528580394e-15
+simple caso35b.txt Flat-L2 verified route_relative_difference 5.339648545831922e-15
+simple caso35b.txt Role-Hybrid verified route_relative_difference 5.615703528580394e-15
+simple caso35b.txt SA-Mat verified route_relative_difference 5.615703528580394e-15
+simple caso35c.txt Base verified route_relative_difference 0.0
+simple caso35c.txt Flat-GM verified route_relative_difference 1.9710817344748062e-14
+simple caso35c.txt Flat-L2 verified route_relative_difference 8.727513727910441e-16
+simple caso35c.txt Role-Hybrid verified route_relative_difference 1.9710817344748062e-14
+simple caso35c.txt SA-Mat verified route_relative_difference 1.9710817344748062e-14
+simple caso35d.txt Base verified route_relative_difference 0.0
+simple caso35d.txt Flat-GM verified route_relative_difference 1.804896082513e-14
+simple caso35d.txt Flat-L2 verified route_relative_difference 3.5415657197221226e-16
+simple caso35d.txt Role-Hybrid verified route_relative_difference 1.804896082513e-14
+simple caso35d.txt SA-Mat verified route_relative_difference 1.804896082513e-14
+simple caso35e.txt Base verified route_relative_difference 0.0
+simple caso35e.txt Flat-GM verified route_relative_difference 2.65185500103502e-15
+simple caso35e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso35e.txt Role-Hybrid verified route_relative_difference 2.65185500103502e-15
+simple caso35e.txt SA-Mat verified route_relative_difference 2.65185500103502e-15
+simple caso35f.txt Base verified route_relative_difference 0.0
+simple caso35f.txt Flat-GM verified route_relative_difference 1.695507869692516e-14
+simple caso35f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso35f.txt Role-Hybrid verified route_relative_difference 1.695507869692516e-14
+simple caso35f.txt SA-Mat verified route_relative_difference 1.695507869692516e-14
+simple caso42a.txt Base verified route_relative_difference 2.705435821499736e-14
+simple caso42a.txt Flat-GM verified route_relative_difference 1.528854076227528e-14
+simple caso42a.txt Flat-L2 verified route_relative_difference 2.4933414501265875e-15
+simple caso42a.txt Role-Hybrid verified route_relative_difference 1.528854076227528e-14
+simple caso42a.txt SA-Mat verified route_relative_difference 1.528854076227528e-14
+simple caso42b.txt Base verified route_relative_difference 2.957124612237599e-15
+simple caso42b.txt Flat-GM verified route_relative_difference 3.1908704743151445e-14
+simple caso42b.txt Flat-L2 verified route_relative_difference 4.0220604869925795e-15
+simple caso42b.txt Role-Hybrid verified route_relative_difference 3.1908704743151445e-14
+simple caso42b.txt SA-Mat verified route_relative_difference 3.1908704743151445e-14
+simple caso42c.txt Base verified route_relative_difference 3.0233416757029974e-14
+simple caso42c.txt Flat-GM verified route_relative_difference 7.780775634574904e-15
+simple caso42c.txt Flat-L2 verified route_relative_difference 2.1397046795465777e-15
+simple caso42c.txt Role-Hybrid verified route_relative_difference 7.780775634574904e-15
+simple caso42c.txt SA-Mat verified route_relative_difference 7.780775634574904e-15
+simple caso42d.txt Base verified route_relative_difference 1.145221497130814e-16
+simple caso42d.txt Flat-GM verified route_relative_difference 4.084300552544103e-15
+simple caso42d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso42d.txt Role-Hybrid verified route_relative_difference 4.084300552544103e-15
+simple caso42d.txt SA-Mat verified route_relative_difference 4.084300552544103e-15
+simple caso42e.txt Base verified route_relative_difference 1.145221497130814e-16
+simple caso42e.txt Flat-GM verified route_relative_difference 1.0616250499979107e-14
+simple caso42e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso42e.txt Role-Hybrid verified route_relative_difference 1.0616250499979107e-14
+simple caso42e.txt SA-Mat verified route_relative_difference 1.0616250499979107e-14
+simple caso42f.txt Base verified route_relative_difference 0.0
+simple caso42f.txt Flat-GM verified route_relative_difference 1.4555474594941985e-14
+simple caso42f.txt Flat-L2 verified route_relative_difference 1.5355276848284333e-16
+simple caso42f.txt Role-Hybrid verified route_relative_difference 1.4555474594941985e-14
+simple caso42f.txt SA-Mat verified route_relative_difference 1.4555474594941985e-14
+simple caso43a.txt Base verified route_relative_difference 1.583368897107377e-14
+simple caso43a.txt Flat-GM verified route_relative_difference 5.83210687914247e-16
+simple caso43a.txt Flat-L2 verified route_relative_difference 1.3974477526190366e-14
+simple caso43a.txt Role-Hybrid verified route_relative_difference 5.83210687914247e-16
+simple caso43a.txt SA-Mat verified route_relative_difference 5.83210687914247e-16
+simple caso43b.txt Base verified route_relative_difference 1.102103244485194e-14
+simple caso43b.txt Flat-GM verified route_relative_difference 3.9201767047279095e-16
+simple caso43b.txt Flat-L2 verified route_relative_difference 1.1894123465998602e-14
+simple caso43b.txt Role-Hybrid verified route_relative_difference 3.9201767047279095e-16
+simple caso43b.txt SA-Mat verified route_relative_difference 3.9201767047279095e-16
+simple caso43c.txt Base verified route_relative_difference 0.16136105182708707
+simple caso43c.txt Flat-GM verified route_relative_difference 4.471282348556785e-15
+simple caso43c.txt Flat-L2 verified route_relative_difference 1.8456857132095764e-14
+simple caso43c.txt Role-Hybrid verified route_relative_difference 4.471282348556785e-15
+simple caso43c.txt SA-Mat verified route_relative_difference 4.471282348556785e-15
+simple caso43d.txt Base verified route_relative_difference 1.5868016657866365e-16
+simple caso43d.txt Flat-GM verified route_relative_difference 9.882147458485234e-15
+simple caso43d.txt Flat-L2 verified route_relative_difference 2.2987759225662817e-16
+simple caso43d.txt Role-Hybrid verified route_relative_difference 9.882147458485234e-15
+simple caso43d.txt SA-Mat verified route_relative_difference 9.882147458485234e-15
+simple caso43e.txt Base verified route_relative_difference 0.0
+simple caso43e.txt Flat-GM verified route_relative_difference 2.904892985035649e-14
+simple caso43e.txt Flat-L2 verified route_relative_difference 5.746939924824728e-16
+simple caso43e.txt Role-Hybrid verified route_relative_difference 2.904892985035649e-14
+simple caso43e.txt SA-Mat verified route_relative_difference 2.904892985035649e-14
+simple caso43f.txt Base verified route_relative_difference 1.5868016657866365e-16
+simple caso43f.txt Flat-GM verified route_relative_difference 2.0945999318722862e-14
+simple caso43f.txt Flat-L2 verified route_relative_difference 2.2987759225662817e-16
+simple caso43f.txt Role-Hybrid verified route_relative_difference 2.0945999318722862e-14
+simple caso43f.txt SA-Mat verified route_relative_difference 2.0945999318722862e-14
+simple caso44a.txt Base verified route_relative_difference 0.0
+simple caso44a.txt Flat-GM verified route_relative_difference 3.6393781124997753e-14
+simple caso44a.txt Flat-L2 verified route_relative_difference 2.266110276838871e-16
+simple caso44a.txt Role-Hybrid verified route_relative_difference 3.6393781124997753e-14
+simple caso44a.txt SA-Mat verified route_relative_difference 3.6393781124997753e-14
+simple caso44b.txt Base verified route_relative_difference 0.0
+simple caso44b.txt Flat-GM verified route_relative_difference 1.0054309616704492e-14
+simple caso44b.txt Flat-L2 verified route_relative_difference 2.266110276838871e-16
+simple caso44b.txt Role-Hybrid verified route_relative_difference 1.0054309616704492e-14
+simple caso44b.txt SA-Mat verified route_relative_difference 1.0054309616704492e-14
+simple caso44c.txt Base verified route_relative_difference 0.0
+simple caso44c.txt Flat-GM verified route_relative_difference 3.61334103577581e-14
+simple caso44c.txt Flat-L2 verified route_relative_difference 2.266110276838871e-16
+simple caso44c.txt Role-Hybrid verified route_relative_difference 3.61334103577581e-14
+simple caso44c.txt SA-Mat verified route_relative_difference 3.61334103577581e-14
+simple caso44d.txt Base verified route_relative_difference 0.0
+simple caso44d.txt Flat-GM verified route_relative_difference 9.323034309198845e-15
+simple caso44d.txt Flat-L2 verified route_relative_difference 1.9683468376583092e-16
+simple caso44d.txt Role-Hybrid verified route_relative_difference 9.323034309198845e-15
+simple caso44d.txt SA-Mat verified route_relative_difference 9.323034309198845e-15
+simple caso44e.txt Base verified route_relative_difference 0.0
+simple caso44e.txt Flat-GM verified route_relative_difference 2.4945782647494143e-14
+simple caso44e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso44e.txt Role-Hybrid verified route_relative_difference 2.4945782647494143e-14
+simple caso44e.txt SA-Mat verified route_relative_difference 2.4945782647494143e-14
+simple caso44f.txt Base verified route_relative_difference 0.0
+simple caso44f.txt Flat-GM verified route_relative_difference 9.323034309198845e-15
+simple caso44f.txt Flat-L2 verified route_relative_difference 1.9683468376583092e-16
+simple caso44f.txt Role-Hybrid verified route_relative_difference 9.323034309198845e-15
+simple caso44f.txt SA-Mat verified route_relative_difference 9.323034309198845e-15
+simple caso45a.txt Base verified route_relative_difference 1.1738894515501527e-16
+simple caso45a.txt Flat-GM verified route_relative_difference 3.7271835166371295e-14
+simple caso45a.txt Flat-L2 verified route_relative_difference 4.052299154429297e-15
+simple caso45a.txt Role-Hybrid verified route_relative_difference 3.7271835166371295e-14
+simple caso45a.txt SA-Mat verified route_relative_difference 3.7271835166371295e-14
+simple caso45b.txt Base verified route_relative_difference 1.7608343863033354e-16
+simple caso45b.txt Flat-GM verified route_relative_difference 1.3035608823294519e-14
+simple caso45b.txt Flat-L2 verified route_relative_difference 1.714162711155132e-16
+simple caso45b.txt Role-Hybrid verified route_relative_difference 1.3035608823294519e-14
+simple caso45b.txt SA-Mat verified route_relative_difference 1.3035608823294519e-14
+simple caso45c.txt Base verified route_relative_difference 0.0
+simple caso45c.txt Flat-GM verified route_relative_difference 8.538323119807969e-16
+simple caso45c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso45c.txt Role-Hybrid verified route_relative_difference 8.538323119807969e-16
+simple caso45c.txt SA-Mat verified route_relative_difference 8.538323119807969e-16
+simple caso45d.txt Base verified route_relative_difference 0.0
+simple caso45d.txt Flat-GM verified route_relative_difference 4.181721056397761e-14
+simple caso45d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso45d.txt Role-Hybrid verified route_relative_difference 4.181721056397761e-14
+simple caso45d.txt SA-Mat verified route_relative_difference 4.181721056397761e-14
+simple caso45e.txt Base verified route_relative_difference 0.0
+simple caso45e.txt Flat-GM verified route_relative_difference 2.2786185415102697e-14
+simple caso45e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso45e.txt Role-Hybrid verified route_relative_difference 2.2786185415102697e-14
+simple caso45e.txt SA-Mat verified route_relative_difference 2.2786185415102697e-14
+simple caso45f.txt Base verified route_relative_difference 0.0
+simple caso45f.txt Flat-GM verified route_relative_difference 4.181721056397761e-14
+simple caso45f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso45f.txt Role-Hybrid verified route_relative_difference 4.181721056397761e-14
+simple caso45f.txt SA-Mat verified route_relative_difference 4.181721056397761e-14
+simple caso46a.txt Base verified route_relative_difference 2.7907956533504557e-16
+simple caso46a.txt Flat-GM verified route_relative_difference 1.5052077292170206e-14
+simple caso46a.txt Flat-L2 verified route_relative_difference 1.395402602742469e-16
+simple caso46a.txt Role-Hybrid verified route_relative_difference 1.5052077292170206e-14
+simple caso46a.txt SA-Mat verified route_relative_difference 1.5052077292170206e-14
+simple caso46b.txt Base verified route_relative_difference 1.80725246873821e-16
+simple caso46b.txt Flat-GM verified route_relative_difference 7.32711994164753e-16
+simple caso46b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso46b.txt Role-Hybrid verified route_relative_difference 7.32711994164753e-16
+simple caso46b.txt SA-Mat verified route_relative_difference 7.32711994164753e-16
+simple caso46c.txt Base verified route_relative_difference 1.557884514054865e-16
+simple caso46c.txt Flat-GM verified route_relative_difference 2.5156601514891346e-15
+simple caso46c.txt Flat-L2 verified route_relative_difference 1.233970608428689e-16
+simple caso46c.txt Role-Hybrid verified route_relative_difference 2.5156601514891346e-15
+simple caso46c.txt SA-Mat verified route_relative_difference 2.5156601514891346e-15
+simple caso46d.txt Base verified route_relative_difference 0.0
+simple caso46d.txt Flat-GM verified route_relative_difference 2.8580343955257884e-14
+simple caso46d.txt Flat-L2 verified route_relative_difference 3.803095210345945e-15
+simple caso46d.txt Role-Hybrid verified route_relative_difference 2.8580343955257884e-14
+simple caso46d.txt SA-Mat verified route_relative_difference 2.8580343955257884e-14
+simple caso46e.txt Base verified route_relative_difference 0.0
+simple caso46e.txt Flat-GM verified route_relative_difference 5.0875344929396594e-15
+simple caso46e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso46e.txt Role-Hybrid verified route_relative_difference 5.0875344929396594e-15
+simple caso46e.txt SA-Mat verified route_relative_difference 5.0875344929396594e-15
+simple caso46f.txt Base verified route_relative_difference 0.0
+simple caso46f.txt Flat-GM verified route_relative_difference 8.513129933326697e-16
+simple caso46f.txt Flat-L2 verified route_relative_difference 0.0
+simple caso46f.txt Role-Hybrid verified route_relative_difference 8.513129933326697e-16
+simple caso46f.txt SA-Mat verified route_relative_difference 8.513129933326697e-16
+simple caso47a.txt Base verified route_relative_difference 0.0
+simple caso47a.txt Flat-GM verified route_relative_difference 1.8977243470083017e-14
+simple caso47a.txt Flat-L2 verified route_relative_difference 1.1452245725583316e-16
+simple caso47a.txt Role-Hybrid verified route_relative_difference 1.8977243470083017e-14
+simple caso47a.txt SA-Mat verified route_relative_difference 1.8977243470083017e-14
+simple caso47b.txt Base verified route_relative_difference 1.5684550754942042e-14
+simple caso47b.txt Flat-GM verified route_relative_difference 5.265236460211084e-15
+simple caso47b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso47b.txt Role-Hybrid verified route_relative_difference 5.265236460211084e-15
+simple caso47b.txt SA-Mat verified route_relative_difference 5.265236460211084e-15
+simple caso47c.txt Base verified route_relative_difference 0.0
+simple caso47c.txt Flat-GM verified route_relative_difference 4.957597794368246e-15
+simple caso47c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso47c.txt Role-Hybrid verified route_relative_difference 4.957597794368246e-15
+simple caso47c.txt SA-Mat verified route_relative_difference 4.957597794368246e-15
+simple caso47d.txt Base verified route_relative_difference 1.4061585143149497e-16
+simple caso47d.txt Flat-GM verified route_relative_difference 7.681187940236879e-14
+simple caso47d.txt Flat-L2 verified route_relative_difference 4.2184784107754084e-16
+simple caso47d.txt Role-Hybrid verified route_relative_difference 7.681187940236879e-14
+simple caso47d.txt SA-Mat verified route_relative_difference 7.681187940236879e-14
+simple caso47e.txt Base verified route_relative_difference 3.844419087130069e-15
+simple caso47e.txt Flat-GM verified route_relative_difference 3.4149845171876043e-14
+simple caso47e.txt Flat-L2 verified route_relative_difference 1.1785678351879434e-14
+simple caso47e.txt Role-Hybrid verified route_relative_difference 3.4149845171876043e-14
+simple caso47e.txt SA-Mat verified route_relative_difference 3.4149845171876043e-14
+simple caso47f.txt Base verified route_relative_difference 1.4061585143149497e-16
+simple caso47f.txt Flat-GM verified route_relative_difference 4.682790735176429e-16
+simple caso47f.txt Flat-L2 verified route_relative_difference 1.7599676953333264e-15
+simple caso47f.txt Role-Hybrid verified route_relative_difference 4.682790735176429e-16
+simple caso47f.txt SA-Mat verified route_relative_difference 4.682790735176429e-16
+simple caso48a.txt Base verified route_relative_difference 0.0
+simple caso48a.txt Flat-GM verified route_relative_difference 1.725316092633871e-14
+simple caso48a.txt Flat-L2 verified route_relative_difference 0.0
+simple caso48a.txt Role-Hybrid verified route_relative_difference 1.725316092633871e-14
+simple caso48a.txt SA-Mat verified route_relative_difference 1.725316092633871e-14
+simple caso48b.txt Base verified route_relative_difference 1.890426451453167e-14
+simple caso48b.txt Flat-GM verified route_relative_difference 8.022273967932701e-15
+simple caso48b.txt Flat-L2 verified route_relative_difference 0.0
+simple caso48b.txt Role-Hybrid verified route_relative_difference 8.022273967932701e-15
+simple caso48b.txt SA-Mat verified route_relative_difference 8.022273967932701e-15
+simple caso48c.txt Base verified route_relative_difference 0.0
+simple caso48c.txt Flat-GM verified route_relative_difference 0.22599843264173008
+simple caso48c.txt Flat-L2 verified route_relative_difference 0.0
+simple caso48c.txt Role-Hybrid verified route_relative_difference 0.22599843264173008
+simple caso48c.txt SA-Mat verified route_relative_difference 0.22599843264173008
+simple caso48d.txt Base verified route_relative_difference 0.0
+simple caso48d.txt Flat-GM verified route_relative_difference 8.67958699696969e-15
+simple caso48d.txt Flat-L2 verified route_relative_difference 0.0
+simple caso48d.txt Role-Hybrid verified route_relative_difference 8.67958699696969e-15
+simple caso48d.txt SA-Mat verified route_relative_difference 8.67958699696969e-15
+simple caso48e.txt Base verified route_relative_difference 1.7613872095954982e-16
+simple caso48e.txt Flat-GM verified route_relative_difference 2.645995009242977e-15
+simple caso48e.txt Flat-L2 verified route_relative_difference 0.0
+simple caso48e.txt Role-Hybrid verified route_relative_difference 2.645995009242977e-15
+simple caso48e.txt SA-Mat verified route_relative_difference 2.645995009242977e-15
+simple caso48f.txt Base verified route_relative_difference 0.0
+simple caso48f.txt Flat-GM verified route_relative_difference 2.2776394816825935e-15
+simple caso48f.txt Flat-L2 verified route_relative_difference 1.7328185187562268e-15
+simple caso48f.txt Role-Hybrid verified route_relative_difference 2.2776394816825935e-15
+simple caso48f.txt SA-Mat verified route_relative_difference 2.2776394816825935e-15
+full instance001.txt Base verified route_relative_difference 0.0
+full instance001.txt Flat-GM verified route_relative_difference 2.082487500777193e-14
+full instance001.txt Flat-L2 verified route_relative_difference 0.0
+full instance001.txt Role-Hybrid verified route_relative_difference 2.082487500777193e-14
+full instance001.txt SA-Mat verified route_relative_difference 2.082487500777193e-14
+full instance002.txt Base verified route_relative_difference 0.0
+full instance002.txt Flat-GM verified route_relative_difference 3.1463818426401073e-15
+full instance002.txt Flat-L2 verified route_relative_difference 4.793718669408161e-15
+full instance002.txt Role-Hybrid verified route_relative_difference 3.1463818426401073e-15
+full instance002.txt SA-Mat verified route_relative_difference 3.1463818426401073e-15
+full instance003.txt Base verified route_relative_difference 0.0
+full instance003.txt Flat-GM verified route_relative_difference 1.0736143562816986e-14
+full instance003.txt Flat-L2 verified route_relative_difference 1.8575231049306673e-14
+full instance003.txt Role-Hybrid verified route_relative_difference 1.0736143562816986e-14
+full instance003.txt SA-Mat verified route_relative_difference 1.0736143562816986e-14
+full instance004.txt Base verified route_relative_difference 0.0
+full instance004.txt Flat-GM verified route_relative_difference 2.7231339987431483e-14
+full instance004.txt Flat-L2 verified route_relative_difference 2.1653029809402127e-15
+full instance004.txt Role-Hybrid verified route_relative_difference 2.7231339987431483e-14
+full instance004.txt SA-Mat verified route_relative_difference 2.7231339987431483e-14
+full instance005.txt Base verified route_relative_difference 0.0
+full instance005.txt Flat-GM verified route_relative_difference 4.318902585977243e-14
+full instance005.txt Flat-L2 verified route_relative_difference 0.0
+full instance005.txt Role-Hybrid verified route_relative_difference 4.318902585977243e-14
+full instance005.txt SA-Mat verified route_relative_difference 4.318902585977243e-14
+full instance009.txt Base verified route_relative_difference 1.6587386444614945e-16
+full instance009.txt Flat-GM verified route_relative_difference 2.2252495854533783e-14
+full instance009.txt Flat-L2 verified route_relative_difference 1.2851958151260998e-14
+full instance009.txt Role-Hybrid verified route_relative_difference 2.2252495854533783e-14
+full instance009.txt SA-Mat verified route_relative_difference 2.2252495854533783e-14
+full instance010.txt Base verified route_relative_difference 0.0
+full instance010.txt Flat-GM verified route_relative_difference 1.8145598764209085e-14
+full instance010.txt Flat-L2 verified route_relative_difference 0.0
+full instance010.txt Role-Hybrid verified route_relative_difference 1.8030020665511587e-14
+full instance010.txt SA-Mat verified route_relative_difference 1.8030020665511587e-14
+full instance011.txt Base verified route_relative_difference 0.0
+full instance011.txt Flat-GM verified route_relative_difference 1.5384355858964233e-14
+full instance011.txt Flat-L2 verified route_relative_difference 0.0
+full instance011.txt Role-Hybrid verified route_relative_difference 1.5384355858964233e-14
+full instance011.txt SA-Mat verified route_relative_difference 1.5384355858964233e-14
+full instance012.txt Base verified route_relative_difference 4.323735354634739e-16

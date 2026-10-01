@@ -13,6 +13,7 @@ solved; the budgets are declared inputs, not measurements.
 """
 import argparse
 import csv
+import gzip
 import json
 import math
 import re
@@ -33,9 +34,17 @@ OP = re.compile(r"(<=|>=|=)\s*([-0-9.eE+]+)\s*$")
 
 def rows(path):
     """(family, coefficients, rhs) for every constraint of an LP export."""
-    text = path.read_text()
-    body = text.split("Subject To", 1)[1]
-    body = re.split(r"\nBounds\n|\nBinaries\n|\nGenerals\n|\nEnd\n", body)[0]
+    text = (gzip.decompress(path.read_bytes()).decode() if path.suffix == ".gz"
+            else path.read_text())
+    # Gurobi writes "Subject To", the solver-free DummyLp exporter writes "s.t.".
+    head = re.search(r"^(?:Subject To|s\.t\.)\s*$", text, re.M)
+    if head is None:
+        raise ValueError("no constraint section in %s" % path)
+    body = text[head.end():]
+    # Section keywords are case-insensitive in the LP format, and the two writers differ:
+    # Gurobi emits "Bounds"/"Binaries", the DummyLp exporter "bounds"/"binary".
+    body = re.split(r"(?im)^(?:bounds|binaries|binary|generals|general|integers|end)\s*$",
+                    body)[0]
     current, out = None, []
     for line in body.splitlines():
         m = ROW.match(line)
