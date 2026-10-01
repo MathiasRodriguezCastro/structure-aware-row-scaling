@@ -93,6 +93,29 @@ covers small coefficients, the RHS, bounds, and objective values that the old fi
 precision format could lose. `code/build/` is not used for this target. A first build
 takes longer than the Python-only check.
 
+### What it costs, measured from a fresh clone
+
+Timed on 1 October 2026 on one machine --- Intel Core i7-13620H, 16 threads, 15 GB RAM,
+Ubuntu 22.04.5, kernel 6.8, g++ 11.4, TeX Live 2022/Debian, CPython 3.10.12 --- by cloning
+this repository into an empty directory and running each target in order. The log of that run
+is [`paper/research-audit/cleanroom-20261001.log`](paper/research-audit/cleanroom-20261001.log).
+
+| Command | Time | What it needs |
+|---|---|---|
+| `git clone` | 12 s | 5.3 GB on disk, of which 5.0 GB is the stored LP text and bases of the fixed-basis audit |
+| `make research-check-python` | 2 s | the pinned Python packages |
+| `make research-check` | 13 s | also a C++17 compiler; includes the first `build-audit` compile |
+| `make research-analysis` | 6 s | regenerates every current table, figure and summary |
+| `make research-fixed-basis-check` | 200 s | rebuilds all 1,530 bases from the LP text and recomputes their conditioning |
+| `make research-budget BUDGET_SOLVERS=highs BUDGET_OUT=...` | 7 s | `highspy`; 1,728 fresh configurations |
+| `make paper` | 3 s | pdfLaTeX and BibTeX; builds `paper/main.pdf` and the supplement |
+| `make -C paper mpc` | 4 s | rebuilds the Springer submission version from `paper/main.tex` |
+
+Nothing here needs a commercial solver. Gurobi and CPLEX are needed only to rerun their arms
+of the stress experiment and the operational campaign, both of which are reported from stored
+data. The one long step is the fixed-basis check, and it is the only one that reads the bulk
+data.
+
 ## Which data support the current manuscript?
 
 | Location under `results-revision/research-audit/` | Role |
