@@ -15,7 +15,7 @@ APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
         research-budget-analysis research-matrix-analysis research-operational-analysis \
         research-fixed-basis-analysis research-fixed-basis-check research-fixed-basis \
         research-fixed-basis-precision research-application-budgets \
-        research-application-export \
+        research-application-export research-online-resources \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
         research-rounding-check research-rounding-analysis rounding-note \
         research-robustness-analysis
@@ -31,6 +31,7 @@ help:
 	@echo "  make research-analysis      - regenerate current tables, figures and summaries"
 	@echo "  make research-application-budgets - declared-budget table and its delta sweep"
 	@echo "  make research-application-export  - re-export that model and compare byte by byte"
+	@echo "  make research-online-resources    - audit the two Online Resources before submitting"
 	@echo "  make paper                  - build main and supplement PDFs with pdfLaTeX"
 	@echo "  make audit-build            - isolated solver-free C++ build in code/build-audit"
 	@echo "Optional fresh experiments (new output directories only):"
@@ -98,6 +99,10 @@ research-budget-analysis:
 
 research-matrix-analysis:
 	$(PYTHON) scripts/research/analyze_identifiability.py
+
+# Pre-submission audit of Online Resource 1 and 2; see the script for what it checks.
+research-online-resources:
+	$(PYTHON) scripts/research/audit_online_resources.py
 
 # The declared residual contract on one dispatch model, and how far the budgets can be
 # tightened before a kernel stops being admissible. Reads the stored LP; no solver.
