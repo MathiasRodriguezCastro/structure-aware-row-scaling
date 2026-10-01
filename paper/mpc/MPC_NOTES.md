@@ -50,14 +50,21 @@ are Springer's own files, kept for provenance.
    unchanged. No ORCID was invented.
 6. **Abstract, keywords, MSC** now sit inside the `abstract` environment as the class expects.
    The keywords are the original six, reformatted with `\and`. See below for the abstract.
-7. **Declarations moved after the references**, as requested. Their text is unchanged:
-   *Funding and competing interests*, *Authorship and computational resources*, *Use of AI
-   assistance*. *Data and software availability* and *Supplementary information* keep their
-   position before the references, and the references to Online Resource 1 and Online Resource 2
-   are unchanged. The supplement is not merged into the article.
+7. **Declarations moved after the references**, as requested, together with the
+   acknowledgement. The headings are the ones Springer asks for: *Funding*, *Competing
+   interests*, *Author contributions*, *Ethics approval, consent and human or animal
+   participants* (not applicable) and *Use of AI assistance*, preceded by *Acknowledgements*,
+   which credits ClusterUY. *Data and software availability* and *Supplementary information*
+   keep their position before the references, and the references to Online Resource 1 and
+   Online Resource 2 are unchanged. The supplement is not merged into the article.
 8. **Bibliography style** `spmpsci` (Springer, mathematical and physical sciences, numbered),
-   replacing `plainnat`. The `.bib` file is unchanged: no entry, author, title, year, DOI or URL
-   was touched, and all 19 entries are still cited.
+   replacing `plainnat`. No entry, author, title, year or real DOI was changed for the format.
+   Two defects of the `.bib` were fixed, in both layouts: four documentation entries carried the
+   editorial note "documentation access year" in their `note` field, which `spmpsci` printed in
+   the reference list, and the IEEE 754 entry carried its DOI both in `note` and in `doi`, so it
+   printed twice. All twelve DOIs and seven URLs were then checked to resolve, and the twelve
+   DOIs were matched against Crossref on authors, year, volume and pages. All 19 entries are
+   still cited.
 9. **Three wide tables scaled.** The Springer text block is about a quarter narrower than the
    original layout, and Tables 3, 4 and 5 overflowed it. Each is wrapped in
    `\resizebox{\textwidth}{!}{...}`; the table sources are untouched, so every number, column and
@@ -65,27 +72,37 @@ are Springer's own files, kept for provenance.
 
 ## Fidelity check
 
-- The body of `main_mpc.tex` and `paper/main.tex` differ only by the two blank lines left where
-  the declarations were removed, the bibliography style, and the three `\resizebox` wrappers.
-  Everything else is byte-identical, verified by diff after normalising exactly those items.
-- `sections/*.tex`, `tables/*.tex`, `research-references.bib` and the three figure PDFs are
-  byte-identical copies (SHA-256 compared).
+Re-run after each revision; the figures below are from 1 October 2026.
+
+- The body of `main_mpc.tex` and `paper/main.tex` differ only by the blank lines left where the
+  declarations and the acknowledgement were removed, the bibliography style, the position of
+  that block, and the three `\resizebox` wrappers. After normalising exactly those items the
+  two bodies are identical string for string.
+- Every input `main_mpc.tex` reads --- `sections/*.tex`, the tables it uses,
+  `research-references.bib` and its two figure PDFs --- is a byte-identical copy of the original,
+  and `build_mpc.py` now refreshes them on every build so they cannot drift. (`paper/tables/`
+  additionally holds the sensitivity table of the supplement, which the article does not read;
+  the supplement ships as a PDF.)
 - Proposition and corollary numbers match the original PDF exactly: Proposition 4.1 (5
   occurrences), 4.2 (2), 4.3 (3), 5.1 (5), 5.3 (3), Corollary 5.2 (1), and no stray "Theorem".
-- Every reported value, policy name, solver version and instance or run count was compared
-  between the two rendered PDFs: 0.698, 0.682, 0.777, 0.778, 1.077, 1.078, 30--32\%, 4,320, 1,530,
-  1,080, 4,752, 10.2, 4.27, 4.97, Base, Flat-GM, Flat-L2, Role-Hybrid, SA-Mat, SA-Pre, GM-tight,
+- Every reported value, policy name, solver version and instance or run count was counted in
+  both rendered PDFs: 0.698, 0.682, 0.777, 0.778, 1.077, 1.078, 4,320, 1,530, 1,080, 4,752, 1,728,
+  192, 306, 10.2, 4.27, 4.97, Base, Flat-GM, Flat-L2, Role-Hybrid, SA-Mat, SA-Pre, GM-tight,
   Budget-only, Budget-GM, Budget-dyadic, Budget-round, GCD-floor, HiGHS 1.15.1, Gurobi 13.0.2,
-  CPLEX 22.1.2, SG-Ter-Mer, instance077, caso46e, "96 models", "240 assigned runs". The only
-  count differences are artefacts of the extraction: the original PDF carries review line numbers,
-  and the narrower measure hyphenates a few policy names across lines. The sources agree exactly.
+  CPLEX 22.1.2, SG-Ter-Mer, instance077, caso46e. Four counts came out one lower in the Springer
+  layout, and each has an identified cause in `pdftotext`, not in the document: "306" because the
+  original carries review line numbers and one of them is the number 306; "SA-Mat" and
+  "Budget-only" because a line break glues their hyphen in the narrower measure, so they extract
+  as "SAMat" and "Budgetonly" (adding those variants restores 17 and 11); and "Budget-round"
+  because one occurrence breaks next to a superscript and extracts as "Budget<sup>-6</sup>round".
+  The rendered text is correct in every case.
 - Conclusions, section titles and figure and table numbering are unchanged.
 
 ## Abstract
 
 MPC asks for roughly 150--250 words. The manuscript abstract was **272 words**; the MPC abstract
-is **241**, deliberately short of the limit because an editorial system that splits hyphenated
-terms would count more. All nine required messages are kept: the fixed-basis audit on 306 models; six to eight
+is **239** by `wc -w` on the source and **232** as extracted from the typeset PDF, deliberately
+short of the limit because an editorial system that splits hyphenated terms would count more. All nine required messages are kept: the fixed-basis audit on 306 models; six to eight
 orders of magnitude; the coupling-kernel rather than block-metadata explanation; the optimal
 factor $(1+\rho^2)^{-1/2}$; residual-budget contracts; the SG-Ter-Mer solver-work result; the
 seed and solver sensitivity; the stress test with verified optima; and the distinction between a
@@ -125,9 +142,9 @@ problem size. Editors sometimes adjust these, but they are now verified rather t
 ## Remaining warnings
 
 - 0 overfull boxes, 0 undefined references, 0 undefined citations, 0 LaTeX warnings.
-- 2 underfull `\vbox` warnings from page breaking around floats. Cosmetic; they do not affect
+- 3 underfull `\vbox` warnings from page breaking around floats. Cosmetic; they do not affect
   content and are usual in a float-heavy article.
-- 25 pages in the Springer layout, against 21 in the original.
+- 26 pages in the Springer layout, against 21 in the original.
 
 ## Submission package
 
@@ -135,12 +152,11 @@ problem size. Editors sometimes adjust these, but they are now verified rather t
 `abstract.tex`, the sections, tables and vector figures, the bibliography and `main_mpc.bbl`,
 the four Springer class and style files, the compiled manuscript, the cover letter, these notes,
 and the supplement as Online Resource~1. Online Resource~2 is
-`paper/submission/reproducibility-artifact.zip`. Rebuild both with
-`python3 scripts/research/package_submission.py`, then check them with
+`paper/submission/reproducibility-artifact.zip`. Rebuild the manuscript itself with
+`make -C paper mpc`, which regenerates `main_mpc.tex` from `paper/main.tex` and compiles it;
+rebuild the archives with `python3 scripts/research/package_submission.py`, then check them with
 `python3 scripts/research/validate_submission.py`, which extracts each archive, verifies its
-checksums and recompiles the manuscript from the bundle alone. The last run: checksums verified
-for all three archives, and the bundle rebuilt to 25 pages with no overfull boxes and no
-undefined references, using only the class files it ships.
+checksums and recompiles the manuscript from the bundle alone.
 
 ## Decisions that need your approval
 
@@ -155,4 +171,16 @@ undefined references, using only the class files it ships.
 3. **The MSC codes**, which are a proposal.
 4. **The scaled tables**, which are the least invasive way to fit the narrower measure. The
    alternative is to typeset them at `\footnotesize` in a full-width `table*`.
-5. **The abstract**, at 241 words, for you to compare with the 272-word original.
+5. **The abstract**, at 239 words, for you to compare with the 272-word original.
+
+## Cold reproduction
+
+The repository was cloned twice into empty directories and every license-free target was run in
+order; the logs are `paper/research-audit/cleanroom-20261001.log` and
+`cleanroom-20261001-pass2.log`. All targets returned zero. `make -C paper all` built the three
+documents from scratch with no overfull boxes and no undefined references (21, 11 and 26 pages),
+the HiGHS arm reran its 1,728 configurations and the independent checker audited them, the 1,530
+fixed bases were rebuilt from the stored LP text, and the certified rational bounds of Table~S2
+were recomputed bit for bit. Two defects that only a cold run exposes were found and fixed: the
+documented `python3 -m venv` step needs a package that Debian and Ubuntu do not install by
+default, and `research-fixed-basis-precision` did not create the parent of its output directory.

@@ -130,7 +130,9 @@ def main():
     ap.add_argument("--out", type=Path, help="default: <root>/precision-check")
     args = ap.parse_args()
     out = args.out or args.root / "precision-check"
-    out.mkdir(exist_ok=False)
+    # exist_ok stays false: a rerun must not overwrite a stored one. parents is needed because
+    # reruns/ does not exist in a fresh clone.
+    out.mkdir(parents=True, exist_ok=False)
     d = list(csv.DictReader((args.root / "fresh-results.csv").open()))
     cell = {(r["class"], r["instance"], r["variant"]): r for r in d}
     rng = np.random.default_rng(args.seed)

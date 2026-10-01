@@ -107,6 +107,9 @@ is [`paper/research-audit/cleanroom-20261001.log`](paper/research-audit/cleanroo
 | `make research-check` | 13 s | also a C++17 compiler; includes the first `build-audit` compile |
 | `make research-analysis` | 6 s | regenerates every current table, figure and summary |
 | `make research-fixed-basis-check` | 200 s | rebuilds all 1,530 bases from the LP text and recomputes their conditioning |
+| `make research-fixed-basis-precision` | 102 s | recomputes the certified rational bounds of the stress sample; reproduced them bit for bit |
+| `make research-application-budgets` | 3 s | regenerates the declared-budget table and its sweep |
+| `make research-application-export` | 11 s | re-exports that model and compares it byte by byte |
 | `make research-budget BUDGET_SOLVERS=highs BUDGET_OUT=...` | 7 s | `highspy`; 1,728 fresh configurations |
 | `make paper` | 3 s | pdfLaTeX and BibTeX; builds `paper/main.pdf` and the supplement |
 | `make -C paper mpc` | 4 s | rebuilds the Springer submission version from `paper/main.tex` |
