@@ -453,8 +453,8 @@ file-level audit ranks last is, in the class where the effect is largest, the be
 equilibration has run. The reverse also happens: Flat-GM, which improves all 34 Full models on the
 file, improves only 24 of them after equilibration. A condition number read on the exported
 representation therefore states a property of that representation, as
-\cref{tab:endpoints} says, and it does not order scaling kernels by what a solver will
-work with --- not even in sign, let alone in magnitude.
+\cref{tab:endpoints} says, and it does not order scaling kernels after a solver-style
+equilibration --- not even in sign, let alone in magnitude.
 
 \begin{table}[tb]
 \centering\small
@@ -721,13 +721,13 @@ amplification in \eqref{eq:rounding-budget}.
 
 \section{Conclusion}
 External row scaling changes the exported representation a great deal and the representation
-the solver works with rather less. Holding one basis fixed, it moves the condition number of
-the file by six to eight orders of magnitude in the median while preserving the MILP in exact
-arithmetic, and the kernel determines whether this happens; after the kind of equilibration a
-solver applies, what the choice is still worth is a factor of a few. The difference is not
+after a solver-style equilibration rather less. Holding one basis fixed, it moves the condition
+number of the file by six to eight orders of magnitude in the median while preserving the MILP
+in exact arithmetic, and the kernel determines whether this happens; after such an
+equilibration, what the choice is still worth is a factor of a few. The difference is not
 erased --- a row scaling is not in the kernel of an infinity-norm equilibration --- but the
-file-level figure is not a measure of what reaches the solver, and it does not even order the
-kernels correctly.
+file-level figure is not a measure of what necessarily survives solver-side scaling, and it
+does not even order the kernels correctly.
 
 Correct attribution changes the explanation of the gain. The advantage originally attributed to
 block metadata is a coupling-kernel effect: exact GM local normalization erases the
@@ -786,8 +786,8 @@ thesis work.
 \paragraph{Ethics approval, consent and human or animal participants.}
 Not applicable: the study involves no human participants, animals or personal data.
 \paragraph{Use of AI assistance.}
-AI assistants (OpenAI Codex and Anthropic Claude) were used as coding and writing tools
-during the preparation of this work: for implementation and verification code, for
+AI assistants (OpenAI ChatGPT and Codex, and Anthropic Claude) were used as coding and
+writing tools during the preparation of this work: for implementation and verification code, for
 derivations and their review, for analysis of the literature, and for drafting and
 editorial revision. Reported numerical results come from the stored computational runs,
 and figures were generated programmatically from those data or the stated equations. The
