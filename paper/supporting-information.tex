@@ -476,6 +476,50 @@ both tables from it. That export is written by the repository's own serializer r
 Gurobi, as the archived one was: the two differ in the last digits of their decimal output, which
 moves the reported quantities of one group by a relative $10^{-15}$ and nothing in either table.
 
+\section{Cross-run certificate audit}
+The audit of \S7.5 of the article uses two stored campaigns: the solver-robustness campaign,
+which was prepared, partly run and then stopped by decision, and the two replications of the
+operational reconstruction. Neither is a census and neither was designed to estimate how often a
+solver contradicts itself, so the counts below describe what occurred in the runs that exist.
+Table~\ref{tab:certificate-audit-detail} splits them by level and policy.
+
+The comparison rests on the stored verification. Each run's returned point is re-evaluated
+against the original unscaled model, so a point accepted on a scaled export is still checked
+where it has to hold, and \texttt{verif\_solver\_obj\_original} is its objective there. Points
+accepted at the campaign tolerance can be slightly infeasible, so the audit also carries a
+strict tier that only trusts points whose residuals are at round-off; the counts reported in the
+article use the ordinary tier, and the extreme case below is contradicted under both.
+
+\begin{table}[tb]
+\centering\small
+\caption{Cross-run certificate audit by level and policy. ``Dual bound'' counts runs whose
+reported bound lies above a verified point of the same model; ``Certificate'' counts the subset
+that also reported completion further from that point than the requested gap. Runs and
+instances are the totals of that level.}
+\label{tab:certificate-audit-detail}
+\input{tables/certificate-audit-detail}
+\end{table}
+
+\paragraph{The extreme case.} On \path{v1_simple_000293}, one of the recombined Simple models,
+eight runs exist at a 1\% gap and seed 1: four policies under each of Gurobi 13.0.1 and CPLEX
+22.1.2, all recorded against the same \texttt{instance\_sha256}. Seven of them return an
+objective between $-2.893\times10^8$ and $-2.913\times10^8$. The eighth, Gurobi on the unscaled
+Base export, returns $-1.317\times10^8$ with status optimal, a reported gap of zero and a dual
+bound equal to its objective. Its stored record shows one node explored against a root gap of
+$1.22$, a wall time of 6~s, and three solver warnings: large bounds, large matrix coefficients
+and large right-hand sides. Its returned point is feasible for the original model with maximum
+relative violation $1.2\times10^{-7}$ and relative activity violation $3.2\times10^{-14}$, so
+the point is sound and the bound is not. CPLEX on the same unscaled file explored 6,151 nodes,
+emitted no warnings and reached $-2.904\times10^8$. The best verified point of the instance,
+$-2.913\times10^8$, comes from Gurobi on the Flat-L2 export.
+
+Two readings are excluded by the record. The runs are not on different models, because the
+instance hash is identical across all eight. And the discrepancy is not an artifact of scaling,
+because the run that fails is the unscaled one and the same solver on two scaled exports of the
+same model does not fail. What the record does not establish is a cause inside the solver, which
+is not observable from these logs; the warnings and the single node are consistent with a
+tolerance-driven termination on a badly scaled model, and that is as far as the evidence goes.
+
 \section{Independent verification and arithmetic checks}
 The independent script \path{scripts/research/verify_saved_experiment.py} imports
 neither the experiment runner nor an optimizer. For each of the 96 stored models it

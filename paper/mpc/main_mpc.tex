@@ -130,7 +130,8 @@ compatibility conditions, an incompatibility certificate, the constrained logari
 factor, the integer-rounding term that scaling cannot remove, and exact binary64 export with
 power-of-two factors (\cref{sec:contract}).
 \item \emph{Validation.} A fixed-basis audit of 306 dispatch models, recomputed through a
-solver-style equilibration, a fresh audit of 1,080
+solver-style equilibration, an exploratory audit of stored runs against points verified feasible
+for the original model, a fresh audit of 1,080
 matched matrix exports, a reconstruction of 240 operational solver runs with two
 matched sensitivity reruns of the same size, and an exactly enumerated stress experiment with
 4,752 optimizer calls on three solvers
@@ -655,6 +656,51 @@ archived admissibility check records the corresponding counts for each kernel.}
 \resizebox{\textwidth}{!}{\input{tables/application-budget}}
 \end{table}
 
+\subsection{Exploratory cross-run certificate audit}
+\label{subsec:results-certificates}
+The enumerated family of \cref{subsec:results-budget} is the only setting here in which the
+optimum is known exactly, which is why it is small. A weaker check is available on the dispatch
+models themselves, and it is worth reporting because it concerns the same endpoint. Every run of
+the campaigns stored the point its solver returned, re-evaluated against the original unscaled
+model with exact residuals, so runs on one instance are comparable whatever policy, solver, gap
+or seed produced them, and any verified point is an upper bound on that instance's optimum. Two
+things can then contradict a run: a reported dual bound lying above a verified point, which
+makes the bound invalid, and, more strongly, a run that also reports completion at an objective
+further from that point than the gap it was asked for, which contradicts its completion
+certificate. \Cref{tab:certificate-audit} counts both. In the stopped campaign, 77 of 4,542 runs
+have an invalid bound, across 27 instances, and 25 of those runs, across 9 instances, have the
+certificate contradicted as well; in the operational replication the figures are 20 of 480 runs
+across 6 instances, and 9 runs across 4 instances. Neither campaign is a census --- the first
+was stopped by decision and the second covers a fixed 30-instance subset --- and neither was
+designed to estimate how often this happens, so these are occurrences in what was run and not
+rates. Online Resource~1, Table~S9 gives the breakdown by policy and level, and the audit of
+the extreme case.
+
+Two features of the counts matter more than their size. The unscaled model is not exempt: Base
+accounts for 5 of the 25 contradicted certificates in the first campaign and 1 of the 9 in the
+second, so this is not a defect that scaling introduces. And the largest discrepancy is not
+subtle. On \texttt{v1\_simple\_000293}, a Simple model that all eight of its runs share by
+file hash, Gurobi on the unscaled export reported an optimal status with a zero gap and a dual
+bound equal to its objective, at a point $54.8\%$ worse than a verified point from the same
+solver on a scaled export; it closed a root gap of $1.22$ in a single node, and emitted three
+warnings about large bounds, large matrix coefficients and large right-hand sides. The point it
+returned is feasible for the original model to round-off, so what failed is the bound, not the
+point. CPLEX on that same unscaled file explored 6,151 nodes and reached an objective $54.8\%$
+better. This is the phenomenon of \cref{subsec:results-budget} appearing on a model of the size
+that motivates the work, and it is reported as exploratory evidence: the stress family remains
+the one that establishes what the optimum is.
+
+\begin{table}[tb]
+\centering\small
+\caption{Cross-run certificate audit. ``Dual bound'' counts runs whose reported bound lies above
+a point verified feasible for the same model; ``Certificate'' counts the subset that also
+reported completion at an objective further from that point than the requested gap. ``Instances''
+is the number of distinct models in which a run of either kind occurs. Neither campaign is a
+census and neither estimates a rate.}
+\label{tab:certificate-audit}
+\input{tables/certificate-audit}
+\end{table}
+
 \section{Discussion}
 \label{sec:discussion}
 \subsection{What we learned}
@@ -709,7 +755,12 @@ representation reduced completed-run work and caused a timeout, the same factors
 differently by the three pipelines, and a one-ulp change in a factor changed outcomes in one of
 them. Pipeline, not solver: presolve, internal scaling, tolerances and finite precision all sit
 between the exported row and the point that comes back, and the experiments here cannot
-separate their contributions.
+separate their contributions. The certificate audit of \cref{subsec:results-certificates}
+points the same way from the opposite end. Runs whose own dual bound a verified point
+contradicts occur on the unscaled model as well as on scaled ones, and the extreme case is a
+solver reporting a proven optimum, on the unscaled export, at a point half again worse than one
+the other solver reaches from the same file. Whatever such a run shows, it is not that scaling
+caused it.
 
 \subsection{Scope and limitations}
 The operational evidence comes from one application: two instance classes and 15 fixed
@@ -719,8 +770,11 @@ one finding is configuration-dependent rather than a stable property of the repr
 far too small to describe the population of configurations. The stress instances are small and
 deliberately adversarial; their budget of 0.01 is a numerical test parameter, and the dispatch
 budgets of \cref{tab:application-budget} are stated by us to show what the contract implies,
-not supplied or validated by the operator. Solver outcomes depend on
-the solver, its version and its settings. The collapse result concerns the extrema-based block
+not supplied or validated by the operator. The certificate audit of
+\cref{subsec:results-certificates} is exploratory in a specific sense: it reads two stored
+campaigns, one of which was stopped by decision, neither of which was designed to estimate how
+often a solver contradicts itself, and it establishes that particular runs are wrong without
+establishing why. Solver outcomes depend on the solver, its version and its settings. The collapse result concerns the extrema-based block
 statistic after GM normalization; other block statistics, other kernels and physical scale
 information are outside it, and on the operational models the coupling rows receive the same
 factors under every GM-local policy, so ownership is tested only on synthetic matrices. Finally, row scaling cannot repair within-row
