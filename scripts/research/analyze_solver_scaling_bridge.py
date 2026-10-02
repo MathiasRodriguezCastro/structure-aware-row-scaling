@@ -32,37 +32,38 @@ def main():
     cols = ["kappa1_unscaled"] + [f"kappa1_equilibrated_{p}" for p in PASSES]
     base = d[d.variant == "Base"].set_index(["class", "instance"])[cols]
 
-    lines = [r"\begin{tabular}{llrrrrr}", r"\toprule",
-             r"Class & Policy & $n$ & As exported & \multicolumn{3}{c}{After equilibration} \\",
-             r"\cmidrule(lr){5-7}",
-             r" & & & & 1 pass & 2 passes & 10 passes \\", r"\midrule"]
+    lines = [r"\begin{tabular}{llrrrr}", r"\toprule",
+             r"Class & Policy & $n$ & As exported & 2 passes & 10 passes \\",
+             r"\midrule"]
     summary = []
     for key, label in CLASSES:
         sub = d[d["class"] == key]
         if sub.empty:
             continue
-        first = True
+        b = base.loc[key] if key in base.index.get_level_values(0) else None
+        lines.append(f"{label} & Base ($\\kappa_1$) & {len(b)} & {sci(b[cols[0]].median())} & "
+                     f"{sci(b[cols[2]].median())} & {sci(b[cols[4]].median())} \\\\")
         for pol in args.policies:
-            p = sub[sub.variant == pol].set_index(["class", "instance"])[cols]
-            common = p.index.intersection(base.index)
-            if not len(common):
+            p = sub[sub.variant == pol].set_index("instance")
+            if p.empty:
                 continue
-            ratios = [(p.loc[common, c] / base.loc[common, c]).median() for c in cols]
-            summary.append({"class": label, "policy": pol, "n": len(common),
-                            "unscaled": ratios[0], "p1": ratios[1], "p2": ratios[2],
-                            "p10": ratios[4]})
-            lines.append(f"{label if first else ''} & {pol} & {len(common)} & "
-                         f"{sci(ratios[0])} & {sci(ratios[1])} & {sci(ratios[2])} & "
-                         f"{sci(ratios[4])} \\\\")
-            first = False
-    lines += [r"\bottomrule", r"\end{tabular}"]
+            cells, rec = [], {"class": label, "policy": pol, "n": len(p)}
+            for c, tag in ((cols[0], "unscaled"), (cols[2], "p2"), (cols[4], "p10")):
+                r = (p[c] / b[c]).dropna()
+                cells.append(f"{sci(r.median())} ({int((r < 1).sum())})")
+                rec[tag] = r.median(); rec[tag + "_improved"] = int((r < 1).sum())
+            summary.append(rec)
+            lines.append(f" & {pol} & {len(p)} & " + " & ".join(cells) + r" \\")
+        lines.append(r"\midrule")
+    lines[-1] = r"\bottomrule"
+    lines.append(r"\end{tabular}")
     args.out.write_text("\n".join(lines) + "\n")
 
-    print(f"{'class':12s} {'policy':9s} {'n':>4s}  {'exported':>10s} {'1 pass':>10s} "
-          f"{'2 passes':>10s} {'10 passes':>10s}")
+    print(f"{'class':12s} {'policy':9s} {'n':>4s}  {'exported':>12s} {'2 passes':>12s} {'10 passes':>12s}")
     for r in summary:
-        print(f"{r['class']:12s} {r['policy']:9s} {r['n']:4d}  {r['unscaled']:10.3e} "
-              f"{r['p1']:10.3e} {r['p2']:10.3e} {r['p10']:10.3e}")
+        print(f"{r['class']:12s} {r['policy']:9s} {r['n']:4d}  "
+              f"{r['unscaled']:9.3e}({r['unscaled_improved']:3d}) "
+              f"{r['p2']:9.3e}({r['p2_improved']:3d}) {r['p10']:9.3e}({r['p10_improved']:3d})")
     base10 = base["kappa1_equilibrated_10"]
     print(f"\nmedian kappa1 of Base: as exported {base['kappa1_unscaled'].median():.3e}, "
           f"after 10 passes {base10.median():.3e}")

@@ -15,7 +15,7 @@ APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
         research-budget-analysis research-matrix-analysis research-operational-analysis \
         research-fixed-basis-analysis research-fixed-basis-check research-fixed-basis \
         research-fixed-basis-precision research-application-budgets \
-        research-application-export research-online-resources \
+        research-application-export research-online-resources research-bridge \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
         research-rounding-check research-rounding-analysis rounding-note \
         research-robustness-analysis
@@ -32,6 +32,7 @@ help:
 	@echo "  make research-application-budgets - declared-budget table and its delta sweep"
 	@echo "  make research-application-export  - re-export that model and compare byte by byte"
 	@echo "  make research-online-resources    - audit the two Online Resources before submitting"
+	@echo "  make research-bridge              - what a solver-style scaling leaves of the audit"
 	@echo "  make paper                  - build main and supplement PDFs with pdfLaTeX"
 	@echo "  make audit-build            - isolated solver-free C++ build in code/build-audit"
 	@echo "Optional fresh experiments (new output directories only):"
@@ -99,6 +100,14 @@ research-budget-analysis:
 
 research-matrix-analysis:
 	$(PYTHON) scripts/research/analyze_identifiability.py
+
+# Rescales every basis of the fixed-basis audit the way a solver would and recomputes kappa_1,
+# plus the constructed check that such a scaling does not undo a pre-export row scaling.
+BRIDGE_OUT ?= $(AUDIT_ROOT)/solver-scaling-bridge/bridge.csv
+research-bridge:
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/solver_scaling_bridge.py --out $(BRIDGE_OUT)
+	$(PYTHON) scripts/research/analyze_solver_scaling_bridge.py --csv $(BRIDGE_OUT)
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/equilibration_kernel_check.py
 
 # Pre-submission audit of Online Resource 1 and 2; see the script for what it checks.
 research-online-resources:

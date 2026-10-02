@@ -51,19 +51,21 @@ Residual-Budget Contracts}
 Multiplying a row of a mixed-integer program by a positive number preserves it exactly and
 changes the numbers a solver sees. We ask what that change buys and what it still guarantees.
 On 306 generated hydrothermal-dispatch models, holding each model's LP basis fixed across its
-representations, geometric-mean row scaling lowers its condition number on every
-model, by six to eight orders of magnitude in the median of each class. An apparent block-metadata effect is a coupling-kernel effect:
-geometric-mean centering makes the extrema-based block statistic identically one, so the
-block-relative rule becomes Euclidean normalization, which a control without ownership
-information reproduces; the idealized coupling problem has optimal factor
-$(1+\rho^2)^{-1/2}$. Residual budgets stated in application units, by contrast, survive
-consistent re-emission, and we characterize exactly the row factors compatible with a budget
-and coefficient limits. In reconstructed dispatch runs with Gurobi, scaling used 30--32\% less
-solver work on the 14 SG-Ter-Mer instances every policy completed, while one instance timed out
-under every scaled policy and reversed the failure-sensitive ordering, and reruns reproduce the gain with a second seed but not a second solver. In an exactly enumerated stress test, plain centering lost
-verified optima on all three solvers, adding the budget to that same rule lost none, and whether scaling helped at all differed across the three
-pipelines. A representation can be numerically better without being operationally safer, unless
-what safer means is stated in the units of the original model.
+representations, geometric-mean row scaling lowers the condition number of the exported file on
+every model, by six to eight orders of magnitude in the median of each class. That figure
+describes the file: rescaling the same bases the way a solver does recovers most of it, leaving
+a factor of a few, and on one class it inverts the ordering of kernels, so a diagnostic read on
+the exported matrix does not rank scaling policies. We then separate two kinds of
+information. An apparent block-metadata effect is a coupling-kernel effect, because
+geometric-mean centering makes the extrema-based block statistic identically one; a residual
+budget in application units, by contrast, survives consistent re-emission, and we characterize
+exactly the row factors a budget and coefficient limits admit. In reconstructed dispatch runs, scaling used
+30--32\% less solver work on the instances every policy completed, while one timed out under
+every scaled policy and reversed the failure-sensitive ordering. In an enumerated stress test,
+plain centering lost verified optima on all three solvers and adding the budget to that same
+rule lost none. A representation can be numerically better without
+being operationally safer, unless what safer means is stated in the units of the original
+model.
 \keywords{Mixed-integer linear programming \and Row scaling \and Numerical reliability \and
 Equilibration \and Residual budgets \and Computational reproducibility}
 %% MSC 2020, checked against the AMS list (mathscinet.ams.org/msnhtml/msc2020.pdf):
@@ -82,11 +84,15 @@ tolerance. Solvers scale internally; a generator can also scale before export an
 information that a matrix file does not carry, such as row roles, variable ownership and
 application units \cite{gurobiExternalScaling,idaesScaling}.
 
-The numerical effect of external row scaling can be large. On 306 dispatch models from a
+The numerical effect of external row scaling looks large. On 306 dispatch models from a
 hydrothermal generator, holding one LP basis fixed across representations, geometric-mean
 row scaling lowers the 1-norm condition number of that basis on every model, by six to eight
-orders of magnitude in the median of each class (\cref{subsec:results-fixed-basis}). A gain of this
-kind leaves one question open, in two halves:
+orders of magnitude in the median of each class (\cref{subsec:results-fixed-basis}). It looks
+large because it is measured on the file the generator writes. Rescale the same bases the way a
+solver does and most of it is recovered by the solver itself, leaving a factor of a few, and on
+one of the three classes the ordering of the scaling kernels reverses
+(\cref{subsec:results-bridge}). So the number is real, it is not the whole story, and a gain of
+this kind leaves one question open, in two halves:
 \begin{quote}
 \emph{when external preprocessing changes a generated MILP, what caused the numerical
 improvement, and what guarantee about the original model survives the change?}
@@ -105,7 +111,10 @@ are the following.
 coverage, row roles, kernels and safeguards are matched. With such controls, the
 order-of-magnitude conditioning advantage of a block-relative coupling rule over flat
 geometric-mean normalization is reproduced by a rule that uses no block scales, including its
-growth with block heterogeneity (\cref{sec:identifiability,subsec:results-kernel}).
+growth with block heterogeneity (\cref{sec:identifiability,subsec:results-kernel}). A matrix
+diagnostic read on the exported file also fails to rank the kernels it compares: recomputed
+after the scaling a solver applies, the separation falls from orders of magnitude to a factor
+of a few and, on one class, changes sign (\cref{subsec:results-bridge}).
 \item \emph{Mechanism.} Geometric-mean row centering makes the post-local extrema-based block
 statistic identically one, so the block-relative coupling formula reduces to Euclidean row
 normalization. After local whitening --- that is, once each local block's rows have been
@@ -118,7 +127,8 @@ re-emission, that is, rewriting a row and its right-hand side in different units
 compatibility conditions, an incompatibility certificate, the constrained logarithmic minimax
 factor, the integer-rounding term that scaling cannot remove, and exact binary64 export with
 power-of-two factors (\cref{sec:contract}).
-\item \emph{Validation.} A fixed-basis audit of 306 dispatch models, a fresh audit of 1,080
+\item \emph{Validation.} A fixed-basis audit of 306 dispatch models, recomputed through a
+solver-style equilibration, a fresh audit of 1,080
 matched matrix exports, a reconstruction of 240 operational solver runs with two
 matched sensitivity reruns of the same size, and an exactly enumerated stress experiment with
 4,752 optimizer calls on three solvers
@@ -302,7 +312,10 @@ each of the Simple and SG-Ter-Mer classes with Gurobi at relative MIP gaps of 1\
 (seed 42, 16 threads, 1,800-second limit): 240 assigned runs, whose native logs and input
 hashes were retrieved from the cluster. Its mean PAR10 is the only quantity reported here in
 units of time, and all 240 logs name one processor and operating system; Online Resource 1,
-Table~S3 states the environment of every campaign. The subsets were fixed before outcomes were inspected. Nine of the 15 SG-Ter-Mer instances, including instance077, carry the scenario defect of
+Table~S3 states the environment of every campaign. The two subsets are the ones that historical campaign ran, listed in Online Resource~1;
+they predate this analysis, so they were not chosen after these endpoints were seen. No
+selection rule was recorded with them, and we therefore claim only that, not
+pre-registration. Nine of the 15 SG-Ter-Mer instances, including instance077, carry the scenario defect of
 \cref{subsec:design-bank}; Online Resource 1 repeats the endpoints on the six instances
 without it.
 The pre-specified primary endpoint is failure-sensitive performance: the arithmetic-mean PAR10
@@ -411,6 +424,52 @@ Base on 44 of 306 models; on the synthetic coupling matrices it reproduces the e
 attributed to block metadata. A kernel ranking obtained from one matrix diagnostic therefore
 does not transfer to another family, still less to solver behavior, and the endpoints of
 \cref{tab:endpoints} have to be measured where they are claimed.
+
+\subsection{What the solver's own scaling leaves}
+\label{subsec:results-bridge}
+Every solver equilibrates internally, so a conditioning difference measured on the exported
+file need not be one the solver ever sees. To find out what survives, the same 1,530 bases were
+rescaled by an iterative row-and-column infinity-norm equilibration with factors rounded to
+powers of two --- the scheme the three solvers describe, and the rounding that keeps every
+scaled coefficient exact in binary64 --- and $\kappa_1$ was recomputed after each pass. This is
+a model of a solver's scaling stage, not any solver's implementation, and no optimizer is
+called; what it isolates is how much of a pre-export difference an equilibration of this kind
+can remove.
+
+It removes most of it, and it does not remove all of it
+(\cref{tab:solver-scaling-bridge}). The equilibration is itself worth ten to fourteen orders of
+magnitude on the unscaled file: the median Base basis falls from $8.9\times10^{18}$ to
+$1.6\times10^{8}$ in Simple and from $2.9\times10^{20}$ to $2.9\times10^{6}$ in SG-Ter-Mer. Of
+the six to eight orders that separated Flat-GM from Base on the file, what is left afterwards
+is a factor of about six in Simple and SG-Ter-Mer and about two in Full. The surviving part is
+not an artifact of precision. On 200 random matrices scaled by exact powers of two, so that the
+scaled matrix is bit-identical to the product and nothing is lost in forming it, a converged
+equilibration never brought the two representations within a factor of two of each other: the
+median separation is 22 and the largest 755. An infinity-norm equilibration has no unique fixed
+point, and a row scaling applied before it is not in its kernel, which is why the file a
+generator writes still constrains what the solver's own scaling can reach.
+
+The more consequential observation is that the ranking does not survive. On the exported file
+Flat-L2 is the weak policy, with median ratios near 1.5 and improvements on 32 of 204, 10 of 68
+and 2 of 34 models. After equilibration it improves 177, 67 and 26 of them, and in SG-Ter-Mer
+its median ratio is $4.5\times10^{-2}$, four times better than Flat-GM's 0.181. The policy the
+file-level audit ranks last is, in the class where the effect is largest, the best one once the
+solver has scaled. The reverse also happens: Flat-GM, which improves all 34 Full models on the
+file, improves only 24 of them after equilibration. A condition number read on the exported
+representation therefore states a property of that representation, as
+\cref{tab:endpoints} says, and it does not order scaling kernels by what a solver will
+work with --- not even in sign, let alone in magnitude.
+
+\begin{table}[tb]
+\centering\small
+\caption{What survives a solver-style scaling. For each class the first row is the median
+$\kappa_1$ of the Base basis; the others give the median per-instance ratio
+$\kappa_1(\text{policy})/\kappa_1(\text{Base})$ with, in parentheses, the number of models on
+which the policy lowers $\kappa_1$. Columns are the exported file and the same bases after two
+and ten passes of power-of-two row-and-column equilibration.}
+\label{tab:solver-scaling-bridge}
+\input{tables/solver-scaling-bridge}
+\end{table}
 
 \subsection{A kernel effect mistaken for a block effect}
 \label{subsec:results-kernel}
@@ -595,9 +654,15 @@ archived admissibility check records the corresponding counts for each kernel.}
 \section{Discussion}
 \label{sec:discussion}
 \subsection{What we learned}
-\paragraph{Row scaling can substantially change numerical conditioning.} With the basis held
-fixed, the representation alone moves the condition number by six to eight orders of magnitude
-in the median, and the kernel decides whether it does.
+\paragraph{Row scaling changes the exported representation, and part of that reaches the
+solver.} With the basis held fixed, the representation alone moves the condition number of the
+exported file by six to eight orders of magnitude in the median, and the kernel decides whether
+it does. That figure describes the file. A solver-style equilibration applied to the same bases
+recovers most of it --- ten to fourteen orders on the unscaled model --- and what the choice of
+export is still worth afterwards is a factor of about six in two classes and two in the third.
+The pre-export choice is not erased, because an infinity-norm equilibration does not undo a row
+scaling, but it is worth far less than the file-level number suggests, and on one class it
+inverts: the kernel that ranks last on the file ranks first after the solver has scaled.
 
 \paragraph{The mechanism is simpler than the metadata explanation.} Under exact GM local
 normalization, the extrema-based post-local block statistic carries no block-scale information
@@ -610,6 +675,15 @@ structure has a single coupling row.
 coupling kernel together with the information used, and the fixed-basis audit shows how much a
 kernel alone can change: identical coverage, representations orders of magnitude apart. A claim
 that generator information improves preprocessing needs a kernel-matched control.
+
+\paragraph{A condition number of an exported file does not rank scaling policies.} It is the
+natural thing to measure, because it needs no optimizer and no license, and this paper measures
+it on 306 models. What \cref{subsec:results-bridge} shows is that it should not be used to
+choose between kernels: after the kind of scaling every solver applies, the ordering it gives
+is wrong in sign on one of the three classes and compressed by six orders of magnitude on the
+others. Anyone comparing pre-export scalings by a matrix diagnostic should report what remains
+of the difference once that diagnostic is recomputed through the solver's own scaling stage,
+which costs no optimizer time.
 
 \paragraph{Residual budgets are a meaningful invariant quantity.} A residual budget carried
 consistently with its row defines a contract that is invariant under consistent re-emission ---
@@ -649,9 +723,14 @@ heterogeneity beyond the limit in \eqref{eq:budget-feasibility} or the integer-r
 amplification in \eqref{eq:rounding-budget}.
 
 \section{Conclusion}
-External row scaling genuinely matters numerically. Holding one basis fixed, it changes the
-conditioning of generated dispatch models by six to eight orders of magnitude in the median
-while preserving the MILP in exact arithmetic, and the kernel determines whether this happens.
+External row scaling changes the exported representation a great deal and the representation
+the solver works with rather less. Holding one basis fixed, it moves the condition number of
+the file by six to eight orders of magnitude in the median while preserving the MILP in exact
+arithmetic, and the kernel determines whether this happens; after the kind of equilibration a
+solver applies, what the choice is still worth is a factor of a few. The difference is not
+erased --- a row scaling is not in the kernel of an infinity-norm equilibration --- but the
+file-level figure is not a measure of what reaches the solver, and it does not even order the
+kernels correctly.
 
 Correct attribution changes the explanation of the gain. The advantage originally attributed to
 block metadata is a coupling-kernel effect: exact GM local normalization erases the
@@ -668,8 +747,10 @@ tested.
 
 What a solver does with a scaled representation still has to be measured, and its output still
 has to be verified. The practical lesson is therefore not to avoid external scaling, but to make
-it accountable: attribute its gains with matched controls, state its accuracy contract in the
-model's own units, and verify solver output against that contract.
+it accountable, in three steps that cost no optimizer time: attribute its gains with
+kernel-matched controls, measure them again through the solver's own scaling stage before
+believing the ordering they give, and state its accuracy contract in the model's own units so
+that solver output can be verified against it.
 
 \section*{Data and software availability}
 The accompanying repository contains the C++ generator, frozen historical aggregates, the
