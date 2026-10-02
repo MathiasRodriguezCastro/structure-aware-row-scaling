@@ -169,7 +169,18 @@ reconstructed; no quantity reported from those campaigns depends on the host.}
 The final historical campaign assigned 15 instances in each of two dispatch families,
 four policies, and two relative MIP gaps. Thus there are 240 assigned Gurobi 13.0.1 runs (Table~\ref{tab:environment}).
 All use seed 42, 16 threads and a 1,800-second limit. The four policies are Base,
-Flat-GM, Flat-L2 and Role-Hybrid. The analysis retains the assigned subsets and
+Flat-GM, Flat-L2 and Role-Hybrid. The assigned instances are
+
+\begin{quote}\small\raggedright
+Simple: \path{caso01a}, \path{caso03b}, \path{caso05d}, \path{caso10e}, \path{caso14a}, \path{caso20c}, \path{caso22d}, \path{caso24f}, \path{caso27a}, \path{caso29c}, \path{caso31e}, \path{caso33f}, \path{caso42b}, \path{caso44c}, \path{caso46e}.\\[2pt]
+SG-Ter-Mer: \path{instance001}, \path{instance005}, \path{instance014}, \path{instance022}, \path{instance027}, \path{instance031}, \path{instance042}, \path{instance046}, \path{instance051}, \path{instance058}, \path{instance068}, \path{instance072}, \path{instance077}, \path{instance081}, \path{instance092}.
+\end{quote}
+
+\noindent They are those of the historical campaign and are spread across the ordering of each
+class, but the rule that produced them was not recorded, so this is a description of the subsets
+rather than evidence of a pre-registered design. What can be checked is that they predate the
+analysis: the runs are reconstructed from logs retrieved from the cluster, and the frozen tables
+of the two replications reuse the same two lists. The analysis retains the assigned subsets and
 includes every non-completion in the primary runtime endpoint.
 
 For assigned instance $i$ in a cell, let $t_i$ be the recorded runtime and define
