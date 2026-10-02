@@ -26,9 +26,9 @@ changing the numbers a solver sees. The paper asks what that change buys and wha
 guarantees. The first half attributes an observed gain. Holding one LP basis fixed per model,
 geometric-mean row scaling lowers the basis condition number on every one of the 306 generated
 dispatch models, with median reductions of six to eight orders of magnitude across the three
-classes. That measures the exported file; rescaling the same bases the way a solver does
-recovers most of it, leaves a factor of a few, and on one class reverses the ordering of the
-kernels, so a condition number of an exported matrix should not be used to rank scaling
+classes. That measures the exported file; rescaling the same bases with a solver-style
+row-and-column equilibration recovers most of it, leaves a factor of a few, and on one class
+reverses the ordering of the kernels, so a condition number of an exported matrix should not be used to rank scaling
 policies. An advantage previously read as evidence for block metadata proves to be a
 coupling-kernel effect that a control using no ownership information reproduces. The second half
 states what a representation can guarantee: residual budgets in application units survive

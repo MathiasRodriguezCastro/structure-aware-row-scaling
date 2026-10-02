@@ -3,8 +3,9 @@ changes the numbers a solver sees. We ask what that change buys and what it stil
 On 306 generated hydrothermal-dispatch models, holding each model's LP basis fixed across its
 representations, geometric-mean row scaling lowers the condition number of the exported file on
 every model, by six to eight orders of magnitude in the median of each class. That figure
-describes the file: rescaling the same bases the way a solver does recovers most of it, leaving
-a factor of a few, and on one class it inverts the ordering of kernels, so a diagnostic read on
+describes the file: rescaling the same bases with a solver-style row-and-column equilibration
+recovers most of it, leaving a factor of a few, and on one class it inverts the ordering of
+kernels, so a diagnostic read on
 the exported matrix does not rank scaling policies. We then separate two kinds of
 information. An apparent block-metadata effect is a coupling-kernel effect, because
 geometric-mean centering makes the extrema-based block statistic identically one; a residual
