@@ -81,4 +81,4 @@ an explicit manuscript license is subsequently supplied.
 The local [submission preparation](submission/README.md) includes the cover letter,
 source ZIP and reproducibility archive. The main article has 15 pages and the supplement
 6 pages in the current review layout. Authorship, no external funding and no competing
-interests have been confirmed; the AI-assistance declaration is included in the article.
+interests have been confirmed; the AI declaration is included in the article.

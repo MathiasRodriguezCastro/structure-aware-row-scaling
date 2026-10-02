@@ -53,7 +53,7 @@ are Springer's own files, kept for provenance.
 7. **Declarations moved after the references**, as requested, together with the
    acknowledgement. The headings are the ones Springer asks for: *Funding*, *Competing
    interests*, *Author contributions*, *Ethics approval, consent and human or animal
-   participants* (not applicable) and *Use of AI assistance*, preceded by *Acknowledgements*,
+   participants* (not applicable) and *AI declaration*, preceded by *Acknowledgements*,
    which credits ClusterUY. *Data and software availability* and *Supplementary information*
    keep their position before the references, and the references to Online Resource 1 and
    Online Resource 2 are unchanged. The supplement is not merged into the article.
