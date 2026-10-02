@@ -1,8 +1,9 @@
 # Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 
 **Research status, 25 September 2026: prepared for submission to Mathematical Programming
-Computation.** The manuscript is in `paper/` in a journal-neutral layout and in `paper/mpc/` in
-Springer's `svjour3` format, the version intended for MPC; `paper/mpc/MPC_NOTES.md` records
+Computation.** The article is `paper/mpc/main_mpc.pdf`, in Springer's `svjour3` format. Its
+source is generated from `paper/main.tex`, a journal-neutral layout kept because the Springer
+version is derived from it and the derivation is what shows that no content changed; `paper/mpc/MPC_NOTES.md` records
 every change the format required and the checks that the two versions agree. The submission
 package, and the script that verifies it, are in `paper/submission/`. What changed in the last
 revision round, and which claims are confirmatory rather than exploratory, is recorded in
@@ -66,7 +67,7 @@ checks the saved binary solutions and enumerated optima, and checks all 1,080 fi
 LP hashes. It imports neither HiGHS nor Gurobi. It writes an updated
 `budget-final/verification.json`; the saved model and solution data are unchanged.
 `research-analysis` regenerates the current budget, matrix, and operational summaries,
-tables, and vector figures from saved data. `paper` builds `paper/main.pdf` and
+tables, and vector figures from saved data. `paper` builds the article, the supplement and
 `paper/supporting-information.pdf` with pdfLaTeX and BibTeX. A standard TeX Live
 installation with the packages listed in [paper/README.md](paper/README.md) suffices;
 the historical Wiley class and its assets now sit beside the baseline that uses them, in paper/research-audit/baseline-20260908/.

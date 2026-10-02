@@ -85,7 +85,6 @@ def main():
     paper += list(collect('paper/sections',{'.tex'}))
     paper += list(collect('paper/tables',{'.tex'}))
     paper += list(collect('paper/figs/research',{'.pdf'}))
-    n1=archive('manuscript-sources.zip',paper)
     artifact=paper+[Path(x) for x in ['README.md','Makefile','LICENSE','DATA_LICENSE.md','CITATION.cff','.zenodo.json']]
     artifact += list(collect('environment',{'.txt','.md'}))
     artifact += list(collect('scripts',{'.py','.sh'}))
@@ -101,12 +100,12 @@ def main():
     n2=archive('reproducibility-artifact.zip',artifact)
     n3=mpc_bundle()
     print(f'Prepared {n3} files for the MPC submission bundle')
-    paths=[OUT/'manuscript-sources.zip', OUT/'reproducibility-artifact.zip',
+    paths=[OUT/'reproducibility-artifact.zip',
            OUT/'mpc-submission.zip',
-           ROOT/'paper/main.pdf',ROOT/'paper/supporting-information.pdf',
+           ROOT/'paper/supporting-information.pdf',
            ROOT/'paper/mpc/main_mpc.pdf',ROOT/'paper/mpc/cover-letter.pdf']
     (OUT/'SHA256SUMS').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(ROOT)}\n' for p in paths))
-    print(f'Prepared {n1} manuscript files and {n2} artifact files in {OUT}')
+    print(f'Prepared {n2} artifact files in {OUT}')
 
 
 if __name__=='__main__':

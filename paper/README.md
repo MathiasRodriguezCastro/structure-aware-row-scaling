@@ -31,7 +31,10 @@ Or, to compile the already generated tables and figures:
 make -C paper
 ```
 
-The outputs are `main.pdf` and `supporting-information.pdf`. The current `Makefile`
+The outputs are `mpc/main_mpc.pdf`, the article as submitted, and
+`supporting-information.pdf`, Online Resource 1. `main.tex` is the source the Springer version
+is generated from; building it also produces a `main.pdf` in this layout, which is a local
+artifact and is not tracked. The current `Makefile`
 uses `pdflatex -halt-on-error` and BibTeX for the main article, and pdfLaTeX for the
 supplement. The source uses the standard `article` class, not the old Wiley template.
 The required TeX packages include geometry, fontenc, lmodern, microtype, amsmath,

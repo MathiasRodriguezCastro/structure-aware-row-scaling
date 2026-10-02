@@ -55,11 +55,11 @@ def rebuild_mpc():
 
 def main():
     result = {"archives": [check_archive(n) for n in
-                           ["mpc-submission.zip", "manuscript-sources.zip",
+                           ["mpc-submission.zip",
                             "reproducibility-artifact.zip"]],
               "mpc_bundle_build": rebuild_mpc(),
               "documents": {}}
-    for label, pdf in [("main", ROOT / "paper/main.pdf"),
+    for label, pdf in [
                        ("supplement", ROOT / "paper/supporting-information.pdf"),
                        ("mpc_manuscript", ROOT / "paper/mpc/main_mpc.pdf"),
                        ("cover_letter", ROOT / "paper/mpc/cover-letter.pdf")]:

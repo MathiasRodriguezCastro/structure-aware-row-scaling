@@ -16,8 +16,8 @@ submitted or accepted anywhere.
 | `reproducibility-artifact.zip` | Online Resource 2: code, experiment data, manifests, checksums, tests and reproduction instructions |
 | `../mpc/cover-letter.pdf` | cover letter, also inside the bundle |
 
-`manuscript-sources.zip` holds the sources of the original, journal-neutral layout in `paper/`;
-it is not part of the MPC upload and is kept so the two layouts stay comparable.
+There is one article PDF. The journal-neutral layout in `paper/main.tex` is the source the
+Springer version is generated from, not a second deliverable, so it is no longer packaged.
 
 ## The bulk data behind the fixed-basis audit
 
