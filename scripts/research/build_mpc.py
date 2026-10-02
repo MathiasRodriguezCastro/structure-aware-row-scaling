@@ -52,9 +52,9 @@ PREAMBLE = r"""%% Mathematical Programming Computation (Springer) submission ver
 \emergencystretch=1.5em
 \begin{document}
 
-\title{Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and
+\title{Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and
 Residual-Budget Contracts}
-\titlerunning{Pre-Export Row Scaling for Generated MIPs}
+\titlerunning{Pre-Export Row Scaling in Generated MIPs}
 \author{Mathias Rodr\'iguez Castro}
 \authorrunning{M. Rodr\'iguez Castro}
 \institute{M. Rodr\'iguez Castro \at

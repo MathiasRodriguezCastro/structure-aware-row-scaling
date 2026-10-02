@@ -1,4 +1,4 @@
-# Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
+# Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 
 **Research status, 25 September 2026: prepared for submission to Mathematical Programming
 Computation.** The manuscript is in `paper/` in a journal-neutral layout and in `paper/mpc/` in

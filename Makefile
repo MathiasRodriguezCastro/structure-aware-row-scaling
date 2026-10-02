@@ -16,7 +16,7 @@ APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
         research-fixed-basis-analysis research-fixed-basis-check research-fixed-basis \
         research-fixed-basis-precision research-application-budgets \
         research-application-export research-online-resources research-bridge \
-        research-certificate-audit \
+        research-certificate-audit research-stage-ablation \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
         research-rounding-check research-rounding-analysis rounding-note \
         research-robustness-analysis
@@ -35,6 +35,7 @@ help:
 	@echo "  make research-online-resources    - audit the two Online Resources before submitting"
 	@echo "  make research-bridge              - what a solver-style scaling leaves of the audit"
 	@echo "  make research-certificate-audit   - solver claims contradicted by a verified point"
+	@echo "  make research-stage-ablation      - historical local/coupling stage ablation"
 	@echo "  make paper                  - build main and supplement PDFs with pdfLaTeX"
 	@echo "  make audit-build            - isolated solver-free C++ build in code/build-audit"
 	@echo "Optional fresh experiments (new output directories only):"
@@ -74,7 +75,7 @@ research-check: audit-build research-check-python
 
 research-analysis: research-budget-analysis research-matrix-analysis research-operational-analysis \
                    research-fixed-basis-analysis research-application-budgets \
-                   research-certificate-audit
+                   research-certificate-audit research-stage-ablation
 
 # Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
 research-robustness-analysis:
@@ -107,6 +108,10 @@ research-matrix-analysis:
 # Runs whose reported bound or completion certificate a verified point contradicts.
 research-certificate-audit:
 	$(PYTHON) scripts/research/certificate_audit.py
+
+# Where the earlier structured rules' solver-time gain sat, from the stored ablation runs.
+research-stage-ablation:
+	$(PYTHON) scripts/research/stage_ablation_table.py
 
 # Rescales every basis of the fixed-basis audit the way a solver would and recomputes kappa_1,
 # plus the constructed check that such a scaling does not undo a pre-export row scaling.

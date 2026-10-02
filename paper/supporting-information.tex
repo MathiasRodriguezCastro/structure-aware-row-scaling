@@ -10,7 +10,7 @@
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
-\title{Online Resource 1\\\large Supplement to ``Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts''}
+\title{Online Resource 1\\\large Supplement to ``Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts''}
 \author{Mathias Rodr\'iguez Castro\\\small Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay\\\small\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
 \date{Prepared for Mathematical Programming Computation}
 \begin{document}
@@ -300,6 +300,38 @@ input hashes and analysis settings. The script
 main-text table. A separate two-run smoke check under \path{precision-smoke/}
 verifies that the corrected C++ Work marker preserves the solver API's precision;
 it does not replace any of the 240 historical observations.
+
+\paragraph{Historical stage ablation.}
+The earlier preprocessing campaign included a stage ablation under Gurobi. It predates the
+attribution analysis of the present article and is reported here only as exploratory evidence
+about solver effort. The structured rules had three conceptual stages: local-row normalization,
+block-scale construction and coupling-row scaling. The ablation retained either the local stage
+alone or the coupling stage alone and compared them with Base and the full rule on the same
+instance banks, at relative MIP gaps of 1\% and 0.1\%.
+
+Table~\ref{tab:stage-ablation} gives the structured rule on all three classes. Local-only
+normalization reproduces the full rule's shifted geometric mean of solver time in every cell,
+to within 0.5\% except on Simple at a 1\% gap, where the two differ by 0.01~s. Coupling-only
+scaling never improves on Base: it matches it on Simple and SG-Ter-Mer and is 1 to 2\% above it
+on Full. The matrix rule, recorded in the same files, agrees cell by cell with one exception
+worth stating: on Full at a 0.1\% gap it does not improve on Base at all (396.71~s for the full
+rule against 373.58~s), and local-only tracks it there as elsewhere (394.67~s). The attribution
+is therefore about where a stage-wise difference sits, not a claim that either rule always helps.
+
+This does not contradict the coupling-kernel attribution of the article. That concerns which
+kernel explains a representation-level conditioning difference under matched controls; this
+ablation concerns where an operational Gurobi time difference arose in an earlier campaign. The
+endpoints and the comparisons are different.
+
+\begin{table}[htb]
+\centering\small
+\caption{Historical stage ablation, structured rule. Shifted geometric mean of solver time in
+seconds, Gurobi. The ablation belongs to the earlier preprocessing campaign and is not a rerun
+of the present policy set; \texttt{make research-stage-ablation} recomputes it from the stored
+runs in \texttt{results-revision/r5-ablation/}.}
+\label{tab:stage-ablation}
+\input{tables/stage-ablation}
+\end{table}
 
 \section{Fresh matrix audit}
 Ten seeds, 20260909--20260918, are crossed with exponent ranges $[-R,R]$ for

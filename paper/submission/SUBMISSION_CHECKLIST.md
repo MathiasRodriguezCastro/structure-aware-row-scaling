@@ -11,10 +11,10 @@ transcription of the journal's current requirements. Check the form as you fill 
 
 | Item | File | Note |
 |---|---|---|
-| Manuscript PDF | `paper/mpc/main_mpc.pdf` | 32 pages, figures embedded, built from the sources below |
+| Manuscript PDF | `paper/mpc/main_mpc.pdf` | 33 pages, figures embedded, built from the sources below |
 | LaTeX sources | `paper/submission/mpc-submission.zip` | 1.2 MB; carries `svjour3.cls`, `svglov3.clo`, `spmpsci.bst`, the `.bbl`, sections, tables and vector figures, so it compiles without the class installed |
 | Cover letter | `paper/mpc/cover-letter.pdf` | one page |
-| Online Resource 1 | `paper/supporting-information.pdf` | 13 pages; also inside the bundle |
+| Online Resource 1 | `paper/supporting-information.pdf` | 14 pages; also inside the bundle |
 | Online Resource 2 | `paper/submission/reproducibility-artifact.zip` | 20 MB; if the portal refuses it, cite the release link instead |
 | Artifact link | `https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling` | the release tag is named in the manuscript's availability statement |
 
@@ -24,7 +24,7 @@ pages with no overfull boxes and no undefined references.
 
 ## Metadata the form will ask for
 
-- **Title.** Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution
+- **Title.** Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution
   and Residual-Budget Contracts.
 - **Abstract.** 245 words, as in the PDF.
 - **Keywords (6).** Mixed-integer linear programming; Row scaling; Numerical reliability;

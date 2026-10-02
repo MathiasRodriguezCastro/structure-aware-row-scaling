@@ -25,9 +25,9 @@
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\argmin}{\operatorname*{arg\,min}}
 \newcommand{\nnz}{\operatorname{nnz}}
-\hypersetup{pdftitle={Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts},pdfauthor={Mathias Rodr\'iguez Castro}}
+\hypersetup{pdftitle={Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts},pdfauthor={Mathias Rodr\'iguez Castro}}
 \graphicspath{{figs/research/}{figs/}}
-\title{Pre-Export Row Scaling for Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts}
+\title{Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts}
 \author{Mathias Rodr\'iguez Castro\\
 \small Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay\\
 \small\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
@@ -152,6 +152,16 @@ $D_r$, replacing $(A,b)$ by $(D_rA,D_rb)$ preserves every constraint, variable d
 objective value in exact arithmetic. The whole row, including its RHS, is multiplied by one
 positive number; dividing different coefficients of a row by different block scales is not a
 row scaling and is outside this equivalence.
+
+We restrict the external policies to whole-row scaling. Scaling a continuous column can be
+represented as an invertible change of variables if the objective, bounds and all affected
+coefficients are transformed consistently. For an integer column, however, a nontrivial change
+$x_j=s_j\widetilde x_j$ changes the natural lattice to $\widetilde x_j\in s_j^{-1}\mathbb Z$, so
+retaining the standard integer domain does not in general preserve the MILP. Row scaling avoids
+this distinction: it leaves the variable space, objective and domains unchanged and changes only
+the representation of each constraint. Solver-side equilibration may of course include columns;
+\cref{subsec:results-bridge} treats that separately as a diagnostic of the representation after
+export, not as an external model transformation proposed here.
 
 The generator provides a partition of the local rows into nonempty blocks, a set of coupling
 rows, and a column-to-block map $\beta$. A scaling policy is then determined by four separate
@@ -573,7 +583,7 @@ operationally safer, unless what safer means is stated in the units of the origi
 Relative to the unscaled model, the outcome depends on the pipeline: presolve, internal
 scaling, tolerances and finite precision all intervene between the exported row and the
 accepted point. The complete
-counts for every policy and solver are in Online Resource 1, Table~S7. On HiGHS, Budget-only
+counts for every policy and solver are in Online Resource 1, Table~S8. On HiGHS, Budget-only
 verifies 191 of 192 configurations and Budget-GM 182, against 167 for Base and 141 for GM;
 Budget-only gains 24 configurations over Base and loses none. On Gurobi, Budget-only verifies
 151, Budget-GM 152 and Base 156. On CPLEX every scaled policy verifies 140 and Base 150: the
@@ -618,7 +628,7 @@ considered here already lies well inside that restriction. The budgets are decla
 measured, so the margin is also the sensitivity: scaling all six by a common multiplier, all
 three kernels stay admissible on all 4,320 rows down to $10^{-4}$ and the two the comparison
 turns on down to $10^{-5}$, which places the result far from the chosen numbers (Online Resource 1,
-Table~S8).
+Table~S9).
 
 Its content is in the reading of a residual. One family is written pre-scaled: the Baygorria
 generation definition carries a coefficient of $10^7$ on the generation variable, so the same
@@ -667,7 +677,7 @@ of those runs, across 9 instances, also report completion beyond their gap; in t
 replication the figures are 20 of 480 runs across 6 instances, and 9 runs across 4 instances.
 Neither campaign is a census --- the first was stopped by decision and the second covers a
 fixed 30-instance subset --- and neither was designed to estimate how often this happens, so
-these are occurrences in what was run and not rates. Online Resource~1, Table~S9 gives the
+these are occurrences in what was run and not rates. Online Resource~1, Table~S10 gives the
 breakdown by policy and level, and the audit of the extreme case.
 
 Two features of the counts matter more than their size. The unscaled model is not exempt: Base
@@ -724,6 +734,19 @@ coupling kernel together with the information used, and the fixed-basis audit sh
 kernel alone can change: identical coverage, representations orders of magnitude apart. A claim
 that generator information improves preprocessing needs a kernel-matched control.
 
+\paragraph{The mechanism behind a conditioning gain need not be the one behind a solver-effort
+gain.} A stage ablation of the earlier structured policies, run with Gurobi and kept in the
+archive, separated local-row normalization from coupling-row scaling. Across all three classes
+and both gap settings, local normalization alone reproduces the full rule's shifted
+geometric-mean solve time to within a few per cent, while coupling-only scaling stays at the
+Base level or slightly above it (Online Resource 1, Table~S7). On Simple at a 1\% gap, for
+instance, Base is 3.73~s, the full rule 2.02~s, local only 2.01~s and coupling only 3.74~s.
+This is exploratory evidence from an earlier campaign and earlier policies, not a
+kernel-matched test of the present set, and it is reported because of what it separates: the
+coupling kernel is what explains the representation-level conditioning result above, and in
+that campaign the operational gain sat in the other stage. Representation quality and solver
+effort are different endpoints, and they need not have the same mechanism.
+
 \paragraph{A condition number of an exported file does not rank scaling policies.} It is the
 natural thing to measure, because it needs no optimizer and no license, and this paper measures
 it on 306 models. What \cref{subsec:results-bridge} shows is that it should not be used to
@@ -768,7 +791,9 @@ one finding is configuration-dependent rather than a stable property of the repr
 far too small to describe the population of configurations. The stress instances are small and
 deliberately adversarial; their budget of 0.01 is a numerical test parameter, and the dispatch
 budgets of \cref{tab:application-budget} are stated by us to show what the contract implies,
-not supplied or validated by the operator. The certificate audit of
+not supplied or validated by the operator. The historical stage ablation is likewise
+exploratory: it concerns Gurobi and the earlier structured policies, and it is not a
+kernel-matched operational decomposition of the present policy set. The certificate audit of
 \cref{subsec:results-certificates} is exploratory in a specific sense: it reads two stored
 campaigns, one of which was stopped by decision, neither of which was designed to estimate how
 often a solver contradicts itself, and it establishes that particular runs are wrong without
