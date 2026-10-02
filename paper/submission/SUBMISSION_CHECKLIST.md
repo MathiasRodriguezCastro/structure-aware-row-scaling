@@ -47,6 +47,7 @@ pages with no overfull boxes and no undefined references.
 ## Zenodo: already done
 
 The GitHub integration has been active since June, so every release is archived automatically.
-The concept DOI, which always resolves to the latest version, is **10.5281/zenodo.20648949**.
-Nothing needs to be done by hand; a refreshed release produces a new version DOI, and that
-number is the one to cite for the exact reviewed state.
+The concept DOI, which always resolves to the latest version, is **10.5281/zenodo.20648949**, and the
+v1.0-mpc-submission release is **10.5281/zenodo.23104497**. The article cites the concept DOI, because a
+version DOI only exists after the release that contains the article; the release tag pins the
+exact state and the concept DOI is permanent.

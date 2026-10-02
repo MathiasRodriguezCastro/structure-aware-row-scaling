@@ -21,6 +21,9 @@ This repository is **Online Resource 2** of the manuscript above, submitted to *
 Programming Computation*. Online Resource 1 is the supplement,
 [`paper/supporting-information.pdf`](paper/supporting-information.pdf).
 
+Archived at Zenodo: concept DOI [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949), which resolves to the latest
+version; the `v1.0-mpc-submission` release is [10.5281/zenodo.23104497](https://doi.org/10.5281/zenodo.23104497).
+
 Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la República,
 Montevideo, Uruguay — <mathiasr@fing.edu.uy>.
 
