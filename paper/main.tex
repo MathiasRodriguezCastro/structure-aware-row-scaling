@@ -199,6 +199,45 @@ Verified correctness & Exact original residuals, bounds and integrality; enumera
 \end{tabularx}
 \end{table}
 
+\subsection{The instance bank}
+\label{subsec:design-bank}
+The dispatch models come from one generator, written for the hydrothermal operation of the
+Uruguayan power system, and they are what that generator produces rather than a selection from
+a benchmark library. All have a 360-hour horizon and fall into three classes. \emph{Simple}
+(204 models) dispatches the R\'io Negro cascade --- the reservoirs Bonete, Baygorria and
+Palmar, in that order downstream --- against a fixed demand with a cost of unserved energy.
+\emph{SG-Ter-Mer} (68 models) dispatches the Uruguayan share of the binational Salto Grande
+plant together with a thermal unit against a market, whose unserved demand is priced by a
+piecewise-linear curve; its segments are the \emph{market-shortage rows} referred to below.
+\emph{Full} (34 models) combines both and values Bonete's stored water by Bellman cuts. The
+integer variables are the indicators that select the height band of each reservoir's production
+function.
+
+\Cref{tab:instance-bank} gives the sizes. Within a class they do not vary: the horizon and the
+plant set are fixed and the instances differ in their data --- inflows, demands, water values,
+initial volumes --- not in their structure. That is a limitation of the bank, and it is why the
+conditioning audit below reports a per-instance ratio rather than treating the 306 models as a
+size sweep. What does vary, and is the reason scaling is in question at all, is the numerical
+range: a single model mixes reservoir volumes in cubic metres, with coefficients reaching
+$10^9$ in Simple and $10^{10}$ in the other two classes, with power in megawatts and with water
+values near $10^{-4}$, so its coefficient magnitudes span 11.9 decades in the median Simple
+model and 13.4 in the median Full one, before any scaling. One Simple model, caso46e, is used in
+\cref{subsec:results-budget} to state residual budgets in application units; it is otherwise
+unremarkable within its class.
+
+Nine of the SG-Ter-Mer instances carry a defect in their total-demand series, described in
+Online Resource 1: they remain well-posed MILPs, and every comparison here is between
+representations of one model, but they are not faithful market scenarios.
+
+\begin{table}[tb]
+\centering\small
+\caption{The dispatch instance bank, from the unscaled export of every model. Entries are the
+median and, where it differs, the range over the class. Sizes are constant within a class;
+decades is $\log_{10}$ of the ratio between the largest and smallest magnitude in a model.}
+\label{tab:instance-bank}
+\input{tables/instance-bank}
+\end{table}
+
 \subsection{Fixed-basis conditioning audit}
 \label{subsec:design-fixed-basis}
 A condition number read along each policy's own solve compares different vertices as well as
@@ -242,11 +281,9 @@ each of the Simple and SG-Ter-Mer classes with Gurobi at relative MIP gaps of 1\
 (seed 42, 16 threads, 1,800-second limit): 240 assigned runs, whose native logs and input
 hashes were retrieved from the cluster. Its mean PAR10 is the only quantity reported here in
 units of time, and all 240 logs name one processor and operating system; Online Resource 1,
-Table~S3 states the environment of every campaign. The subsets were fixed before outcomes were inspected. Nine
-of the 15 SG-Ter-Mer instances, including instance077, carry a scenario defect that makes them
-unfaithful market cases without affecting their validity as MILPs or the comparison of
-representations of one model; Online Resource 1 repeats the endpoints on the six instances
-without the defect.
+Table~S3 states the environment of every campaign. The subsets were fixed before outcomes were inspected. Nine of the 15 SG-Ter-Mer instances, including instance077, carry the scenario defect of
+\cref{subsec:design-bank}; Online Resource 1 repeats the endpoints on the six instances
+without it.
 The pre-specified primary endpoint is failure-sensitive performance: the arithmetic-mean PAR10
 over all 15 instances of a cell, with 18,000 seconds assigned to a non-completion. Solver effort,
 the secondary endpoint, is Gurobi's work measure, recovered from the native logs at a common
@@ -256,6 +293,10 @@ replications.
 
 \subsection{Enumerated residual-budget stress experiment}
 \label{subsec:design-stress}
+The design follows the idea of Neumaier and Shcherbina \cite{neumaier2004safe}, who build
+small mixed-integer programs on which a tolerance-based solver returns an answer that is wrong
+in exact arithmetic. Here the construction is used not to exhibit a failure but to compare
+representations of one model under a rule that decides acceptance independently of the solver.
 Three binary families with 12 variables contain a cardinality row, three positive packing rows
 and three rows with signed integer coefficients; profits are positive integers. With integer
 matrix $W$ and integer capacities $k$, the represented constraints are
@@ -395,7 +436,14 @@ out, Base included, while under CPLEX the run that reaches the limit is Base at 
 Role-Hybrid at 0.1\%.
 The completed-run gain of this class is therefore a property of a representation together with a
 pipeline, and the failure that reversed the PAR10 ordering is not a stable property of the
-instance either.
+instance either. Neither observation is surprising in the light of what is known about
+performance variability in mixed-integer programming: Lodi and Tramontani
+\cite{lodi2013variability} document changes of this order from perturbations that leave the
+model mathematically unchanged, such as a different seed or a permuted formulation. A row
+scaling is exactly such a perturbation. The seed-to-seed movement reported here, from 0.698 to
+0.778, is of the same order as the effect being measured, which is why these numbers are
+reported as a measured conditional gain on a fixed pool rather than as an estimate of
+acceleration.
 
 The two endpoints answer different questions: completed-run effort describes how a
 representation affects the runs that finish, and PAR10 whether it changes which runs finish.

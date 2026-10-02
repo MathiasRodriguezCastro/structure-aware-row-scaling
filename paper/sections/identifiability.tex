@@ -161,6 +161,18 @@ and this is the mechanism the matched control isolates empirically. The statemen
 common factor on a locally whitened triangular structure; for general generated MIPs it
 motivates the Euclidean coupling kernel rather than certifying it.
 
+That a Euclidean rule should do well is not itself news: van der Sluis
+\cite{vandersluis1969condition} showed that normalizing rows in the Euclidean norm comes
+within $\sqrt n$ of the best $\kappa_2$ attainable by any row scaling, which is already
+enough to expect the control to be competitive. Two things here are not supplied by that
+classical bound, and both are what the attribution argument needs. The first is an exact
+optimum rather than a factor: on this structure the best common factor is $(1+\rho^2)^{-1/2}$
+and the best attainable condition number is $\sqrt{1+\rho^2}+\rho$, so there is nothing left
+for a block-scale map to contribute, whereas a $\sqrt n$ bound would leave room for one. The
+second is the behaviour of that optimum under an external restriction: the interval form
+below is what connects this section to the contract of \cref{sec:contract}, and a bound on
+the attainable condition number says nothing about it.
+
 \paragraph{Why conditioning needs a residual bound.}
 The interval form of \cref{prop:audit-triangular-optimum} matters. In $A_\gamma$,
 $\kappa_2$ decreases to one as $\gamma\to0$, while a fixed residual on the exported coupling
