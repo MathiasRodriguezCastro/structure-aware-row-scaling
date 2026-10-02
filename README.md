@@ -95,24 +95,24 @@ takes longer than the Python-only check.
 
 ### What it costs, measured from a fresh clone
 
-Timed on 1 October 2026 on one machine --- Intel Core i7-13620H, 16 threads, 15 GB RAM,
+Timed on 2 October 2026 on one machine --- Intel Core i7-13620H, 16 threads, 15 GB RAM,
 Ubuntu 22.04.5, kernel 6.8, g++ 11.4, TeX Live 2022/Debian, CPython 3.10.12 --- by cloning
 this repository into an empty directory and running each target in order. The log of that run
-is [`paper/research-audit/cleanroom-20261001.log`](paper/research-audit/cleanroom-20261001.log).
+is [`paper/research-audit/cleanroom-20261002.log`](paper/research-audit/cleanroom-20261002.log).
 
 | Command | Time | What it needs |
 |---|---|---|
-| `git clone` | 12 s | 5.3 GB on disk, of which 5.0 GB is the stored LP text and bases of the fixed-basis audit |
+| `git clone` | 17 s | 5.3 GB on disk, of which 5.0 GB is the stored LP text and bases of the fixed-basis audit |
 | `make research-check-python` | 2 s | the pinned Python packages |
-| `make research-check` | 13 s | also a C++17 compiler; includes the first `build-audit` compile |
-| `make research-analysis` | 6 s | regenerates every current table, figure and summary |
-| `make research-fixed-basis-check` | 200 s | rebuilds all 1,530 bases from the LP text and recomputes their conditioning |
-| `make research-fixed-basis-precision` | 102 s | recomputes the certified rational bounds of the stress sample; reproduced them bit for bit |
-| `make research-application-budgets` | 3 s | regenerates the declared-budget table and its sweep |
+| `make research-check` | 16 s | also a C++17 compiler; includes the first `build-audit` compile |
+| `make research-analysis` | 10 s | regenerates every current table, figure and summary |
+| `make research-fixed-basis-check` | 218 s | rebuilds all 1,530 bases from the LP text and recomputes their conditioning |
+| `make research-fixed-basis-precision` | 107 s | recomputes the certified rational bounds of the stress sample; reproduced them bit for bit |
+| `make research-application-budgets` | 4 s | regenerates the declared-budget table and its sweep |
 | `make research-application-export` | 11 s | re-exports that model and compares it byte by byte |
 | `make research-budget BUDGET_SOLVERS=highs BUDGET_OUT=...` | 7 s | `highspy`; 1,728 fresh configurations |
-| `make paper` | 3 s | pdfLaTeX and BibTeX; builds `paper/main.pdf` and the supplement |
-| `make -C paper mpc` | 4 s | rebuilds the Springer submission version from `paper/main.tex` |
+| `make -C paper all` | 5 s | pdfLaTeX and BibTeX; builds the article, the supplement and the Springer submission version |
+| `make research-online-resources` | <1 s | audits the two Online Resources against the manuscript |
 
 Nothing here needs a commercial solver. Gurobi and CPLEX are needed only to rerun their arms
 of the stress experiment and the operational campaign, both of which are reported from stored

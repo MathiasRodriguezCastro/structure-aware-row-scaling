@@ -175,12 +175,13 @@ checksums and recompiles the manuscript from the bundle alone.
 
 ## Cold reproduction
 
-The repository was cloned twice into empty directories and every license-free target was run in
-order; the logs are `paper/research-audit/cleanroom-20261001.log` and
-`cleanroom-20261001-pass2.log`. All targets returned zero. `make -C paper all` built the three
-documents from scratch with no overfull boxes and no undefined references (21, 11 and 26 pages),
-the HiGHS arm reran its 1,728 configurations and the independent checker audited them, the 1,530
-fixed bases were rebuilt from the stored LP text, and the certified rational bounds of Table~S2
-were recomputed bit for bit. Two defects that only a cold run exposes were found and fixed: the
-documented `python3 -m venv` step needs a package that Debian and Ubuntu do not install by
-default, and `research-fixed-basis-precision` did not create the parent of its output directory.
+The repository was cloned into an empty directory and every license-free target was run in
+order; the log is `paper/research-audit/cleanroom-20261002.log`. All targets returned zero.
+`make -C paper all` built the three documents from scratch with no overfull boxes and no
+undefined references (25, 12 and 31 pages), the HiGHS arm reran its 1,728 configurations and
+the independent checker audited them, the 1,530 fixed bases were rebuilt from the stored LP
+text, the certified rational bounds of Table~S2 were recomputed, the application model was
+re-exported and matched byte for byte, and the Online Resource audit passed. Two defects that
+only a cold run exposes were found and fixed on the way: the documented `python3 -m venv` step
+needs a package that Debian and Ubuntu do not install by default, and
+`research-fixed-basis-precision` did not create the parent of its output directory.
