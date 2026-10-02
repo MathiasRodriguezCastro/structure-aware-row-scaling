@@ -66,11 +66,12 @@ These analyses need no optimizer or commercial license. `make research-check-pyt
 checks the saved binary evidence and matrix hashes; `make research-check` also builds
 and tests the actual C++ LP exporter.
 
-Earlier draft sources and PDFs are preserved in `research-audit/baseline-20260908/`.
-That draft's positive block-attribution claim and journal-specific presentation have
-been superseded. `references.bib`, the Wiley class/support files, old figure folders,
-and old synthetic exports remain historical material; they are not dependencies of
-the current PDF build.
+Earlier draft sources and PDFs are preserved in `research-audit/baseline-20260908/`,
+together with the Wiley class, style, bibliography and image files that draft needs, so
+that it stays buildable without leaving them in this directory. That draft's positive
+block-attribution claim and journal-specific presentation have been superseded, and none
+of those files is a dependency of the current PDF build. The working notes and latexdiff
+output of earlier revision rounds are in `research-audit/`.
 
 The manuscript and supplement require the author's final scientific and submission
 review. Their preparation as PDFs does not imply external peer review, acceptance,

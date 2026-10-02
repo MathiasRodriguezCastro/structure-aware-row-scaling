@@ -421,8 +421,8 @@ does not transfer to another family, still less to solver behavior, and the endp
 
 \subsection{What a solver-style scaling leaves}
 \label{subsec:results-bridge}
-Every solver equilibrates internally, so a conditioning difference measured on the exported
-file need not be one the solver ever sees. To find out what survives, the same 1,530 bases were
+Solver pipelines commonly apply internal scaling, so a conditioning difference measured on the
+exported file need not survive unchanged. To find out what survives, the same 1,530 bases were
 rescaled by an iterative row-and-column infinity-norm equilibration with factors rounded to
 powers of two, and $\kappa_1$ was recomputed after each pass. Equilibration of this kind is a
 documented scaling option in solvers \cite{gurobiScaling,berthold2021scaling}, and powers of two

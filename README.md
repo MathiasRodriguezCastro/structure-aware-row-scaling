@@ -69,7 +69,7 @@ LP hashes. It imports neither HiGHS nor Gurobi. It writes an updated
 tables, and vector figures from saved data. `paper` builds `paper/main.pdf` and
 `paper/supporting-information.pdf` with pdfLaTeX and BibTeX. A standard TeX Live
 installation with the packages listed in [paper/README.md](paper/README.md) suffices;
-the current manuscript does not use the historical Wiley class or fonts.
+the historical Wiley class and its assets now sit beside the baseline that uses them, in paper/research-audit/baseline-20260908/.
 
 `research-fixed-basis-check` recomputes the conditioning audit of §4 from the stored
 exports and bases, independently of the campaign that produced them, and
