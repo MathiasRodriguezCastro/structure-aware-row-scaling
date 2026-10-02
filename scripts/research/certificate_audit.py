@@ -6,9 +6,13 @@ original unscaled model with exact residuals. Runs on one instance are therefore
 whatever policy, solver, gap or seed produced them, and any verified point is an upper bound on
 that instance's optimum. Two levels are reported, in increasing strength:
 
-  dual bound    the reported dual bound lies above a verified point, so the bound is invalid;
+  dual bound    the reported dual bound lies above such a point, so the two are inconsistent;
   certificate   the run also reported completion at an objective further from that point than
-                the gap it was asked for, so the completion certificate is contradicted.
+                the gap it was asked for.
+
+Only witnesses of the strict tier are used: points whose residuals against the original model
+are at most 1e-9 in relative activity, in bounds and in integrality. A point the campaign
+tolerance merely accepted can be slightly infeasible, and would not bound the optimum.
 
 Neither campaign is a census. The solver-robustness campaign was stopped by decision and the
 operational replication covers a fixed 30-instance subset, so these counts describe occurrences
@@ -36,19 +40,27 @@ def tru(v):
 
 
 def summarize(path):
-    rows = list(csv.DictReader(path.open()))
-    strong = [r for r in rows if tru(r["optimality_claim_contradicted"])]
+    """Counts under the strict tier only: witnesses whose residuals against the original
+    model are at round-off, so the comparison does not rest on a point that the campaign
+    tolerance merely accepted."""
+    all_rows = list(csv.DictReader(path.open()))
+    rows = [r for r in all_rows if tru(r["dual_bound_invalid_strict"])]
+    strong = [r for r in all_rows if tru(r["optimality_claim_contradicted_strict"])]
     return {
         "rows": len(rows), "instances": len({r["instance"] for r in rows}),
+        "rows_ordinary_tier": len(all_rows),
         "strong_runs": len(strong), "strong_instances": len({r["instance"] for r in strong}),
         "by_solver": dict(Counter(r["solver"] for r in strong)),
         "by_policy": dict(Counter(r["policy"] for r in strong)),
         "by_policy_all": dict(Counter(r["policy"] for r in rows)),
         "by_solver_all": dict(Counter(r["solver"] for r in rows)),
-        "worst_excess": max((float(r["relative_excess"]) for r in rows if r["relative_excess"]),
+        "worst_excess": max(((float(r["objective"]) - float(r["best_known_strict"]))
+                             / abs(float(r["best_known_strict"]))
+                             for r in rows if r.get("best_known_strict") and r["objective"]),
                             default=None),
-        "worst_row": max((r for r in rows if r["relative_excess"]),
-                         key=lambda r: float(r["relative_excess"]), default=None),
+        "worst_row": max((r for r in rows if r.get("best_known_strict") and r["objective"]),
+                         key=lambda r: (float(r["objective"]) - float(r["best_known_strict"]))
+                         / abs(float(r["best_known_strict"])), default=None),
     }
 
 
@@ -89,7 +101,7 @@ def main():
         print(f"    by policy  : {s['by_policy']}")
         w = s["worst_row"]
         print(f"  worst excess              : {s['worst_excess']:.4f} "
-              f"({w['solver']}/{w['policy']} on {w['instance']}, best point from {w['best_known_from']})")
+              f"({w['solver']}/{w['policy']} on {w['instance']}; strict witness named in the article)")
         print()
     for block, path in ((main, args.out), (detail, args.detail)):
         block += [r"\bottomrule", r"\end{tabular}"]

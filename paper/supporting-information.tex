@@ -477,20 +477,23 @@ Gurobi, as the archived one was: the two differ in the last digits of their deci
 moves the reported quantities of one group by a relative $10^{-15}$ and nothing in either table.
 
 \section{Cross-run certificate audit}
-The audit of \S7.5 of the article uses two stored campaigns: the solver-robustness campaign,
+The audit of \S7.6 of the article uses two stored campaigns: the solver-robustness campaign,
 which was prepared, partly run and then stopped by decision, and the two replications of the
 operational reconstruction. Neither is a census and neither was designed to estimate how often a
 solver contradicts itself, so the counts below describe what occurred in the runs that exist.
-Table~\ref{tab:certificate-audit-detail} splits them by level and policy.
 
 The comparison rests on the stored verification. Each run's returned point is re-evaluated
 against the original unscaled model, so a point accepted on a scaled export is still checked
-where it has to hold, and \texttt{verif\_solver\_obj\_original} is its objective there. Points
-accepted at the campaign tolerance can be slightly infeasible, so the audit also carries a
-strict tier that only trusts points whose residuals are at round-off; the counts reported in the
-article use the ordinary tier, and the extreme case below is contradicted under both.
+where it has to hold, and \texttt{verif\_solver\_obj\_original} is its objective there. A point
+the campaign tolerance merely accepted can be slightly infeasible, and an infeasible point
+bounds nothing, so both the article and Table~\ref{tab:certificate-audit-detail} use only the
+\emph{strict} tier: witnesses whose relative activity residual, bound violation and integrality
+violation against the original model are each at most $10^{-9}$. The looser tier changes one
+run and one instance, in the weaker of the two levels of the stopped campaign (77 runs across 27
+instances instead of 76 across 26) and nothing at all elsewhere; the stored CSVs carry both
+tiers in their own columns.
 
-\begin{table}[tb]
+\begin{table}[htb]
 \centering\small
 \caption{Cross-run certificate audit by level and policy. ``Dual bound'' counts runs whose
 reported bound lies above a verified point of the same model; ``Certificate'' counts the subset
@@ -507,11 +510,14 @@ objective between $-2.893\times10^8$ and $-2.913\times10^8$. The eighth, Gurobi 
 Base export, returns $-1.317\times10^8$ with status optimal, a reported gap of zero and a dual
 bound equal to its objective. Its stored record shows one node explored against a root gap of
 $1.22$, a wall time of 6~s, and three solver warnings: large bounds, large matrix coefficients
-and large right-hand sides. Its returned point is feasible for the original model with maximum
-relative violation $1.2\times10^{-7}$ and relative activity violation $3.2\times10^{-14}$, so
-the point is sound and the bound is not. CPLEX on the same unscaled file explored 6,151 nodes,
-emitted no warnings and reached $-2.904\times10^8$. The best verified point of the instance,
-$-2.913\times10^8$, comes from Gurobi on the Flat-L2 export.
+and large right-hand sides. Its returned point is itself feasible for the original model, with
+relative activity violation $3.2\times10^{-14}$, so the point is sound and the bound is not.
+The strict witness of this instance is Gurobi on the Flat-GM export at $-2.909\times10^8$, with
+relative activity residual $1.1\times10^{-13}$ and no bound or integrality violation; the
+reported objective exceeds it by $1.592\times10^8$, which is $54.7\%$ of the magnitude of the
+witness. A looser witness, Gurobi on Flat-L2 at $-2.913\times10^8$, does not meet the strict
+residual threshold and is not used. CPLEX on the same unscaled file explored 6,151 nodes,
+emitted no warnings and reached $-2.904\times10^8$.
 
 Two readings are excluded by the record. The runs are not on different models, because the
 instance hash is identical across all eight. And the discrepancy is not an artifact of scaling,
