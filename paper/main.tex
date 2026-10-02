@@ -99,11 +99,13 @@ geometric-mean normalization is reproduced by a rule that uses no block scales, 
 growth with block heterogeneity (\cref{sec:identifiability,subsec:results-kernel}).
 \item \emph{Mechanism.} Geometric-mean row centering makes the post-local extrema-based block
 statistic identically one, so the block-relative coupling formula reduces to Euclidean row
-normalization. After local whitening, the idealized coupling problem has the closed-form
+normalization. After local whitening --- that is, once each local block's rows have been
+normalized so that the block is an identity as far as scale is concerned --- the idealized
+coupling problem has the closed-form
 optimal common factor $(1+\rho^2)^{-1/2}$, which requires no ownership metadata
 (\cref{sec:identifiability}).
 \item \emph{Contract.} Residual budgets stated in application units survive consistent row
-re-emission. We characterize the admissible row factors exactly, with necessary and sufficient
+re-emission, that is, rewriting a row and its right-hand side in different units. We characterize the admissible row factors exactly, with necessary and sufficient
 compatibility conditions, an incompatibility certificate, the constrained logarithmic minimax
 factor, the integer-rounding term that scaling cannot remove, and exact binary64 export with
 power-of-two factors (\cref{sec:contract}).
@@ -164,12 +166,15 @@ Flat-L2 & L2 & L2 & Row coefficients\\
 Role-Hybrid & GM & L2 & Row roles, coefficients\\
 SA-Mat & GM & $\left[\sum_j(a_{rj}/s_{\beta(j)})^2\right]^{-1/2}$ & Roles, block scales, ownership\\
 SA-Pre & GM & Same expression, pre-local scales & Roles, original block scales\\
+SA-Mat-permB & GM & Same expression, permuted block scales & Roles, permuted ownership\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Relabeling blocks without changing their assignment is an invariance check, whereas permuting
-the assignment of unequal block scales tests whether the map is useful on the chosen instances.
+The last policy is a control rather than a proposal: SA-Mat-permB applies the SA-Mat formula
+with the block scales assigned to the wrong blocks. Relabeling blocks without changing their
+assignment is an invariance check, whereas permuting the assignment of unequal block scales
+tests whether the map is useful on the chosen instances.
 
 \input{sections/identifiability}
 \input{sections/residual_contract}
@@ -264,12 +269,19 @@ and hashes are archived.
 \label{subsec:design-matrix}
 A C++ generator of block-structured instances builds local blocks and coupling rows and
 retains row roles and column ownership, so every policy in \cref{tab:policies} is available in
-one implementation and exports can be compared before any optimizer is called. The archived
-headline cell has four heterogeneous blocks, coefficient exponent range $[-2,2]$, coupling
-disturbance severity 6 and 30 seeds. A fresh replication crosses ten seeds
-(20260909--20260918) with exponent ranges $[-R,R]$ for $R\in\{1,2,3\}$, two severities and
-three coupling patterns: 180 instances and 1,080 exports, written with a serializer that
-preserves binary64 values on readback. Identity claims rest on direct comparisons of named
+one implementation and exports can be compared before any optimizer is called. Two generator
+parameters control the disturbance it introduces. The \emph{severity} $S$ is its half-width in
+decades: a disturbed row is multiplied by $10^{\xi}$ with $\xi$ uniform on $[-S,S]$. The
+\emph{pattern} says which rows are disturbed and whether they share a draw. Under
+\texttt{coupling} each coupling row draws its own $\xi$, which is the adversarial case, since
+no single common factor can compress heterogeneity between rows; under
+\texttt{coupling\_uniform} all coupling rows share one draw, which is the collective change of
+units that a common factor is designed for; under \texttt{mixed} local rows are disturbed as
+well. The archived headline cell has four heterogeneous blocks, coefficient exponent range
+$[-2,2]$, pattern \texttt{coupling} at severity 6, and 30 seeds. A fresh replication crosses
+ten seeds (20260909--20260918) with exponent ranges $[-R,R]$ for $R\in\{1,2,3\}$, severities
+$S\in\{3,6\}$ and the three patterns: 180 instances and 1,080 exports, written with a
+serializer that preserves binary64 values on readback. Identity claims rest on direct comparisons of named
 exports. The spectral pseudo-condition number
 $\kappa_2^+(A)=\sigma_{\max}(A)/\sigma_{\min}^+(A)$ uses a numerical rank fixed per instance from
 the row-L2-normalized Base (relative threshold $10^{-12}$) and shared by all its variants.
@@ -460,7 +472,8 @@ number establishes acceptance; \cref{tab:application-budget} supplies one.
 \centering\includegraphics[width=.9\linewidth]{budget-verification.pdf}
 \caption{Verified optima by coefficient multiplier. Each cell counts the configurations whose
 returned point is a verified optimum, out of the 48 in that cell (three families, eight seeds,
-two presolve settings). The fixed margin in \eqref{eq:stress-family} brings the continuous
+two presolve settings); the shading is that count as a percentage, on the common scale at the
+right. The fixed margin in \eqref{eq:stress-family} brings the continuous
 feasibility boundary increasingly close to an integer activity. Hatched cells marked
 \mbox{--} are abstentions, where the policy declines to export. The detached bottom row is
 GCD-floor, the later integer-aware reformulation control, not a scaling policy.}

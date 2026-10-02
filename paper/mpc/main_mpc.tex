@@ -108,11 +108,13 @@ geometric-mean normalization is reproduced by a rule that uses no block scales, 
 growth with block heterogeneity (\cref{sec:identifiability,subsec:results-kernel}).
 \item \emph{Mechanism.} Geometric-mean row centering makes the post-local extrema-based block
 statistic identically one, so the block-relative coupling formula reduces to Euclidean row
-normalization. After local whitening, the idealized coupling problem has the closed-form
+normalization. After local whitening --- that is, once each local block's rows have been
+normalized so that the block is an identity as far as scale is concerned --- the idealized
+coupling problem has the closed-form
 optimal common factor $(1+\rho^2)^{-1/2}$, which requires no ownership metadata
 (\cref{sec:identifiability}).
 \item \emph{Contract.} Residual budgets stated in application units survive consistent row
-re-emission. We characterize the admissible row factors exactly, with necessary and sufficient
+re-emission, that is, rewriting a row and its right-hand side in different units. We characterize the admissible row factors exactly, with necessary and sufficient
 compatibility conditions, an incompatibility certificate, the constrained logarithmic minimax
 factor, the integer-rounding term that scaling cannot remove, and exact binary64 export with
 power-of-two factors (\cref{sec:contract}).
@@ -173,12 +175,15 @@ Flat-L2 & L2 & L2 & Row coefficients\\
 Role-Hybrid & GM & L2 & Row roles, coefficients\\
 SA-Mat & GM & $\left[\sum_j(a_{rj}/s_{\beta(j)})^2\right]^{-1/2}$ & Roles, block scales, ownership\\
 SA-Pre & GM & Same expression, pre-local scales & Roles, original block scales\\
+SA-Mat-permB & GM & Same expression, permuted block scales & Roles, permuted ownership\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Relabeling blocks without changing their assignment is an invariance check, whereas permuting
-the assignment of unequal block scales tests whether the map is useful on the chosen instances.
+The last policy is a control rather than a proposal: SA-Mat-permB applies the SA-Mat formula
+with the block scales assigned to the wrong blocks. Relabeling blocks without changing their
+assignment is an invariance check, whereas permuting the assignment of unequal block scales
+tests whether the map is useful on the chosen instances.
 
 \input{sections/identifiability}
 \input{sections/residual_contract}
@@ -208,6 +213,45 @@ Verified correctness & Exact original residuals, bounds and integrality; enumera
 \end{tabularx}
 \end{table}
 
+\subsection{The instance bank}
+\label{subsec:design-bank}
+The dispatch models come from one generator, written for the hydrothermal operation of the
+Uruguayan power system, and they are what that generator produces rather than a selection from
+a benchmark library. All have a 360-hour horizon and fall into three classes. \emph{Simple}
+(204 models) dispatches the R\'io Negro cascade --- the reservoirs Bonete, Baygorria and
+Palmar, in that order downstream --- against a fixed demand with a cost of unserved energy.
+\emph{SG-Ter-Mer} (68 models) dispatches the Uruguayan share of the binational Salto Grande
+plant together with a thermal unit against a market, whose unserved demand is priced by a
+piecewise-linear curve; its segments are the \emph{market-shortage rows} referred to below.
+\emph{Full} (34 models) combines both and values Bonete's stored water by Bellman cuts. The
+integer variables are the indicators that select the height band of each reservoir's production
+function.
+
+\Cref{tab:instance-bank} gives the sizes. Within a class they do not vary: the horizon and the
+plant set are fixed and the instances differ in their data --- inflows, demands, water values,
+initial volumes --- not in their structure. That is a limitation of the bank, and it is why the
+conditioning audit below reports a per-instance ratio rather than treating the 306 models as a
+size sweep. What does vary, and is the reason scaling is in question at all, is the numerical
+range: a single model mixes reservoir volumes in cubic metres, with coefficients reaching
+$10^9$ in Simple and $10^{10}$ in the other two classes, with power in megawatts and with water
+values near $10^{-4}$, so its coefficient magnitudes span 11.9 decades in the median Simple
+model and 13.4 in the median Full one, before any scaling. One Simple model, caso46e, is used in
+\cref{subsec:results-budget} to state residual budgets in application units; it is otherwise
+unremarkable within its class.
+
+Nine of the SG-Ter-Mer instances carry a defect in their total-demand series, described in
+Online Resource 1: they remain well-posed MILPs, and every comparison here is between
+representations of one model, but they are not faithful market scenarios.
+
+\begin{table}[tb]
+\centering\small
+\caption{The dispatch instance bank, from the unscaled export of every model. Entries are the
+median and, where it differs, the range over the class. Sizes are constant within a class;
+decades is $\log_{10}$ of the ratio between the largest and smallest magnitude in a model.}
+\label{tab:instance-bank}
+\input{tables/instance-bank}
+\end{table}
+
 \subsection{Fixed-basis conditioning audit}
 \label{subsec:design-fixed-basis}
 A condition number read along each policy's own solve compares different vertices as well as
@@ -234,12 +278,19 @@ and hashes are archived.
 \label{subsec:design-matrix}
 A C++ generator of block-structured instances builds local blocks and coupling rows and
 retains row roles and column ownership, so every policy in \cref{tab:policies} is available in
-one implementation and exports can be compared before any optimizer is called. The archived
-headline cell has four heterogeneous blocks, coefficient exponent range $[-2,2]$, coupling
-disturbance severity 6 and 30 seeds. A fresh replication crosses ten seeds
-(20260909--20260918) with exponent ranges $[-R,R]$ for $R\in\{1,2,3\}$, two severities and
-three coupling patterns: 180 instances and 1,080 exports, written with a serializer that
-preserves binary64 values on readback. Identity claims rest on direct comparisons of named
+one implementation and exports can be compared before any optimizer is called. Two generator
+parameters control the disturbance it introduces. The \emph{severity} $S$ is its half-width in
+decades: a disturbed row is multiplied by $10^{\xi}$ with $\xi$ uniform on $[-S,S]$. The
+\emph{pattern} says which rows are disturbed and whether they share a draw. Under
+\texttt{coupling} each coupling row draws its own $\xi$, which is the adversarial case, since
+no single common factor can compress heterogeneity between rows; under
+\texttt{coupling\_uniform} all coupling rows share one draw, which is the collective change of
+units that a common factor is designed for; under \texttt{mixed} local rows are disturbed as
+well. The archived headline cell has four heterogeneous blocks, coefficient exponent range
+$[-2,2]$, pattern \texttt{coupling} at severity 6, and 30 seeds. A fresh replication crosses
+ten seeds (20260909--20260918) with exponent ranges $[-R,R]$ for $R\in\{1,2,3\}$, severities
+$S\in\{3,6\}$ and the three patterns: 180 instances and 1,080 exports, written with a
+serializer that preserves binary64 values on readback. Identity claims rest on direct comparisons of named
 exports. The spectral pseudo-condition number
 $\kappa_2^+(A)=\sigma_{\max}(A)/\sigma_{\min}^+(A)$ uses a numerical rank fixed per instance from
 the row-L2-normalized Base (relative threshold $10^{-12}$) and shared by all its variants.
@@ -251,11 +302,9 @@ each of the Simple and SG-Ter-Mer classes with Gurobi at relative MIP gaps of 1\
 (seed 42, 16 threads, 1,800-second limit): 240 assigned runs, whose native logs and input
 hashes were retrieved from the cluster. Its mean PAR10 is the only quantity reported here in
 units of time, and all 240 logs name one processor and operating system; Online Resource 1,
-Table~S3 states the environment of every campaign. The subsets were fixed before outcomes were inspected. Nine
-of the 15 SG-Ter-Mer instances, including instance077, carry a scenario defect that makes them
-unfaithful market cases without affecting their validity as MILPs or the comparison of
-representations of one model; Online Resource 1 repeats the endpoints on the six instances
-without the defect.
+Table~S3 states the environment of every campaign. The subsets were fixed before outcomes were inspected. Nine of the 15 SG-Ter-Mer instances, including instance077, carry the scenario defect of
+\cref{subsec:design-bank}; Online Resource 1 repeats the endpoints on the six instances
+without it.
 The pre-specified primary endpoint is failure-sensitive performance: the arithmetic-mean PAR10
 over all 15 instances of a cell, with 18,000 seconds assigned to a non-completion. Solver effort,
 the secondary endpoint, is Gurobi's work measure, recovered from the native logs at a common
@@ -265,6 +314,10 @@ replications.
 
 \subsection{Enumerated residual-budget stress experiment}
 \label{subsec:design-stress}
+The design follows the idea of Neumaier and Shcherbina \cite{neumaier2004safe}, who build
+small mixed-integer programs on which a tolerance-based solver returns an answer that is wrong
+in exact arithmetic. Here the construction is used not to exhibit a failure but to compare
+representations of one model under a rule that decides acceptance independently of the solver.
 Three binary families with 12 variables contain a cardinality row, three positive packing rows
 and three rows with signed integer coefficients; profits are positive integers. With integer
 matrix $W$ and integer capacities $k$, the represented constraints are
@@ -404,7 +457,14 @@ out, Base included, while under CPLEX the run that reaches the limit is Base at 
 Role-Hybrid at 0.1\%.
 The completed-run gain of this class is therefore a property of a representation together with a
 pipeline, and the failure that reversed the PAR10 ordering is not a stable property of the
-instance either.
+instance either. Neither observation is surprising in the light of what is known about
+performance variability in mixed-integer programming: Lodi and Tramontani
+\cite{lodi2013variability} document changes of this order from perturbations that leave the
+model mathematically unchanged, such as a different seed or a permuted formulation. A row
+scaling is exactly such a perturbation. The seed-to-seed movement reported here, from 0.698 to
+0.778, is of the same order as the effect being measured, which is why these numbers are
+reported as a measured conditional gain on a fixed pool rather than as an estimate of
+acceleration.
 
 The two endpoints answer different questions: completed-run effort describes how a
 representation affects the runs that finish, and PAR10 whether it changes which runs finish.
@@ -421,7 +481,8 @@ number establishes acceptance; \cref{tab:application-budget} supplies one.
 \centering\includegraphics[width=.9\linewidth]{budget-verification.pdf}
 \caption{Verified optima by coefficient multiplier. Each cell counts the configurations whose
 returned point is a verified optimum, out of the 48 in that cell (three families, eight seeds,
-two presolve settings). The fixed margin in \eqref{eq:stress-family} brings the continuous
+two presolve settings); the shading is that count as a percentage, on the common scale at the
+right. The fixed margin in \eqref{eq:stress-family} brings the continuous
 feasibility boundary increasingly close to an integer activity. Hatched cells marked
 \mbox{--} are abstentions, where the policy declines to export. The detached bottom row is
 GCD-floor, the later integer-aware reformulation control, not a scaling policy.}

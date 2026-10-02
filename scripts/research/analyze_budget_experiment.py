@@ -138,7 +138,10 @@ def main():
     plt.rcParams.update({'font.size':11, 'pdf.fonttype':42, 'ps.fonttype':42})
     # One blank row separates the scaling policies from the integer-aware control.
     layout = methods[:-1] + [None] + methods[-1:]
-    fig, axes = plt.subplots(1,len(solvers),figsize=(4.3*len(solvers),5.6),sharey=True,layout='constrained')
+    # Narrower panels: the figure is printed at 0.9 of a text column, so a wide canvas is
+    # scaled down and takes the cell labels with it.
+    fig, axes = plt.subplots(1,len(solvers),figsize=(2.9*len(solvers),4.6),sharey=True,layout='constrained')
+    im = None
     for ax, solver in zip(np.atleast_1d(axes),solvers):
         a = d[d.solver.eq(solver)]
         grid = np.full((len(layout),4), np.nan)
@@ -148,7 +151,7 @@ def main():
             for j, e in enumerate([0,3,6,9]):
                 s = a[a.method.eq(method)&a.exponent.eq(e)]
                 grid[i,j] = 100*s.rounded_optimal.mean()
-        ax.imshow(np.ma.masked_invalid(grid),cmap='Blues',vmin=0,vmax=100,aspect='auto')
+        im = ax.imshow(np.ma.masked_invalid(grid),cmap='Blues',vmin=0,vmax=100,aspect='auto')
         for i, method in enumerate(layout):
             if method is None:
                 continue
@@ -160,14 +163,17 @@ def main():
                 else:
                     label = str(int(s.rounded_optimal.sum()))
                     color = 'white' if grid[i,j]>65 else 'black'
-                ax.text(j,i,label,ha='center',va='center',fontsize=11,color=color)
-        ax.set_xticks(range(4),[r'$10^0$',r'$10^3$',r'$10^6$',r'$10^9$'])
-        ax.set_yticks(range(len(layout)),[m or '' for m in layout])
-        ax.set_xlabel('Coefficient multiplier')
+                ax.text(j,i,label,ha='center',va='center',fontsize=13,color=color)
+        ax.set_xticks(range(4),[r'$10^0$',r'$10^3$',r'$10^6$',r'$10^9$'],fontsize=11)
+        ax.set_yticks(range(len(layout)),[m or '' for m in layout],fontsize=11)
+        ax.set_xlabel('Coefficient multiplier',fontsize=11)
         ax.set_title(f'({"abc"[solvers.index(solver)]}) {SOLVER_LABELS[solver]}')
         ax.tick_params(left=False)
         for spine in ax.spines.values():
             spine.set_visible(False)
+    cb = fig.colorbar(im, ax=np.atleast_1d(axes).tolist(), fraction=.035, pad=.02)
+    cb.set_label('Verified optima in the cell (%)', fontsize=10)
+    cb.ax.tick_params(labelsize=9)
     fig.savefig(args.figures/'budget-verification.pdf',bbox_inches='tight')
     fig.savefig(args.figures/'budget-verification.png',dpi=180,bbox_inches='tight')
     plt.close(fig)
