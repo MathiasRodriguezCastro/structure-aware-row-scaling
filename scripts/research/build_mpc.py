@@ -60,6 +60,7 @@ Residual-Budget Contracts}
 \institute{M. Rodr\'iguez Castro \at
               Facultad de Ingenier\'ia, Universidad de la Rep\'ublica,
               Montevideo, Uruguay \\
+              ORCID: \href{https://orcid.org/0009-0002-7235-7677}{0009-0002-7235-7677} \\
               \email{mathiasr@fing.edu.uy}}
 \date{Received: date / Accepted: date}
 \maketitle
