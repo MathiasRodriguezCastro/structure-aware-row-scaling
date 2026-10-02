@@ -249,7 +249,9 @@ the row-L2-normalized Base (relative threshold $10^{-12}$) and shared by all its
 The operational campaign runs Base, Flat-GM, Flat-L2 and Role-Hybrid on 15 fixed instances from
 each of the Simple and SG-Ter-Mer classes with Gurobi at relative MIP gaps of 1\% and 0.1\%
 (seed 42, 16 threads, 1,800-second limit): 240 assigned runs, whose native logs and input
-hashes were retrieved from the cluster. The subsets were fixed before outcomes were inspected. Nine
+hashes were retrieved from the cluster. Its mean PAR10 is the only quantity reported here in
+units of time, and all 240 logs name one processor and operating system; Online Resource 1,
+Table~S3 states the environment of every campaign. The subsets were fixed before outcomes were inspected. Nine
 of the 15 SG-Ter-Mer instances, including instance077, carry a scenario defect that makes them
 unfaithful market cases without affecting their validity as MILPs or the comparison of
 representations of one model; Online Resource 1 repeats the endpoints on the six instances
@@ -381,16 +383,16 @@ intervals $[0.486,0.944]$ and $[0.470,0.925]$): about 30--32\% less work on that
 fifteenth instance, instance077, completes under Base and times out under every scaled policy
 at both gaps. Under PAR10 this single failure dominates: Base averages 116 and 134 seconds,
 while every scaled policy averages between 1,216 and 1,218 seconds (Online Resource 1,
-Table~S4). Scaling therefore produced a sizeable completed-run efficiency gain in this class,
+Table~S5). Scaling therefore produced a sizeable completed-run efficiency gain in this class,
 but the gain was not robust to failure-sensitive aggregation. On the six instances of the class
 that are free of the scenario defect the conditional gain is larger and, since instance077 is
-not among them, the reversal disappears (Online Resource 1, Table~S3). The Simple class has no uniform ordering: Flat-GM
+not among them, the reversal disappears (Online Resource 1, Table~S4). The Simple class has no uniform ordering: Flat-GM
 lowers mean PAR10 from 11.9 to 2.1 seconds at 1\% gap and raises it from 52.0 to 73.0 seconds
 at 0.1\%. Role-Hybrid stays within one second of Flat-GM in all four cells.
 
 \paragraph{Replication under a second seed and a second solver.} The reconstruction is one
 solver at one seed. The same 30 instances, four policies, two gaps and 1,800-second limit were
-rerun changing one factor at a time (Online Resource 1, Table~S5). Under Gurobi with seed 7 the
+rerun changing one factor at a time (Online Resource 1, Table~S6). Under Gurobi with seed 7 the
 SG-Ter-Mer effort ratio of Flat-GM is 0.778 at a 1\% gap and 0.777 at 0.1\%, against 0.698 and
 0.682 at seed 42: the conditional gain survives the change of seed. Under CPLEX at the original
 seed, in its own deterministic effort metric, the same ratio is 1.078 and 1.077: it does not survive
@@ -454,7 +456,7 @@ operationally safer, unless what safer means is stated in the units of the origi
 Relative to the unscaled model, the outcome depends on the pipeline: presolve, internal
 scaling, tolerances and finite precision all intervene between the exported row and the
 accepted point. The complete
-counts for every policy and solver are in Online Resource 1, Table~S6. On HiGHS, Budget-only
+counts for every policy and solver are in Online Resource 1, Table~S7. On HiGHS, Budget-only
 verifies 191 of 192 configurations and Budget-GM 182, against 167 for Base and 141 for GM;
 Budget-only gains 24 configurations over Base and loses none. On Gurobi, Budget-only verifies
 151, Budget-GM 152 and Base 156. On CPLEX every scaled policy verifies 140 and Base 150: the
@@ -499,7 +501,7 @@ considered here already lies well inside that restriction. The budgets are decla
 measured, so the margin is also the sensitivity: scaling all six by a common multiplier, all
 three kernels stay admissible on all 4,320 rows down to $10^{-4}$ and the two the comparison
 turns on down to $10^{-5}$, which places the result far from the chosen numbers (Online Resource 1,
-Table~S7).
+Table~S8).
 
 Its content is in the reading of a residual. One family is written pre-scaled: the Baygorria
 generation definition carries a coefficient of $10^7$ on the generation variable, so the same
@@ -514,9 +516,13 @@ coefficient, and only a budget carried with the row distinguishes them.
 \caption{A declared residual contract on the dispatch model, applied to the 4,320 rows of
 caso46e whose units are interpretable. Budgets are stated by the modeller, not measured or
 supplied by the operator. Admissible factors are the interval of \cref{prop:budget} for
-$\epsilon=10^{-6}$ and coefficient limits $[10^{-9},10^{9}]$; the last column is
-$\epsilon$ divided by the geometric-mean factor, the original-unit residual that the tolerance
-allows, in the units of that group's budget. The last group is written pre-scaled, with a coefficient of $10^7$ on the generation
+$\epsilon=10^{-6}$ and coefficient limits $[10^{-9},10^{9}]$. The geometric-mean factor is
+constant within every group except the tangents, where it ranges over $[1.99,2.33]$; the
+column ``GM (med.)'' gives its median, and ``Worst resid.'' gives $\epsilon$ divided by the
+\emph{smallest} factor of the group, the largest original-unit residual the tolerance allows
+there, in the units of that group's budget. The two therefore coincide except on the tangents, where the worst residual
+$5.0\times10^{-7}$ belongs to the row with factor 1.99 rather than to the median row, whose
+residual is $4.7\times10^{-7}$. The last group is written pre-scaled, with a coefficient of $10^7$ on the generation
 variable, so 0.1\,MW there is $10^{6}$ in the units of the row as written. The admissibility
 check covers the three kernels the four policies use --- the unit factor, the geometric-mean
 factor shown here and $1/\|a_r\|_2$ --- and every one of them is admissible on every row. The

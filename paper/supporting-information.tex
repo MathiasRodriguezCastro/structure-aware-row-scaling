@@ -143,9 +143,31 @@ reference basis. That computation did not retain its exports, basis identities o
 and its multithreaded incumbents cannot be replayed, so it is not used as evidence. The
 provenance audit is in \path{results-revision/research-audit/fixed-basis-recovery-20260914-v2/}.
 
+\section{Computing environment}
+Table~\ref{tab:environment} states, per campaign, the optimizer and version, the thread count, the time limit and
+the machine. Only one row of it can affect a reported number. The mean PAR10 of the operational
+campaign is the single quantity in this work stated in units of time, and all 240 of its
+assigned runs carry a native log naming the same processor and operating system; two further
+logs in \path{operational/precision-smoke/} come from a laptop and belong to a separate smoke
+test, not to the campaign. Everything else is reported in solver-internal units that do not
+depend on the host --- Gurobi work units for the seed replication, CPLEX deterministic ticks for
+the solver replication --- or in counts and condition numbers, which do not depend on it either.
+The two replications ran on ClusterUY under SLURM with 16 cores per task, but their node is not
+recorded, and the machine of the fixed-basis audit, of the matrix audit and of the stress
+experiment was not recorded either. No number taken from any of them would change if it had
+been.
+
+\begin{table}[tb]
+\centering\footnotesize
+\caption{Computing environment by campaign. ``Not recorded'' is stated rather than
+reconstructed; no quantity reported from those campaigns depends on the host.}
+\label{tab:environment}
+\resizebox{\textwidth}{!}{\input{tables/environment}}
+\end{table}
+
 \section{Operational evidence and reconstruction}
 The final historical campaign assigned 15 instances in each of two dispatch families,
-four policies, and two relative MIP gaps. Thus there are 240 assigned Gurobi 13.0.1 runs (Debian GNU/Linux 12).
+four policies, and two relative MIP gaps. Thus there are 240 assigned Gurobi 13.0.1 runs (Table~\ref{tab:environment}).
 All use seed 42, 16 threads and a 1,800-second limit. The four policies are Base,
 Flat-GM, Flat-L2 and Role-Hybrid. The analysis retains the assigned subsets and
 includes every non-completion in the primary runtime endpoint.

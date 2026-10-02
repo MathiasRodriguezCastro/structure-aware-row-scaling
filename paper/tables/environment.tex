@@ -1,0 +1,13 @@
+\begin{tabular}{llllll}
+\toprule
+Campaign & Optimizer & Thr. & Limit & Machine & Reported quantity \\
+\midrule
+Fixed-basis audit    & HiGHS 1.15.1 (LP only)       & 1  & ---     & not recorded              & $\kappa_1$ \\
+Matrix audit         & none                         & --- & ---    & not recorded              & $\kappa_2^{+}$, identity \\
+Operational campaign & Gurobi 13.0.1                & 16 & 1,800~s & Xeon Gold 6138, Debian 12 & PAR10 (s), work units \\
+Replication, seed 7  & Gurobi 13.0.1                & 16 & 1,800~s & ClusterUY, node not recorded & work units \\
+Replication, CPLEX   & CPLEX 22.1.2.0               & 16 & 1,800~s & ClusterUY, node not recorded & deterministic ticks \\
+Stress experiment    & HiGHS 1.15.1, Gurobi 13.0.2, & 1  & 10~s    & not recorded              & verified counts \\
+                     & CPLEX 22.1.2.0               &    &         &                           & \\
+\bottomrule
+\end{tabular}

@@ -36,8 +36,8 @@ def main():
     d = d.sort_values(["_o", "constraint_group"])
     unit = {"MW": "MW", "m3": r"m\textsuperscript{3}", "MW1e7": "row units"}
     lines = [r"\begin{tabular}{lrrrr}", r"\toprule",
-             r"Constraint group & Budget $\delta$ & Admissible factors & GM factor & "
-             r"Residual at $\epsilon$ \\",
+             r"Constraint group & Budget $\delta$ & Admissible factors & "
+             r"GM (med.) & Worst resid. \\",
              r"\midrule"]
     for _, r in d.iterrows():
         u = unit.get(r.unit, r.unit)
