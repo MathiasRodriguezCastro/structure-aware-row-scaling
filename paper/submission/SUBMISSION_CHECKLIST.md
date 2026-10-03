@@ -29,3 +29,6 @@ The existing computational artifact is pinned to v1.0-mpc-submission,
 DOI https://doi.org/10.5281/zenodo.23104497; the concept DOI is
 https://doi.org/10.5281/zenodo.20648949. The COAP editorial revision is frozen in v1.1-coap-submission; its archive is a separate
 version under the same concept DOI. The earlier version DOI continues to identify the MPC release.
+
+Verified COAP version DOI: https://doi.org/10.5281/zenodo.23112768. The release archive is public at
+https://zenodo.org/records/23112768.
