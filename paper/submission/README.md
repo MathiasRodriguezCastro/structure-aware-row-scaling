@@ -8,15 +8,29 @@ the existing svjour3 layout is retained. This package has not been externally su
 
 ## What to upload
 
-| File | Role |
-|---|---|
-| `coap-submission.zip` | the manuscript in Springer's `svjour3` format, with its class files, sections, tables, vector figures, bibliography, compiled PDF, cover letter, and the supplement as Online Resource 1 |
-| `../supporting-information.pdf` | Online Resource 1, also inside the bundle |
-| `reproducibility-artifact.zip` | Online Resource 2: code, experiment data, manifests, checksums, tests and reproduction instructions |
-| `../coap/cover-letter.pdf` | cover letter, also inside the bundle |
+Upload the following files **separately** in Editorial Manager. Ready-to-upload copies
+are generated in `editorial-manager/` by `python3 scripts/research/prepare_editorial_uploads.py`.
+The packaging script also runs that step automatically.
 
-There is one article PDF. The journal-neutral layout in `paper/main.tex` is the source the
-Springer version is generated from, not a second deliverable, so it is no longer packaged.
+| File in `editorial-manager/` | Role |
+|---|---|
+| `main_coap.pdf` | Manuscript PDF |
+| `coap-submission.zip` | Editable LaTeX sources, class/style files, bibliography, tables and figures |
+| `cover-letter.pdf` | Cover letter |
+| `ESM_1.pdf` | Supplementary material: Online Resource 1 |
+| `ESM_2.zip` | Supplementary material: Online Resource 2, code and stored experiment data |
+
+`ESM_1.pdf` is byte-identical to `../supporting-information.pdf`; `ESM_2.zip` is
+byte-identical to `reproducibility-artifact.zip`. Existing repository names are retained.
+Online Resource 2 is **not inside** `coap-submission.zip`: upload `ESM_2.zip` as a separate
+supplementary file. The copy of Online Resource 1 inside the source bundle likewise does not
+replace its separate supplementary upload. The manuscript's accompanying source/data archive
+therefore remains supplied, and its wording needs no change.
+
+`editorial-manager/UPLOAD_INSTRUCTIONS.md` gives upload roles and captions to paste into the
+supplementary-file fields. `editorial-manager/SHA256SUMS` verifies all five upload copies.
+The journal-neutral layout in `paper/main.tex` is the source from which the Springer version
+is generated, not another article PDF to upload.
 
 ## The bulk data behind the fixed-basis audit
 

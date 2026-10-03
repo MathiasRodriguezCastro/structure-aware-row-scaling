@@ -116,6 +116,8 @@ def main():
            ROOT/'paper/coap/main_coap.pdf',ROOT/'paper/coap/cover-letter.pdf']
     (OUT/'SHA256SUMS').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(ROOT)}\n' for p in paths))
     print(f'Prepared {n2} artifact files in {OUT}')
+    from prepare_editorial_uploads import main as prepare_uploads
+    prepare_uploads()
 
 
 if __name__=='__main__':

@@ -9,8 +9,13 @@ Guidelines: https://link.springer.com/journal/10589/submission-guidelines
 | Manuscript PDF | `paper/coap/main_coap.pdf` |
 | Editable sources and class files | `paper/submission/coap-submission.zip` |
 | Cover letter | `paper/coap/cover-letter.pdf` |
-| Online Resource 1 | `paper/supporting-information.pdf` |
-| Online Resource 2 | `paper/submission/reproducibility-artifact.zip` |
+| Online Resource 1 — separate supplementary upload | `paper/submission/editorial-manager/ESM_1.pdf` |
+| Online Resource 2 — separate supplementary upload | `paper/submission/editorial-manager/ESM_2.zip` |
+
+Generate the upload copies with `python3 scripts/research/prepare_editorial_uploads.py`.
+Upload both ESM files separately, as supplementary material. Online Resource 2 is not inside
+the manuscript source ZIP. The names inside the repository are unchanged. Captions for both
+resources are in `editorial-manager/UPLOAD_INSTRUCTIONS.md`.
 
 Title: Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts.
 Keywords (6): Mixed-integer linear programming; Row scaling; Numerical reliability;

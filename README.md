@@ -31,6 +31,9 @@ The current manuscript is **unpublished**. The COAP preparation is frozen in
 [`v1.1-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1-coap-submission).
 The manuscript, reproducibility artifact and bulk-input archives are attached to that release.
 Journal submission, acceptance and publication of this revision are not claimed.
+For Editorial Manager, prepare the separate supplementary uploads `ESM_1.pdf` and `ESM_2.zip`
+with `python3 scripts/research/prepare_editorial_uploads.py`; see the
+[submission checklist](paper/submission/SUBMISSION_CHECKLIST.md).
 
 The paper separates what row scaling demonstrably does from what it is credited with. With one
 LP basis held fixed, scaling moves the basis condition number by six to eight orders of
