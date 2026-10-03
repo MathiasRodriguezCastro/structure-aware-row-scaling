@@ -34,6 +34,37 @@ def check_archive(name):
                 "checksum_output": r.stdout.strip()[:400]}
 
 
+def audit_artifact():
+    """Check the included supplement and run the documented audit from the ZIP alone."""
+    with tempfile.TemporaryDirectory(prefix="artifact-audit-") as tmp:
+        with zipfile.ZipFile(OUT / "reproducibility-artifact.zip") as archive:
+            archive.extractall(tmp)
+        root = Path(tmp)
+        supplement = root / "paper/supporting-information.pdf"
+        if not supplement.is_file() or sha(supplement) != sha(ROOT / "paper/supporting-information.pdf"):
+            raise SystemExit("Online Resource 2 is missing the exact Online Resource 1 PDF")
+        audit = subprocess.run(["make", "research-online-resources"], cwd=tmp,
+                               capture_output=True, text=True)
+        if audit.returncode:
+            raise SystemExit("Extracted artifact audit failed:\n" + audit.stdout + audit.stderr)
+        # README links to files in this artifact must resolve inside the extracted archive.
+        import re
+        missing = []
+        for rel in ("README.md", "paper/README.md", "paper/submission/README.md"):
+            readme = root / rel
+            for target in re.findall(r"\]\(([^)]+)\)", readme.read_text()):
+                if "://" in target or target.startswith("#"):
+                    continue
+                target = target.split("#", 1)[0]
+                if not (readme.parent / target).exists():
+                    missing.append(rel + " -> " + target)
+        if missing:
+            raise SystemExit("Artifact README links do not resolve: " + ", ".join(missing))
+        return {"online_resource_1_included": True, "supplement_pdf_sha256": sha(supplement),
+                "research_online_resources_passed": True, "readme_relative_links_verified": True,
+                "audit_output": audit.stdout.strip()}
+
+
 def rebuild_coap():
     """The bundle must compile on its own, with the class files it carries."""
     with tempfile.TemporaryDirectory(prefix="coap-build-") as tmp:
@@ -60,6 +91,7 @@ def main():
                            ["coap-submission.zip",
                             "reproducibility-artifact.zip"]],
               "coap_bundle_build": rebuild_coap(),
+              "artifact_audit": audit_artifact(),
               "documents": {}}
     for label, pdf in [
                        ("supplement", ROOT / "paper/supporting-information.pdf"),

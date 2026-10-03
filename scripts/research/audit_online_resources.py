@@ -137,7 +137,7 @@ def main():
         if claim.replace("\\times10^{", "").replace("}", "") and claim not in MAIN.read_text():
             failures.append(f"article no longer states {claim} for the {name}")
 
-    required = ["Pre-Export Row Scaling", "Mathematical Programming Computation",
+    required = ["Pre-Export Row Scaling", "Computational Optimization and Applications",
                 "Rodr\\'iguez Castro", "Universidad de la Rep\\'ublica", "mathiasr@fing.edu.uy",
                 "Online Resource 1"]
     missing = [r for r in required if r not in si_src]

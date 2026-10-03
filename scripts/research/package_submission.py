@@ -87,7 +87,7 @@ def coap_bundle():
 
 def main():
     OUT.mkdir(exist_ok=True)
-    paper=[Path('paper')/x for x in ['main.tex','main.bbl','supporting-information.tex',
+    paper=[Path('paper')/x for x in ['main.tex','main.bbl','supporting-information.tex','supporting-information.pdf',
                                      'research-references.bib','Makefile','README.md']]
     paper += list(collect('paper/sections',{'.tex'}))
     paper += list(collect('paper/tables',{'.tex'}))
@@ -100,10 +100,12 @@ def main():
     artifact += list(collect('data'))
     artifact += list(collect('results-revision/research-audit'))
     artifact += list(collect('results-revision/attribution-controls'))
+    artifact += list(collect('results-revision/fixed-basis'))
+    artifact += list(collect('results-revision/r5-ablation'))
     artifact += [p.relative_to(ROOT) for p in (ROOT/'results-revision/final-variants').glob('*/resumen.csv')]
     artifact += list(collect('paper/research-audit',{'.md','.json','.csv','.txt'}))
     artifact += list(collect('paper/research-audit/baseline-20260908',{'.tex','.pdf','.bib','.cpp'}))
-    artifact += [Path('paper/submission/README.md'),
+    artifact += [Path('paper/submission/README.md'), Path('paper/submission/SUBMISSION_CHECKLIST.md'),
                  Path('paper/submission/data-deposit/MANIFEST.json'),
                  Path('paper/submission/data-deposit/SHA256SUMS')]
     artifact += list(collect('paper/coap', {'.tex', '.bib', '.bst', '.cls', '.clo', '.md', '.pdf'}))

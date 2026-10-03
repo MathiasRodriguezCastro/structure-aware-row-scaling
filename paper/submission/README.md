@@ -21,7 +21,9 @@ The packaging script also runs that step automatically.
 | `ESM_2.zip` | Supplementary material: Online Resource 2, code and stored experiment data |
 
 `ESM_1.pdf` is byte-identical to `../supporting-information.pdf`; `ESM_2.zip` is
-byte-identical to `reproducibility-artifact.zip`. Existing repository names are retained.
+byte-identical to `reproducibility-artifact.zip`. Existing repository names are retained. Online Resource 2 also includes an exact copy
+of Online Resource 1 at `paper/supporting-information.pdf`, so its README and
+`make research-online-resources` audit work directly after extraction.
 Online Resource 2 is **not inside** `coap-submission.zip`: upload `ESM_2.zip` as a separate
 supplementary file. The copy of Online Resource 1 inside the source bundle likewise does not
 replace its separate supplementary upload. The manuscript's accompanying source/data archive

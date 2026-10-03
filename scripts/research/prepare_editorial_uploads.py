@@ -68,13 +68,14 @@ Online Resource 2: Source code and stored experiment data, with analysis and ver
 scripts, manifests, checksums and reproduction instructions. The bulk fixed-basis inputs are
 available separately through the archived repository and the linked GitHub release.
 
+ESM_2.zip also contains paper/supporting-information.pdf, byte-identical to ESM_1.pdf.
 ESM_1.pdf is byte-identical to supporting-information.pdf; ESM_2.zip is byte-identical
 to reproducibility-artifact.zip. These are upload names, and the repository sources retain
 their existing names. SHA256SUMS verifies all five upload files from this directory.
 
 Guidelines: https://link.springer.com/journal/10589/submission-guidelines
-Archived release: https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1-coap-submission
-Zenodo version DOI: https://doi.org/10.5281/zenodo.23112768
+Archived release: https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1.1-coap-submission
+Zenodo concept DOI: https://doi.org/10.5281/zenodo.20648949
 ''')
     print('Prepared five separately uploaded files in', OUT.relative_to(ROOT))
     print('ESM_1.pdf and ESM_2.zip match the verified source files byte for byte.')

@@ -15,7 +15,7 @@ the sixth keyword is Finite-precision optimization. A new COAP cover letter is p
 The AI declaration remains in Statements and Declarations. MSC codes are unchanged.
 
 No results, theorem statements, tables, figures, experiments or limitations were changed.
-The COAP revision is frozen in v1.1-coap-submission. The existing v1.0-mpc-submission
+The COAP revision is frozen in v1.1.1-coap-submission. The existing v1.0-mpc-submission
 artifact DOI/tag identifies the earlier archived version. The concept DOI identifies the series.
 Previous MPC sources and PDFs are preserved in paper/mpc; make mpc can regenerate its layout
 from the current canonical source. The active build and package use paper/coap.
@@ -26,4 +26,10 @@ Verify: python3 scripts/research/validate_submission.py
 See paper/submission/VALIDATION.json for actual document lengths and bundle checks.
 
 Repository citation and Zenodo metadata describe the COAP revision and use the release tag
-v1.1-coap-submission. Earlier MPC records and tags retain their historical identifiers.
+v1.1.1-coap-submission. Earlier MPC records and tags retain their historical identifiers.
+
+Maintenance correction before submission: Online Resource 1 now says "All three solvers use
+one thread". Online Resource 2 includes the exact supplement PDF and the two cited historical
+summary directories. README links to excluded historical material point to the full repository
+or its historical tags. Validation extracts Online Resource 2, compares its PDF to Online
+Resource 1, verifies relative README links and runs make research-online-resources successfully.

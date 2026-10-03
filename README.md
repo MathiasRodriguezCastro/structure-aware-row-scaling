@@ -4,13 +4,15 @@
 Applications (COAP).** The article is `paper/coap/main_coap.pdf`, generated from
 `paper/main.tex` in Springer's `svjour3` layout. The editorial changes are recorded in
 [`paper/coap/COAP_NOTES.md`](paper/coap/COAP_NOTES.md). Results and experiments are unchanged.
-The previous MPC version is preserved in `paper/mpc/`. The submission package and validation
+The previous MPC version is preserved in `paper/mpc/` in the full repository; it is
+not included in the supplementary ZIP. The submission package and validation
 record are in `paper/submission/`.
 
 A pre-registered solver-robustness campaign was prepared and partly run on ClusterUY, then
 descoped from this manuscript to keep it about mechanism and guarantees rather than
 benchmarking. Its protocol, split, frozen run tables and the 9,057 runs completed before it was
-stopped remain in [`results-revision/solver-robustness/`](results-revision/solver-robustness/)
+stopped remain in [the full repository](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/tree/v1.1-coap-submission/results-revision/solver-robustness)
+(outside the supplementary ZIP)
 for a separate study; nothing in the paper depends on them.
 
 ## Online Resource 2
@@ -20,7 +22,7 @@ Optimization and Applications*. Online Resource 1 is the supplement,
 [`paper/supporting-information.pdf`](paper/supporting-information.pdf).
 
 Archived at Zenodo: concept DOI [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949), which resolves to the latest
-version. The COAP release `v1.1-coap-submission` is archived at
+version. The earlier COAP release `v1.1-coap-submission` is archived at
 [10.5281/zenodo.23112768](https://doi.org/10.5281/zenodo.23112768). The earlier MPC release
 `v1.0-mpc-submission` remains at [10.5281/zenodo.23104497](https://doi.org/10.5281/zenodo.23104497).
 
@@ -28,7 +30,7 @@ Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la Re
 Montevideo, Uruguay — <mathiasr@fing.edu.uy>.
 
 The current manuscript is **unpublished**. The COAP preparation is frozen in
-[`v1.1-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1-coap-submission).
+[`v1.1.1-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1.1-coap-submission).
 The manuscript, reproducibility artifact and bulk-input archives are attached to that release.
 Journal submission, acceptance and publication of this revision are not claimed.
 For Editorial Manager, prepare the separate supplementary uploads `ESM_1.pdf` and `ESM_2.zip`
@@ -46,7 +48,14 @@ The results do not establish a universal solver speedup or reliability improveme
 The earlier positive block-attribution claim is superseded. Historical drafts and intermediate
 results remain available so the change in interpretation can be audited; the separate
 rounding-safety investigation lives in its own
-[working note](paper/research-notes/joint-rounding.pdf) and is not part of this manuscript.
+[historical working note](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/blob/v1.0-mpc-submission/paper/research-notes/joint-rounding.pdf)
+(outside the supplementary ZIP) and is not part of this manuscript.
+
+The supplementary ZIP includes `paper/supporting-information.pdf`, byte-identical to
+`ESM_1.pdf`, along with the sources and stored summaries used by `make research-online-resources`.
+Historical material linked to GitHub is available in the full repository or a historical tag,
+as explicitly marked above. Bulk LP exports and bases are distributed separately in
+`fixed-basis-exports.tar.zst`; the manifest is included in `paper/submission/data-deposit/`.
 
 ## Reproduce the current paper without a solver license
 
@@ -107,7 +116,8 @@ takes longer than the Python-only check.
 Timed on 2 October 2026 on one machine --- Intel Core i7-13620H, 16 threads, 15 GB RAM,
 Ubuntu 22.04.5, kernel 6.8, g++ 11.4, TeX Live 2022/Debian, CPython 3.10.12 --- by cloning
 this repository into an empty directory and running each target in order. The log of that run
-is [`paper/research-audit/cleanroom-20261002.log`](paper/research-audit/cleanroom-20261002.log).
+is [cleanroom log in the full repository](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/blob/v1.1-coap-submission/paper/research-audit/cleanroom-20261002.log)
+(outside the supplementary ZIP).
 
 | Command | Time | What it needs |
 |---|---|---|
@@ -242,5 +252,5 @@ research draft, not an accepted or submitted-version article.
 The pre-existing archive identifier
 [10.5281/zenodo.20648950](https://doi.org/10.5281/zenodo.20648950) belongs to the project's
 archive history. It does not establish that this local revision has been deposited.
-See [CITATION.cff](CITATION.cff) for the current local citation metadata; there is no
+See [CITATION.cff](CITATION.cff) for the current citation metadata; there is no
 journal article DOI for this manuscript.

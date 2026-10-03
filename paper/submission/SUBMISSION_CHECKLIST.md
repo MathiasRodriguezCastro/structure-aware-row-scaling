@@ -1,6 +1,6 @@
 # Submission checklist — Computational Optimization and Applications
 
-Prepared on 2 October 2026 for the fixed release v1.1-coap-submission.
+Prepared on 2 October 2026 for the fixed release v1.1.1-coap-submission.
 Journal submission is not claimed.
 Guidelines: https://link.springer.com/journal/10589/submission-guidelines
 
@@ -32,8 +32,10 @@ The editor's portal may request additional metadata. Author review and upload re
 
 The existing computational artifact is pinned to v1.0-mpc-submission,
 DOI https://doi.org/10.5281/zenodo.23104497; the concept DOI is
-https://doi.org/10.5281/zenodo.20648949. The COAP editorial revision is frozen in v1.1-coap-submission; its archive is a separate
+https://doi.org/10.5281/zenodo.20648949. The COAP editorial revision is frozen in v1.1.1-coap-submission; its archive is a separate
 version under the same concept DOI. The earlier version DOI continues to identify the MPC release.
 
-Verified COAP version DOI: https://doi.org/10.5281/zenodo.23112768. The release archive is public at
+Previous COAP version DOI: https://doi.org/10.5281/zenodo.23112768. The release archive is public at
 https://zenodo.org/records/23112768.
+
+The corrected supplementary files are supplied in v1.1.1-coap-submission.
