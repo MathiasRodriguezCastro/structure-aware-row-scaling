@@ -39,3 +39,6 @@ Previous COAP version DOI: https://doi.org/10.5281/zenodo.23112768. The release 
 https://zenodo.org/records/23112768.
 
 The corrected supplementary files are supplied in v1.1.1-coap-submission.
+
+Verified corrected version DOI: https://doi.org/10.5281/zenodo.23113132.
+Use the files from v1.1.1-coap-submission for the journal upload.

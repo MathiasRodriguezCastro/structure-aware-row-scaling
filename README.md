@@ -22,7 +22,8 @@ Optimization and Applications*. Online Resource 1 is the supplement,
 [`paper/supporting-information.pdf`](paper/supporting-information.pdf).
 
 Archived at Zenodo: concept DOI [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949), which resolves to the latest
-version. The earlier COAP release `v1.1-coap-submission` is archived at
+version. The corrected release `v1.1.1-coap-submission` is archived at
+[10.5281/zenodo.23113132](https://doi.org/10.5281/zenodo.23113132). The earlier COAP release `v1.1-coap-submission` is archived at
 [10.5281/zenodo.23112768](https://doi.org/10.5281/zenodo.23112768). The earlier MPC release
 `v1.0-mpc-submission` remains at [10.5281/zenodo.23104497](https://doi.org/10.5281/zenodo.23104497).
 
