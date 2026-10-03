@@ -18,14 +18,13 @@ APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
         research-application-export research-online-resources research-bridge \
         research-certificate-audit research-stage-ablation \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
-        research-rounding-check research-rounding-analysis rounding-note \
+        research-rounding-check research-rounding-analysis \
         research-robustness-analysis
 
 help:
 	@echo "Active rounding-safety investigation (not submission-ready):"
 	@echo "  make research-rounding-check    - exact certificates, witnesses and math tests"
 	@echo "  make research-rounding-analysis - verify the lattice control and draw comparison"
-	@echo "  make rounding-note              - build the active working-note PDF"
 	@echo "Current paper (no optimizer license required):"
 	@echo "  make research-check-python  - mathematical tests, saved binary audit, LP hashes"
 	@echo "  make research-check         - also build and test the C++ LP serializer"
@@ -58,9 +57,6 @@ research-rounding-check:
 research-rounding-analysis:
 	$(PYTHON) scripts/research/analyze_guard_holdout.py --root $(AUDIT_ROOT)/guards-holdout-100-isolated --control $(AUDIT_ROOT)/guards-lattice-control-100 --out paper/research-audit/guards-comparison-20260913
 
-rounding-note:
-	pdflatex -interaction=nonstopmode -halt-on-error -output-directory=paper/research-notes paper/research-notes/joint-rounding.tex
-	pdflatex -interaction=nonstopmode -halt-on-error -output-directory=paper/research-notes paper/research-notes/joint-rounding.tex
 
 audit-build:
 	$(MAKE) -C code BUILD_DIR=build-audit USE_GUROBI=0 USE_CPLEX=0 USE_CBC=0 USE_HEXALY=0

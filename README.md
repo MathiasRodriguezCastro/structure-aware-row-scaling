@@ -1,13 +1,11 @@
 # Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 
-**Research status, 25 September 2026: prepared for submission to Mathematical Programming
-Computation.** The article is `paper/mpc/main_mpc.pdf`, in Springer's `svjour3` format. Its
-source is generated from `paper/main.tex`, a journal-neutral layout kept because the Springer
-version is derived from it and the derivation is what shows that no content changed; `paper/mpc/MPC_NOTES.md` records
-every change the format required and the checks that the two versions agree. The submission
-package, and the script that verifies it, are in `paper/submission/`. What changed in the last
-revision round, and which claims are confirmatory rather than exploratory, is recorded in
-[the revision record](paper/research-audit/revision-record-20260924.md).
+**Research status, 2 October 2026: prepared for Computational Optimization and
+Applications (COAP).** The article is `paper/coap/main_coap.pdf`, generated from
+`paper/main.tex` in Springer's `svjour3` layout. The editorial changes are recorded in
+[`paper/coap/COAP_NOTES.md`](paper/coap/COAP_NOTES.md). Results and experiments are unchanged.
+The previous MPC version is preserved in `paper/mpc/`. The submission package and validation
+record are in `paper/submission/`.
 
 A pre-registered solver-robustness campaign was prepared and partly run on ClusterUY, then
 descoped from this manuscript to keep it about mechanism and guarantees rather than
@@ -17,8 +15,8 @@ for a separate study; nothing in the paper depends on them.
 
 ## Online Resource 2
 
-This repository is **Online Resource 2** of the manuscript above, submitted to *Mathematical
-Programming Computation*. Online Resource 1 is the supplement,
+This repository is **Online Resource 2** of the manuscript above, prepared for *Computational
+Optimization and Applications*. Online Resource 1 is the supplement,
 [`paper/supporting-information.pdf`](paper/supporting-information.pdf).
 
 Archived at Zenodo: concept DOI [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949), which resolves to the latest
@@ -27,8 +25,10 @@ version; the `v1.0-mpc-submission` release is [10.5281/zenodo.23104497](https://
 Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la República,
 Montevideo, Uruguay — <mathiasr@fing.edu.uy>.
 
-The current manuscript is **unpublished**. No journal acceptance, submission, or
-upload of this revision to an external archive is claimed.
+The current manuscript is **unpublished**. The COAP preparation is frozen in
+[`v1.1-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1-coap-submission).
+The manuscript, reproducibility artifact and bulk-input archives are attached to that release.
+Journal submission, acceptance and publication of this revision are not claimed.
 
 The paper separates what row scaling demonstrably does from what it is credited with. With one
 LP basis held fixed, scaling moves the basis condition number by six to eight orders of

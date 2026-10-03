@@ -2,7 +2,7 @@
 """Check the submission archives the way a reviewer would: extract, verify, rebuild.
 
 Extracts each archive into a temporary directory, verifies its recorded checksums, rebuilds the
-MPC manuscript from the bundle alone, and records what was checked in
+COAP manuscript from the bundle alone, and records what was checked in
 paper/submission/VALIDATION.json.
 """
 import hashlib
@@ -34,16 +34,18 @@ def check_archive(name):
                 "checksum_output": r.stdout.strip()[:400]}
 
 
-def rebuild_mpc():
+def rebuild_coap():
     """The bundle must compile on its own, with the class files it carries."""
-    with tempfile.TemporaryDirectory(prefix="mpc-build-") as tmp:
-        zipfile.ZipFile(OUT / "mpc-submission.zip").extractall(tmp)
-        shipped = sha(Path(tmp) / "main_mpc.pdf")
+    with tempfile.TemporaryDirectory(prefix="coap-build-") as tmp:
+        zipfile.ZipFile(OUT / "coap-submission.zip").extractall(tmp)
+        shipped = sha(Path(tmp) / "main_coap.pdf")
         for _ in range(2):
-            subprocess.run(["pdflatex", "-interaction=nonstopmode", "main_mpc.tex"],
-                           cwd=tmp, capture_output=True)
-        log = (Path(tmp) / "main_mpc.log").read_text(errors="ignore")
-        pages = subprocess.run(["pdfinfo", "main_mpc.pdf"], cwd=tmp, capture_output=True,
+            subprocess.run(["pdflatex", "-halt-on-error", "-interaction=nonstopmode", "main_coap.tex"],
+                           cwd=tmp, capture_output=True, check=True)
+        for _ in range(2):
+            subprocess.run(["pdflatex", "-halt-on-error", "-interaction=nonstopmode", "supporting-information.tex"], cwd=tmp, capture_output=True, check=True)
+        log = (Path(tmp) / "main_coap.log").read_text(errors="ignore")
+        pages = subprocess.run(["pdfinfo", "main_coap.pdf"], cwd=tmp, capture_output=True,
                                text=True).stdout
         pages = next((l.split()[-1] for l in pages.splitlines() if l.startswith("Pages")), None)
         return {"rebuilt_from_bundle_alone": True,
@@ -55,19 +57,23 @@ def rebuild_mpc():
 
 def main():
     result = {"archives": [check_archive(n) for n in
-                           ["mpc-submission.zip",
+                           ["coap-submission.zip",
                             "reproducibility-artifact.zip"]],
-              "mpc_bundle_build": rebuild_mpc(),
+              "coap_bundle_build": rebuild_coap(),
               "documents": {}}
     for label, pdf in [
                        ("supplement", ROOT / "paper/supporting-information.pdf"),
-                       ("mpc_manuscript", ROOT / "paper/mpc/main_mpc.pdf"),
-                       ("cover_letter", ROOT / "paper/mpc/cover-letter.pdf")]:
+                       ("coap_manuscript", ROOT / "paper/coap/main_coap.pdf"),
+                       ("cover_letter", ROOT / "paper/coap/cover-letter.pdf")]:
         info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
         pages = next((l.split()[-1] for l in info.splitlines() if l.startswith("Pages")), None)
         result["documents"][label] = {"pages": int(pages) if pages else None, "sha256": sha(pdf)}
     (OUT / "VALIDATION.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
+    if not all(a["checksums_verified"] for a in result["archives"]):
+        raise SystemExit("Archive checksum verification failed")
+    if result["coap_bundle_build"]["undefined_references"] or result["coap_bundle_build"]["overfull_boxes"]:
+        raise SystemExit("Bundle build has unresolved references or overfull boxes")
 
 
 if __name__ == "__main__":

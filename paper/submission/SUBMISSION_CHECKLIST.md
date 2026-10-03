@@ -1,53 +1,31 @@
-# Submission checklist — Mathematical Programming Computation
+# Submission checklist — Computational Optimization and Applications
 
-Everything below is prepared and was regenerated from the current build. Two items need an
-account I do not have, and they are marked **you**.
+Prepared on 2 October 2026 for the fixed release v1.1-coap-submission.
+Journal submission is not claimed.
+Guidelines: https://link.springer.com/journal/10589/submission-guidelines
 
-Springer's guideline pages could not be retrieved from this machine (the site serves a
-JavaScript challenge), so the form fields below are what the manuscript provides, not a
-transcription of the journal's current requirements. Check the form as you fill it.
+| Item | File |
+|---|---|
+| Manuscript PDF | `paper/coap/main_coap.pdf` |
+| Editable sources and class files | `paper/submission/coap-submission.zip` |
+| Cover letter | `paper/coap/cover-letter.pdf` |
+| Online Resource 1 | `paper/supporting-information.pdf` |
+| Online Resource 2 | `paper/submission/reproducibility-artifact.zip` |
 
-## Upload to the editorial system
+Title: Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts.
+Keywords (6): Mixed-integer linear programming; Row scaling; Numerical reliability;
+Equilibration; Residual budgets; Finite-precision optimization.
+MSC: 90C11, 65F35, 90-08, 65G50.
+Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la República,
+Montevideo, Uruguay; mathiasr@fing.edu.uy; ORCID 0009-0002-7235-7677.
+Declarations: no external funding; no competing interests; sole author; ethics not applicable;
+AI assistance disclosed in Statements and Declarations.
 
-| Item | File | Note |
-|---|---|---|
-| Manuscript PDF | `paper/mpc/main_mpc.pdf` | 33 pages, figures embedded, built from the sources below |
-| LaTeX sources | `paper/submission/mpc-submission.zip` | 1.2 MB; carries `svjour3.cls`, `svglov3.clo`, `spmpsci.bst`, the `.bbl`, sections, tables and vector figures, so it compiles without the class installed |
-| Cover letter | `paper/mpc/cover-letter.pdf` | one page |
-| Online Resource 1 | `paper/supporting-information.pdf` | 14 pages; also inside the bundle |
-| Online Resource 2 | `paper/submission/reproducibility-artifact.zip` | 20 MB; if the portal refuses it, cite the release link instead |
-| Artifact link | `https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling` | the release tag is named in the manuscript's availability statement |
+Use `coap/abstract.tex` for the submission abstract. Consult `VALIDATION.json` for verified
+page counts and checksums; `validate_submission.py` checks archives and recompiles the bundle.
+The editor's portal may request additional metadata. Author review and upload remain pending.
 
-`python3 scripts/research/validate_submission.py` extracts each archive, verifies its
-checksums and rebuilds the manuscript from the bundle alone; the last run rebuilt it to 32
-pages with no overfull boxes and no undefined references.
-
-## Metadata the form will ask for
-
-- **Title.** Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution
-  and Residual-Budget Contracts.
-- **Abstract.** 245 words, as in the PDF.
-- **Keywords (6).** Mixed-integer linear programming; Row scaling; Numerical reliability;
-  Equilibration; Residual budgets; Computational reproducibility.
-- **MSC 2020.** 90C11, 65F35, 90-08, 65G50, checked against the AMS list.
-- **Author.** Mathias Rodríguez Castro, sole author, Facultad de Ingeniería, Universidad de la
-  República, Montevideo, Uruguay, mathiasr@fing.edu.uy.
-- **Declarations.** No funding; no competing interests; sole author; ethics not applicable; AI
-  declaration in the manuscript; not under consideration elsewhere.
-
-## Needs your account
-
-1. **ORCID** (**you**). Free, a few minutes, at <https://orcid.org/register>. Set the identifier's
-   visibility to everyone so it can be verified. Give it to me and it goes into the manuscript,
-   the supplement, `CITATION.cff` and `.zenodo.json`; I did not invent one.
-
-2. **The editorial system** (**you**). Account, upload, form. Everything it asks about the
-   manuscript is above.
-
-## Zenodo: already done
-
-The GitHub integration has been active since June, so every release is archived automatically.
-The concept DOI, which always resolves to the latest version, is **10.5281/zenodo.20648949**, and the
-v1.0-mpc-submission release is **10.5281/zenodo.23104497**. The article cites the concept DOI, because a
-version DOI only exists after the release that contains the article; the release tag pins the
-exact state and the concept DOI is permanent.
+The existing computational artifact is pinned to v1.0-mpc-submission,
+DOI https://doi.org/10.5281/zenodo.23104497; the concept DOI is
+https://doi.org/10.5281/zenodo.20648949. The COAP editorial revision is frozen in v1.1-coap-submission; its archive is a separate
+version under the same concept DOI. The earlier version DOI continues to identify the MPC release.

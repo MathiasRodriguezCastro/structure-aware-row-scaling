@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build reviewable local archives. Does not publish or submit anything."""
 import hashlib
+import re
 from pathlib import Path
 import zipfile
 
@@ -53,24 +54,30 @@ def archive(name, paths):
     return len(paths)
 
 
-def mpc_bundle():
-    """Everything an MPC editor needs in one archive: sources, class files, PDF, letter."""
-    mpc = ROOT/'paper/mpc'
-    paths = [mpc/n for n in ['main_mpc.tex', 'abstract.tex', 'research-references.bib',
-                             'main_mpc.bbl', 'main_mpc.pdf', 'cover-letter.pdf',
-                             'cover-letter.tex', 'MPC_NOTES.md',
+def coap_bundle():
+    """Everything a COAP editor needs in one archive: sources, class files, PDF, letter."""
+    coap = ROOT/'paper/coap'
+    paths = [coap/n for n in ['main_coap.tex', 'abstract.tex', 'research-references.bib',
+                             'main_coap.bbl', 'main_coap.pdf', 'cover-letter.pdf',
+                             'cover-letter.tex', 'COAP_NOTES.md',
                              'svjour3.cls', 'svglov3.clo', 'spmpsci.bst', 'spbasic.bst']]
-    paths += sorted(mpc.glob('sections/*.tex')) + sorted(mpc.glob('tables/*.tex'))
-    paths += sorted(mpc.glob('figs/*.pdf'))
-    paths += [ROOT/'paper/supporting-information.pdf']          # Online Resource 1
+    paths += sorted(coap.glob('sections/*.tex')) + sorted(coap.glob('tables/*.tex'))
+    paths += sorted(coap.glob('figs/*.pdf'))
+    paths += [ROOT/'paper/supporting-information.tex', ROOT/'paper/supporting-information.pdf']          # Online Resource 1
+    supplement = (ROOT/'paper/supporting-information.tex').read_text()
+    supplement_inputs = re.findall(r'\\input\{([^}]+)\}', supplement)
+    paths += [ROOT/'paper'/ (name + '.tex') for name in supplement_inputs
+              if not (coap/(name + '.tex')).exists()]
+    paths += [ROOT/'paper/figs/research/budget-compatibility.pdf']
+    paths = list(dict.fromkeys(paths))
     missing = [p for p in paths if not p.exists()]
     if missing:
-        raise SystemExit('missing for the MPC bundle: ' + ', '.join(str(m) for m in missing))
-    with zipfile.ZipFile(OUT/'mpc-submission.zip', 'w', compression=zipfile.ZIP_DEFLATED,
+        raise SystemExit('missing for the COAP bundle: ' + ', '.join(str(m) for m in missing))
+    with zipfile.ZipFile(OUT/'coap-submission.zip', 'w', compression=zipfile.ZIP_DEFLATED,
                          compresslevel=9) as z:
         hashes = []
         for p in paths:
-            rel = p.relative_to(mpc) if mpc in p.parents else Path(p.name)
+            rel = p.relative_to(coap) if coap in p.parents else p.relative_to(ROOT/'paper')
             content = p.read_bytes()
             z.writestr(str(rel), content)
             hashes.append(f'{hashlib.sha256(content).hexdigest()}  {rel}')
@@ -96,14 +103,17 @@ def main():
     artifact += [p.relative_to(ROOT) for p in (ROOT/'results-revision/final-variants').glob('*/resumen.csv')]
     artifact += list(collect('paper/research-audit',{'.md','.json','.csv','.txt'}))
     artifact += list(collect('paper/research-audit/baseline-20260908',{'.tex','.pdf','.bib','.cpp'}))
-    artifact += [Path('paper/submission/README.md'), Path('paper/mpc/cover-letter.tex')]
+    artifact += [Path('paper/submission/README.md'),
+                 Path('paper/submission/data-deposit/MANIFEST.json'),
+                 Path('paper/submission/data-deposit/SHA256SUMS')]
+    artifact += list(collect('paper/coap', {'.tex', '.bib', '.bst', '.cls', '.clo', '.md', '.pdf'}))
     n2=archive('reproducibility-artifact.zip',artifact)
-    n3=mpc_bundle()
-    print(f'Prepared {n3} files for the MPC submission bundle')
+    n3=coap_bundle()
+    print(f'Prepared {n3} files for the COAP submission bundle')
     paths=[OUT/'reproducibility-artifact.zip',
-           OUT/'mpc-submission.zip',
+           OUT/'coap-submission.zip',
            ROOT/'paper/supporting-information.pdf',
-           ROOT/'paper/mpc/main_mpc.pdf',ROOT/'paper/mpc/cover-letter.pdf']
+           ROOT/'paper/coap/main_coap.pdf',ROOT/'paper/coap/cover-letter.pdf']
     (OUT/'SHA256SUMS').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(ROOT)}\n' for p in paths))
     print(f'Prepared {n2} artifact files in {OUT}')
 

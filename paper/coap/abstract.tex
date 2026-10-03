@@ -1,0 +1,20 @@
+Positive row scaling preserves a mixed-integer program in exact arithmetic, but changes its
+finite-precision representation and the original-unit meaning of residual tolerances.
+We distinguish the information that explains a numerical gain from the information that
+supports an accuracy guarantee. Geometric-mean centering makes an extrema-based block
+statistic identically one, reducing a block-relative coupling rule to Euclidean normalization;
+the idealized coupling problem has the closed-form optimal factor $(1+\rho^2)^{-1/2}$.
+We construct residual-budget contracts in application units and characterize exactly the row
+factors compatible with a budget and coefficient limits, including incompatibility conditions,
+constrained logarithmic minimax centering, integer-rounding restrictions and exact binary64
+export with power-of-two factors. Budgets retain their meaning under consistent row re-emission.
+Kernel-matched controls then distinguish ownership metadata
+from the scaling mechanism. On 306 generated dispatch models, fixed-basis condition numbers
+fall by six to eight orders of magnitude in class medians, but solver-style equilibration
+recovers most of that gain and can reverse the kernel ordering. Reconstructed dispatch runs
+use 30--32\% less solver work on the instances every policy completes, while a timeout reverses
+the failure-sensitive ordering; the gain reproduces with a second seed but not a second solver.
+In an exactly enumerated stress test, plain centering loses verified optima on all three solvers,
+whereas adding a residual budget to the same rule loses none relative to that rule.
+Equivalent formulations can therefore behave differently in finite precision, and external
+scaling requires both mechanism attribution and an accuracy contract in original units.

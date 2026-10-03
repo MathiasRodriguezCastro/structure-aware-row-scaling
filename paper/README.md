@@ -1,20 +1,10 @@
-# Active research note and preserved manuscript
+# COAP manuscript
 
-**Not recommended for submission yet (13 September 2026).** The active mathematical
-and experimental work is [joint-rounding.pdf](research-notes/joint-rounding.pdf)
-with [TeX source](research-notes/joint-rounding.tex). It includes the exact
-row-scaling obstruction, finite certificates, tolerance thresholds, complexity
-results and the completed negative comparison with a classical lattice reformulation.
-See [research status](research-audit/research-status-20260913.md) for unresolved
-scientific requirements. Run `make rounding-note` from the repository root to build it.
-
-The preserved unpublished manuscript is **Pre-Export Row Scaling in Generated Mixed-Integer Programs:
-Mechanism Attribution and Residual-Budget Contracts**, by Mathias Rodríguez Castro.
-It develops an attribution result for post-normalization block summaries and
-conditional residual-budget constructions, with independently checked computational
-evidence. Its scientific positioning has been superseded by the new controls.
-Publication and journal acceptance are not claimed. The commands below reproduce
-that earlier candidate; the root README documents the active investigation.
+The active manuscript is **Pre-Export Row Scaling in Generated Mixed-Integer Programs:
+Mechanism Attribution and Residual-Budget Contracts**, by Mathias Rodríguez Castro,
+prepared for Computational Optimization and Applications on 2 October 2026.
+The editorial revision is documented in [COAP_NOTES.md](coap/COAP_NOTES.md).
+Publication, journal acceptance and external submission are not claimed.
 
 ## Build
 
@@ -31,7 +21,7 @@ Or, to compile the already generated tables and figures:
 make -C paper
 ```
 
-The outputs are `mpc/main_mpc.pdf`, the article as submitted, and
+The outputs are `coap/main_coap.pdf`, the prepared article, and
 `supporting-information.pdf`, Online Resource 1. `main.tex` is the source the Springer version
 is generated from; building it also produces a `main.pdf` in this layout, which is a local
 artifact and is not tracked. The current `Makefile`
@@ -82,6 +72,5 @@ or deposition. The manuscript is outside the repository's code/data licenses unl
 an explicit manuscript license is subsequently supplied.
 
 The local [submission preparation](submission/README.md) includes the cover letter,
-source ZIP and reproducibility archive. The main article has 15 pages and the supplement
-6 pages in the current review layout. Authorship, no external funding and no competing
+source ZIP and reproducibility archive. Actual PDF page counts and archive checks are recorded in `submission/VALIDATION.json`. Authorship, no external funding and no competing
 interests have been confirmed; the AI declaration is included in the article.

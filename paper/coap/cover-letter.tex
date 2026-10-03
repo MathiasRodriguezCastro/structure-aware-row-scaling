@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[colorlinks=true,allcolors=black]{hyperref}
+\pagestyle{empty}
+\begin{document}
+\noindent Mathias Rodr\'iguez Castro\\
+Facultad de Ingenier\'ia, Universidad de la Rep\'ublica\\
+Montevideo, Uruguay\\
+\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}
+
+\bigskip
+\noindent To the Editors of \emph{Computational Optimization and Applications}
+
+\bigskip
+\noindent Dear Editors,
+
+\medskip
+Please consider ``Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism
+Attribution and Residual-Budget Contracts'' for publication in \emph{Computational Optimization
+and Applications}.
+
+Positive row scaling preserves a mixed-integer program in exact arithmetic, but changes its
+finite-precision behavior and the original-unit meaning of feasibility tolerances. Beyond
+asking which scaling improves an optimization pipeline, this paper asks which mechanism
+produces the apparent improvement and which accuracy guarantee survives the change of
+representation.
+
+Two analytical contributions organize the paper. First, geometric-mean centering eliminates
+an extrema-based block statistic, making an apparently metadata-dependent coupling rule
+identical to Euclidean normalization. The locally whitened triangular model admits the
+closed-form optimal common coupling factor $(1+\rho^2)^{-1/2}$. Second, residual-budget
+contracts characterize exactly the factors compatible with application-unit budgets and
+coefficient limits, including an incompatibility certificate, constrained logarithmic minimax
+centering, integer-rounding restrictions and conditions for exact binary64 export.
+Kernel-matched controls distinguish the scaling mechanism from ownership metadata.
+
+Computational validation includes a fixed-basis audit of 306 generated dispatch models,
+1{,}080 matched matrix exports, 240 reconstructed operational runs with two matched
+sensitivity reruns, and an exactly enumerated stress experiment with 4{,}752 optimizer calls
+across three solvers. File-level conditioning gains largely shrink after solver-style
+equilibration. A completed-run work reduction is reversed by timeout penalties and does not
+reproduce with a second solver. Adding a residual budget to the same centering rule loses
+no verified stress optima relative to that rule. These findings support numerical methodology
+and error analysis; the operational evidence remains limited to one application.
+
+The work connects the journal's areas of Integer Programming; Approximations and Error
+Analysis; Software, Benchmarks, Numerical Experimentation and Comparisons; and Modelling Languages and Systems for
+Optimization. Online Resource~1 provides proofs, protocols and reproduction instructions;
+Online Resource~2 provides code, stored data, manifests and verification tools.
+
+I am the sole author, received no external funding and declare no competing interests.
+The manuscript documents AI assistance and my responsibility for its scientific content.
+The work has not been published and is not under consideration elsewhere.
+
+\bigskip
+\noindent Sincerely,\\[6pt]
+Mathias Rodr\'iguez Castro
+\end{document}
