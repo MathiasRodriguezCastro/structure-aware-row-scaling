@@ -1,7 +1,6 @@
 # Aggregate experimental results
 
-This directory holds the **aggregate outputs** of the dispatch experiments reported in
-the paper. Each scenario folder is kept light and contains only:
+This directory holds the **aggregate outputs** of the stored dispatch campaigns used as inputs to the current audits. Each scenario folder is kept light and contains only:
 
 - `resumen.csv` — one row per (instance, variant) with all the metrics used by the
   analysis scripts (times, deterministic work/dettime, solver conditioning, nodes,
@@ -17,8 +16,9 @@ the paper. Each scenario folder is kept light and contains only:
 > artifacts (see [`../artifacts/README.md`](../artifacts/README.md)) to keep the
 > repository light and clonable — this is a size decision, not an access restriction.
 
-The analysis at reproduction level **N0** rebuilds every paper table and figure from the
-`resumen.csv` files alone, with no solver:
+The collection-era analysis rebuilds its summaries from `resumen.csv` files alone,
+without a solver. The current manuscript is reproduced with `make research-analysis` as
+documented in the root README. To rerun the collection-era analysis:
 
 ```bash
 make analysis-n0            # from the repository root

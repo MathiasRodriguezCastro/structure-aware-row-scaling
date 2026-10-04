@@ -1,7 +1,7 @@
 # Solver-robustness campaign — stopped by decision, 2026-09-24
 
 Campaign id `solver-robustness-v1`. Design and pre-registration:
-`paper/research-audit/solver-robustness-design-20260916.md` and `campaign-manifest.json`.
+`results-revision/solver-robustness/design.md` and `campaign-manifest.json`.
 
 **Status: descoped from the manuscript and stopped mid-flight.** The paper it was meant to
 support argues that solver effort and acceptance are pipeline-dependent; a benchmark of tens of

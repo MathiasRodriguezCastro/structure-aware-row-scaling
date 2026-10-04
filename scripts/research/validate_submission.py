@@ -7,6 +7,7 @@ paper/submission/VALIDATION.json.
 """
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -24,7 +25,13 @@ def sha(path):
 def check_archive(name):
     archive = OUT / name
     with tempfile.TemporaryDirectory(prefix="submission-check-") as tmp:
-        zipfile.ZipFile(archive).extractall(tmp)
+        with zipfile.ZipFile(archive) as bundle:
+            names = bundle.namelist()
+            forbidden = [n for n in names if n.startswith(('paper/mpc/', 'paper/research-audit/'))
+                         or Path(n).name in {'build_mpc.py', 'main_mpc.tex', 'mpc-submission.zip'}]
+            if forbidden:
+                raise SystemExit('Previous editorial material in archive: ' + ', '.join(forbidden))
+            bundle.extractall(tmp)
         manifest = Path(tmp) / "CONTENTS.sha256"
         r = subprocess.run(["sha256sum", "--quiet", "-c", manifest.name],
                            cwd=tmp, capture_output=True, text=True)
@@ -47,8 +54,17 @@ def audit_artifact():
                                capture_output=True, text=True)
         if audit.returncode:
             raise SystemExit("Extracted artifact audit failed:\n" + audit.stdout + audit.stderr)
+        claims = subprocess.run(['make', 'research-claims'], cwd=tmp, capture_output=True, text=True)
+        if claims.returncode:
+            raise SystemExit('Extracted independent claims audit failed:\n' + claims.stdout + claims.stderr)
+        regenerated = subprocess.run(['python3', 'scripts/research/build_coap.py'], cwd=tmp,
+                                     capture_output=True, text=True)
+        built = subprocess.run(['make', '-C', 'paper', 'coap'], cwd=tmp,
+                               capture_output=True, text=True) if regenerated.returncode == 0 else None
+        if regenerated.returncode or built is None or built.returncode:
+            raise SystemExit('COAP regeneration from the artifact failed:\n' + regenerated.stdout
+                             + regenerated.stderr + (built.stdout + built.stderr if built else ''))
         # README links to files in this artifact must resolve inside the extracted archive.
-        import re
         missing = []
         for rel in ("README.md", "paper/README.md", "paper/submission/README.md"):
             readme = root / rel
@@ -61,8 +77,29 @@ def audit_artifact():
         if missing:
             raise SystemExit("Artifact README links do not resolve: " + ", ".join(missing))
         return {"online_resource_1_included": True, "supplement_pdf_sha256": sha(supplement),
-                "research_online_resources_passed": True, "readme_relative_links_verified": True,
+                "research_online_resources_passed": True, "independent_claims_passed": True,
+                "readme_relative_links_verified": True, "current_editorial_files_only": True,
+                "coap_regeneration_and_build_passed": True,
                 "audit_output": audit.stdout.strip()}
+
+
+def check_delivery():
+    """Verify the five separately uploaded files in the complete delivery ZIP."""
+    with tempfile.TemporaryDirectory(prefix='delivery-check-') as tmp:
+        with zipfile.ZipFile(OUT / 'coap-delivery.zip') as archive:
+            names = archive.namelist()
+            archive.extractall(tmp)
+        expected = {'main_coap.pdf', 'coap-submission.zip', 'cover-letter.pdf',
+                    'ESM_1.pdf', 'ESM_2.zip', 'UPLOAD_INSTRUCTIONS.md', 'SHA256SUMS'}
+        if set(names) != expected:
+            raise SystemExit('Unexpected delivery contents: ' + ', '.join(names))
+        subprocess.run(['sha256sum', '--quiet', '-c', 'SHA256SUMS'], cwd=tmp,
+                       capture_output=True, text=True, check=True)
+        for name in expected - {'SHA256SUMS', 'UPLOAD_INSTRUCTIONS.md'}:
+            if sha(Path(tmp) / name) != sha(OUT / 'editorial-manager' / name):
+                raise SystemExit('Delivery file differs from validated upload copy: ' + name)
+        return {'files': sorted(names), 'checksums_verified': True,
+                'upload_copies_verified': True, 'sha256': sha(OUT / 'coap-delivery.zip')}
 
 
 def rebuild_coap():
@@ -92,6 +129,7 @@ def main():
                             "reproducibility-artifact.zip"]],
               "coap_bundle_build": rebuild_coap(),
               "artifact_audit": audit_artifact(),
+              "delivery": check_delivery(),
               "documents": {}}
     for label, pdf in [
                        ("supplement", ROOT / "paper/supporting-information.pdf"),

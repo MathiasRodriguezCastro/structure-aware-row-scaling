@@ -21,7 +21,7 @@ def collect(folder, suffixes=None):
         if not p.is_file() or p.is_symlink():
             continue
         if any(x.startswith('build') or x in {'__pycache__', '.git', '.pytest_cache', 'rendered'}
-               for x in rel.parts):
+               for x in rel.parts[:-1]):
             continue
         if set(rel.parts) & BULK_DIRS or p.stat().st_size > MAX_FILE_BYTES:
             EXCLUDED.append((rel, p.stat().st_size))
@@ -92,7 +92,7 @@ def main():
     paper += list(collect('paper/sections',{'.tex'}))
     paper += list(collect('paper/tables',{'.tex'}))
     paper += list(collect('paper/figs/research',{'.pdf'}))
-    artifact=paper+[Path(x) for x in ['README.md','Makefile','LICENSE','DATA_LICENSE.md','CITATION.cff','.zenodo.json']]
+    artifact=paper+[Path(x) for x in ['README.md','Makefile','LICENSE','DATA_LICENSE.md','CITATION.cff','.zenodo.json','artifacts/README.md']]
     artifact += list(collect('environment',{'.txt','.md'}))
     artifact += list(collect('scripts',{'.py','.sh'}))
     artifact += list(collect('tests',{'.py','.cpp'}))
@@ -103,8 +103,8 @@ def main():
     artifact += list(collect('results-revision/fixed-basis'))
     artifact += list(collect('results-revision/r5-ablation'))
     artifact += [p.relative_to(ROOT) for p in (ROOT/'results-revision/final-variants').glob('*/resumen.csv')]
-    artifact += list(collect('paper/research-audit',{'.md','.json','.csv','.txt'}))
-    artifact += list(collect('paper/research-audit/baseline-20260908',{'.tex','.pdf','.bib','.cpp'}))
+    artifact += list(collect('paper/validation', {'.md', '.json', '.csv'}))
+    artifact += list(collect('results-revision/spectral-heterogeneous', {'.csv'}))
     artifact += [Path('paper/submission/README.md'), Path('paper/submission/SUBMISSION_CHECKLIST.md'),
                  Path('paper/submission/data-deposit/MANIFEST.json'),
                  Path('paper/submission/data-deposit/SHA256SUMS')]

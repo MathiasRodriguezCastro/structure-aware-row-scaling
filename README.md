@@ -1,257 +1,132 @@
 # Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 
-**Research status, 2 October 2026: prepared for Computational Optimization and
-Applications (COAP).** The article is `paper/coap/main_coap.pdf`, generated from
-`paper/main.tex` in Springer's `svjour3` layout. The editorial changes are recorded in
-[`paper/coap/COAP_NOTES.md`](paper/coap/COAP_NOTES.md). Results and experiments are unchanged.
-The previous MPC version is preserved in `paper/mpc/` in the full repository; it is
-not included in the supplementary ZIP. The submission package and validation
-record are in `paper/submission/`.
+Manuscript and reproducibility artifact prepared for **Computational Optimization and
+Applications (COAP)**. Author: Mathias Rodríguez Castro, Facultad de Ingeniería,
+Universidad de la República, Montevideo, Uruguay; mathiasr@fing.edu.uy;
+ORCID [0009-0002-7235-7677](https://orcid.org/0009-0002-7235-7677).
 
-A pre-registered solver-robustness campaign was prepared and partly run on ClusterUY, then
-descoped from this manuscript to keep it about mechanism and guarantees rather than
-benchmarking. Its protocol, split, frozen run tables and the 9,057 runs completed before it was
-stopped remain in [the full repository](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/tree/v1.1-coap-submission/results-revision/solver-robustness)
-(outside the supplementary ZIP)
-for a separate study; nothing in the paper depends on them.
+The manuscript develops mechanism attribution for pre-export row scaling and residual-budget
+contracts in original application units. Its numerical and operational findings are verified
+against stored data; they do not establish a universal solver speedup or reliability improvement.
+Journal submission, acceptance and publication are not claimed.
 
-## Online Resource 2
+## Manuscript and supplements
 
-This repository is **Online Resource 2** of the manuscript above, prepared for *Computational
-Optimization and Applications*. Online Resource 1 is the supplement,
-[`paper/supporting-information.pdf`](paper/supporting-information.pdf).
+| File | Purpose |
+|---|---|
+| `paper/coap/main_coap.pdf` | Manuscript for COAP |
+| `paper/submission/coap-submission.zip` | Editable LaTeX sources, class/style files, figures and bibliography |
+| `paper/coap/cover-letter.pdf` | Cover letter |
+| `paper/submission/editorial-manager/ESM_1.pdf` | Online Resource 1: supplementary proofs, protocols and reproduction instructions |
+| `paper/submission/editorial-manager/ESM_2.zip` | Online Resource 2: source code, stored data, analysis and verification scripts |
+| `paper/submission/coap-delivery.zip` | Complete set of separately uploaded files and instructions |
 
-Archived at Zenodo: concept DOI [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949), which resolves to the latest
-version. The corrected release `v1.1.1-coap-submission` is archived at
-[10.5281/zenodo.23113132](https://doi.org/10.5281/zenodo.23113132). The earlier COAP release `v1.1-coap-submission` is archived at
-[10.5281/zenodo.23112768](https://doi.org/10.5281/zenodo.23112768). The earlier MPC release
-`v1.0-mpc-submission` remains at [10.5281/zenodo.23104497](https://doi.org/10.5281/zenodo.23104497).
+Upload the manuscript, source ZIP, cover letter and two ESM files separately in Editorial
+Manager. Online Resource 2 includes `paper/supporting-information.pdf`, byte-identical to
+Online Resource 1. See the [submission checklist](paper/submission/SUBMISSION_CHECKLIST.md).
 
-Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la República,
-Montevideo, Uruguay — <mathiasr@fing.edu.uy>.
+The current release is
+[`v1.2-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.2-coap-submission).
+The repository is archived under the Zenodo concept DOI
+[10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949).
+[CITATION.cff](CITATION.cff) gives the citation metadata. Earlier repository states remain
+available through Git history and tagged releases.
 
-The current manuscript is **unpublished**. The COAP preparation is frozen in
-[`v1.1.1-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1.1-coap-submission).
-The manuscript, reproducibility artifact and bulk-input archives are attached to that release.
-Journal submission, acceptance and publication of this revision are not claimed.
-For Editorial Manager, prepare the separate supplementary uploads `ESM_1.pdf` and `ESM_2.zip`
-with `python3 scripts/research/prepare_editorial_uploads.py`; see the
-[submission checklist](paper/submission/SUBMISSION_CHECKLIST.md).
+## Reproduce and verify
 
-The paper separates what row scaling demonstrably does from what it is credited with. With one
-LP basis held fixed, scaling moves the basis condition number by six to eight orders of
-magnitude; the apparent block-metadata advantage of an earlier draft turns out to be a
-coupling-kernel effect that a control without ownership information reproduces; residual budgets
-stated in application units survive consistent row re-emission and determine the admissible row
-factors exactly; and what a solver then does with the representation is measured, not assumed.
-The results do not establish a universal solver speedup or reliability improvement.
-
-The earlier positive block-attribution claim is superseded. Historical drafts and intermediate
-results remain available so the change in interpretation can be audited; the separate
-rounding-safety investigation lives in its own
-[historical working note](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/blob/v1.0-mpc-submission/paper/research-notes/joint-rounding.pdf)
-(outside the supplementary ZIP) and is not part of this manuscript.
-
-The supplementary ZIP includes `paper/supporting-information.pdf`, byte-identical to
-`ESM_1.pdf`, along with the sources and stored summaries used by `make research-online-resources`.
-Historical material linked to GitHub is available in the full repository or a historical tag,
-as explicitly marked above. Bulk LP exports and bases are distributed separately in
-`fixed-basis-exports.tar.zst`; the manifest is included in `paper/submission/data-deposit/`.
-
-## Reproduce the current paper without a solver license
-
-Run commands from the repository root. The recorded environment is Python 3.10.12,
-NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, matplotlib 3.10.9, and pytest 9.0.3.
-The requirements file pins these Python packages; it does not install an optimizer.
-
-On a stock Debian or Ubuntu, `python3 -m venv` needs a package that is not installed by
-default, and the C++ and PDF targets below need a compiler and a TeX installation:
+Run commands from the repository root. The recorded environment is CPython 3.10.12,
+NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, matplotlib 3.10.9 and pytest 9.0.3.
+The requirements pin analysis dependencies; optimizer packages are optional.
 
 ```bash
-sudo apt install python3-venv build-essential texlive-latex-recommended texlive-fonts-recommended
-```
-
-```bash
+sudo apt install python3-venv build-essential texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
 python3 -m venv .venv-research
 . .venv-research/bin/activate
 python3 -m pip install -r environment/research-requirements.txt
 make research-check-python
-make research-analysis
+make research-claims
 make paper
+make research-online-resources
+python3 scripts/research/package_submission.py
+python3 scripts/research/validate_submission.py
 ```
 
-`research-check-python` runs the row-factor mathematical/numerical tests, independently
-checks the saved binary solutions and enumerated optima, and checks all 1,080 final
-LP hashes. It imports neither HiGHS nor Gurobi. It writes an updated
-`budget-final/verification.json`; the saved model and solution data are unchanged.
-`research-analysis` regenerates the current budget, matrix, and operational summaries,
-tables, and vector figures from saved data. `paper` builds the article, the supplement and
-`paper/supporting-information.pdf` with pdfLaTeX and BibTeX. A standard TeX Live
-installation with the packages listed in [paper/README.md](paper/README.md) suffices;
-the historical Wiley class and its assets now sit beside the baseline that uses them, in paper/research-audit/baseline-20260908/.
+`research-check-python` tests the row-factor implementation, independently verifies saved
+binary solutions and optima, and checks all 1,080 matrix-export hashes. `research-claims`
+independently enumerates the stored binary models, verifies solver acceptance labels,
+checks native operational logs and audits the matrix comparisons. Neither imports an optimizer.
+`make research-check` also builds the C++ LP exporter and verifies its decimal serialization.
 
-`research-fixed-basis-check` recomputes the conditioning audit of §4 from the stored
-exports and bases, independently of the campaign that produced them, and
-`research-fixed-basis-precision` recomputes the certified bounds of Table S2 into a new
-directory. Neither needs an optimizer:
+`make research-analysis` regenerates the current tables, figures and summaries from stored data.
+`make paper` compiles the canonical manuscript, COAP version and supplement with pdfLaTeX and
+BibTeX. [paper/README.md](paper/README.md) maps the manuscript sources.
 
-```bash
-make research-fixed-basis-check
-make research-fixed-basis-precision
-```
+`validate_submission.py` extracts the archives, verifies their checksums, recompiles the
+manuscript and supplement, verifies the exact Online Resource 1 copy in Online Resource 2,
+checks relative README links and runs the documented audits from the extracted artifact.
+Results are saved in `paper/submission/VALIDATION.json`.
 
-To also check the actual C++ LP serializer, install GNU Make and a C++17 compiler:
+## Stored experiment data
 
-```bash
-make research-check
-```
+The authoritative datasets are under `results-revision/research-audit/`:
 
-This builds a solver-free `DummyLp` executable in the isolated `code/build-audit/`
-directory, then runs both Python checks and a C++ export integration test. The test
-covers small coefficients, the RHS, bounds, and objective values that the old fixed
-precision format could lose. `code/build/` is not used for this target. A first build
-takes longer than the Python-only check.
-
-### What it costs, measured from a fresh clone
-
-Timed on 2 October 2026 on one machine --- Intel Core i7-13620H, 16 threads, 15 GB RAM,
-Ubuntu 22.04.5, kernel 6.8, g++ 11.4, TeX Live 2022/Debian, CPython 3.10.12 --- by cloning
-this repository into an empty directory and running each target in order. The log of that run
-is [cleanroom log in the full repository](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/blob/v1.1-coap-submission/paper/research-audit/cleanroom-20261002.log)
-(outside the supplementary ZIP).
-
-| Command | Time | What it needs |
-|---|---|---|
-| `git clone` | 17 s | 5.3 GB on disk, of which 5.0 GB is the stored LP text and bases of the fixed-basis audit |
-| `make research-check-python` | 2 s | the pinned Python packages |
-| `make research-check` | 16 s | also a C++17 compiler; includes the first `build-audit` compile |
-| `make research-analysis` | 10 s | regenerates every current table, figure and summary |
-| `make research-fixed-basis-check` | 218 s | rebuilds all 1,530 bases from the LP text and recomputes their conditioning |
-| `make research-fixed-basis-precision` | 107 s | recomputes the certified rational bounds of the stress sample; reproduced them bit for bit |
-| `make research-application-budgets` | 4 s | regenerates the declared-budget table and its sweep |
-| `make research-application-export` | 11 s | re-exports that model and compares it byte by byte |
-| `make research-budget BUDGET_SOLVERS=highs BUDGET_OUT=...` | 7 s | `highspy`; 1,728 fresh configurations |
-| `make -C paper all` | 5 s | pdfLaTeX and BibTeX; builds the article, the supplement and the Springer submission version |
-| `make research-online-resources` | <1 s | audits the two Online Resources against the manuscript |
-
-Nothing here needs a commercial solver. Gurobi and CPLEX are needed only to rerun their arms
-of the stress experiment and the operational campaign, both of which are reported from stored
-data. The one long step is the fixed-basis check, and it is the only one that reads the bulk
-data.
-
-## Which data support the current manuscript?
-
-| Location under `results-revision/research-audit/` | Role |
+| Directory | Evidence |
 |---|---|
-| `identifiability-final/` | Authoritative matrix audit: 180 generated instances, six policies, 1,080 LP exports using the corrected round-trip serializer; named comparisons, whole-row checks, spectra at a common reference rank, and hashes. |
-| `budget-final/` | Authoritative binary stress experiment, HiGHS and Gurobi arms: 96 models, nine policies, two presolve settings; 3,456 planned configurations, including 288 abstentions and 3,168 optimizer calls. Models, factors, returned points, protocol and source snapshots are retained. |
-| `budget-final-cplex/` | The third solver of the same experiment: the identical 96 stored models and row factors under CPLEX, 1,728 configurations. Together with `budget-final/` this is the three-solver experiment the manuscript reports, 4,752 optimizer calls in total. The models are byte-identical to `budget-final/models/`, which the claims verifier asserts. |
-| `exploration-lattice/`, `exploration-lattice-cplex/` | The integer-aware GCD controls of that experiment, 576 configurations per solver. |
-| `operational-replication/` | The two matched sensitivity reruns of the operational reconstruction: the same 30 instances, policies, gaps and limit under a second seed and under a second solver, 240 runs each, with frozen run tables and the comparison against the reconstruction. |
-| `application-budgets/` | The declared residual contract applied to the 4,320 interpretable rows of one dispatch instance, with the exported model itself, its provenance, and the sweep that tightens the declared budgets to find where each kernel stops being admissible. Regenerated by `make research-application-budgets`; `make research-application-export` re-exports the model from the instance and compares it byte by byte. |
-| `operational/` | Authoritative reconstruction of 240 historical dispatch runs, with recovered native logs, input hashes, fixed-pool PAR10, conditional completed-run Work summaries, and residual diagnostics. These are reconstructed observations, not new optimizer runs. |
-| `budget-pilot/`, `budget-confirmatory/`, `budget-confirmatory-v2/` | Earlier stress runs, retained for provenance. The initial endpoint implementation and later correction give different results; these folders must not be substituted for `budget-final/`. |
-| `identifiability-confirmatory/` | Earlier matrix export with the old serializer; retained to expose the effect of representation changes. |
+| `fixed-basis-final-20260914/` | Fixed-basis audit of 306 dispatch models under five policies, with 1,530 bases and an independent precision check |
+| `identifiability-final/` | 180 generated instances, six policies and 1,080 matrix exports; named comparisons, spectra and hashes |
+| `budget-final/`, `budget-final-cplex/` | Identical 96 stored binary models under three solvers, nine policies and two presolve settings: 5,184 planned configurations and 4,752 optimizer calls |
+| `exploration-lattice/`, `exploration-lattice-cplex/` | Integer-aware GCD controls with exact-enumeration verification |
+| `operational/` | Reconstruction of 240 dispatch runs, with native logs, input hashes, completed-run work comparisons and fixed-pool PAR10 |
+| `operational-replication/` | Two matched 240-run sensitivity campaigns using a second seed and a second solver |
+| `application-budgets/` | Declared residual budgets for 4,320 interpretable rows of one dispatch model, its exported LP and a budget-sensitivity sweep |
 
-`budget-final/protocol.json` and `budget-final-cplex/protocol.json` record versions, seeds,
-settings, methods and source hashes. The independent checker verifies the complete Cartesian configuration grid,
-all 96 enumerated optima and stored acceptance labels, 768 exact dyadic exports, and
-288 justified abstentions. Its current saved-data SHA-256 is
-`f0cfa86aa97e60dcca6985dd66b235883ecabafb1fe1f4de40a3b70b39840aa2`
-for `budget-final/runs.csv`.
+Protocols retain versions, seeds, settings and source hashes. Recorded results and source
+snapshots are frozen. Intermediate datasets needed to interpret the experiments retain their
+provenance; the supplement identifies which comparisons are exploratory.
 
-The stress models deliberately approach integer feasibility boundaries and do not
-estimate failure rates or runtime on industrial MILPs. A verified binary optimum uses
-the paper's declared independent acceptance rule. Abstention is counted separately
-from a solve. The dispatch data have no corresponding exact optimality certificate
-or application-calibrated residual budgets.
+The root directories `results/` and `results-revision/` also retain dispatch aggregates and
+controls used by the current audits. The input instances are under `data/`.
+The binary stress models approach integer feasibility boundaries and do not estimate
+industrial failure rates. Dispatch instances do not have corresponding exact optimality
+certificates or application-calibrated residual budgets.
 
-The original paper sources and PDFs are preserved in
-`paper/research-audit/baseline-20260908/`; superseded documentation is in its `docs/`
-subdirectory. Earlier attribution controls are in
-`results-revision/attribution-controls/`. Existing `results/`, `results-revision/`
-campaigns, synthetic outputs, old figures, and the original `paper/references.bib`
-are historical material unless explicitly referenced by the current manuscript.
+## Bulk inputs
+
+Online Resource 2 carries the stored summaries, analysis inputs and native logs used by the
+verification commands above. The bulk fixed-basis LP text and bases are distributed separately
+as `fixed-basis-exports.tar.zst`: 337 MB compressed, 5.18 GB uncompressed in 11,585 files.
+Their manifest and checksum are in `paper/submission/data-deposit/`; the archive is attached
+to the current release. See [artifacts/README.md](artifacts/README.md).
+
+Only `make research-fixed-basis-check`, which reconstructs all 1,530 bases from LP text,
+requires that archive extracted over the repository. `make research-fixed-basis-precision`
+recomputes the certified rational bounds into a new output directory. These are verification
+calculations, not optimizer runs.
 
 ## Optional fresh experiments
 
-These commands generate new experiments; they are not needed to verify the saved
-results or build the paper. Targets reject an existing output directory, so choose
-a new path for each rerun. The rerun defaults are separate from the authoritative data.
-
-The matrix grid uses `DummyLp` and performs **no optimization**:
+Fresh experiment targets require new output directories and retain the stored evidence:
 
 ```bash
-make research-grid
-# Equivalent, after make audit-build:
-python3 scripts/audit_identifiability_grid.py \
-    --exe code/build-audit/SistemaElectrico \
-    --out results-revision/research-audit/reruns/identifiability-manual \
-    --seeds 10 --seed-base 20260909 --roundtrip-export
+make research-grid GRID_OUT=results-revision/research-audit/reruns/grid
+make research-budget BUDGET_SOLVERS=highs BUDGET_OUT=results-revision/research-audit/reruns/budget-highs
 ```
 
-The binary experiment uses the Python solver APIs. The complete recorded protocol
-uses HiGHS 1.15.1 and Gurobi 13.0.2; the latter requires a suitable license:
+The matrix grid uses the solver-free C++ exporter. A HiGHS-only binary run requires `highspy`
+and covers one solver arm; it does not replace the three-solver manuscript data. The Gurobi
+and CPLEX arms require their respective packages and licenses. The supplement gives the full
+recorded protocols. Solver trajectories and wall times can depend on versions and platforms.
 
-```bash
-python3 -m pip install highspy==1.15.1 gurobipy==13.0.2
-make research-budget
-python3 scripts/research/verify_saved_experiment.py \
-    --root results-revision/research-audit/reruns/budget
-```
+## Layout and licensing
 
-There are up to 3,168 solver calls with a ten-second limit per call in the full run.
-To run only the license-free HiGHS arm:
-
-```bash
-python3 -m pip install highspy==1.15.1
-make research-budget BUDGET_SOLVERS=highs \
-    BUDGET_OUT=results-revision/research-audit/reruns/budget-highs
-python3 scripts/research/verify_saved_experiment.py \
-    --root results-revision/research-audit/reruns/budget-highs
-```
-
-A HiGHS-only run has half the planned configurations. The current paper table/plot
-script expects both solvers; do not replace the complete paper data with that subset.
-For a complete rerun, analyze into a separate output location:
-
-```bash
-python3 scripts/research/analyze_budget_experiment.py \
-    --root results-revision/research-audit/reruns/budget \
-    --figures results-revision/research-audit/reruns/budget/figures \
-    --tables results-revision/research-audit/reruns/budget/tables
-```
-
-Solver outputs can depend on the versions and platform. Frozen sources identify the
-reported implementation; rerunning the current code is a reproduction attempt, not
-a promise of identical trajectories or wall times. The matrix analysis script reads
-`identifiability-final/` explicitly; a fresh grid produces its own comparison CSVs
-and hashes without replacing the manuscript's chosen data.
-
-The original commercial-solver dispatch campaigns and cluster templates remain in
-`cluster/`, `environment/solver-notes.md`, and the historical documentation. They are
-longer, separate experiments, not dependencies of any current verification target.
-`make help` lists current and historical targets. `make analysis-n0` and
-`make synthetic-mini` reproduce earlier analyses, not the current paper.
-
-## Repository map and licensing
-
-- `paper/`: current manuscript, supplement, bibliography, generated figures/tables,
-  and research audits.
-- `scripts/research/`: budget construction, experiment, analysis and independent checker.
-- `scripts/audit_identifiability_grid.py`: direct named LP and row-scaling audit.
-- `scripts/audit_operational_evidence.py`: reconstruction from saved dispatch records.
-- `tests/`: mathematical/numerical checks and C++ serializer integration.
-- `code/`: C++ model generator, row preprocessing and retained solver interfaces.
-- `data/`, `results/`, `results-revision/`: instances and current/historical evidence.
+| Path | Contents |
+|---|---|
+| `paper/` | Current manuscript, supplement, cover letter, bibliography, tables and figures |
+| `scripts/` | Experiment, analysis, packaging and independent verification tools |
+| `tests/` | Row-factor mathematics and C++ export integration checks |
+| `code/` | C++ generator and row-scaling implementation |
+| `data/`, `results/`, `results-revision/` | Instances, stored observations and provenance |
+| `environment/` | Recorded dependencies and solver environment |
 
 Code is MIT-licensed ([LICENSE](LICENSE)); data and aggregate results use CC BY 4.0
-([DATA_LICENSE.md](DATA_LICENSE.md)). The manuscript is not covered by those licenses;
-all rights are reserved pending an explicit manuscript license. It is an unpublished
-research draft, not an accepted or submitted-version article.
-
-The pre-existing archive identifier
-[10.5281/zenodo.20648950](https://doi.org/10.5281/zenodo.20648950) belongs to the project's
-archive history. It does not establish that this local revision has been deposited.
-See [CITATION.cff](CITATION.cff) for the current citation metadata; there is no
-journal article DOI for this manuscript.
+([DATA_LICENSE.md](DATA_LICENSE.md)). The manuscript is outside those licenses.

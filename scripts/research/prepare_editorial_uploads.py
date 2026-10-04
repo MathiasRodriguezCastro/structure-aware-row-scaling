@@ -2,6 +2,7 @@
 """Prepare separately uploaded Editorial Manager files without changing their contents."""
 import hashlib
 import shutil
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -42,6 +43,8 @@ def main():
     (OUT / 'SHA256SUMS').write_text('\n'.join(hashes) + '\n')
     (OUT / 'UPLOAD_INSTRUCTIONS.md').write_text('''# Files to upload separately in Editorial Manager
 
+Extract coap-delivery.zip and upload the five files listed below separately.
+
 Article: Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts
 Journal: Computational Optimization and Applications
 Author: Mathias Rodríguez Castro, Facultad de Ingeniería, Universidad de la República, Montevideo, Uruguay
@@ -74,11 +77,20 @@ to reproducibility-artifact.zip. These are upload names, and the repository sour
 their existing names. SHA256SUMS verifies all five upload files from this directory.
 
 Guidelines: https://link.springer.com/journal/10589/submission-guidelines
-Archived release: https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.1.1-coap-submission
+Archived release: https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.2-coap-submission
 Zenodo concept DOI: https://doi.org/10.5281/zenodo.20648949
 ''')
+    delivery = ROOT / 'paper/submission/coap-delivery.zip'
+    with zipfile.ZipFile(delivery, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+        for name in (*FILES, 'UPLOAD_INSTRUCTIONS.md', 'SHA256SUMS'):
+            archive.write(OUT / name, arcname=name)
+    rel = delivery.relative_to(ROOT).as_posix()
+    lines = [line for line in manifest.read_text().splitlines() if not line.endswith('  ' + rel)]
+    lines.append(sha(delivery) + '  ' + rel)
+    manifest.write_text('\n'.join(lines) + '\n')
     print('Prepared five separately uploaded files in', OUT.relative_to(ROOT))
     print('ESM_1.pdf and ESM_2.zip match the verified source files byte for byte.')
+    print('Prepared complete delivery:', delivery.relative_to(ROOT))
 
 
 if __name__ == '__main__':

@@ -1,76 +1,46 @@
 # COAP manuscript
 
-The active manuscript is **Pre-Export Row Scaling in Generated Mixed-Integer Programs:
-Mechanism Attribution and Residual-Budget Contracts**, by Mathias Rodríguez Castro,
-prepared for Computational Optimization and Applications on 2 October 2026.
-The editorial revision is documented in [COAP_NOTES.md](coap/COAP_NOTES.md).
-Publication, journal acceptance and external submission are not claimed.
+**Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and
+Residual-Budget Contracts**, by Mathias Rodríguez Castro, prepared for Computational
+Optimization and Applications.
 
-## Build
+## Build and validation
 
 From the repository root:
 
 ```bash
-make research-analysis
 make paper
+make research-online-resources
+make research-claims
+python3 scripts/research/package_submission.py
+python3 scripts/research/validate_submission.py
 ```
 
-Or, to compile the already generated tables and figures:
+The submission PDF is `coap/main_coap.pdf`. Its source is generated directly from `main.tex`
+by `scripts/research/build_coap.py`. The `main.pdf` build is a local journal-neutral view of
+the same article. Online Resource 1 is `supporting-information.pdf`.
 
-```bash
-make -C paper
-```
+PDF compilation needs pdfLaTeX, BibTeX and the TeX packages listed in the root
+[README](../README.md). The Springer class and bibliography styles are included in `coap/`.
+The independent claims verifier uses stored experiments and imports no optimizer.
 
-The outputs are `coap/main_coap.pdf`, the prepared article, and
-`supporting-information.pdf`, Online Resource 1. `main.tex` is the source the Springer version
-is generated from; building it also produces a `main.pdf` in this layout, which is a local
-artifact and is not tracked. The current `Makefile`
-uses `pdflatex -halt-on-error` and BibTeX for the main article, and pdfLaTeX for the
-supplement. The source uses the standard `article` class, not the old Wiley template.
-The required TeX packages include geometry, fontenc, lmodern, microtype, amsmath,
-amssymb, amsthm, mathtools, graphicx, booktabs, tabularx, array, enumitem, natbib,
-hyperref, xcolor, cleveref and lineno. A TeX Live installation with the recommended
-and extra LaTeX packages plus Latin Modern fonts provides these dependencies.
+## Files
 
-## Source and data map
-
-| File or directory | Purpose |
+| Path | Contents |
 |---|---|
-| `main.tex` | Main manuscript, experimental design, results and declarations. |
-| `sections/identifiability.tex` | Exact collapse, identity-band bounds and analytic matrix examples. |
-| `sections/residual_contract.tex` | Residual-budget compatibility, minimax factors, rounding allowance and exact dyadic export. |
-| `sections/related_work.tex` | Positioning relative to prior work. |
-| `sections/matrix_replication.tex` | Fresh matrix attribution audit and its limits. |
-| `supporting-information.tex` | Supplement and reproducibility details. |
-| `research-references.bib` | Bibliography used by the current manuscript. |
-| `tables/`, `figs/research/` | Current generated table fragments and publication figures. |
-| `research-audit/` | Mathematical/evidence/literature audits and preserved earlier versions. |
+| `main.tex` | Canonical manuscript, results and declarations |
+| `coap/` | Current Springer source, class/style files, bibliography, figures and cover letter |
+| `supporting-information.tex`, `supporting-information.pdf` | Online Resource 1 |
+| `sections/` | Mathematical results and related work |
+| `tables/`, `figs/research/` | Tables and figures used by the current manuscript |
+| `research-references.bib` | Current bibliography |
+| `validation/` | Independent numerical-claim verification |
+| `submission/` | [Submission packages and instructions](submission/README.md) |
 
-The authoritative results are `../results-revision/research-audit/budget-final/`,
-`identifiability-final/`, and `operational/`. The first two are newly generated
-experiments; the third reconstructs 240 historical dispatch runs from saved records
-and native logs. The root [README](../README.md) documents the protocol, checks,
-optional reruns, and reasons for retaining intermediate datasets.
+`submission/VALIDATION.json` records the bundle compilation, checksum checks and clean
+extraction of Online Resource 2. The latter includes the exact Online Resource 1 PDF,
+so the documented Online Resource audit works from that artifact alone.
 
-`make research-analysis` regenerates the budget table and two figures, the matrix
-summary and figure, and the operational summaries. It copies the generated
-operational table into `tables/operational-results.tex` for inclusion by the article.
-These analyses need no optimizer or commercial license. `make research-check-python`
-checks the saved binary evidence and matrix hashes; `make research-check` also builds
-and tests the actual C++ LP exporter.
-
-Earlier draft sources and PDFs are preserved in `research-audit/baseline-20260908/`,
-together with the Wiley class, style, bibliography and image files that draft needs, so
-that it stays buildable without leaving them in this directory. That draft's positive
-block-attribution claim and journal-specific presentation have been superseded, and none
-of those files is a dependency of the current PDF build. The working notes and latexdiff
-output of earlier revision rounds are in `research-audit/`.
-
-The manuscript and supplement require the author's final scientific and submission
-review. Their preparation as PDFs does not imply external peer review, acceptance,
-or deposition. The manuscript is outside the repository's code/data licenses unless
-an explicit manuscript license is subsequently supplied.
-
-The local [submission preparation](submission/README.md) includes the cover letter,
-source ZIP and reproducibility archive. Actual PDF page counts and archive checks are recorded in `submission/VALIDATION.json`. Authorship, no external funding and no competing
-interests have been confirmed; the AI declaration is included in the article.
+Authorship, funding, competing interests and AI assistance are stated in the manuscript.
+The manuscript is outside the source-code and data licenses unless an explicit manuscript
+license is supplied. This preparation does not claim journal submission or acceptance.

@@ -267,7 +267,7 @@ From the repository root:
 python3 scripts/research/analyze_direction_compression.py
 ```
 
-The three campaign directories and their completed `independent-verification.json` files must be present. Outputs are rebuilt under `paper/research-audit/direction-comparison-20260913/`; frozen solver data are read only.
+The three campaign directories and their completed `independent-verification.json` files must be present. Outputs are rebuilt under `results-revision/research-audit/direction-comparison/`; frozen solver data are read only.
 """
     (destination / "report.md").write_text(text)
 
@@ -275,7 +275,7 @@ The three campaign directories and their completed `independent-verification.jso
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=REPO / "results-revision/research-audit")
-    parser.add_argument("--out", type=Path, default=REPO / "paper/research-audit/direction-comparison-20260913")
+    parser.add_argument("--out", type=Path, default=REPO / "results-revision/research-audit/direction-comparison")
     args = parser.parse_args()
     frames, provenance, models = [], {}, {}
     for name in CAMPAIGNS:

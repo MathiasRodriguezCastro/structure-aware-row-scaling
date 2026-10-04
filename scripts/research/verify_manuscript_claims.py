@@ -12,7 +12,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 AUDIT = ROOT / 'results-revision/research-audit'
-OUT = Path(__file__).with_name('final-claims-evidence-20260914.json')
+VALIDATION = ROOT / 'paper/validation'
+VALIDATION.mkdir(parents=True, exist_ok=True)
+OUT = VALIDATION / 'claims.json'
 
 
 def rows(path):
@@ -102,6 +104,8 @@ for name in ('budget-final', 'budget-final-cplex', 'exploration-lattice',
         result['campaigns'][name]['input_hashes_checked'] = len(protocol['model_sha256'])
 
 op = rows(AUDIT/'operational/reconstructed_runs.csv')
+original_hashes = {r['path']: r['sha256'] for r in json.loads(
+    (AUDIT/'operational/input_manifest.json').read_text())}
 rx = re.compile(r'Explored [^\n]*? in [\d.eE+-]+ seconds \(([\d.eE+-]+) work units\)')
 cells = defaultdict(dict)
 operational_sources = {}
@@ -114,7 +118,8 @@ for r in op:
     complete = source['status'] == 'OK' and source['status_solver'] in {'OPTIMAL', 'OPTIMO', 'SOLVED', 'INTEGER OPTIMAL'}
     assert complete == (r['completed'] == 'True')
     assert float(source['tiempo_solver_s']) == float(r['solver_seconds'])
-    log = ROOT/r['log']
+    log = AUDIT/'operational/cluster-logs'/r['cell']/'logs'/Path(r['log']).name
+    assert sha(log) == original_hashes[r['log']], r['log']
     matches = rx.findall(log.read_text(errors='replace'))
     assert len(matches) == 1
     assert float(matches[0]) == float(r['work_native_log'])
@@ -190,7 +195,7 @@ archive['paired_findings'] = {'matched_spectral_equal': 30,
     'permutation_instances': len(ranks), 'true_assignment_best': sum(r == 1 for r in ranks),
     'true_assignment_median_rank': float(np.median(ranks))}
 result['archived_spectral'] = archive
-eq_path = Path(__file__).with_name('final-lattice-export-equivalence-20260914.csv')
+eq_path = VALIDATION / 'lattice-export-equivalence.csv'
 with eq_path.open('w', newline='') as stream:
     writer = csv.DictWriter(stream, fieldnames=export_equivalence_rows[0].keys())
     writer.writeheader()
