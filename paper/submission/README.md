@@ -47,3 +47,6 @@ includes the summaries and native operational logs used by its documented verifi
 
 The release is archived under the concept DOI https://doi.org/10.5281/zenodo.20648949.
 The scripts prepare and verify local files; they do not submit the manuscript to the journal.
+
+Published archive for this release: [10.5281/zenodo.23145294](https://doi.org/10.5281/zenodo.23145294).
+`PUBLICATION.json` records the published assets and checksum verification.

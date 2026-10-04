@@ -27,7 +27,8 @@ Online Resource 1. See the [submission checklist](paper/submission/SUBMISSION_CH
 
 The current release is
 [`v1.2-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.2-coap-submission).
-The repository is archived under the Zenodo concept DOI
+This version is archived at Zenodo DOI [10.5281/zenodo.23145294](https://doi.org/10.5281/zenodo.23145294).
+The repository uses the Zenodo concept DOI
 [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949).
 [CITATION.cff](CITATION.cff) gives the citation metadata. Earlier repository states remain
 available through Git history and tagged releases.

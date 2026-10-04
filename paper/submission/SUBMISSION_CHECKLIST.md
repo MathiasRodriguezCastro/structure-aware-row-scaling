@@ -27,3 +27,6 @@ the exact Online Resource 1 PDF and passes the documented audit after extraction
 See `VALIDATION.json` for verified PDF lengths, compilation and artifact checks.
 The repository archive uses concept DOI https://doi.org/10.5281/zenodo.20648949.
 Journal submission is pending the author completing Editorial Manager.
+
+Published archive for this release: [10.5281/zenodo.23145294](https://doi.org/10.5281/zenodo.23145294).
+`PUBLICATION.json` records the published assets and checksum verification.
