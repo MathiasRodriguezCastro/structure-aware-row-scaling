@@ -1,0 +1,140 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Busqueda de metodos MILP con presupuestos de precision}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\title{Búsqueda de un método para MILP\\con presupuestos de precisión}
+\author{Nota de investigación separada del manuscrito OMS}
+\date{17 de octubre de 2026}
+\begin{document}
+\maketitle
+
+\textbf{Resultado.} Se desarrollaron y contrastaron cuatro candidatos, sin
+restringir la búsqueda al escalado conjunto de filas y columnas. Dos tienen
+propiedades matemáticas implementadas y verificadas; ninguno acredita todavía
+una ventaja práctica propia frente a controles fuertes. No se añadió contenido
+al artículo ni se modificó su versión congelada v1.3.14.
+
+\section*{Resultados de la búsqueda}
+\begin{tabularx}{\textwidth}{@{}p{3.8cm}X@{}}
+\toprule
+Candidato & Evidencia y decisión\\\midrule
+Cambio mínimo de columnas & 27 casos; cambio cero en los 22 compatibles;
+cinco certificados de incompatibilidad. No aparece oportunidad real.\\
+Contracción certificada de big-$M$ & 1.753 deducciones de cotas y 96
+contracciones de $10^{17}$ a aproximadamente $2{,}27\times10^6$.
+Los contratos redondeados siguen incompatibles.\\
+Escala de actividades SOS1 & 54 llamadas. La propuesta y SOS convencional
+cumplen los presupuestos en 12/12 cada uno. El control obtiene mejores
+objetivos en control30.\\
+Copias enteras redundantes & 78 llamadas. Tres celdas admisibles y una
+abstención; presolve elimina todas las copias. Los controles continuos
+producen el mismo modelo reducido.\\\bottomrule
+\end{tabularx}
+
+Se conservaron y verificaron los 132 puntos devueltos. Se examinaron 3.456
+conjuntos de hipótesis SOS y 2.592 de amplificación. Se hicieron además seis
+diagnósticos de presolve sin optimizar, repetidos una vez para comprobar su
+reproducción (12 llamadas en total). No se infiere optimalidad MILP de los
+estados del solver ni de las comprobaciones primales.
+
+\section*{La propiedad candidata de las copias enteras}
+Para una binaria $z$, se añade una entera $q\in[0,K]$ y
+$\sigma(Kz-q)=0$, con $K$ entero positivo. Esta extensión preserva la
+proyección LP y MILP del modelo de partida. Si
+\[
+ |z-\operatorname{round}(z)|\leq\gamma,\qquad
+ |q-\operatorname{round}(q)|\leq\gamma,\qquad
+ |\sigma(Kz-q)|\leq\epsilon,
+\]
+y $K\gamma+\epsilon/\sigma+\gamma<1/2$, las dos redondeadas enteras cumplen
+$\operatorname{round}(q)=K\operatorname{round}(z)$. En consecuencia,
+\[
+ |z-\operatorname{round}(z)|\leq
+ \gamma_{\rm eff}=\frac{\gamma+\epsilon/\sigma}{K}.
+\]
+El límite para una fila con una sola binaria pasa a ser
+$\epsilon/\alpha+|a_z|\gamma_{\rm eff}\leq\delta$.
+El selector elige factores diádicos, comprueba exportación exacta y minimiza
+el tamaño máximo de los coeficientes dentro de la ventana declarada.
+Las hipótesis se verifican sobre los puntos almacenados.
+
+En cinca, se admite $K=2048$ para presupuesto $10^{-4}$ y $K=2097152$
+para $10^{-8}$. En control30, $10^{-4}$ admite $K$ entre 2 y 256; para
+$10^{-8}$ el selector se abstiene. La integralidad redundante es una operación
+conocida y no se afirma prioridad del criterio propuesto.
+
+\textbf{Control causal.} Con presolve automático, las nueve parejas de
+copias enteras y continuas producen exactamente el mismo punto completo y
+objetivo. Los tres pares de matrices y dominios reducidos también son
+idénticos. Se eliminan las 24 copias de control30 y las 96 de cada variante
+de cinca. El mayor cociente de trabajo entero/continuo es aproximadamente
+1,000001. Con presolve desactivado, en control30 la mediana de objetivo es
+3,16534 con copias enteras y 2,66253 con continuas; menor es mejor.
+No aparece una ventaja consistente del mecanismo.
+
+\section*{El control SOS convencional también importa}
+Para $g(x_C)\leq Mz$, la reformulación con actividad $y$ usa
+$g-hy\leq0$, $0\leq y\leq M'/h$, $w+z=1$ y SOS1$(w,y)$, donde $M'$
+es una contracción certificada común a los controles. El límite condicional
+del error redondeado es
+\[
+ \frac{\epsilon}{\alpha}+h\max(\gamma_{\rm SOS},\tau),
+\]
+con $\tau$ el error permitido de la cota superior de $y$.
+Escoger $h$ por ese contrato no mejoró SOS con $h=1$ en el piloto:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Presupuesto en control30 & Propuesta & SOS con $h=1$\\\midrule
+$10^{-4}$ & 2,36943 & 1,83523\\
+$10^{-8}$ & 5,45573 & 1,83523\\\bottomrule
+\end{tabular}
+\end{center}
+Son medianas de objetivos de minimización al mismo límite de trabajo.
+En cinca no aparece una diferencia relevante. Veinte conjuntos de hipótesis
+nominales fallan en la propuesta de control30, aunque sus puntos redondeados
+cumplen por comprobación directa. Se mantienen separadas esas dos evidencias.
+
+\section*{Alcance y reproducción}
+Los modelos son control30-3-2-3 y neos-3421095-cinca, seleccionados antes por
+su diagnóstico. Son datos de descubrimiento. Los presupuestos $10^{-4}$ y
+$10^{-8}$ son algebraicos experimentales y solo cambian en las activaciones.
+Las otras filas y cotas conservan sus presupuestos originales.
+
+Gurobi 13.0.2; cuatro hilos; WorkLimit=1, TimeLimit=30 s, MIPGap=0.01;
+$\epsilon=10^{-6}$, $\gamma=10^{-9}$. Semillas SOS: 151, 157, 163;
+semillas de copias: 167, 173, 179. Muchos puntos útiles terminan por límite
+de trabajo; sus objetivos no son óptimos certificados. El tiempo de solver
+no comprende toda la selección y exportación. OutputFlag=0 dejó únicamente
+cabeceras en los logs; se preservan modelos, parámetros, atributos y puntos,
+pero no trazas completas del árbol.
+
+El informe íntegro está en \texttt{RESULTADOS.md}; las 58 agregaciones de
+tres semillas, en \texttt{SUMMARY.csv}. Desde la carpeta de esta nota,
+\texttt{python3 verify\_all.py} repite ocho verificaciones sin optimizar;
+\texttt{python3 analyze.py} reconstruye las agregaciones. Se requiere el
+repositorio completo. Cada candidato conserva protocolo, implementación,
+pruebas y resultados. Los pilotos están protegidos contra sobrescritura.
+
+\section*{Antecedentes que delimitan la novedad}
+SCIP ya implementa indicadores y escalado de holguras en
+\href{https://raw.githubusercontent.com/scipopt/scip/master/src/scip/cons_indicator.c}{\texttt{cons\_indicator.c}}.
+La semántica numérica de SOS y sus conversiones está documentada por
+\href{https://docs.gurobi.com/projects/optimizer/en/12.0/concepts/modeling/constraints.html}{Gurobi}.
+La agregación de variables enteras forma parte del
+\href{https://github.com/ERGO-Code/HiGHS/blob/master/highs/presolve/HPresolve.cpp}{presolve de HiGHS}.
+El fortalecimiento de coeficientes es un antecedente establecido, entre otros,
+en \href{https://research.dial.uclouvain.be/entities/publication/03ea6bfe-7105-4d5c-a48a-47578c173bd1}{Andersen y Pochet}.
+Esta consulta inicial no prueba prioridad ni reemplaza una revisión exhaustiva.
+
+\textbf{Decisión para OMS.} Mantener estos resultados como investigación
+separada. Hay propiedades verificables y prototipos reproducibles, pero no
+evidencia suficiente para anunciar un método nuevo con utilidad adicional.
+\end{document}
