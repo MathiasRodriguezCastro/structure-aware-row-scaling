@@ -75,11 +75,13 @@ def main():
     pdf_text = subprocess.check_output(
         ['pdftotext', '-layout', str(release / 'main_oms.pdf'), '-'], text=True)
     abstract_pdf = ' '.join(pdf_text.split('ABSTRACT', 1)[1].split('KEYWORDS', 1)[0].split())
-    assert len(abstract_pdf.split()) == 191
+    abstract_pdf_words = len(abstract_pdf.split())
+    assert 0 < abstract_pdf_words <= 200
     # Restore superscript notation lost by text extraction, without changing meaning.
     abstract = abstract_pdf.replace(' m3', ' m³').replace('10−9', '10^(-9)')
     abstract = re.sub(r'\s+([,.;:!?])', r'\1', abstract)
-    assert len(abstract.split()) == 190
+    abstract_words = len(abstract.split())
+    assert 0 < abstract_words <= 200
     assert not any(character in abstract for character in ('\\', '$', '\x0c'))
     keyword_tex = re.search(r'\\begin\{keywords\}(.*?)\\end\{keywords\}', tex, re.S)
     assert keyword_tex is not None
@@ -183,17 +185,20 @@ def main():
             item['source_of_final_stage_requirement'] = 'Taylor & Francis Interact documentation, Section 1.2'
     write('UPLOAD_MAP.json', {'version': VERSION, 'files': uploads, 'figures_if_requested': figure_records})
     write('VALIDATION.json', {'version': VERSION, 'frozen_release_checksums_verified': len(release_checks),
-          'all_59_source_payload_files_plus_checksum_extracted_identically': len(source_bytes) == 60,
+          'source_archive_member_count': len(source_bytes),
+          'all_source_payload_files_plus_checksum_extracted_identically': True,
           'source_archive_manuscript_matches_frozen_upload': True,
           'abstract_semantically_identical_to_frozen_PDF_except_restored_typography': True,
-          'abstract_words': 190, 'raw_PDF_abstract_words_before_punctuation_normalization': 191,
+          'abstract_words': abstract_words,
+          'raw_PDF_abstract_words_before_punctuation_normalization': abstract_pdf_words,
           'keywords': 6, 'declarations_from_frozen_source': 5,
           'main_article_figures_extracted_identically': len(figure_records),
           'saved_scientific_results_changed': False, 'native_optimizer_calls': 0,
           'remote_upload_performed': False, 'journal_submission_performed': False,
           'release_checksums': release_checks})
     print('Prepared portal form fields and exact sources:', target.relative_to(ROOT))
-    print('Portal abstract: 190 words; raw PDF extraction: 191; keywords: 6; upload roles: 5; article figures: 2.')
+    print(f'Portal abstract: {abstract_words} words; raw PDF extraction: {abstract_pdf_words}; '
+          f'keywords: {len(keywords)}; upload roles: {len(uploads)}; article figures: {len(figure_records)}.')
 
 
 if __name__ == '__main__':

@@ -90,6 +90,7 @@ research-oms-tables:
 	$(PYTHON) scripts/research/oms_matched_tables.py
 	$(PYTHON) scripts/research/oms_frontier_tables.py
 	$(PYTHON) scripts/research/oms_followup_tables.py
+	$(PYTHON) exploration/oms-evidence-audit-20261017/write_tables.py
 
 # Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
 research-robustness-analysis:
@@ -164,6 +165,9 @@ research-oms-check:
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/check_dispatch.py tolerance
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/check_dispatch.py cycle
 	$(PYTHON) scripts/research/oms_followup_tables.py
+	$(PYTHON) exploration/oms-evidence-audit-20261017/analyze.py
+	$(PYTHON) exploration/oms-evidence-audit-20261017/check.py
+	$(PYTHON) exploration/oms-evidence-audit-20261017/write_tables.py
 
 # The declared residual contract on one dispatch model, and how far the budgets can be
 # tightened before a kernel stops being admissible. Reads the stored LP; no solver.

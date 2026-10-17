@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "paper/submission/oms"
-VERSION = "v1.3.13-oms-submission"
+VERSION = "v1.3.14-oms-submission"
 REVISION_DATE = "2026-10-17"
 NEW_DATA = Path("results-revision/research-audit/oms-close-20261013")
 BASELINE = {"version": "v1.2-coap-submission", "version_doi": "10.5281/zenodo.23145294",
@@ -116,6 +116,10 @@ def strengthening_files():
     for name in ('external','tolerance','native-cycle'):
         d=json.loads((folder/name/'design.json').read_text())
         for rel in d['dependencies']:yield Path(rel)
+    # Secondary audit: all saved outcomes, no new optimizer calls.
+    for p in (ROOT/'exploration/oms-evidence-audit-20261017').rglob('*'):
+        if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.aux','.out','.zip'):
+            yield p.relative_to(ROOT)
 
 
 def write_metadata():
@@ -158,8 +162,8 @@ def write_metadata():
     snapshot = {"version": VERSION, "revision_date": REVISION_DATE,
                 "status": "locally frozen submission snapshot, not a published Zenodo release",
                 "version_doi": None, "published": False, "submission_performed": False,
-                "previous_local_snapshot": "v1.3.12-oms-submission",
-                "editorial_revision": "Add independently checked batch-scheduling transfer and full native-cycle evidence; delimit integer-tolerance robustness and explain the activation-factor path without claiming an internal solver cause. Shorten the abstract; author confirmed CAP did not support this work.",
+                "previous_local_snapshot": "v1.3.13-oms-submission",
+                "editorial_revision": "Foreground the software contribution using established residual-transfer identities; add independently checked model/seed deletion analyses and external complete-cost controls; distinguish the two tested favorable budgets from an untested interval. No new optimizer calls or stronger generalization claim.",
                 "work_reconciliation": {"geometric_mean": 4.484727186569008,
                     "median": 4.97549504639489, "same_per_seed_work": True,
                     "proof": "paper/validation/oms-work-reconciliation.json"},
@@ -234,6 +238,13 @@ def write_metadata():
                     "activation_factors_independently_checked":53280,"unchanged_other_rows_checked":319680,
                     "internal_solver_mechanism_identified":False,
                     "preoptimization_external_order_failure_retained":True,"adverse_results_rerun":False},
+                "secondary_evidence_audit": {"root":"exploration/oms-evidence-audit-20261017",
+                    "table":"S22","new_optimizer_calls":0,"dispatch_pairs_checked":222,
+                    "all_budget_presolve_cells_retained":14,"raw_external_calls_checked":96,
+                    "favorable_dispatch_pairwise_work_wins":36,
+                    "omitting_any_model_or_seed_retains_work_advantage":True,
+                    "analysis_is_posthoc":True,"internal_solver_cause_identified":False,
+                    "external_computational_superiority_established":False},
                 "supplement_2": "reproducibility-artifact.zip",
                 "licensing": {"code": "MIT", "data": "CC BY 4.0",
                               "manuscript": "outside code/data licenses"},

@@ -36,15 +36,15 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-We investigate pre-export row scaling in generated mixed-integer programs through
-mechanism attribution and residual-budget contracts. The contracts characterize
+We present and evaluate a software workflow for pre-export row scaling in generated
+mixed-integer programs. Residual-budget contracts characterize
 admissible factors under original-unit accuracy requirements and coefficient limits,
 including integer rounding and exact binary64 export. Across 306 hydrothermal dispatch
 models, geometric-mean scaling reduces fixed-basis condition numbers by six to eight
 orders of magnitude in class medians, although solver-style equilibration recovers
 most of that advantage. Kernel-matched controls distinguish numerical choices from
-metadata; a Ruiz comparison separates conditioning from solver-effort rankings. A prespecified multi-budget study identifies
-a 30--100\,m\textsuperscript{3} precision--effort regime under automatic presolve
+metadata; a Ruiz comparison separates conditioning from solver-effort rankings. A prespecified study finds favorable precision--effort outcomes
+at 30 and 100\,m\textsuperscript{3} under automatic presolve
 with IntFeasTol=$10^{-9}$ across six known dispatch models and three new seeds: Budget-L2 satisfies every tested
 primal budget without detected bound or completion contradictions. At 100\,m\textsuperscript{3},
 it requires 0.362 times the solver work and 0.629 times the complete-process time of
@@ -107,16 +107,14 @@ a coupling-kernel effect. We establish the optimal common coupling factor for an
 locally whitened triangular structure and show why conditioning diagnostics need not rank
 kernels by solver effort
 (\cref{sec:identifiability,subsec:results-fixed-basis,subsec:results-bridge,subsec:results-ruiz}).
-\item \emph{Accuracy-aware row scaling.} Residual-budget contracts characterize admissible
-row factors under declared original-unit accuracy requirements and coefficient limits.
+\item \emph{Accuracy-aware scaling and verification software.} Residual-budget contracts
+make original-unit accuracy requirements explicit inputs to factor selection, export
+and returned-point checks. They characterize admissible row factors under coefficient limits.
 The construction provides incompatibility conditions, constrained logarithmic centering,
 invariance under consistent unit re-emission, integer-rounding allowances and exact
-binary64 power-of-two export. An implementable factor-selection and verification workflow
-connects these conditions to optimization software. Factor admissibility is conditional
+binary64 power-of-two export. Factor admissibility is conditional
 on the exported residual and does not replace verification of actual solver output
-(\cref{sec:contract,sec:implementation}). Together, the construction integrates
-application-unit budgets, factor admissibility, representable export and independent
-primal verification.
+(\cref{sec:contract,sec:implementation}).
 \end{enumerate}
 
 \paragraph{Computational validation.}
@@ -130,7 +128,7 @@ interpretation and checked residuals rather than a budget-induced performance ga
 An activation-row follow-up makes factors change and adds exact feasible witnesses
 and matched numerical controls.
 The stress experiments identify when budgets change verified outcomes. A prespecified
-330-call multi-budget study then identifies a 30--100\,m\textsuperscript{3} regime
+330-call multi-budget study then identifies favorable results at 30 and 100\,m\textsuperscript{3}
 under automatic presolve on six known models and three new seeds. Budget-L2 meets
 all tested primal budgets without detected bound or completion contradictions; at
 100\,m\textsuperscript{3}, paired geometric-mean work and complete-time ratios against
@@ -143,9 +141,10 @@ the enumerated stress family; separate exact global-LP bounds and integer witnes
 also certify the original dispatch model instance031 and provide reference intervals
 for the other five models (Supplementary Material~1, Table~S19).
 
-The elementary residual-transfer identity is established scaling practice; the proposed
-procedure combines it with coefficient limits, representability checks and explicit
-abstention rather than introducing a new general-purpose preconditioner. The C++ component
+The residual-transfer identity and accuracy-based scaling are established practice
+\cite{gurobiExternalScaling,pritchett2017scaling}. The software contribution connects
+budget specification, admissible selection or explicit abstention, checked export and
+independent returned-point verification. The C++ component
 generates and exports the dispatch comparisons; the budget-aware factor selector has a
 Python reference implementation and an isolated C++ integration checked for identical
 factors and exports. Separate preparation and complete-cycle benchmarks distinguish
@@ -768,7 +767,11 @@ completion contradiction, and uses less work than NumericFocus=3 in every model,
 without more than 1\% deterioration in the compared candidate costs.
 At 100\,m\textsuperscript{3}, paired geometric-mean Budget-L2/NumericFocus=3
 ratios are 0.362 for work and 0.629 for complete process time on the shared host.
-These are terminal-output comparisons, not equally certified MILP gaps.
+All 18 paired work ratios are below one at each target. A secondary analysis
+omitting any one model leaves geometric-mean work ratios of 0.373--0.519 at
+30\,m\textsuperscript{3} and 0.329--0.499 at 100\,m\textsuperscript{3}
+(Supplementary Material~1, Table~S22). These are descriptive checks on known
+models, not confidence intervals or equally certified MILP gaps.
 The primal recovery relative to L2 remains localized; larger budgets and
 presolve-off configurations retain adverse outcomes. The sensitivity therefore
 identifies a tested precision--effort regime rather than a generally superior rule.
@@ -812,8 +815,11 @@ $10^{-5}$ kg; matched dyadic L2 and L2-tight also meet all 24, while NF3 meets
 23. One NF3 point violates a capacity row by 111 mg against the 10 mg study
 target, although its scaled residual is below $10^{-6}$. This establishes
 transfer of the specification and verification procedure, with no added primal
-recovery over matched L2 or general optimality certification
-(Supplementary Material~1, Table~S20).
+recovery over matched L2. Budget-L2/L2 work and complete-time ratios are 0.960
+and 1.054; against NF3 they are 0.554 and 1.049. Thus lower work does not yield
+a complete-process time advantage in this external example. Only 12 of 96
+bound checks have exact feasible references; 84 remain unknown
+(Supplementary Material~1, Tables~S20 and S22).
 
 \section{Discussion and conclusions}
 \label{sec:discussion}
@@ -851,15 +857,13 @@ active coupling transformation. The synthetic mechanism audit and the operationa
 ablation consequently answer different questions: a coupling kernel explains a spectral
 comparison, while local transformations account for the changed dispatch representation.
 
-\paragraph{A condition number of an exported file does not rank scaling policies} It is the
-natural thing to measure, because it needs no optimizer and no license, and this paper measures
-it on 306 models. What \cref{subsec:results-bridge} shows is that it should not be used to
-choose between kernels: after a solver-style equilibration the ordering it gives is wrong in
-sign on one of the three classes and compressed by six orders of magnitude on the others.
-Anyone comparing pre-export scalings by a matrix diagnostic should report what remains of the
-difference once that diagnostic is recomputed through such a step, which costs no optimizer
-time. Whether a particular solver's own stage leaves more or less than the model used here is a
-question this paper does not settle.
+\paragraph{A condition number of an exported file does not rank scaling policies}
+File-level diagnostics require no optimizer license. Across 306 models,
+\cref{subsec:results-bridge} finds that subsequent solver-style equilibration reverses
+the kernel ordering on one class and compresses differences by six orders of magnitude
+on the others. Evaluation should therefore recompute diagnostics after documented
+equilibration and measure solver endpoints separately. This diagnostic does not identify
+what a particular solver's internal scaling leaves.
 
 \paragraph{Residual budgets are a meaningful invariant quantity} A residual budget carried
 consistently with its row defines a contract that is invariant under consistent re-emission ---
@@ -931,8 +935,12 @@ generality or an additional primal benefit over matched L2. Seven of its eight
 exact reference refinements remain unresolved, so their bound comparisons are
 unknown. Exact original-model reference certificates in
 Supplementary Material~1, Table~S19 establish one dispatch optimum, but do not
-certify the remaining native solver reports or explain the internal solver mechanism
-behind the favorable budget regime.
+certify the remaining native solver reports.
+The favorable dispatch targets are the two tested points 30 and
+100\,m\textsuperscript{3}; intermediate budgets were not tested. Model and seed
+deletion checks assess concentration within the observed sample and do not
+predict new models, solvers or parameter settings. The factor audit locates the
+external intervention; internal presolve, LP and search mechanisms remain unresolved.
 Solver outcomes depend on the solver, its version and its settings. The collapse result concerns the extrema-based block
 statistic after GM normalization; other block statistics, other kernels and physical scale
 information are outside it, and on the operational models the coupling rows receive the same
@@ -951,28 +959,23 @@ coupling stage; it does not establish general local-stage superiority.
 
 Residual-budget contracts give an explicit admissibility interval, incompatibility conditions
 and a constrained factor-selection rule, with separate restrictions for integer rounding
-and finite-precision export. All tested factors remain admissible on 129,600 physical rows
-in three declared dispatch precision scenarios, and the stored incumbents meet their
-budgets. That audit provides a conditional precision interpretation and original-unit
-checks. The fully matched 144-call activation comparison changes factors but recovers
+and finite-precision export. The initial dispatch audit leaves factors unchanged;
+the fully matched 144-call activation comparison changes factors but recovers
 primal accuracy relative to L2 only on instance046 with presolve disabled.
 NumericFocus=3 meets every tested budget with more work and no detected bound/gap
 contradiction; Budget-L2 retains four contradicted bounds in that comparison.
-The additional multi-budget study identifies a 30--100\,m\textsuperscript{3}
-regime under automatic presolve with lower work than NumericFocus=3 across the
-six known models and no detected contradictions, at a different matched integer tolerance.
+At the tested 30 and 100\,m\textsuperscript{3} targets under automatic presolve,
+Budget-L2 uses less work than NumericFocus=3 across the six known models with
+no detected contradictions, at a different matched integer tolerance.
 The matched tolerance follow-up limits that regime to its tested setting.
 Independent batch-scheduling checks demonstrate transfer of the primal-budget
 workflow, and native integration reduces measured complete-cycle overhead while
 preserving solver work and outputs.
-This tradeoff and the
-preset sensitivity show that primal precision does not certify MILP optimality. The controlled stress
-family supplies the complementary reliability test: budgets recover verified optima lost
-by some unbudgeted rules, their effect remains solver-dependent, and GCD with RHS flooring
-is stronger on that family. A useful scaling implementation should retain original rows and
-units, report incompatible specifications, document safeguards, and verify actual solver
-output. Neither improved conditioning nor factor admissibility alone certifies a MILP
-solution or a solver's optimality claim.
+The enumerated stress family confirms that budgets can recover verified optima lost
+by unbudgeted rules, with solver-dependent effects; GCD with RHS flooring is stronger
+there. A scaling implementation should retain original rows and units, report
+incompatibilities, document safeguards and verify returned points. Neither conditioning,
+factor admissibility nor primal-budget compliance certifies MILP optimality.
 
 \section*{Data and software availability}
 The repository at \url{https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling}
@@ -983,7 +986,7 @@ at \doi{10.5281/zenodo.23145294}; its concept DOI is \doi{10.5281/zenodo.2064894
 It supplies the earlier fixed-basis, matrix, operational and stress experiments. Those
 public identifiers describe the baseline and do not identify the new OMS experiments.
 
-The frozen OMS snapshot is \path{v1.3.13-oms-submission}, dated 17 October 2026,
+The frozen OMS snapshot is \path{v1.3.14-oms-submission}, dated 17 October 2026,
 supplied as Supplementary Material~2. It retains the historical analysis inputs and adds
 the controlled row-only Ruiz comparison, final-policy implementation check and three-scenario
 physical-budget audit, activation studies, common-incumbent diagnostic and matched

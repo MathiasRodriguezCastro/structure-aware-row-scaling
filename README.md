@@ -10,7 +10,7 @@ residual-budget contracts in original application units, explicit factor-selecti
 finite-precision export and independent verification. The C++ dispatch exporter and Python
 budget selector are separate components. The archived numerical baseline is retained, with
 a controlled row-only Ruiz comparison, final-policy stage ablation, and three application
-precision scenarios on the same 30 operational models added for OMS. The locally frozen `v1.3.13-oms-submission` snapshot includes those additions. It has not
+precision scenarios on the same 30 operational models added for OMS. The locally frozen `v1.3.14-oms-submission` snapshot includes those additions. It has not
 been submitted or published as a separate Zenodo release and has no version DOI.
 
 The OMS activation follow-up adds 114 nonpilot solver calls, 20 exact feasible witnesses, and matched numerical controls on six archived scenarios without the documented demand inversion. [Findings and limits](exploration/oms-followup-20261014/RESULTADOS.md) distinguish original-unit precision from MILP-bound validity; `make research-oms-check` verifies the supplied data without optimizing.
@@ -25,6 +25,11 @@ adds six known models, automatic/off presolve, three seeds and four policies: 14
 terminal comparisons plus one preserved externally interrupted attempt. Main Table 11 and supplementary Table S16
 keep primal budgets, effort and bound/gap refutations separate. This is within-family
 confirmation, with all full-process stages supplied, not external generalization.
+
+The [secondary evidence audit](exploration/oms-evidence-audit-20261017/RESULTADOS.md)
+checks model/seed deletion and complete external costs without new optimization.
+Its work advantage is stable within the observed dispatch sample; the external
+example validates budget delivery without lower complete time than L2.
 
 ## Manuscript and supplements
 
@@ -48,12 +53,12 @@ This version is archived at Zenodo DOI [10.5281/zenodo.23145294](https://doi.org
 The repository uses the Zenodo concept DOI
 [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949).
 [CITATION.cff](CITATION.cff) and `.zenodo.json` describe the local OMS snapshot
-`v1.3.13-oms-submission`, frozen 2026-10-17. The former root metadata for the published
+`v1.3.14-oms-submission`, frozen 2026-10-17. The former root metadata for the published
 baseline are preserved in `artifacts/baseline-metadata/`; the baseline DOI belongs to
 `v1.2-coap-submission`, not to the new OMS experiments. The version metadata and new-data
 inventory are in `paper/submission/oms/SNAPSHOT.json` and `OMS_DATA_MANIFEST.json`.
 After package validation, `python3 scripts/research/freeze_oms.py` creates the immutable
-local copy under `paper/submission/oms/releases/v1.3.13-oms-submission/`, with hashes and both
+local copy under `paper/submission/oms/releases/v1.3.14-oms-submission/`, with hashes and both
 supplements. It does not publish to Zenodo or create a remote Git tag. The prior locally frozen `v1.3-oms-submission` copy is retained; this revision clarifies
 two main contributions supported by computational evidence. Earlier editorial
 files remain in `paper/coap/`; `make paper` builds OMS.
@@ -64,8 +69,8 @@ intermediates, duplicate study bundles and local upload/deposit preparation are
 excluded from version control. The two recorded native-selector executables are
 retained because their exact hashes belong to the timing evidence. Superseded
 editorial previews and packaging logs are kept in a separate local archive.
-The [repository validation](paper/validation/oms-repository-validation.json)
-records replay and compilation from a clean checkout of the committed sources.
+The [baseline repository validation](paper/validation/oms-repository-validation.json)
+records replay and compilation from the preceding committed sources.
 
 ## Reproduce and verify
 

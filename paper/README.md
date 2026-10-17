@@ -40,7 +40,7 @@ to the separately supplied Supplementary Material 1.
 The numerical data include the archived `v1.2-coap-submission` baseline and the additional
 OMS dispatch comparison, stage ablation and physical-budget audit in
 `results-revision/research-audit/oms-close-20261013`. The OMS revision is
-locally frozen as `v1.3.13-oms-submission` and has no new Zenodo version DOI. The default build does not regenerate the historical
+locally frozen as `v1.3.14-oms-submission` and has no new Zenodo version DOI. The default build does not regenerate the historical
 COAP folder. Authorship, funding, competing interests and AI assistance remain stated in
 the manuscript. The manuscript is outside the source-code and data licenses.
 
@@ -67,3 +67,9 @@ sensitivity and activation-factor replay (S21), and complete-cycle native timing
 in S18. `scripts/research/oms_followup_tables.py` generates the three new tables.
 The two principal contributions remain unchanged; the abstract is shortened and
 its favorable dispatch regime now explicitly states the integer tolerance.
+
+Version v1.3.14 adds the secondary evidence audit in Supplementary Table S22:
+model/seed deletion checks and all external control costs. Its solver-free
+programs are under `exploration/oms-evidence-audit-20261017/`. The favorable
+dispatch work result survives removal of each observed model or seed; external
+complete-process time does not improve over L2. No optimizer calls are added.

@@ -1,6 +1,6 @@
 # OMS local submission package
 
-Target: **Optimization Methods and Software**. Revised and frozen 2026-10-16.
+Target: **Optimization Methods and Software**. Revised 2026-10-17.
 Article: **Pre-Export Row Scaling for Generated Mixed-Integer Programs: Accuracy Contracts
 and Software Evaluation**.
 
@@ -31,7 +31,7 @@ OMS sources and numerical audits from a clean extraction of the artifact. `SHA25
 identifies the files generated locally. The package is not a published release and does not
 assert that the manuscript has been submitted.
 
-The locally frozen OMS version is `v1.3.13-oms-submission`. `SNAPSHOT.json` records the
+The locally frozen OMS version is `v1.3.14-oms-submission`. `SNAPSHOT.json` records the
 historical/new-data distinction, and `OMS_DATA_MANIFEST.json` inventories every new OMS
 experiment file and required replay program/input with SHA-256. After validation,
 `python3 scripts/research/freeze_oms.py` creates a non-overwriting versioned copy of the
@@ -170,3 +170,17 @@ still deferred. Historical versions and research archives are preserved.
 
 Validated v1.3.13 layout: 36 manuscript pages, 28 supplementary pages, one cover
 page and a four-page separate research note. The rendered abstract has 191 words.
+
+## Evidence revision v1.3.14 — 17 October 2026
+
+No new optimizer calls. The software specification and checked workflow are
+foregrounded using established residual-transfer identities. A secondary audit
+checks all saved frontier cells and external control costs. Supplementary Table
+S22 shows 36/36 favorable dispatch work pairs, model/seed deletion ranges and
+external complete-process costs. This is descriptive robustness on known models,
+not new external generalization or an explanation of internal solver mechanisms.
+The two tested favorable targets are 30 and 100 m3; intermediate budgets were
+not tested. Earlier frozen releases remain unchanged; the new DOI stays deferred.
+
+Validated layout: 36 manuscript pages, 29 supplementary pages and one cover page.
+The rendered abstract has 193 words; all 39 tables are regenerated from saved data.

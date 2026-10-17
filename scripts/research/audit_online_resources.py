@@ -40,6 +40,7 @@ QUOTED = {
     "S18": ["0.824", "0.731", "0.987"],
     "S20": ["24/24", "23/24", "111.041", "8.2"],
     "S21": ["0.356", "18/18"],
+    "S22": ["0.373", "0.519", "0.329", "0.499", "0.960", "1.054"],
 }
 
 
@@ -58,6 +59,17 @@ def table_blocks(text):
         blocks.setdefault(num, "")
         blocks[num] += text[pos:end]
     return blocks
+
+
+def cited_tables(source):
+    """Read singular/plural pointers, lists and inclusive LaTeX ranges."""
+    cited = set()
+    pattern = r"Tables?~(S\d+(?:(?:--|,\s*|\s+and\s+)S\d+)*)"
+    for match in re.finditer(pattern, source):
+        cited.update(re.findall(r"S\d+", match[1]))
+        for first, last in re.findall(r"S(\d+)--S(\d+)", match[1]):
+            cited.update(f"S{i}" for i in range(int(first), int(last) + 1))
+    return sorted(cited, key=lambda s: int(s[1:]))
 
 
 # The documents write paths relative to these roots, as the supplement states; a bare path is
@@ -93,7 +105,7 @@ def main():
     blocks = table_blocks(si_txt)
     failures = []
 
-    cited = sorted(set(re.findall(r"Table~(S\d+)", main_src)), key=lambda s: int(s[1:]))
+    cited = cited_tables(main_src)
     present = sorted(blocks, key=lambda s: int(s[1:]))
     print(f"[1] article cites {', '.join(cited)}; supplement contains {', '.join(present)}")
     for t in cited:
