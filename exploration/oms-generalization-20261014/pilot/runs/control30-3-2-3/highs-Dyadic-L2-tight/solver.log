@@ -1,0 +1,84 @@
+Running HiGHS 1.15.1 (git hash: 04024d7): Copyright (c) 2026 under MIT licence terms
+Includes third-party software components, see THIRD_PARTY_NOTICES.md for full details
+MIP Dyadic-L2 has 512 rows; 332 cols; 1472 nonzeros; 90 integer variables (90 binary)
+Coefficient ranges:
+  Matrix  [1e-07, 1e+00]
+  Cost    [1e+00, 1e+00]
+  Bound   [1e+00, 1e+00]
+  RHS     [4e-02, 5e-01]
+Presolving model
+508 rows, 328 cols, 1454 nonzeros 0s
+440 rows, 263 cols, 1326 nonzeros 0s
+439 rows, 263 cols, 1323 nonzeros 0s
+Presolve reductions: rows 439(-73); columns 263(-69); nonzeros 1323(-149) 
+
+Solving MIP model with:
+   439 rows
+   263 cols (89 binary, 0 integer, 0 implied int., 174 continuous, 0 domain fixed)
+   1323 nonzeros
+   Thread count 4 (of 16 threads). Using 1 max workers. Parallel search off
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic;
+     I => Shifting; J => Feasibility jump; L => Sub-MIP; P => Empty MIP; R => Randomized rounding;
+     S => Solve LP; T => Evaluate node; U => Unbounded; X => User solution; Y => HiGHS solution;
+     Z => ZI Round; l => Trivial lower; p => Trivial point; u => Trivial upper; z => Trivial zero
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   -inf            inf                  inf        0      0      0         0     0.0s
+ R       0       0         0   0.00%   -20763026.78757 170.0452221        Large        0      0      0       313     0.0s
+ L       0       0         0   0.00%   -20385874.30306 126.0307131        Large     2528    196     14       874     0.3s
+ L       0       0         0   0.00%   -20385874.30306 96.69151723        Large     2528     97     14      1893     0.6s
+ T       0       0         0   0.00%   -20385874.30306 7.525305969        Large     2528     97     14      1893     0.9s
+ T      47       0        10   0.00%   -20385874.30306 7.206990823        Large     2544     97     42      6265     0.9s
+ T      50       0        12   0.00%   -20385874.30306 7.012039095        Large     2548     97     45      6306     0.9s
+ T      71       1        22   0.00%   -20385874.30306 6.730445128        Large     2563     97     72      6643     1.0s
+ T     575     158       207   0.00%   -14037735.44125 4.979776362        Large     3220    147    572     33581     4.1s
+ T     633     162       221   0.00%   -14037735.44125 4.309097471        Large     3234    147    597     35667     4.1s
+ T     635     162       222   0.00%   -14037735.44125 4.244990312        Large     3235    147    597     35673     4.1s
+ T     964     241       347   0.00%   -14037735.44125 3.920916624        Large     3372    150   1015     45161     5.3s
+      2211     556       814   0.00%   -9994726.545232 3.920916624        Large     3413    141   2469     79230    10.7s
+
+Restarting search from the root node
+Model after restart has 435 rows, 263 cols (89 bin., 0 int., 0 impl., 174 cont., 0 dom.fix.), and 1311 nonzeros
+
+      2386       0         0   0.00%   -9634882.498469 3.920916624        Large      144      0      0     84242    10.8s
+      2386       0         0   0.00%   -9634882.498469 3.920916624        Large      144     92    102     84650    10.9s
+
+Restarting search from the root node
+Model after restart has 433 rows, 263 cols (89 bin., 0 int., 0 impl., 174 cont., 0 dom.fix.), and 1307 nonzeros
+
+      3894       0         0   0.00%   -9634882.498469 3.920916624        Large      147      0      0    111512    13.6s
+      3894       0         0   0.00%   -9634882.498469 3.920916624        Large      147     78    104    111686    13.6s
+      4754     236       304   0.00%   -9634882.498469 3.920916624        Large     3128    154   2683    126790    15.0s
+
+Solving report
+  Model             Dyadic-L2
+  Status            Time limit reached
+  Primal bound      3.92091662428
+  Dual bound        -9634882.49847
+  Gap               245730459.04% (tolerance: 1%)
+  P-D integral      36633601.5776
+  Solution status   feasible
+                    3.92091662428 (objective)
+                    0 (bound viol.)
+                    2.22044604925e-16 (int. viol.)
+                    0 (row viol.)
+  Timing            15.00
+                    0.44 (Presolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.44 [696]
+                    14.48 (Solve)
+                        MIP    time [calls] = 7.80 [1]
+                        subMIP time [calls] = 6.68 [582]
+                    0.00 (Postsolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.00 [696]
+  Max sub-MIP depth 16
+  Nodes             4754
+  Repair LPs        31 (31 feasible; 172 iterations)
+  LP iterations     126790
+                    19892 (strong br.)
+                    4525 (separation)
+                    45784 (heuristics)

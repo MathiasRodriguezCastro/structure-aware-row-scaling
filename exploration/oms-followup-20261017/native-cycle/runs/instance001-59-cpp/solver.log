@@ -1,0 +1,81 @@
+
+Gurobi 13.0.2 (linux64) logging started Sat Oct 17 00:37:15 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-followup-20261017/native-cycle/runs/instance001-59-cpp/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-09
+Set parameter ScaleFlag to value -1
+Set parameter IntegralityFocus to value 0
+Set parameter NumericFocus to value 0
+Set parameter Presolve to value -1
+Set parameter Seed to value 59
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  59
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0xc70d7ca3
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [1e-08, 2e+02]
+  Objective range  [9e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [3e+00, 5e+05]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 5.019439e+08
+Presolve removed 1400 rows and 496 columns
+Presolve time: 0.08s
+Presolved: 8680 rows, 5624 columns, 20652 nonzeros
+Found heuristic solution: objective 5.018433e+08
+Variable types: 4228 continuous, 1396 integer (1396 binary)
+
+Root relaxation: objective -1.188351e+06, 5347 iterations, 0.10 seconds (0.18 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -1188350.8    0 1334 5.0184e+08 -1188350.8   100%     -    0s
+H    0     0                    -989879.4735 -1188350.8  20.1%     -    0s
+     0     0 -1120868.9    0 1119 -989879.47 -1120868.9  13.2%     -    0s
+     0     0 -1119717.6    0 1116 -989879.47 -1119717.6  13.1%     -    0s
+     0     0 -1113833.0    0 1116 -989879.47 -1113833.0  12.5%     -    0s
+     0     0 -1113802.2    0 1116 -989879.47 -1113802.2  12.5%     -    0s
+     0     0 -1038378.0    0  526 -989879.47 -1038378.0  4.90%     -    1s
+     0     0 -1038378.0    0  530 -989879.47 -1038378.0  4.90%     -    1s
+     0     0 -1033868.0    0  513 -989879.47 -1033868.0  4.44%     -    1s
+     0     0 -1031730.2    0  513 -989879.47 -1031730.2  4.23%     -    1s
+     0     0 -989879.47    0  513 -989879.47 -989879.47  0.00%     -    1s
+
+Cutting planes:
+  Gomory: 22
+  Implied bound: 71
+  MIR: 40
+  Flow cover: 216
+  RLT: 49
+  Relax-and-lift: 9
+
+Explored 1 nodes (15851 simplex iterations) in 1.40 seconds (1.92 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 3: -989879 5.01843e+08 5.01944e+08 
+No other solutions better than -989879
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -9.898794735172e+05, best bound -9.898794735172e+05, gap 0.0000%

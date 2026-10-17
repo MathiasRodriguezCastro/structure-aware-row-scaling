@@ -1,0 +1,139 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[spanish]{babel}
+\usepackage[margin=2cm]{geometry}\usepackage{amsmath,amssymb,booktabs,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}{\Large Límites conjuntos del escalamiento por filas}\\[3pt]
+Nota preliminar independiente, 15 de octubre de 2026\end{center}
+\textbf{Estado.} Derivación y certificados comprobados; novedad editorial y
+ventaja práctica no establecidas. OMS v1.3.5 permanece sin cambios. Ninguna
+llamada nueva a optimizadores.
+
+\textbf{Antecedente clásico.} Para $A$ cuadrada no singular,
+$S(A)=\|\,|A^{-1}|\,|A|\,\|_\infty$ es invariante por filas y
+$\min_D\kappa_\infty(DA)=S(A)$; equilibrar las sumas absolutas de filas alcanza
+el mínimo. Véase \href{https://eprints.maths.manchester.ac.uk/651/1/SURVEY.pdf}{Higham (1994), ecuaciones 2.11--2.12}.
+No es un resultado nuevo de estas notas. El escalamiento óptimo tiene extensa
+literatura, incluyendo \href{https://www.tuhh.de/ti3/paper/rump/Ru03a.pdf}{Rump (2003)}
+y \href{https://arxiv.org/abs/2209.00809}{Qu et al.} Una búsqueda preliminar no
+determina prioridad para la extensión acotada siguiente.
+
+\textbf{Intervalos.} Sean $r_i=\sum_j|a_{ij}|$, $C=|A^{-1}|$ y
+$0<L_i\leq\alpha_i\leq H_i<\infty$. Definir
+\[
+ t_0=\max_i L_i r_i,\quad
+ \alpha_i^*=\min\{H_i,t_0/r_i\},\quad
+ K_* = \max_j\sum_i C_{ji}\max\{r_i,t_0/H_i\}.
+\]
+Entonces $\alpha^*$ es admisible y alcanza el mínimo $K_*$ de
+$\kappa_\infty(D_\alpha A)$. Es una derivación corta propia aquí, sin afirmar
+novedad. Seleccionar factores no exige la inversa; certificar $K_*$ en general sí.
+
+\emph{Prueba.} Para cualquier $\alpha$ admisible, $t=\max_i\alpha_i r_i\geq t_0$,
+\[
+ \kappa_\infty(D_\alpha A)=\max_j\sum_i C_{ji}\frac{t}{\alpha_i},\qquad
+ \frac{t}{\alpha_i}\geq\max\{r_i,t/H_i\}\geq\max\{r_i,t_0/H_i\}.
+\]
+Esto prueba la cota inferior; $\alpha^*$ tiene norma máxima de filas $t_0$
+y alcanza todas esas cotas, probando optimalidad.
+
+\textbf{Qué detecta.} Intervalos locales no vacíos no garantizan
+$\kappa_\infty\leq K$ si $K<K_*$. Para $A=I$, cajas $[1,10^9]$ y
+$[1/16,1/8]$ dan mínimo $8$, aun con $S(A)=1$. La matriz
+$\left[\begin{smallmatrix}1&1\\1&1+2^{-20}\end{smallmatrix}\right]$ tiene
+piso $4\,194\,307$, aunque casi no hay dispersión de coeficientes dentro de filas.
+Son ejemplos construidos, no casos operativos del despacho.
+
+\newpage
+\textbf{Compatibilidad conjunta.} Para $Ax=b$, la hipótesis de residuo
+exportado $|D(A\widehat x-b)|\leq\epsilon\mathbf1$ da
+$|\widehat x-x|\leq\epsilon C(1/\alpha)$. Es la mejor envolvente sobre la caja
+independiente de residuos; otras restricciones pueden excluir sus extremos.
+No se deduce esa hipótesis de un parámetro del solver.
+
+Exigir a la vez $\kappa_\infty(DA)\leq K$ y esa envolvente $\leq\Delta$ equivale
+a la factibilidad del LP en $(v,t)$:
+\[
+ v_i\geq r_i,\qquad t/H_i\leq v_i\leq t/L_i,\qquad
+ Cv\leq K\mathbf1,\qquad \epsilon Cv\leq t\Delta.
+\]
+Las primeras restricciones implican $t\geq t_0>0$. Necesidad: usar
+$t=\max_i\alpha_i r_i$, $v_i=t/\alpha_i$. Suficiencia: tomar
+$\alpha_i=t/v_i$; la norma de filas es $\leq t$ y las dos últimas filas
+garantizan los objetivos. Es una transformación lineal fraccional elemental.
+
+\textbf{Certificado exacto.} Para
+\[
+ A=\begin{pmatrix}1&-1\\0&1\end{pmatrix},\quad
+ L=(1,1),\ H=(1,128),\ \epsilon=1,\ K=10,\ \Delta=(2,1/128),
+\]
+condición sola es factible con $\alpha=(1,2)$, dando $\kappa=3$.
+Error solo es factible con $(1,128)$, pero da $\kappa=129$.
+La caja y la segunda precisión fuerzan esa última pareja, así que los objetivos
+son incompatibles juntos. Todos esos factores son potencias de dos.
+El LP tiene el certificado Farkas (multiplicadores no negativos)
+\[
+\begin{aligned}
+129(-v_2\leq-1)&+(v_1+v_2\leq10)\\
+&+(t-v_1\leq0)+128(v_2-t/128\leq0)
+\end{aligned}
+\quad\Longrightarrow\quad 0\leq-119.
+\]
+No usa tolerancias ni etiquetas de un optimizador. Relajar $K$ a $129$ admite
+$(v_1,v_2,t)=(128,1,128)$. $\epsilon=1$ es una normalización del ejemplo.
+
+\textbf{Grilla dyádica.} Reducir la caja a extremos dyádicos admisibles,
+resolver el mínimo continuo y redondear cada factor hacia abajo conserva la
+caja. La norma de filas no aumenta y la norma de la inversa crece por menos de
+dos. Se obtiene una aproximación por factor dos al óptimo dyádico de condición.
+Esto no preserva automáticamente una meta conjunta $\Delta$ ni garantiza
+representabilidad del vector solución. La inviabilidad del LP real sí descarta
+factores dyádicos. La representabilidad de productos debe entrar en los extremos.
+
+\newpage
+\textbf{Bloque hidráulico real.} En tres MILP originales de 360 períodos,
+con 1440 enteras intactas, se extraen las columnas de volumen en sus balances,
+fijando flujos y vertimientos. El bloque $B$ tiene diagonal $1$ y subdiagonal
+$-1$; $B^{-1}$ tiene unos en el triángulo inferior. Se comprueban sus entradas
+y $BB^{-1}=I$. Por eso $\kappa_\infty(B)=720$ y el mínimo por filas es $719$.
+Lo alcanza $D=\operatorname{diag}(1,1/2,\ldots,1/2)$, admisible para los tres
+escenarios y con exportación exacta. Los prefijos analíticos $T=8,24$ tienen
+pisos $15,47$; no son instancias MILP ni resultados LP--DW.
+
+\begin{center}\begin{tabular}{lrrr}\toprule
+Caso & Inicial & Mínimo & Error acumulado máximo, m$^3$\\\midrule
+001 & 720 & 719 & 0.0022245 \\
+022 & 720 & 719 & 3.3755e-06 \\
+046 & 720 & 719 & 0.0035253 \\
+\bottomrule\end{tabular}\end{center}
+
+Se auditan los 1093 eventos del paquete anterior, incluyendo finales repetidos.
+Se suma exactamente el residuo de agua hasta cada período y se verifica el
+telescopado directo. Es discrepancia respecto de reconstruir almacenamiento
+con los mismos flujos/inicialización; no un error físico medido ni reparación
+del MILP. Aunque 100 m$^3$ por balance permitiría una cota genérica de 36\,000
+m$^3$ al final, el máximo observado es menor que 0.004 m$^3$. No aparece una
+necesidad práctica en este banco.
+
+La cota terminal teórica al usar factores máximos es aproximadamente
+$1.296\cdot10^{-9}$ m$^3$, siempre condicionada a un residuo exportado que
+realmente se cumpla. No es residuo observado ni promesa del solver. Los
+escenarios autorizados no exigen esa precisión extrema.
+
+\textbf{Límites y decisión.} El piso 719 corresponde a ese subsistema con flujos
+fijos: no es una cota de condición de la matriz rectangular completa, de todas
+las bases ni de la matriz interna del solver. La norma infinito no es la norma
+1/2 del resto de los diagnósticos. Cambiar las holguras unitarias al construir
+una base puede dar una matriz distinta de $DB$. La caracterización requiere
+un sistema cuadrado fijo y puede necesitar una inversa densa costosa.
+
+Se verifican 4667 comparaciones exactas de grillas en 24 matrices pequeñas,
+el certificado Farkas y cuatro tests. Esto comprueba las fórmulas, no prioridad
+histórica ni generalización. La parte libre es clásica; la formulación acotada
+y conjunta requiere revisar más antecedentes y demostrar utilidad real antes
+de considerar OMS. No se añade un teorema al artículo por sí solo.
+
+README.md describe el replay sin solvers. La auditoría completa usa el ZIP padre
+fijado por SHA256; no se incluye otra copia de sus 30 MB. Los nueve paquetes
+previos y la entrega OMS permanecen sin cambios.
+\end{document}

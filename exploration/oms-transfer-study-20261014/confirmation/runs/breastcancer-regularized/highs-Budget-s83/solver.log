@@ -1,0 +1,72 @@
+Running HiGHS 1.15.1 (git hash: 04024d7): Copyright (c) 2026 under MIT licence terms
+Includes third-party software components, see THIRD_PARTY_NOTICES.md for full details
+MIP imported has 723 rows; 715 cols; 8283 nonzeros; 706 integer variables (692 binary)
+Coefficient ranges:
+  Matrix  [2e-02, 1e+01]
+  Cost    [2e-02, 7e+00]
+  Bound   [1e+00, 7e+02]
+  RHS     [2e-05, 2e-05]
+WARNING: Problem has some excessively small row bounds
+Presolving model
+721 rows, 713 cols, 8270 nonzeros 0s
+719 rows, 711 cols, 7585 nonzeros 0s
+Presolve reductions: rows 719(-4); columns 711(-4); nonzeros 7585(-698) 
+Objective function is integral with scale 38000
+
+Solving MIP model with:
+   719 rows
+   711 cols (692 binary, 10 integer, 9 implied int., 0 continuous, 0 domain fixed)
+   7585 nonzeros
+   Thread count 4 (of 16 threads). Using 1 max workers. Parallel search off
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic;
+     I => Shifting; J => Feasibility jump; L => Sub-MIP; P => Empty MIP; R => Randomized rounding;
+     S => Solve LP; T => Evaluate node; U => Unbounded; X => User solution; Y => HiGHS solution;
+     Z => ZI Round; l => Trivial lower; p => Trivial point; u => Trivial upper; z => Trivial zero
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+ u       0       0         0   0.00%   -inf            746.0876316        Large        0      0      0         0     0.0s
+ J       0       0         0   0.00%   -inf            738.5926053        Large        0      0      0         0     0.0s
+ R       0       0         0   0.00%   0.3143514725    341.15            99.91%        0      0      0       291     0.0s
+ C       0       0         0   0.00%   0.5741940729    340.47            99.83%     1199     91      0       605     0.1s
+ L       0       0         0   0.00%   0.7779649734    40.74163158       98.09%     1534    180      0      1511     0.7s
+
+Symmetry detection completed in 0.0s
+Found 46 full orbitope(s) acting on 280 columns
+
+ L       0       0         0   0.00%   0.7779649734    38.68771053       97.99%     1198    150     61      6319     1.6s
+       104      23        29   0.00%   1.114022578     38.68771053       97.12%     1244    412   1634     84802     7.6s
+       153      43        42   0.03%   1.442267082     38.68771053       96.27%     1516    739   1978    114892    13.2s
+       165      64        47   0.03%   1.442267082     38.68771053       96.27%     1574    791   1988    122223    15.0s
+
+Solving report
+  Model             imported
+  Status            Time limit reached
+  Primal bound      38.6877105263
+  Dual bound        1.44228947368
+  Gap               96.27% (tolerance: 1%)
+  P-D integral      14.5440807334
+  Solution status   feasible
+                    38.6877105263 (objective)
+                    0 (bound viol.)
+                    8.03801469829e-13 (int. viol.)
+                    0 (row viol.)
+  Timing            15.00
+                    1.02 (Presolve)
+                        MIP    time [calls] = 0.02 [1]
+                        subMIP time [calls] = 1.00 [111]
+                    13.97 (Solve)
+                        MIP    time [calls] = 7.07 [1]
+                        subMIP time [calls] = 6.90 [98]
+                    0.00 (Postsolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.00 [111]
+  Max sub-MIP depth 12
+  Nodes             165
+  Repair LPs        0
+  LP iterations     122223
+                    93568 (strong br.)
+                    2084 (separation)
+                    15852 (heuristics)

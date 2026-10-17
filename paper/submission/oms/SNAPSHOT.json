@@ -1,0 +1,230 @@
+{
+  "version": "v1.3.13-oms-submission",
+  "revision_date": "2026-10-17",
+  "status": "locally frozen submission snapshot, not a published Zenodo release",
+  "version_doi": null,
+  "published": false,
+  "submission_performed": false,
+  "previous_local_snapshot": "v1.3.12-oms-submission",
+  "editorial_revision": "Add independently checked batch-scheduling transfer and full native-cycle evidence; delimit integer-tolerance robustness and explain the activation-factor path without claiming an internal solver cause. Shorten the abstract; author confirmed CAP did not support this work.",
+  "work_reconciliation": {
+    "geometric_mean": 4.484727186569008,
+    "median": 4.97549504639489,
+    "same_per_seed_work": true,
+    "proof": "paper/validation/oms-work-reconciliation.json"
+  },
+  "historical_baseline": {
+    "version": "v1.2-coap-submission",
+    "version_doi": "10.5281/zenodo.23145294",
+    "concept_doi": "10.5281/zenodo.20648949"
+  },
+  "historical_data_reused": [
+    "306-model fixed-basis audit",
+    "1,080-export matrix audit",
+    "240-run operational reconstruction and two 240-run sensitivities",
+    "4,752-call enumerated stress experiment",
+    "exploratory stored-run discrepancy audit"
+  ],
+  "new_oms_data": {
+    "root": "results-revision/research-audit/oms-close-20261013",
+    "comparison_models": 30,
+    "comparison_assigned_runs": 120,
+    "complementary_stage_models": 6,
+    "additional_stage_assigned_runs": 12,
+    "stored_runs_and_exports": 132,
+    "physical_rows_per_comparison_policy": 129600,
+    "precision_scenarios": 3,
+    "all_factor_contract_records": 1710720,
+    "named_conditioning_bases": 120,
+    "parameters": {
+      "name": "Gurobi",
+      "version": [
+        13,
+        0,
+        2
+      ],
+      "parameters": {
+        "Threads": 4,
+        "Seed": 42,
+        "TimeLimit": 120.0,
+        "MIPGap": 0.01,
+        "FeasibilityTol": 1e-06,
+        "IntFeasTol": 1e-05,
+        "ScaleFlag": -1,
+        "Presolve": -1
+      }
+    },
+    "interpretation": "stage check has an inactive coupling stage; physical contracts do not change factors"
+  },
+  "new_data_manifest": "paper/submission/oms/OMS_DATA_MANIFEST.json",
+  "activation_followup": {
+    "root": "exploration/oms-followup-20261014",
+    "models": 6,
+    "principal_calls": 72,
+    "mechanism_calls": 27,
+    "fresh_seed_comparison_calls": 9,
+    "preset_sensitivity_calls": 6,
+    "nonpilot_calls": 114,
+    "separate_pilot_calls": 8,
+    "exact_native_export_witnesses": 20,
+    "replay": "python3 exploration/oms-followup-20261014/verify_and_summarize.py",
+    "interpretation": "study numerical precision goals extended to activation thresholds; benefits depend on target and configuration; feasible witnesses expose unsupported bounds, not global optima"
+  },
+  "new_data_manifest_sha256": "b41470d5aeca5008c32913e364f01a4fbf2106ef1a7a66a02819bc44135dee75",
+  "incumbent_diagnostic": {
+    "root": "exploration/oms-root-attribution-20261015",
+    "known_models": 3,
+    "seeds": [
+      503,
+      509,
+      521
+    ],
+    "native_mip_calls": 36,
+    "reference_lp_calls": 3,
+    "posthoc_pattern_lp_calls": 15,
+    "exact_reference_optima": 3,
+    "final_pattern_exact_optima": 13,
+    "final_pattern_unknown": 2,
+    "loaded_common_starts": 18,
+    "table": "S14",
+    "case_selection": "retrospective; one application family",
+    "replay": "python3 exploration/oms-root-attribution-20261015/independent_check.py",
+    "interpretation": "initialization sensitivity of an auxiliary MPS/power-of-two bank, not causal identification of one solver component or of the historical LP campaign"
+  },
+  "supplement_1": "paper/supporting-information.pdf",
+  "matched_if_workflow": {
+    "root": "exploration/oms-if1-workflow-20261015",
+    "known_models": 1,
+    "seeds": [
+      11,
+      23,
+      47
+    ],
+    "principal_mip_calls": 12,
+    "first_pass_mip_calls": 12,
+    "total_new_mip_calls": 24,
+    "new_lp_calls": 0,
+    "borrowed_exact_native_export_witnesses": 2,
+    "table": "S15",
+    "replay": "python3 exploration/oms-if1-workflow-20261015/independent_check.py",
+    "interpretation": "IF1 leaves all six paired endpoints unchanged; full fresh-process prototype timings on a shared machine; neither new generality nor global optimality"
+  },
+  "matched_accuracy": {
+    "root": "exploration/oms-matched-accuracy-20261016",
+    "known_models": 6,
+    "seeds": [
+      11,
+      23,
+      47
+    ],
+    "presolve": [
+      -1,
+      0
+    ],
+    "policies": [
+      "L2",
+      "Budget-L2",
+      "L2-tight",
+      "L2-NF3"
+    ],
+    "terminal_comparisons": 144,
+    "native_attempts": 145,
+    "externally_interrupted_attempts_retained": 1,
+    "new_lp_calls": 0,
+    "borrowed_exact_native_export_witnesses": 12,
+    "table": "S16",
+    "replay": "python3 exploration/oms-matched-accuracy-20261016/independent_check.py",
+    "interpretation": "within-family retrospective confirmation; terminal budget delivery and bound/gap refutations kept separate; no external generalization or global optimality"
+  },
+  "precision_frontier": {
+    "root": "exploration/oms-frontier-20261016",
+    "assignments": 360,
+    "native_MIP_calls": 330,
+    "abstentions": 30,
+    "exact_native_export_witness_LPs": 31,
+    "seeds": [
+      59,
+      71,
+      89
+    ],
+    "common_integer_tolerance": 1e-09,
+    "volume_budgets": [
+      10,
+      30,
+      100,
+      300,
+      1000,
+      3000,
+      10000
+    ],
+    "prespecified_regime_found": true,
+    "automatic_presolve_qualified_models_30_and_100": 6,
+    "table": "S17",
+    "main_table": "12"
+  },
+  "native_selector": {
+    "root": "exploration/oms-native-selector-20261016",
+    "timed_preparations": 336,
+    "preflight_preparations": 48,
+    "exactly_equal_model_pairs": 12,
+    "new_optimizer_calls": 0,
+    "table": "S18",
+    "interpretation": "standalone preparation cost; no extrapolation to full-solve speedup"
+  },
+  "global_LP_references": {
+    "root": "exploration/oms-global-lp-20261016",
+    "unfixed_global_LP_calls": 6,
+    "additional_Base_integer_witness_LPs": 6,
+    "one_percent_certified_reference_models": [
+      "instance005",
+      "instance022",
+      "instance031"
+    ],
+    "exact_MILP_optimum_certified_reference_models": [
+      "instance031"
+    ],
+    "table": "S19",
+    "interpretation": "original-Base reference intervals, not certificates of all native floating-export results"
+  },
+  "followup_20261017": {
+    "root": "exploration/oms-followup-20261017",
+    "new_MIP_calls": 176,
+    "new_exact_LP_attempts": 8,
+    "new_contractual_abstentions": 18,
+    "external_models": 8,
+    "known_external_anchor_models": 2,
+    "new_external_horizons": 6,
+    "external_comparison_calls": 96,
+    "external_reference_calls": 8,
+    "external_primal_passes": {
+      "L2": 24,
+      "Budget-L2": 24,
+      "L2-tight": 24,
+      "L2-NF3": 23
+    },
+    "external_exact_feasible_references": 1,
+    "external_exact_refinement_unknown": 7,
+    "external_unknown_bound_checks": 84,
+    "external_table": "S20",
+    "tolerance_new_MIP_calls": 36,
+    "tolerance_borrowed_low_gamma_calls": 54,
+    "tolerance_table": "S21",
+    "zero_bound_flag_regime_robust_across_two_gammas": false,
+    "native_cycle_calls": 36,
+    "native_cycle_equal_points_work_and_endpoints_pairs": 18,
+    "native_cycle_cpp_to_python_full_time_ratio": 0.8241102465391204,
+    "native_cycle_table": "S18",
+    "activation_factors_independently_checked": 53280,
+    "unchanged_other_rows_checked": 319680,
+    "internal_solver_mechanism_identified": false,
+    "preoptimization_external_order_failure_retained": true,
+    "adverse_results_rerun": false
+  },
+  "supplement_2": "reproducibility-artifact.zip",
+  "licensing": {
+    "code": "MIT",
+    "data": "CC BY 4.0",
+    "manuscript": "outside code/data licenses"
+  },
+  "full_historical_basis_rebuild": "requires the baseline's separate fixed-basis-exports.tar.zst"
+}

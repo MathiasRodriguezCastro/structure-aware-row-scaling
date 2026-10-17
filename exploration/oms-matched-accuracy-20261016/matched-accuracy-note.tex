@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,booktabs,graphicx,microtype}
+\usepackage[colorlinks=true]{hyperref}
+\title{Matched accuracy and cost controls for pre-export scaling}
+\author{Research note accompanying the OMS manuscript}
+\date{16 October 2026}
+\begin{document}\maketitle
+Six known demand-inversion-free dispatch models, three previously used seeds,
+automatic/off presolve and four policies give 144 fixed assignments. This is a
+within-generator confirmation, not external validation. Targets are 0.01 MW and
+100 m$^3$, checked exactly in original units after integer rounding on all 4,320
+audited rows per saved point.
+
+\begin{center}\resizebox{\linewidth}{!}{\input{matched-accuracy}}\end{center}
+Every policy has 18 calls in each presolve configuration. Maximum activation
+violation is in m$^3$; Limits counts native time limits. Work is the geometric mean
+over all calls; Total is the median full fresh-process wall time in seconds.
+$B>U$ counts bounds contradicted by exact feasible witnesses of the actual export,
+allowing max($10^{-6}$,8 bound ulps). Gap flags count reported 1\% completions
+satisfying $U<C-0.01|C|$. Absence of a flag does not certify a bound or optimality.
+
+\begin{center}\input{matched-cases}\end{center}
+Per-model budget compliance, out of three seeds, with presolve disabled. Tight
+tolerances and NumericFocus are matched controls on the identical L2 export.
+All 144 terminal outcomes, including time limits, are retained. Objective values
+and paired Work ratios appear in the machine-readable reports; comparable primal
+budget compliance alone is not comparable optimization success.
+
+\paragraph{Settings and cost scope.}
+Gurobi 13.0.2, four threads, 120 seconds, 1\% gap, ScaleFlag=-1,
+IntegralityFocus=0, seeds 11/23/47 and no MIP starts. L2/Budget-L2 use
+FeasibilityTol=$10^{-6}$ and IntFeasTol=$2^{-28}$; L2-tight uses $10^{-9}$ for
+both; L2-NF3 adds NumericFocus=3 to the matched L2 tolerances. A fixed permutation
+sets the order. The C++ generator constructs the model once per call; exports reproduce
+the prior model hashes. Only 1,440 activation factors per model differ for Budget-L2.
+Total includes startup, C++ generation/Base writing, metadata, factor selection,
+scaled export, native import/equality checks, optimization, extraction, verification
+and persistence. Stages are supplied; shared-machine wall times describe this
+prototype. Compilation and historical witness acquisition are offline costs;
+current witness revalidation is timed separately.
+
+\paragraph{Scope.}
+The experiment measures terminal delivery at the native stopping rule, not time
+to first verified incumbent or a full precision--cost frontier. Exact feasible
+witnesses refute specific bounds; they do not establish global optima. The
+reader-only replay checks twelve witnesses and every saved candidate without
+optimizer calls. The protocol, sources, logs, points, exact-unit checks and
+complete discussion are supplied alongside this note. OMS v1.3.8 and all previous
+closed research archives are preserved. A host reboot interrupted one additional
+attempt; its partial output is retained and that assignment alone was repeated,
+giving 145 native attempts and 144 terminal comparisons. The 37 completed calls
+before the reboot were kept; models, parameters and endpoints were unchanged.
+\end{document}

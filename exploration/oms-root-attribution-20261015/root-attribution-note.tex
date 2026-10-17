@@ -1,0 +1,115 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,booktabs,tabularx}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\begin{document}
+\begin{center}\Large Common incumbents and row-scaling attribution\\[3pt]
+\normalsize Focused exploration for OMS --- 15 October 2026\end{center}
+\textbf{Question.} How much of the observed external-scaling benefit survives
+when Base and GM receive the same feasible incumbent? This addresses mechanism
+attribution in the existing paper, without introducing cuts, decomposition,
+prediction or a new preconditioner.
+
+\section*{1. Controlled intervention}
+Three known SG--Ter--Mer cases retain 6,120 variables, 10,080 rows and 1,440
+binaries each. Cases 001 and 003 previously favored GM; case 042 favored Base.
+This is retrospective diagnosis in one family, not held-out validation.
+Base/GM $\times$ Cold/CommonStart $\times$ seeds 503,509,521 gives 36 sequential
+MILP calls. Gurobi 13.0.2 uses four threads, 12 seconds/12 work units, gap
+$10^{-3}$, primal tolerance $10^{-6}$, integer tolerance $10^{-5}$, normal
+presolve/internal scaling and IntegralityFocus=0. Frozen exact row factors are
+reused; objectives, domains and the underlying mathematical models are fixed.
+This auxiliary MPS/power-of-two bank differs from the historical LP campaign;
+it does not establish the cause of that campaign's reported work reduction.
+
+For each case, only the integer pattern of archived GM seed 307 is used.
+SoPlex produces an exact feasible continuation and a matching dual bound for
+the fixed-pattern LP. This certifies that LP, not global MILP optimality.
+The rational point is converted to one binary64 vector supplied identically to
+both policies. All 18 starts are loaded and their pattern/cost is observed.
+Original/exported residuals from conversion are retained separately.
+
+\section*{2. Completion and work}
+Each cell gives native completions out of three and median native work over
+all three calls, including censored ones. Ratios of censored runs are not
+interpreted as speedups; native completion is not a certified MILP gap.
+\begin{center}\small
+\begin{tabular}{llrr}\toprule
+Case&Initialization&Base: completes; work&GM: completes; work\\\midrule
+001&Cold&0/3; 12.0001&3/3; 5.4909\\
+001&CommonStart&3/3; 6.4158&3/3; 6.7719\\
+003&Cold&0/3; 12.0002&3/3; 4.3099\\
+003&CommonStart&3/3; 4.7903&3/3; 4.6932\\
+042&Cold&3/3; 0.3284&3/3; 0.4928\\
+042&CommonStart&3/3; 0.0000&3/3; 0.0000\\
+\bottomrule\end{tabular}\end{center}
+The common start removes the completion advantage of GM in both favorable
+cases. In 001, paired GM/Base work ratios are 1.0555, 1.0519 and 1.3686; GM
+requires more work in all three pairs. In 003 the ratios are 0.9957, 1.1114 and
+0.7683, with mixed signs. The zero native-work reports for warm 042 do not mean
+zero total cost and are not divided into ratios. No root LP is logged there.
+
+Root objectives match at printed precision within all 15 Base/GM pairs where
+root relaxations are logged. The start changes some root objectives relative
+to Cold: it can alter objective cutoffs, presolve and later search. Therefore
+the intervention supports dependence on incumbent access, without isolating
+one heuristic or proving that all effects have that cause.
+\newpage
+\section*{3. Acquisition and exact checks}
+The references are offline diagnostic inputs. Their patterns came from
+previous GM runs; the new exact LP construction/check took 1.79--1.84 seconds
+per case, separate from the earlier work needed to obtain those patterns.
+This is not a deployable algorithm with free starts, nor a total-time speedup.
+
+All 15 unique final integer patterns entered a queue fixed before posthoc LP
+checking (five-second limit, no replacement). Thirteen have exact primal/dual
+optima. Two remain unknown, both from Base-Cold 001, which did not reach the
+requested gap. Warm comparisons have certified continuations at comparable
+costs. Conditional pattern optima are not global MILP lower bounds.
+
+No reported bound exceeds the common exact feasible objective in this
+experiment. Absence of contradiction is not validation of global bounds.
+All native candidates and logs are retained. Original-row checks use stored
+binary64 coefficients and rational arithmetic after integer rounding; they do
+not certify an intended pre-rounding physical model.
+
+The independent replay checks 1,179,324 exact products, 226 candidate objectives, all 36 final points and pattern assignments, all 18 loaded common starts, three reference LPs and 15 final-pattern LPs. Four tests passed before MILP calls.
+
+\section*{4. What this contributes to OMS}
+The result directly tests a mechanism behind the paper's observed operational
+effects. It supports a short qualification of existing evidence, rather than
+another principal contribution or a claim that scaling strengthens the LP.
+No extra campaign is warranted by these three known cases.
+
+\textit{Concrete candidate paragraph:}
+
+An auxiliary MPS-based diagnostic with power-of-two GM factors further
+limits mechanism attribution.
+On three known dispatch cases with three new seeds, Base and GM receive the
+same independently checked feasible reference as a MIP start. In the two cases
+where cold-start GM reaches the requested native gap in 3/3 calls while Base
+reaches it in 0/3, the common start makes both reach it in 3/3. GM then requires
+more work in all three pairs on one case and has mixed work differences on the
+other. This diagnostic conditions on an offline reference; it is not a new
+solution method or a global optimality certificate. It shows that the observed
+completion advantage depends on incumbent access and cannot be attributed to
+exported-matrix conditioning alone; it does not isolate a particular heuristic.
+
+
+\section*{5. Limits and reproducibility}
+One application family, three selected cases, one solver/version and short
+limits cannot establish a general ranking. A common start affects the whole
+solver pipeline. Its acceptance is checked because the
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/attributes/variable.html#attr:Start}{Gurobi Start API}
+does not guarantee that a supplied vector becomes an incumbent. The incumbent
+source is fully declared and is not used to train a predictive rule.
+
+The package contains canonical inputs, source provenance, archived discovery
+records, exact references, schedules, native logs, candidates, fixed-pattern
+LPs, rational certificates and solver-free replay. Python, NumPy and pytest
+suffice for checks; pdfLaTeX builds this note. New solves additionally require
+the declared Gurobi and GMP-enabled SoPlex binaries/licences. The manuscript,
+frozen OMS v1.3.5 delivery and eleven previous research archives are preserved.
+\end{document}

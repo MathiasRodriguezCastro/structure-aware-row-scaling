@@ -1,0 +1,223 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{lmodern,amsmath,amssymb,booktabs,tabularx,array}
+\usepackage[margin=1.85cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newcommand{\R}{\mathbb{R}}
+\begin{document}
+\begin{center}
+{\Large Reparación, aceptación y decisión numérica}\\[3pt]
+{\large Seguimiento prospectivo independiente del paper OMS}\\[3pt]
+14 de octubre de 2026 --- documento de investigación
+\end{center}
+\textbf{Resultado.} Verificar y reparar recuperó entregas que fallaban en Base,
+pero no se demuestra una ventaja propia de contratos frente a alternativas
+existentes. El estudio queda separado del artículo v1.3.5.
+\section*{Diseño y aceptación}
+Se fijaron 80 tratamientos antes de resolver: cinco modelos, semillas 11 y 23,
+ocho alternativas y orden aleatorio registrado. Kondili H14/H16 son horizontes
+nuevos de la misma fuente independiente; los tres MIPLIB son los del piloto,
+con semillas nuevas. No son nuevas familias ni una muestra representativa.
+La calibración previa, semilla 17, se excluye de la confirmación.
+
+Gurobi 13.0.2, cuatro hilos, presolve y escalado interno automáticos, gap 1\%,
+MILP hasta 15 s y referencia de ciclo de 20 s. Los LP condicionales usan
+HiGHS 1.15.1 (hasta 2 s) y SoPlex 8.1.0/GMP (hasta 3 s restantes).
+Las políticas escaladas usan exactamente el kernel diádico existente.
+
+Se conservan los presupuestos: STN $10^{-5}$ kg (10 mg) en material,
+$10^{-5}$ en lógica y $10^{-3}$ en unidades monetarias; MIPLIB
+$10^{-4}\max(1,|b_r|)$ en unidades algebraicas experimentales.
+Son objetivos numéricos del estudio. Una entrega debe satisfacer todas las
+filas y cotas dentro de sus presupuestos y dominios enteros exactamente.
+Los contratos MIPLIB cubren el punto crudo; el redondeado se comprueba después.
+\begin{center}\small
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Tratamiento & Fuente & Entrega & LP & Abst. & Suma s\\\midrule
+Default-check & 7/10 & 7/10 & 0 & 0 & 40.381\\
+Tight-check & 10/10 & 10/10 & 0 & 0 & 48.326\\
+NumericFocus-check & 6/10 & 6/10 & 0 & 0 & 32.690\\
+IntegralityFocus-check & 10/10 & 10/10 & 0 & 0 & 68.679\\
+Base-check-repair & 7/10 & 10/10 & 3 & 0 & 39.193\\
+L2-check-repair & 7/10 & 10/10 & 3 & 0 & 52.895\\
+Budget-check-repair & 6/10 & 8/10 & 2 & 2 & 32.765\\
+Diagnostic-check-repair & 7/10 & 10/10 & 3 & 0 & 41.361\\
+\bottomrule\end{tabular}\end{center}
+Fuente: punto fuente tras redondear; Entrega: asignación verificada; LP:
+reparaciones; Abst.: incompatibilidad contractual. Denominador diez por
+tratamiento, incluyendo abstenciones. No son tasas poblacionales.
+
+Hubo 78 llamadas MILP y 71
+entregas verificadas. Los 11 LP flotantes condicionales recuperaron
+la entrega, con costo de 0.0407--0.1760 s. No se llamó al LP exacto en
+confirmación; dos puntos de HiGHS también resultaron factibles exactos.
+
+La suma incluye selección, exportación, importación y cotejo, MILP,
+verificación y reparación. La persistencia exterior se mide aparte; los
+archivos auxiliares del LP están incluidos en reparación. No hubo errores
+ni excesos de 20 s. \textbf{Desviación documentada:} la construcción común
+inicial no se cronometró, pese a una frase del protocolo. No se incluye en
+estas sumas. Dos semillas no permiten inferir velocidad general.
+\newpage
+\section*{Precisión, costo y calidad del objetivo}
+En \texttt{control30-3-2-3}, Base-repair recupera precisión desde objetivos
+crudos no entregables de $-39.917360$ y $-23.049913$, pero entrega costo
+$26.248128$. Los controles estrictos entregan aproximadamente $1.27$ y
+usan unos 15 s. La reparación rápida de peor objetivo no equivale a
+optimización rápida de igual calidad. No se transfiere el gap de la fuente.
+\begin{center}\small
+\begin{tabular}{@{}rlrr@{}}\toprule
+Semilla & Tratamiento & Costo entregado & Ciclo s\\\midrule
+11 & Tight-check & 1.265274 & 15.154\\
+11 & IntegralityFocus-check & 1.265272 & 15.114\\
+11 & Base-check-repair & 26.248128 & 0.218\\
+11 & Budget-check-repair & 24.661027 & 0.290\\
+11 & L2-check-repair & 33.373658 & 0.295\\
+23 & Tight-check & 1.265275 & 15.158\\
+23 & IntegralityFocus-check & 1.315832 & 15.140\\
+23 & Base-check-repair & 26.248128 & 0.242\\
+23 & Budget-check-repair & 24.661027 & 0.230\\
+23 & L2-check-repair & 33.373658 & 0.207\\
+\bottomrule\end{tabular}\end{center}
+En Kondili todas las alternativas pasan sin reparación. En cinca, Base,
+Tight e IntegralityFocus pasan y NumericFocus falla en ambas semillas.
+L2 necesita reparar una entrega; Budget se abstiene por 96 intervalos
+incompatibles. En \texttt{ta1-UUM}, Base necesita reparación en semilla 23,
+con cambio de objetivo de 0.282 unidades. La recuperación es del LP,
+no del contrato. Los 80 registros y tiempos por etapa quedan conservados.
+\section*{Contradicciones independientes de cotas}
+Un punto binary64 reparado de \texttt{ta1-UUM} satisface exactamente todas
+las filas, cotas y dominios del modelo canónico, comprobados con aritmética
+racional. Su objetivo constituye una cota superior factible del mismo
+modelo. Las llamadas Tight terminan con etiqueta óptima y cotas inferiores
+que la contradicen:
+\begin{center}\small
+\begin{tabular}{@{}rrrr@{}}\toprule
+Semilla & Cota reportada & Testigo exacto & Diferencia\\\midrule
+11 & 7813164.58 & 7695229.19 & 117935.39\\
+23 & 7842648.07 & 7695229.19 & 147418.88\\
+\bottomrule\end{tabular}\end{center}
+El testigo también mejora sus objetivos en más de 1\%. La importación y
+el escalado se cotejan contra los mismos datos originales: no se mezclan
+modelos. La guarda numérica del checker, $\max(10^{-6},8\,\mathrm{ulp}(B))$,
+es muy inferior a las diferencias observadas. No se certifica el óptimo
+global ni se consideran válidas las otras cotas por no hallar contradicción.
+Tampoco se atribuye una causa al presolve o escalado interno sin controles
+adicionales. Precisión primal, calidad y optimalidad se conservan separadas.
+\newpage
+\section*{Mecanismo de reparación y garantías de aceptación}
+Los tres MIPLIB tienen máximos coeficientes enteros de $1.058\,10^7$,
+$10^{17}$ y $1.109\,10^7$, frente a máximos continuos de 1, 1.4 y 1.
+Fijar enteros retira los coeficientes grandes de la matriz del LP. Esta
+observación orienta la reparación, pero no garantiza buena condición,
+factibilidad del patrón o éxito del LP.
+
+El ciclo selecciona y exporta, resuelve una vez y comprueba el punto
+redondeado. Si falla, fija los enteros más próximos, reoptimiza el LP y
+comprueba todas las restricciones originales. Si aún falla la entrega,
+intenta un LP racional y comprueba por separado el testigo y su conversión
+a binary64. Si nada pasa, se abstiene.
+
+\textbf{Propiedad de aceptación.} Defina $V_\delta(y)$ como la verificación
+de todas las filas y cotas bajo sus presupuestos originales y dominios
+enteros exactos. Cada instrucción que devuelve un punto se ejecuta solamente
+después de comprobar $V_\delta(y)$. Por tanto, todo punto devuelto satisface
+$V_\delta$. Es una garantía del filtro, independiente de las etiquetas
+del solver. No garantiza encontrar un punto ni certificar su optimalidad.
+El número de intentos está acotado por un MILP y dos LP; la terminación
+depende de que los backends terminen o sean interrumpidos. Los 20 s son
+una referencia operativa, no una garantía de tiempo real.
+
+Se sustituyen los enteros en el RHS con aritmética racional sobre los
+datos binary64 originales. El LP racional se escribe con decimales completos,
+sin un nuevo redondeo del RHS. Una contradicción en una fila constante
+prueba ausencia de continuación exacta de ese patrón, no inviabilidad
+global MILP. Un testigo exacto es primal; no certifica optimalidad MILP.
+
+El desarrollo separado obtuvo un testigo exacto para control, con costo
+26.248128, entrega flotante también verificada y tiempo
+0.1091 s. Es desarrollo, excluido de la tabla prospectiva.
+
+\section*{Obstrucción de representación}
+Tras fijar enteros, considere $a x=b$, $a\ne0$, y $q=b/a$. Sean
+$f^-<q<f^+$ los dos vecinos binary64 adyacentes, ambos finitos. Entonces
+\[
+\min_{f\in\mathbb F_{64}}|af-b|
+=\min\{|af^--b|,|af^+-b|\}.
+\]
+En cada lado de $q$, $|a|\,|f-q|$ crece al alejarse; ningún otro valor
+flotante tiene menor residuo. Si ese mínimo excede $\delta$, la fila no
+tiene entrega binary64 que cumpla su presupuesto para esos enteros,
+aunque admita un testigo racional exacto. Las cotas de variables no pueden
+eliminar esa imposibilidad. El diagnóstico omite casos sin vecinos finitos.
+
+Ejemplo de comprobación: $3x=1$, $0\le x\le1$. El testigo racional es
+$1/3$ y el mínimo residuo binary64 es $2^{-54}$. Con $\delta=2^{-55}$
+no hay entrega; con $\delta=2^{-54}$ sí. Cinco tests incluyen esa frontera,
+contradicciones enteras, dominios y decimales exactos. No hubo obstrucciones
+unarias en los casos reales. Es cuantización elemental, sin novedad
+matemática reclamada ni beneficio práctico general demostrado.
+\newpage
+\section*{Diagnóstico previo y exportación}
+La regla congelada eligió Budget para STN y Base con reparación reservada
+para MIPLIB. Logra 10/10, como Base-repair, con mayor trabajo de selección.
+En 48 puntos fuente que pasan, la cota nominal $\mu$ supera uno. La falta
+de garantía suficiente no predice un fallo. Solo 12 puntos tienen
+$\mu\le1$; el checker comprueba las hipótesis exportadas e integrales
+y no encuentra contradicciones cuando son satisfechas.
+
+El tratamiento del error de exportación, ya implementado en el piloto,
+usa el soporte firmado de la caja original:
+\[
+R^+=\sum_j\max\{(\alpha a_j-\hat a_j)l_j,
+(\alpha a_j-\hat a_j)u_j\}-(\alpha b-\hat b).
+\]
+Si $x\in[l,u]$ y $\hat a^\top x-\hat b\le\varepsilon$, descomponer
+el residuo da
+\[
+a^\top x-b\le(\varepsilon+R^+)/\alpha.
+\]
+Si cada entero cambia a lo sumo $\gamma$ al redondear, la violación final
+está acotada por
+\[
+\max\left\{0,\frac{\varepsilon+R^+}{\alpha}
++\gamma\sum_{j\in I}|a_j|\right\}.
+\]
+Para igualdades se consideran ambos signos. Términos con error cero no
+necesitan cotas finitas. Aquí las exportaciones diádicas son exactamente
+proporcionales y $R^+=0$. Se distinguen límite nominal, hipótesis observadas
+y residuo efectivamente verificado, sin atribuir capacidad predictiva.
+\section*{Antecedentes y decisión para OMS}
+La reparación exacta y los certificados tienen precedentes explícitos:
+Eifler y Gleixner (2021) y Cheung, Gleixner y Steffy (2016/2017).
+SoPlex implementa LP racional e IntegralityFocus es un control existente
+pertinente. Verificar o reparar no se reclama como idea novedosa.
+La posible investigación es integrar requisitos, representación, aceptación,
+abstención y calidad con trazabilidad. La muestra actual no demuestra una
+ventaja propia del contrato frente a esos controles.
+
+\textbf{Decisión: conservar el envío v1.3.5.} Quedan un ciclo realmente
+ejecutado, reparaciones, certificados reproducibles y una separación
+comprobada entre precisión y optimalidad. No se añade una contribución
+ni una tabla al paper con estos resultados, ni se buscan casos favorables.
+\section*{Reproducción y fuentes}
+El checker independiente no importa el runner ni los solvers. Recomprueba
+78 fuentes, 71 entregas, 11 candidatos LP, 9975 factores y 96 intervalos
+incompatibles; coteja también los tres MPS originales y el desarrollo. Python/NumPy y
+pytest bastan para replay y tests. Los programas, protocolos, enmienda
+pre-ejecución, modelos, fuentes originales, logs, tiempos, puntos y hashes
+se conservan en el artefacto. Los certificados se refieren al modelo
+canónico binary64, no a decimales MPS racionales ideales o estándares físicos.
+
+\small
+\href{https://arxiv.org/abs/2101.09141}{Eifler y Gleixner: exact rational MIP (2021).}\\
+\href{https://arxiv.org/abs/1611.08832}{Cheung, Gleixner y Steffy: verifying integer programming results.}\\
+\href{https://soplex.zib.de/doc/html/EXACT.php}{SoPlex: exact LP and references to Gleixner--Steffy.}\\
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/parameters.html}{Gurobi: IntegralityFocus and numerical controls.}\\
+\href{https://github.com/jckantor/STN-Scheduler}{STN-Scheduler: Kondili source, pinned MIT generator.}\\
+\href{https://miplib.zib.de/tag_numerics.html}{MIPLIB 2017: Numerics collection and original MPS sources.}
+\end{document}

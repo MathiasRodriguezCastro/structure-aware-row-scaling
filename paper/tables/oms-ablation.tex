@@ -1,0 +1,18 @@
+\begin{table}[tb]
+\centering\small
+\caption{Final Role-Hybrid stage ablation on six prospectively selected models.
+Work and total-time ratios use the common-completed subset in each class;
+completion counts and PAR10 retain all three. Rows are scaled with the final C++
+kernels and guards. Base and full-policy calls are shared with
+Table~\ref{tab:oms-comparison}.}\label{tab:oms-ablation}
+\begin{tabular}{llrrrrr}\toprule
+Class & Policy & Done & Paired $n$ & Work & Time & PAR10 (s)\\\midrule
+Simple & Base & 3/3 & 3 & 1.000 & 1.000 & 1.1 \\
+Simple & Local-only & 3/3 & 3 & 1.033 & 1.022 & 1.1 \\
+Simple & Coupling-only & 3/3 & 3 & 1.000 & 0.989 & 1.1 \\
+Simple & Role-Hybrid & 3/3 & 3 & 1.033 & 1.012 & 1.1 \\
+SG-Ter-Mer & Base & 3/3 & 3 & 1.000 & 1.000 & 29.7 \\
+SG-Ter-Mer & Local-only & 3/3 & 3 & 0.387 & 0.456 & 18.4 \\
+SG-Ter-Mer & Coupling-only & 3/3 & 3 & 1.000 & 0.953 & 27.3 \\
+SG-Ter-Mer & Role-Hybrid & 3/3 & 3 & 0.387 & 0.413 & 17.2 \\
+\bottomrule\end{tabular}\end{table}

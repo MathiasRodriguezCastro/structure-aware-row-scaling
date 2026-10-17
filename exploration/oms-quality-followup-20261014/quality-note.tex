@@ -1,0 +1,228 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[spanish]{babel}
+\usepackage{lmodern,amsmath,amssymb,booktabs,tabularx}
+\usepackage[margin=1.9cm]{geometry}\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\begin{document}
+\begin{center}{\Large Calidad, warm starts y cotas}\\[4pt]
+{\large Seguimiento y ablación independientes de OMS}\\[3pt]
+14 de octubre de 2026 --- documento de investigación\end{center}
+\textbf{Resultado.} Hay una señal concreta para Budget-L2 en un modelo auténtico:
+evita objetivos pobres e informes de L2 contradichos. La ablación identifica un
+efecto de la representación final. No hay ventaja general frente a Base/IF1 y
+el envío v1.3.5 permanece separado y sin cambios.
+\section*{Diseño prospectivo y entregas}
+48 asignaciones: los tres MIPLIB previamente seleccionados, semillas nuevas
+31/47 y ocho tratamientos. Gurobi 13.0.2, cuatro hilos, gap 1\%, presolve y
+escalado interno automáticos salvo el control indicado. Frío: hasta 15 s;
+warm: hasta $1+14$ s MILP. Referencia global: 20 s, incluyendo selección,
+exportación, importación/cotejo, resolución, reparación, verificación y auditoría.
+Los factores diádicos existentes no se reajustan después de resultados.
+
+Presupuestos $\delta_r=10^{-4}\max(1,|b_r|)$, cotas $10^{-4}$, dominios
+enteros exactos; unidades algebraicas experimentales. Contratos para el punto
+crudo y comprobación separada del entero. No son tolerancias físicas operativas.
+\begin{center}\small\begin{tabular}{@{}lrrrr@{}}\toprule
+Tratamiento & Entregas & Suma s & Veto online & Cotas en pool\\\midrule
+Cold-tight & 6/6 & 71.189 & 1 & 1\\
+Cold-IF1 & 6/6 & 77.904 & 0 & 0\\
+Base-warm-tight & 6/6 & 59.077 & 2 & 2\\
+Base-warm-IF1 & 6/6 & 75.586 & 0 & 0\\
+L2-warm-IF1 & 6/6 & 53.720 & 0 & 1\\
+Budget-warm-IF1 & 4/6 & 63.252 & 0 & 0\\
+Cold-tight-presolve-off & 6/6 & 52.181 & 2 & 2\\
+Witness-warm-tight & 6/6 & 75.652 & 0 & 1\\
+\bottomrule\end{tabular}\end{center}
+Las cuentas online y posteriores son por fase y se solapan. No se suman como
+fallos distintos. Denominador seis, incluidas abstenciones. La suma de tiempos
+no compara velocidades a calidad equivalente ni estima rendimiento poblacional.
+
+Hubo 68 llamadas MILP y 46
+entregas. Cinca se abstiene dos veces por 96 intervalos incompatibles. Se
+proporcionaron 28 Starts y los logs registran
+27 cargas. No hubo errores o excesos de 20 s.
+
+La preparación compartida se cronometró aparte. La persistencia final del
+seguimiento también; en ablación, el NPZ final se incluye sin medición separada.
+Los archivos auxiliares quedan en su etapa. El control Witness-warm tiene un
+testigo exacto previo cuya adquisición está excluida y declarada: es diagnóstico
+con información previa, no un algoritmo de velocidad nuevo. Los tres modelos
+no son familias nuevas ni una muestra representativa.
+\newpage
+\section*{La reparación puede iniciar otra búsqueda, sin ventaja general}
+En control, warm-tight entrega 1.374590/1.400469 y warm-IF1 1.313721/1.313715,
+recuperando calidad frente al LP solo (antes 26.248128). Cold-IF1 entrega
+1.265274/1.313755 y Cold-tight 1.322940/1.433450. Calentar no supera
+sistemáticamente a los controles robustos con igual asignación MILP.
+
+Comparaciones por modelo/semilla: umbral descriptivo del 1\% del objetivo frío,
+además de una guarda numérica. No es significación estadística ni gap certificado.
+\begin{center}\small\begin{tabular}{@{}lrrr@{}}\toprule
+Warm contra su control frío & Mejora $>1\%$ & Peor $>1\%$ & Sin dos entregas\\\midrule
+Base-warm-tight & 1 & 2 & 0\\
+Base-warm-IF1 & 0 & 3 & 0\\
+L2-warm-IF1 & 1 & 3 & 0\\
+Budget-warm-IF1 & 0 & 3 & 2\\
+Witness-warm-tight & 2 & 1 & 0\\
+\bottomrule\end{tabular}\end{center}
+Base-warm-IF1 no mejora más del 1\% en ningún par y empeora en tres.
+Witness-warm usa información previa y no es un control de velocidad equitativo.
+\section*{Testigos y certificaciones incompatibles}
+Tres testigos exactos previos permitieron cinco vetos online. Los mejores
+testigos obtenidos después contradicen siete cotas y ocho informes de
+terminación al 1\%. Optimalidad continúa no verificada. Una cota no refutada
+no pasa a ser válida por esa ausencia de evidencia.
+
+Los testigos completos verifican todas las filas, cotas y dominios. Los
+objetivos mostrados son 1.265277 en control y 7,547,811.68 en ta1-UUM.
+El checker coteja los MPS originales, incluyendo costos y dominios, bajo su
+interpretación binary64; no se mezclan modelos ni se usan puntos solo
+factibles dentro de tolerancias como testigos exactos.
+
+En ta1-UUM, Base-warm-tight y presolve-off tienen cotas contradichas en ambas
+semillas; Cold-tight falla en 47. Witness-warm-tight/47 necesita el testigo
+mejor obtenido después. Un testigo previo demasiado caro no detecta todos
+los fallos. Desactivar presolve no elimina el problema y no se atribuye una
+causa interna específica al solver.
+
+\textbf{Consistencia del propio informe.} Control/L2-warm-IF1/47 conserva
+etiqueta óptima, objetivo $5.643361$ y cota $-24.177882$. Su log muestra gap
+$528.4306\%$, frente al 1\% solicitado. Rechazar ese informe no requiere
+testigo externo. Se comprueban gap relativo, absoluto y una guarda; no se
+penaliza TIME\_LIMIT por no alcanzar el objetivo. Este caso también tiene
+un testigo mejor, pero su cota negativa no queda refutada por él.
+\newpage
+\section*{Ablación del mecanismo: representación final e inicio}
+La señal en control motivó una selección posterior explícita: estudio de
+mecanismo, no confirmación independiente de generalización. Antes de nuevas
+llamadas se congelaron 14 asignaciones con semillas 59/71: tres controles en
+frío y el cruce $2\times2$ L2/Budget entre origen y destino. Se conservaron
+todos los resultados y no se añadieron coeficientes M artificiales.
+
+Mismo modelo, presupuestos, factores, tolerancias $10^{-6}/10^{-5}$, presolve
+automático e IntegralityFocus 1 en la fase final. Límites $1+14$ s warm y
+15 s frío. Cambiar representación conserva exactamente filas/RHS, objetivo
+y dominios; el Start se transmite en coordenadas originales verificadas.
+\begin{center}\small\begin{tabular}{@{}lrrrr@{}}\toprule
+Tratamiento & Costo 59 & Costo 71 & Ciclo 59/71 s & Fuente final V\\\midrule
+Cold-Base-IF1 & 1.315834 & 1.391930 & 15.352/15.323 & 2/2\\
+Cold-L2-IF1 & 2.815707 & 33.373658 & 0.301/0.336 & 2/2\\
+Cold-Budget-IF1 & 1.313510 & 1.265136 & 15.330/15.301 & 2/2\\
+Warm-L2-to-L2 & 2.815707 & 6.238235 & 0.625/0.540 & 2/2\\
+Warm-L2-to-Budget & 1.313510 & 1.315735 & 14.528/14.496 & 2/2\\
+Warm-Budget-to-L2 & 3.068627 & 7.875892 & 0.643/0.674 & 2/2\\
+Warm-Budget-to-Budget & 1.313506 & 1.265132 & 14.675/14.539 & 2/2\\
+\bottomrule\end{tabular}\end{center}
+Fuente final V: punto del solver tras redondear pasa todas las comprobaciones;
+las entregas finales pasan en los catorce casos gracias al filtro y reparación.
+
+Los seis destinos L2 declaran terminación óptima, pero sus informes al 1\%
+son contradichos por testigos exactos. Cuatro presentan cota inferior
+imposible y los otros dos un gap interno incompatible. Los seis destinos
+Budget alcanzan el límite y no declaran óptimo; costos 1.265--1.316.
+No se certifica su óptimo ni se considera válida una cota solo por no refutarla.
+
+Budget$\to$L2 entrega 3.068627/7.875892: un mejor tipo de inicio no rescata
+la representación L2. L2$\to$Budget entrega 1.313510/1.315735 y evita esos
+resultados. El efecto pertenece a la representación final dentro de esta
+configuración; no identifica una operación interna concreta del solver.
+Los cuatro pares tienen Starts con valores binary64 idénticos y la misma
+primera fase, comprobados por el checker; cambia la representación final.
+
+En frío, Budget da 1.313510/1.265136 frente a L2 2.815707/33.373658.
+Base/IF1 da 1.315834/1.391930 y no tiene cotas contradichas. Evitar el falso
+cierre rápido requiere casi todo el tiempo, unos 15 s frente a menos de 1 s.
+Es calidad y fiabilidad recuperada, no aceleración. Un modelo y cuatro
+semillas acumuladas no prueban ventaja general sobre controles existentes.
+\newpage
+\section*{Propiedades del controlador}
+Sea $V_\delta(y)$ la comprobación completa de filas/cotas dentro de sus
+presupuestos y dominios enteros exactos. Cada candidato entra en $S_k$
+solo si verifica $V_\delta$. Las etapas no borran candidatos. Por inclusión,
+\[
+S_k\subseteq S_{k+1}\quad\Longrightarrow\quad
+\min_{y\in S_{k+1}}c(y)\le\min_{y\in S_k}c(y).
+\]
+Todo punto devuelto verifica, y una fase que falla o entrega un objetivo peor
+no hace perder el punto anterior. El costo se calcula racionalmente sobre los
+valores binary64. Si no hay candidato, se abstiene. No se garantiza progreso
+estricto ni superar otra configuración o encontrar el óptimo global.
+
+Para un testigo racional factible $q$, $U=c^\top q$ es una cota superior
+primal. Cualquier cota inferior válida satisface
+\[
+B\le z^*\le U.
+\]
+Por tanto $B>U$ contradice su validez. El checker requiere el mismo modelo y
+factibilidad exacta de todas las filas, cotas y dominios. Usa una guarda de
+$\max(10^{-6},8\,\mathrm{ulp}(B))$. Una conversión flotante puede fallar su
+presupuesto aunque el testigo racional sea válido; se verifica por separado.
+No hallar contradicción no certifica optimalidad y el gap de un punto fuente
+no se hereda después de repararlo.
+
+El filtro adicional del informe comprueba
+\[
+|C-B|>\max\{0.01|C|,10^{-10}\}+\text{guarda}.
+\]
+Solo descarta incompatibilidad con la terminación solicitada; no certifica
+factibilidad, cota dual u óptimo. Se aplica posteriormente y se declara como
+tal, sin cambiar el diseño ya ejecutado. Nueve tests cubren retención,
+dominios, importación, modelos distintos, testigos exactos sin entrega
+binary64, gap relativo/absoluto y ausencia de inferencias de optimalidad.
+\section*{Decisión de alcance para OMS}
+Existe un resultado tangible: con presolve normal y un modelo auténtico,
+la proyección contractual evita objetivos pobres e informes L2 refutados.
+El cruce confirma un efecto de la representación final. Es una señal para
+discutir el uso verificable de representaciones exportadas.
+
+Todavía no justifica una contribución general adicional: un solo modelo
+presenta el mecanismo, Base/IF1 sigue siendo competitivo, el contrato no gana
+en otros casos o se abstiene, y warm no aporta ventaja general. Se mantiene
+v1.3.5 sin cambios. Una redacción candidata acotada queda en
+\texttt{INCORPORACION\_CANDIDATA.md}, sin afirmar que contratos certifiquen
+cotas, optimalidad o superioridad universal.
+\newpage
+\section*{Evidencia, fuentes y reproducción}
+62 asignaciones nuevas, 90 llamadas MILP, 60 entregas verificadas y dos
+abstenciones contractuales. Los checkers independientes comprueban fuentes,
+puntos, retención, testigos, límites y vetos; no importan los runners o
+controladores ni llaman solvers. Hay 61 registros nuevos de testigos exactos;
+pueden repetir puntos y no se anuncian como soluciones únicas.
+
+Los tres MPS originales se verifican con hashes de descarga. Coeficientes,
+RHS, sentidos, costos, cotas y dominios se cotejan contra la representación
+canónica binary64. Los certificados corresponden a ese modelo, no a los
+decimales racionales ideales del MPS. El adapter independiente admite las
+características presentes y rechaza otras.
+
+Los protocolos, hashes, fuentes, exportaciones, Starts, puntos, tiempos,
+datos adversos y certificados se conservan. La preparación compartida del
+seguimiento y la ablación se mide aparte. Los testigos previos se obtuvieron
+en estudios anteriores; para cinca, un LP exacto adicional de desarrollo
+se guarda y queda fuera de las 62 asignaciones. No se anuncia su adquisición
+como gratuita en Witness-warm ni se llama online al pool posterior.
+
+\textbf{Replay sin licencia comercial.} Desde la raíz del artefacto, Python
+y NumPy bastan para ambos checkers. Pytest ejecuta nueve tests. Regenerar
+el documento necesita Python; compilarlo requiere pdfLaTeX. Ejecutar nuevas
+optimizaciones sí necesita Gurobi/HiGHS/SoPlex con las dependencias declaradas.
+Los códigos y modelos congelados no se editan para reanudar experimentos.
+\begin{verbatim}
+python3 exploration/oms-quality-followup-20261014/independent_check.py
+python3 exploration/oms-quality-followup-20261014/check_ablation.py
+python3 exploration/oms-quality-followup-20261014/write_report.py
+\end{verbatim}
+\textbf{Originalidad.} Warm starts, reparación exacta y certificación tienen
+antecedentes explícitos. No se reclama su idea general como nueva. Se investiga
+la interacción de precisión, representación, aceptación, calidad y trazabilidad,
+con controles fuertes y resultados adversos. Las propiedades del filtro y de
+retención son elementales y no se venden como teoremas novedosos.
+
+\small
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/attributes/variable.html}{Gurobi: Start y atributos de variables.}\\
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/parameters.html}{Gurobi: MIPGap, MIPGapAbs e IntegralityFocus.}\\
+\href{https://arxiv.org/abs/2101.09141}{Eifler y Gleixner: exact rational MIP (2021).}\\
+\href{https://soplex.zib.de/doc/html/EXACT.php}{SoPlex: LP exacto y referencias.}\\
+\href{https://miplib.zib.de/tag_numerics.html}{MIPLIB: Numerics y modelos originales.}\\
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/fileformats/modelformats.html}{Gurobi: convenciones MPS, bounds e integrality markers.}
+\end{document}

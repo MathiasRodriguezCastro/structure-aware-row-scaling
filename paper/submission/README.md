@@ -1,4 +1,7 @@
-# COAP submission package
+# Historical COAP submission package
+
+The current OMS preparation is in [oms/](oms/README.md). This directory's COAP validation,
+checksums and publication record describe the earlier archived release.
 
 Target: **Computational Optimization and Applications**.
 Guidelines: https://link.springer.com/journal/10589/submission-guidelines

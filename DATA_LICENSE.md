@@ -35,6 +35,12 @@ In summary:
   **only because of their size** — to keep the repository light and clonable — not
   because of any access restriction. The same CC BY 4.0 terms apply to them.
 
-The aggregate results were produced by the original ClusterUY runs; the cleaned
+Historical aggregate results were produced by the original ClusterUY runs; the additional
+OMS dispatch results were produced on the documented local workstation. The cleaned
 `code/` reproduces the same monolithic MIP + preprocessing path. When reusing the
 data, please also cite the dispatch-model references listed in the paper.
+
+Third-party STN-Scheduler source under
+`exploration/oms-generalization-20261014/sources/STN-Scheduler/` retains Jeffrey
+Kantor's MIT license and copyright notice. Its archived source and model provenance
+are identified explicitly; inclusion does not replace that license.

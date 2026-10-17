@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-14",
+  "phase": "confirmatory",
+  "instances": [
+    {
+      "class": "sgtm",
+      "instance": "instance001",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance001.txt",
+      "ablation": true
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance005",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance005.txt",
+      "ablation": false
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance022",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance022.txt",
+      "ablation": false
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance027",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance027.txt",
+      "ablation": false
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance031",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance031.txt",
+      "ablation": false
+    },
+    {
+      "class": "sgtm",
+      "instance": "instance046",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance046.txt",
+      "ablation": true
+    }
+  ],
+  "seeds": [
+    1,
+    7,
+    42
+  ],
+  "policies": [
+    "GM",
+    "L2-matched-int",
+    "Budget-L2",
+    "L2-global-tight"
+  ],
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-05,
+    "ScaleFlag": -1,
+    "Presolve": -1
+  },
+  "budget_scenario": "Demanding, declared before this exploration: 0.01 MW/100 m3",
+  "activation_budget_meaning": "study numerical consistency target on the volume threshold of a binary activation, not an operator standard; new row scope explicitly separated from water balances",
+  "coefficient_window": [
+    1e-09,
+    1000000000.0
+  ],
+  "l2_control": "pure coefficient row L2 factor projected onto the coefficient window; no identity-band veto",
+  "guided_integrality": "per model, largest dyadic gamma no greater than 100/(2*max_activation_M), capped by default 1e-5; minimum supported Gurobi gamma 1e-9",
+  "budgets": {
+    "MW": 0.01,
+    "m3": 100.0
+  },
+  "exact_verification": "raw and integer-rounded original binary64 rows, including activation rows; whole-model diagnostics are separate",
+  "no_optimality_certificate": true,
+  "comparison": "L2-matched-int isolates factor selection using identical guided integer tolerance; L2-global-tight uses both primal and integer tolerance 1e-9; GM controls assess existing alternative remedies",
+  "pilot_excluded_from_confirmatory_results": true,
+  "finite_export_allowance": "on activation rows, reserve 2^-52 times sum(|a_j|*X_j)+|b| with finite variable boxes; check scaled nonzero data are normal; other rows retain pointwise post-solve verification",
+  "amendment_from_pilot": "reserve finite-export error in activation factors; add independent dyadic-export and solver-mechanism controls; pilot source and all pilot results retained",
+  "source_sha256": "df2b67c94b2daa1dbb9e03e154f85be3a9a3348314a6a550288e2126b2ac427e",
+  "prepared": [
+    {
+      "instance": "instance001",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 13068483050.0432,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance001.txt",
+          "sha256": "b0fb3f63981e2e2bc5dd7d75a8193acd5efa3bd6b36c0431cde33ac04a5c7859"
+        }
+      },
+      "exports": {
+        "Base": "896e16e4e4735aab8b8588dd2a2f846cf831dc4a8c1d68325f454967c08981e6",
+        "GM": "9297bda5a04881da4d6c3c5bb754b3e2dcc8355c32b154d5c07e165af95085de",
+        "Ruiz-R4": "cc16b46051c5b15070d8978ae95ee7d87acdfe6203223c1dc42d450021ffd0c8",
+        "L2-window": "acde5cf643eeced0c556ab09816012d240da84b573f1ffd48b87eaf1e54fecbe",
+        "Budget-L2": "8fffdae8043cbea6965738ccb16dcee9a5313e39ac961c4e1862948965774881",
+        "L2-dyadic": "0920fd510ffd6c49faac6110c803316c956594c45f1af6be5b7ce43d2233f8eb",
+        "Budget-dyadic": "b994de87c89e3d7da92121a20d1c57914c061f79990a661d4544eee1f33c4fb4"
+      }
+    },
+    {
+      "instance": "instance005",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 12243859026.404,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance005.txt",
+          "sha256": "344fef81b3da85cfa0d4be936b0af8227788be6b6f9086da24343442bed417e7"
+        }
+      },
+      "exports": {
+        "Base": "ec1dc51367a8d5caacbe5d44eaf85514241c9e61f8615b2b69d28cb39a776a42",
+        "GM": "05aa177ffe0ca95315cb287118b298e6fe71cd578816585d39bfe2d743eb2dc9",
+        "Ruiz-R4": "7fc7b7763a45c1babea1527c6d4e2cc0abf78eaa7b9ad8181ca305de11a49af3",
+        "L2-window": "572bc5b2f664c881030139797cda66b1d9729b78f2653a3fa8360b964e57d7e6",
+        "Budget-L2": "58ca370372d474d3a9f24931e1c771efd513eff6a21b472fd8277a4b4ee0bc38",
+        "L2-dyadic": "add36eb0b3171294ceefe5850d2840a9154e41d8579d1ef06a47366b845a5f12",
+        "Budget-dyadic": "9b1aba0470562f2d93fbca6874a150b9e3578ae87eee66b83bc3a94de210e53b"
+      }
+    },
+    {
+      "instance": "instance022",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 12494793414.4504,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance022.txt",
+          "sha256": "39db819835e36068a0a970a4a1013b863e8e560416287292cb43a2bcdf957ce2"
+        }
+      },
+      "exports": {
+        "Base": "68ead48c2eb3c665902578d761bae070ccced2ff3f20b6060f992a4bb03ffa34",
+        "GM": "42ce47bfb7862c75bd98019ded5ae4a212572c7a3afa8f0acbd7e1c96764ed79",
+        "Ruiz-R4": "f5d156b0474666759d84323602776bcfcbf5cb74a570d1c6592523d064093f76",
+        "L2-window": "9ecfe07b273956548a927fcceb7e03976dc4a731065bc94727a6408082687b8c",
+        "Budget-L2": "5a26fce42aa55fa70164624ec8ef96ce5086e80fa52a9ad00ed7199f91e6b139",
+        "L2-dyadic": "3d0301a4125e0f7fc2f7db7bf3e27acdea12e053f3230bdbab5f631e5ead160e",
+        "Budget-dyadic": "50784fc2b751c23b8a9fd18caa87e56961fdd9bf8011b11d0703de60fd787a59"
+      }
+    },
+    {
+      "instance": "instance027",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 10782530763.9456,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance027.txt",
+          "sha256": "a941019cf4c53c25df8f85bc085ec747634aacac76689e20970e034aa25e1a41"
+        }
+      },
+      "exports": {
+        "Base": "7f08bf82c94626cc9346e95ea63c2ff2a0d5420748c7eb5fc2eb38db3db05309",
+        "GM": "f5462b36976d09689d881147688c8cd70304dbd7d05647531b91b9f8469b9c04",
+        "Ruiz-R4": "047690e99c141aaa773289ae5cdd0c65adc6420d42f8af680b6c320999add599",
+        "L2-window": "c1be1a1ad39f198f9e84db5aef5105508a47499a6cb59fa8c5877ecc2c7268c5",
+        "Budget-L2": "1fa4f85ca67ae42052d831a2cc038a71986dffb514b9a6232313a56a55e48eb7",
+        "L2-dyadic": "deb1957c88f52dd5be25b3da69618f7b69b764a06e990742435c1c3c4b1eb786",
+        "Budget-dyadic": "923eb98b9c88e89d5ad04018546ffddfd8a68048a3601fc48339c557df3a8347"
+      }
+    },
+    {
+      "instance": "instance031",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 8778708167.6104,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance031.txt",
+          "sha256": "24820bbefaf8aa369b5cbe4dbab8470592299182c12bf3fce52eb12a4bac83be"
+        }
+      },
+      "exports": {
+        "Base": "75fbdd652a9e599c207e9e19a56af5a236d0baf45503b8a731b5f80d1948d322",
+        "GM": "40a899b929a7864eb9766fba1d7916e08a97640915c0ba95c60c9eb854538c14",
+        "Ruiz-R4": "0ebee69e015136392504b39dfea52b5893eb41912ba4969d609cf63b3b599c6a",
+        "L2-window": "50f3208ad76042f76e3c429b83a2ee0f52d2d8c97e2fa622ecf522edea44663a",
+        "Budget-L2": "5645bae65fd7bc7695398a6ef9af71caa0a7a541f59a952b786044b9fa1a4b04",
+        "L2-dyadic": "04f041046132dde1e7dfe549fd4bfdaebec94f71c37852201d5a772de596525e",
+        "Budget-dyadic": "62f8586c72f1cdc5cf571bd642632c6cc71b2bdb8e21810b323d29e6e9d63125"
+      }
+    },
+    {
+      "instance": "instance046",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 12494793414.4504,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance046.txt",
+          "sha256": "1484e69f45d338dc1a5c82e1682e9d931dee4f2001ee190713b41292b17f6657"
+        }
+      },
+      "exports": {
+        "Base": "995be38dd217aeeeddcc0c8bc1d479596e2be3364ec195674409544ef9acdd7c",
+        "GM": "6289ca00dba60d5ef8672112336bda668281d605803e059f97e0502399f8447d",
+        "Ruiz-R4": "454843bf901ff25451678cd1aa1607339d935ad492abafb1d54d12be606b4019",
+        "L2-window": "4ef72252f478dcb231b5c134ab73057be5ca7171edacda2b60952e549c2048ab",
+        "Budget-L2": "22fb23298e562f5ddfe1375c83df331fcb26d82ac4a3198d3b6238a19a57908a",
+        "L2-dyadic": "829ac6f9bfc9565649f277a55b94d6423d657a34c253b47bf948866840a40554",
+        "Budget-dyadic": "ae7f513ebf9e7dd5f5ddcf75e0e36aae71d9aeee0d2540be9f1fe075073e5429"
+      }
+    }
+  ]
+}

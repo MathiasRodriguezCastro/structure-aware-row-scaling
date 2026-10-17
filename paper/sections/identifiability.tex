@@ -1,4 +1,4 @@
-\section{Identifying the mechanism}
+\section{Mechanism attribution}
 \label{sec:identifiability}
 
 This section shows that, under exact geometric-mean local normalization, the extrema-based
@@ -150,7 +150,7 @@ the unique factor minimizing $\kappa_2(C_\gamma)$ is
 On an admissible interval $0<\ell\leq\gamma\leq h$, the optimum is
 $\min\{h,\max\{\ell,\gamma_*\}\}$.
 \end{proposition}
-The proof (Online Resource 1) reduces the spectrum by an SVD to two-by-two blocks. For the
+The proof (Supplementary Material~1) reduces the spectrum by an SVD to two-by-two blocks. For the
 block at $\rho$, the singular-value ratio $k$ satisfies
 $k+k^{-1}=\gamma^{-1}+\gamma(1+\rho^2)$, whose unique minimizer gives the result.
 
@@ -170,16 +170,16 @@ optimum rather than a factor: on this structure the best common factor is $(1+\r
 and the best attainable condition number is $\sqrt{1+\rho^2}+\rho$, so there is nothing left
 for a block-scale map to contribute, whereas a $\sqrt n$ bound would leave room for one. The
 second is the behaviour of that optimum under an external restriction: the interval form
-below is what connects this section to the contract of \cref{sec:contract}, and a bound on
+of \cref{prop:audit-triangular-optimum} connects this section to the contract of \cref{sec:contract}, and a bound on
 the attainable condition number says nothing about it.
 
-\paragraph{Why conditioning needs a residual bound.}
+\paragraph{Why conditioning needs a residual bound}
 The interval form of \cref{prop:audit-triangular-optimum} matters. In $A_\gamma$,
 $\kappa_2$ decreases to one as $\gamma\to0$, while a fixed residual on the exported coupling
 row corresponds to an original residual larger by the factor $1/\gamma$. A conditioning
 criterion alone cannot say how small a coupling factor may be: on any interval its
 minimizer for $A_\gamma$ is the lower endpoint $\ell$. \Cref{sec:contract} derives that
-endpoint from an application-unit residual budget. The two halves of the paper meet here.
+endpoint from an application-unit residual budget. Accuracy contracts and mechanism attribution meet here.
 In this construction, block ownership did not survive the preceding normalization as usable
 scaling information;
 application-unit accuracy does survive it, once it is encoded as a residual budget carried

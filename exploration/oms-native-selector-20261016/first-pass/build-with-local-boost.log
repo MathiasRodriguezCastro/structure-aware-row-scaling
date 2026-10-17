@@ -1,0 +1,13 @@
+make: se entra en el directorio '/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-native-selector-20261016/source'
+g++ -I/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-followup-20261014/tools/local-deps/usr/include -I. -Wall -Wextra -std=c++17 -g -O2 -DNDEBUG -DNO_GUROBI -DNO_CPLEX -DNO_CBC -DNO_HEXALY -DNO_HIGHS -MMD -MP -c 1_SistemaElectrico.cpp -o build/1_SistemaElectrico.o
+In file included from 1_SistemaElectrico.cpp:50:
+NativeContracts.h: In function ‘void oms_native::apply(Problema&)’:
+NativeContracts.h:119:9: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+  119 |         for (auto& t:terms)t.first*=factors[i];row->setTerminos(terms);
+      |         ^~~
+NativeContracts.h:119:48: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  119 |         for (auto& t:terms)t.first*=factors[i];row->setTerminos(terms);
+      |                                                ^~~
+g++ -I/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-followup-20261014/tools/local-deps/usr/include build/synthetic/ComandoBenchmarkSintetico.o build/synthetic/GeneradorBenchmarkSintetico.o build/synthetic/RunnerBenchmarkSintetico.o build/SystemController/SystemController.o build/SystemController/Agentes/Demanda/Demandas/DemandaFija.o build/SystemController/Agentes/Generacion/Generadores/UnidadTermicaRapida/UnidadTermicaRapida.o build/SystemController/Agentes/Generacion/Generadores/UnidadTermicaSimple/UnidadTermicaSimple.o build/SystemController/Agentes/Generacion/Generadores/SaltoGrande/SaltoGrande.o build/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegroBoneteNoLineal/RioNegroBoneteNoLineal.o build/SystemController/Agentes/Generacion/Generadores/RioNegro/RioNegro.o build/SystemController/Problema/Problema.o build/SystemController/Problema/ProblemaLp/ProblemaLp.o build/SystemController/Problema/PreprocesamientoMIP/PreprocesamientoMIP.o build/SystemController/Despacho/Despacho.o build/SystemController/Despacho/DespachoMercado/DespachoMercado.o build/SystemController/Despacho/DespachoFijo/DespachoFijo.o build/SystemController/Despacho/DespachoProporcional/DespachoProporcional.o build/1_SistemaElectrico.o -o build/SistemaElectrico 
+Build done: build/SistemaElectrico  (GUROBI=0 CPLEX=0 CBC=0 HEXALY=0 HIGHS=0)
+make: se sale del directorio '/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-native-selector-20261016/source'

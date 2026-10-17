@@ -1,0 +1,85 @@
+{
+  "job": {
+    "instance": "instance031",
+    "seed": 89,
+    "id": "instance031-s89"
+  },
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "Presolve": -1,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 89
+  },
+  "native_import": {
+    "rows": 10080,
+    "columns": 6120,
+    "nonzeros": 22679,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "export_sha256": "c78ef5adcb54e9d754f7483d99673efa47c8ea0d8eabd4be2bf65dd476db931f",
+  "outcome": {
+    "status": 2,
+    "solutions": 3,
+    "work": 0.10744812365467012,
+    "runtime": 0.0740509033203125,
+    "solve_seconds": 0.07419380999999703,
+    "bound": -1542528.0000000005,
+    "objective": -1542528.0,
+    "native_completed": true
+  },
+  "checks": {
+    "physical_delivered": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 1440,
+        "raw_max": 5.2492921501654125e-12,
+        "rounded_max": 5.2492921501654125e-12,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(290)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 360,
+        "raw_max": 5.684341886080802e-14,
+        "rounded_max": 5.684341886080802e-14,
+        "rounded_limiting_row": "a1_g4h_def(21)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 1440,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 360,
+        "raw_max": 2.3671600501984358e-07,
+        "rounded_max": 2.3671600501984358e-07,
+        "rounded_limiting_row": "a1_balance(234)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 720,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      }
+    ],
+    "mapping_binary64_exact": true,
+    "known_U": "-111150856416136906078125/72057594037927936",
+    "bound_contradiction": false,
+    "gap_contradiction": false
+  },
+  "global_optimality_independently_verified": false
+}

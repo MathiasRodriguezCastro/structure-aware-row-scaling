@@ -1,0 +1,202 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}\usepackage[spanish]{babel}
+\usepackage{lmodern,amsmath,amssymb,booktabs}\usepackage[margin=1.85cm]{geometry}
+\usepackage[hidelinks]{hyperref}\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\begin{document}\begin{center}{\Large Transferencia y costo comprobable}\\[4pt]
+{\large Auditoría de contratos en grupos nuevos y dos solvers}\\[3pt]
+14 de octubre de 2026 --- investigación independiente de OMS\end{center}
+\textbf{Hallazgo útil.} Una entrega puede satisfacer presupuestos y reportar
+costo cero, pero requerir un costo mínimo positivo con sus propios enteros.
+La auditoría exacta demuestra 59,631/37,251 en cuatro casos; otros cuatro
+patrones no tienen continuación exacta. Se implementó un diagnóstico primal/dual
+con efecto de presupuesto. No se reclama como nueva la dualidad débil.
+\section*{Diseño y fuentes}
+Selección fijada antes de descargar/resolver: cuatro grupos Numerics explícitos
+no usados previamente, mixtos I/C, easy, hasta 5000 filas/variables y 50,000 no
+ceros, orden por no ceros/nombre. Control es referencia conocida, no evidencia
+de transferencia. No hay selección aleatoria o representatividad poblacional.
+
+80 tratamientos: cinco modelos, semillas nuevas 83/97, cuatro métodos por
+solver. Gurobi 13.0.2 y HiGHS 1.15.1, cuatro hilos, presolve/escalado normales,
+gap 1\%, hasta 15 s MILP y referencia de ciclo 20 s. Gurobi Base/L2/Budget
+comparten IntegralityFocus 1; HiGHS no tiene ese control. Base-tight usa
+factibilidad/integralidad $10^{-9}$. No hay warm starts.
+
+Presupuestos algebraicos experimentales $\delta_r=10^{-4}\max(1,|b_r|)$,
+cotas $10^{-4}$ y dominios enteros exactos. No son tolerancias físicas u
+operativas. Kernel diádico existente, ventana $[10^{-9},10^9]$,
+hipótesis exportada $\varepsilon=10^{-6}$. Selección para el punto crudo,
+entero verificado por separado. No se reajustan tras ver resultados.
+
+El MPS de nive tiene 12,123 no ceros frente a 11,583 de su ficha. Se conservan
+todos los datos originales. Cotejo independiente de MPS: coeficientes, RHS,
+sentidos, costos, cotas y dominios, con hashes de descarga.
+\section*{Aceptación fuente/entrega por dos semillas}
+\begin{center}\small\begin{tabular}{@{}llrrrr@{}}\toprule
+Modelo & Solver & Base & L2 & Budget & Tight\\\midrule
+neos-1112787 & gurobi & 2/2 & 0/0 & 2/2 & 2/2\\
+neos-1112787 & highs & 0/0 & 0/0 & 0/0 & 2/2\\
+breastcancer-regularized & gurobi & 2/2 & 2/2 & 2/2 & 2/2\\
+breastcancer-regularized & highs & 2/2 & 2/2 & 2/2 & 2/2\\
+neos-3083784-nive & gurobi & 2/2 & 2/2 & 2/2 & 2/2\\
+neos-3083784-nive & highs & 2/2 & 2/2 & 2/2 & 2/2\\
+neos-3661949-lesse & gurobi & 2/2 & 2/2 & 2/2 & 2/2\\
+neos-3661949-lesse & highs & 2/2 & 2/2 & 2/2 & 2/2\\
+control30-3-2-3* & gurobi & 2/2 & 2/2 & 2/2 & 2/2\\
+control30-3-2-3* & highs & 2/2 & 2/2 & 2/2 & 2/2\\
+\bottomrule\end{tabular}\end{center}
+Cada celda cuenta fuentes enteras verificadas/entregas tras postproceso.
+Denominador dos; asterisco identifica referencia conocida. Verificar
+presupuestos no certifica factibilidad exacta, costo o optimalidad global.
+\newpage
+\section*{Transferencia y controles fuertes}
+Neos-1112787 traslada la mejora sobre L2 a otro grupo Gurobi: L2-IF1 declara
+terminación óptima pero falla el presupuesto en ambas semillas; Budget-IF1
+recupera ambas entregas. Base-IF1 y Base-tight ya cumplen. En HiGHS, Base,
+L2 y Budget fallan la entrega, mientras Base-tight cumple. No se demuestra
+ventaja sobre controles fuertes ni la misma mejora en el segundo solver.
+
+En clasificación Budget obtiene mejores incumbentes que L2; Base-tight
+Gurobi iguala su costo 35.767842 en ambas semillas. Lesse da el mismo
+objetivo con todos los métodos. Factores modificados: 1640, 683 y 160.
+En nive, L2/Budget son idénticos y no se modifica ningún factor: las diferencias
+de tiempo o iteraciones bajo límite de reloj no prueban efecto del contrato.
+
+80 llamadas, 72 entregas, ocho abstenciones posteriores sin candidato,
+cero incompatibilidades o errores de ejecución. Cuatro ciclos HiGHS/nive
+superan 20 s (23.1--23.6 s): importación/cotejo de 7.0--7.4 s más 15 s
+de resolución. El límite solicitado antes de importar no se ajustó luego:
+limitación temporal del controlador, con todos los casos conservados.
+Preparación compartida y persistencia final se miden aparte.
+
+Una cota, dos informes al 1\% y un gap internamente incompatible se
+contradicen en la referencia; las cuentas se solapan. No refutar otras cotas
+no las valida. En 64 fuentes aceptables, $\mu$ nominal supera uno: no tener
+garantía suficiente no predice un fallo.
+\section*{El costo cero que no demuestra mejora}
+En nive, Gurobi y HiGHS L2/Budget entregan cero dentro de los presupuestos.
+Filas big-M con RHS $10^{10}$ permiten residuos hasta $10^6$ bajo esta
+especificación. Es demasiado laxa para justificar fidelidad del objetivo.
+No contradice el contrato: el punto cumple lo pedido, pero lo pedido no
+garantiza costo realizable para esos enteros.
+
+Se congeló después de observarlo una auditoría de los 16 patrones de nive,
+todos los tratamientos/semillas. LP exacto hasta 2 s, salidas primal y dual;
+sin nuevos MILP ni cambios de factores. Su costo se informa aparte, sin
+atribuirlo al algoritmo previamente evaluado.
+\begin{center}\small\begin{tabular}{@{}lrrrr@{}}\toprule
+Tratamiento & Nominal 83 & Mínimo $z$, 83 & Nominal 97 & Mínimo $z$, 97\\\midrule
+gurobi-Base-IF1 & 27851.000 & 27851 & 27851.000 & 27851\\
+gurobi-L2-IF1 & 0.000 & 59631 & 0.000 & 37251\\
+gurobi-Budget-IF1 & 0.000 & 59631 & 0.000 & 37251\\
+gurobi-Base-tight & 27851.000 & 27851 & 27851.000 & 27851\\
+highs-Base & 31651.000 & 31651 & 27850.999 & 27851\\
+highs-L2 & 0 & inviable z & 0 & inviable z\\
+highs-Budget & 0 & inviable z & 0 & inviable z\\
+highs-Base-tight & 34250.997 & 34251 & 29650.998 & 29651\\
+\bottomrule\end{tabular}\end{center}
+``Inviable $z$'' afecta al patrón entero y no al MILP global. Los doce
+pares primal/dual prueban óptimos de LP fijados; cuatro rayos prueban
+patrones sin continuación. No se llama cota inferior global a su costo.
+Son recuentos de entregas, no patrones únicos; L2/Budget duplican patrones.
+La evaluación de $c^\top x$ es correcta; lo que ese precio no respalda
+es una continuación exactamente factible de sus enteros con el mismo costo.
+\newpage
+\section*{Certificado y efecto del presupuesto sobre el costo}
+Fije los enteros $z$. Para el LP continuo, un dual factible $\pi$ tiene
+signo no positivo en filas $\le$, no negativo en filas $\ge$, libre en
+igualdades. Sea $r=c-A^\top\pi$. Si el extremo seleccionado por cada
+$r_j\ne0$ es finito (el término con $r_j=0$ vale cero),
+\[
+L_z=c_I^\top z+\pi^\top b(z)+\sum_j\min\{r_jl_j,r_ju_j\}
+\]
+es cota inferior del LP de ese patrón. Un primal exacto $q$ que alcanza
+$L_z$ certifica su óptimo. El checker verifica todas las filas, cotas,
+enteros, signos y costos, sin confiar en el estado del solver.
+
+Si $y$ satisface los presupuestos de filas $\delta_r$ y cotas $\beta_j$,
+\[
+c_I^\top z+c^\top y\ge L_z-\Delta_z,\qquad
+\Delta_z=\sum_r|\pi_r|\delta_r+\sum_{j\in C}|r_j|\beta_j.
+\]
+Cada fila violada puede reducir su contribución dual a lo sumo
+$|\pi_r|\delta_r$; la caja ampliada reduce el término de costo reducido
+a lo sumo $|r_j|\beta_j$. Sumarlo da la desigualdad. Es dualidad débil
+elemental, sin novedad matemática reclamada. Acota subestimación, no exceso
+de costo o gap global. Los doce certificados verifican esa desigualdad.
+
+Gurobi/97 tiene $L_z=37,251$, precio nominal cero y
+$\Delta_z\approx1.871\,10^{10}$. El cero es compatible con los presupuestos;
+estos no protegen de manera útil el costo. Una $\Delta_z$ grande sola no
+predice daño: el déficit observado se prueba por separado con $L_z$.
+
+Los rayos de Farkas combinan filas, con sus signos correctos, de manera que
+el RHS supera el máximo de actividad sobre la caja continua. Prueban que
+el patrón no puede completarse exactamente. El soporte de la caja ampliada
+y los presupuestos explican la aceptación numérica de los mismos puntos.
+No prueban inviabilidad del MILP con otros enteros.
+
+\textbf{Representación.} Todos los literales originales de nive son exactos
+en binary64: cero redondeos de coeficientes, RHS, costos o cotas. El fenómeno
+no procede de reemplazar 0.1 por su aproximación binaria. En los demás
+modelos los certificados se refieren a la representación canónica binary64,
+con esa limitación explícita frente a decimales racionales ideales.
+\section*{Utilidad del diagnóstico}
+Permite separar candidato numérico con costo respaldado, subestimación para
+el mismo patrón y patrón sin continuación exacta. El controlador que
+retiene el menor costo numérico puede preferir un cero sin respaldo a una
+reparación exacta positiva. Los datos no se corrigen retroactivamente:
+se mantienen separados costo nominal y mejor costo factible exacto.
+
+Los presupuestos relativos al RHS de una formulación big-M no sustituyen
+requisitos de aplicación. La precisión física debe especificarse en las
+unidades y magnitudes pertinentes antes de atribuir sentido operativo
+al error algebraico. MIPLIB no fija tolerancias de planta o del operador.
+\newpage
+\section*{Alcance para el paper OMS}
+Hay un resultado empírico nuevo en esta investigación y un diagnóstico de
+software concreto: presupuestos primales cumplidos no bastan para respaldar
+el precio declarado de un patrón entero. El costo puede auditarse con
+certificados primal/dual y el efecto de los presupuestos puede cuantificarse.
+No se reclama inventar dualidad, Farkas, reparación exacta o un nuevo
+algoritmo globalmente certificado; tienen antecedentes explícitos.
+
+El seguimiento aporta otro grupo con beneficio frente a L2 en Gurobi,
+pero no una ventaja general sobre Base/tolerancias estrictas ni sobre ambos
+solvers. Se mantiene OMS v1.3.5 sin cambios. Queda una redacción candidata
+acotada, fuera del manuscrito, sin crear una tercera contribución o teorema.
+\section*{Evidencia y reproducción}
+El checker principal revisa 80 fuentes, 110 candidatos, 20,673 factores,
+64 registros de testigos exactos y cinco MPS. Los testigos pueden repetir
+puntos; no se cuentan como soluciones únicas. Toda abstención, límite y
+exceso de tiempo se conserva. Dos semillas por grupo no sustentan inferencia
+poblacional o superioridad de velocidad a calidad equivalente.
+
+La auditoría de costo verifica doce certificados de óptimo de LP y cuatro
+rayos de patrones inviables, sobre las 16 entregas fijadas. Seis tests
+cubren signos, cotas superiores, variables libres, igualdad racional,
+patrones distintos y compatibilidad entre infeasibilidad exacta y presupuesto.
+
+Las 16 llamadas LP adicionales costaron 5.131 s en total,
+por separado de los ciclos experimentales.
+
+
+El artefacto incluye diseños, protocolos posteriores explícitos, snapshots,
+MPS, exportaciones, puntos, logs, duales, rayos, tiempos y hashes. Python y
+NumPy bastan para verificación guardada; pytest para tests. No hay llamadas
+solver en replay. Ejecutar nuevas optimizaciones requiere las herramientas
+declaradas; sus binarios/licencias no se redistribuyen. Los archivos y
+diseños anteriores, incluido el envío OMS, conservan sus hashes.
+\begin{verbatim}
+python3 exploration/oms-transfer-study-20261014/independent_check.py
+python3 exploration/oms-transfer-study-20261014/cost_audit.py replay
+python3 exploration/oms-transfer-study-20261014/check_cost_rays.py
+python3 exploration/oms-transfer-study-20261014/write_report.py
+\end{verbatim}
+\small
+\href{https://miplib.zib.de/tag_numerics.html}{MIPLIB Numerics: colección y fuentes.}\\
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/parameters.html}{Gurobi: controles, tolerancias y gap.}\\
+\href{https://ergo-code.github.io/HiGHS/stable/options/definitions/}{HiGHS: opciones numéricas y límites.}\\
+\href{https://soplex.zib.de/doc/html/EXACT.php}{SoPlex: aritmética racional y referencias de LP.}\\
+\href{https://arxiv.org/abs/2101.09141}{Eifler y Gleixner: reparación y certificación exacta.}
+\end{document}

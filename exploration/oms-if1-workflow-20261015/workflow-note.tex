@@ -1,0 +1,72 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}
+\usepackage[margin=2cm]{geometry}\usepackage{booktabs,amsmath,hyperref}
+\begin{document}
+\title{IntegralityFocus and the complete scaling workflow}
+\author{Auxiliary OMS investigation}\date{16 October 2026: aggregation clarification}\maketitle
+\noindent\textbf{Finding.} On the known instance046 with presolve off, IF1 and IF0
+return identical points, objectives, bounds and work in all six matched comparisons.
+All returned integer coordinates are exactly integral. L2 retains a 4,837.338\,m$^3$
+activation violation; Budget-L2 limits it to $1.4782\times10^{-5}$\,m$^3$. This is
+a pertinent control, not evidence that IF1 is generally ineffective.
+
+\paragraph{Design.} Two policies, two IF settings and seeds 11, 23, 47: twelve
+principal calls. Each fresh process generates the original C++ model once, selects
+factors, exports, imports, solves and verifies. All Base/scaled exports reproduce
+the historical SHA-256 values. Gurobi 13.0.2 uses four threads, 120 seconds, 1\% gap,
+presolve off, automatic scaling, primal tolerance $10^{-6}$ and integer tolerance
+$2^{-28}$. No MIP starts, factor changes after observation or new reference LPs.
+
+\paragraph{Accuracy and native reports.} Demanding study targets are 0.01 MW and
+100 m$^3$, not operator standards. Budgets counts original-unit checks after integer
+rounding. $B>U$ compares a reported lower bound with an exactly feasible objective
+of the same imported file, allowing $\max(10^{-6},8\operatorname{ulp}(B))$.
+Gap flags contradict a native 1\% completion when $U<C-0.01|C|$.
+Unflagged reports do not certify optimality. Work is the median of all three calls.
+\begin{center}\small
+\input{if1-accuracy.tex}
+\end{center}
+Budget retains two contradicted bounds of three despite no flagged completion
+at the requested 1\% gap. Native termination and primal accuracy are separate.
+
+\paragraph{Why 4.485 and 4.975 agree.} The Budget-L2 Work values for seeds 11/23/47
+are 3.6054776613, 4.9754950464 and 5.0281587478, identical to the earlier
+presolve-off campaign. Their geometric mean is 4.4847271866 (4.485 in manuscript
+historical Table 11 of v1.3.8 and Table S12), while their median is 4.9754950464 (4.975 here and in
+Table S15). Different summaries explain the figures; no data or settings changed.
+
+\paragraph{Complete measured cost.} Medians in seconds, three calls per cell.
+Generate includes C++ launch, input reading, construction and Base serialization.
+Select/export is the factor and scaled-file stage; import/check includes native
+environment setup and import equality checks. Total is the full fresh Python
+process, including startup, model reading, metadata, integrity, extraction and
+persistence. Additional stages are in the CSV; displayed stages are not an
+exhaustive partition and medians need not add.
+\begin{center}\small
+\input{workflow-cost.tex}
+\end{center}
+The machine was shared with another thesis computation. These measurements
+describe this prototype and do not establish a general speed comparison at equal
+quality. Generator compilation and previous witness acquisition are offline costs.
+
+\paragraph{Instrumentation amendment.} The first twelve-call pass is retained in
+\texttt{first-pass/}. It repeatedly copied binding arrays inside its import checker.
+After caching those arrays once, all twelve treatments were repeated with unchanged
+models, factors, seeds, parameters and checks. All saved points and native outcomes
+match exactly across passes. There are 24 new MILP calls in total; the first pass
+is not pooled as an independent sample or used for the principal timing table.
+
+\paragraph{Independent replay.} A separate rational checker revalidates both exact
+feasible witnesses (20,160 rows, 12,240 variables, 2,880 integer domains) and checks
+103,680 physical row/point combinations before/after rounding. It uses saved data
+and an open-source model reader, without optimization or a commercial license.
+Four endpoint tests cover rounding, exact cancellation and bound/gap refutations.
+Witness revalidation cost is separate from the workflow. Neither witness is a
+global MILP optimum certificate.
+
+\paragraph{OMS decision.} Add a short matched-control statement in Section 7.9;
+retain detail and timing in the supplement. Preserve the two contributions,
+abstract and introduction; the v1.3.8 editorial closure also shortens the cover letter.
+This closes a specific comparison rather
+than opening a new mechanism campaign.
+\end{document}

@@ -1,0 +1,77 @@
+
+Gurobi 13.0.2 (linux64) logging started Wed Oct 14 02:06:06 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-followup-20261014/confirmation-bank/runs/instance046/L2-matched-int-s1/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 3.7252902984619141e-09
+Set parameter ScaleFlag to value -1
+Set parameter Presolve to value -1
+Set parameter Seed to value 1
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+IntFeasTol  3.7252902984619141e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  1
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0x8a1c7423
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [1e-09, 1e+01]
+  Objective range  [3e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [1e+01, 4e+05]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 3.560078e+08
+Presolve removed 1479 rows and 534 columns
+Presolve time: 0.08s
+Presolved: 8601 rows, 5586 columns, 20714 nonzeros
+Variable types: 4184 continuous, 1402 integer (1402 binary)
+
+Root relaxation: objective -8.382208e+05, 6795 iterations, 0.12 seconds (0.21 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -838220.81    0  965 3.5601e+08 -838220.81   100%     -    0s
+H    0     0                    1.396913e+07 -838220.81   106%     -    0s
+     0     0 -835741.29    0  998 1.3969e+07 -835741.29   106%     -    0s
+H    0     0                    1.387252e+07 -835626.56   106%     -    0s
+     0     0 -834949.91    0  999 1.3873e+07 -834949.91   106%     -    0s
+     0     0 -834943.41    0  999 1.3873e+07 -834943.41   106%     -    0s
+     0     0 -834600.99    0 1005 1.3873e+07 -834600.99   106%     -    0s
+H    0     0                    883616.18886 -834475.07   194%     -    0s
+H    0     0                    883196.05506 -834475.07   194%     -    0s
+H    0     0                    818561.01763 -834475.07   202%     -    0s
+H    0     0                    816343.35934 -834475.07   202%     -    0s
+     0     0 -834375.01    0 1005 816343.359 -834375.01   202%     -    0s
+     0     0 816343.359    0 1002 816343.359 816343.359  0.00%     -    1s
+
+Cutting planes:
+  Gomory: 149
+  MIR: 34
+  Flow cover: 410
+  RLT: 362
+
+Explored 1 nodes (11182 simplex iterations) in 1.09 seconds (1.25 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 8: 816343 816343 818561 ... 3.56008e+08
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective 8.163433593374e+05, best bound 8.163433593374e+05, gap 0.0000%

@@ -1,0 +1,90 @@
+
+Gurobi 13.0.2 (linux64) logging started Wed Oct 14 01:42:30 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-followup-20261014/pilot-activation/runs/instance046/GM-indicators-s17/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 60
+Set parameter MIPGap to value 0.01
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-05
+Set parameter ScaleFlag to value -1
+Set parameter Presolve to value -1
+Set parameter Seed to value 17
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  60
+MIPGap  0.01
+LogToConsole  0
+Seed  17
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 8640 rows, 6120 columns and 19799 nonzeros (Min)
+Model fingerprint: 0x14f9cadc
+Model has 721 linear objective coefficients
+Model has 1440 simple general constraints
+  1440 INDICATOR
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [2e-02, 6e+01]
+  Objective range  [3e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [9e+01, 4e+07]
+  GenCon rhs range [2e+09, 2e+09]
+  GenCon coe range [1e+00, 1e+00]
+Warning: Model contains large bounds
+Warning: Model contains large rhs on indicator constraints
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Presolve added 0 rows and 867 columns
+Presolve removed 64 rows and 0 columns
+Presolve time: 0.06s
+Presolved: 8576 rows, 6987 columns, 20606 nonzeros
+Presolved model has 1402 SOS constraint(s)
+Variable types: 5585 continuous, 1402 integer (1402 binary)
+Found heuristic solution: objective -791600.7286
+Found heuristic solution: objective -791604.1608
+
+Root relaxation: objective -8.382253e+05, 10162 iterations, 0.10 seconds (0.21 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -838225.29    0 1440 -791604.16 -838225.29  5.89%     -    0s
+     0     0 -837942.37    0 1428 -791604.16 -837942.37  5.85%     -    0s
+     0     0 -837610.11    0 1260 -791604.16 -837610.11  5.81%     -    0s
+     0     0 -837383.31    0 1131 -791604.16 -837383.31  5.78%     -    0s
+     0     0 -837139.32    0 1129 -791604.16 -837139.32  5.75%     -    0s
+     0     0 -836245.26    0 1127 -791604.16 -836245.26  5.64%     -    0s
+     0     0 -836245.26    0 1127 -791604.16 -836245.26  5.64%     -    0s
+     0     0 -836245.26    0  970 -791604.16 -836245.26  5.64%     -    0s
+     0     0 -834048.93    0  970 -791604.16 -834048.93  5.36%     -    0s
+     0     0 -834048.93    0  970 -791604.16 -834048.93  5.36%     -    0s
+     0     2 -834048.93    0  970 -791604.16 -834048.93  5.36%     -    0s
+H  178     3                    -792031.4984 -830637.93  4.87%   216    1s
+H  234     9                    -792106.9052 -827737.12  4.50%   207    1s
+H  362    14                    -792648.0548 -825684.61  4.17%   158    1s
+H  408     2                    -793103.1145 -822901.62  3.76%   156    2s
+H  408     2                    -793193.0893 -822901.62  3.75%   156    2s
+H  450     7                    -793863.4385 -822129.16  3.56%   153    2s
+H  778     3                    -794239.5297 -809870.33  1.97%   162    2s
+
+Cutting planes:
+  Gomory: 57
+  Implied bound: 217
+  Flow cover: 97
+  RLT: 13
+  Relax-and-lift: 38
+
+Explored 1073 nodes (160896 simplex iterations) in 3.29 seconds (8.65 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 8: -794240 -793863 -793193 ... -791601
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -7.942395296836e+05, best bound -8.004092956468e+05, gap 0.7768%

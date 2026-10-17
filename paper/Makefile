@@ -1,10 +1,10 @@
-# Current COAP manuscript and supplementary information.
+# Current OMS manuscript and supplementary information; COAP files are historical.
 MAIN = main
 SI = supporting-information
-COAP = coap/main_coap
+OMS = oms/main_oms
 PYTHON ?= python3
-.PHONY: all si coap clean
-all: $(MAIN).pdf si coap
+.PHONY: all si oms coap clean
+all: $(MAIN).pdf si oms
 $(MAIN).pdf: $(MAIN).tex research-references.bib $(wildcard sections/*.tex tables/*.tex figs/research/*.pdf)
 	pdflatex -halt-on-error -interaction=nonstopmode $(MAIN)
 	bibtex $(MAIN)
@@ -17,13 +17,17 @@ $(SI).pdf: $(SI).tex $(wildcard sections/*.tex tables/*.tex)
 
 clean:
 	rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).blg $(MAIN).log $(MAIN).out $(MAIN).pdf $(SI).aux $(SI).log $(SI).out $(SI).pdf
-	rm -f $(COAP).aux $(COAP).bbl $(COAP).blg $(COAP).log $(COAP).out $(COAP).pdf
+	rm -f $(OMS).aux $(OMS).bbl $(OMS).blg $(OMS).log $(OMS).out $(OMS).pdf
 
-# The COAP source is generated directly from main.tex.
-coap: $(COAP).pdf coap/cover-letter.pdf
-$(COAP).tex: $(MAIN).tex coap/abstract.tex ../scripts/research/build_coap.py $(wildcard sections/*.tex tables/*.tex) research-references.bib
-	cd .. && $(PYTHON) scripts/research/build_coap.py
-$(COAP).pdf: $(COAP).tex $(wildcard coap/sections/*.tex coap/tables/*.tex coap/figs/*.pdf)
-	cd coap && pdflatex -halt-on-error -interaction=nonstopmode main_coap && bibtex main_coap && pdflatex -halt-on-error -interaction=nonstopmode main_coap && pdflatex -halt-on-error -interaction=nonstopmode main_coap
-coap/cover-letter.pdf: coap/cover-letter.tex
-	cd coap && pdflatex -halt-on-error -interaction=nonstopmode cover-letter && pdflatex -halt-on-error -interaction=nonstopmode cover-letter
+oms: $(OMS).pdf oms/cover-letter.pdf
+$(OMS).tex: $(MAIN).tex ../scripts/research/build_oms.py $(wildcard sections/*.tex tables/*.tex) research-references.bib
+	cd .. && $(PYTHON) scripts/research/build_oms.py
+$(OMS).pdf: $(OMS).tex oms/interact.cls oms/tfq.bst $(wildcard oms/sections/*.tex oms/tables/*.tex oms/figs/research/*.pdf)
+	cd oms && pdflatex -halt-on-error -interaction=nonstopmode main_oms && bibtex main_oms && pdflatex -halt-on-error -interaction=nonstopmode main_oms && pdflatex -halt-on-error -interaction=nonstopmode main_oms
+oms/cover-letter.pdf: oms/cover-letter.tex
+	cd oms && pdflatex -halt-on-error -interaction=nonstopmode cover-letter && pdflatex -halt-on-error -interaction=nonstopmode cover-letter
+
+# The canonical sources now target OMS; do not mix them with the old COAP front matter.
+coap:
+	@echo "Rebuild COAP from archived v1.2-coap-submission; current sources target OMS."
+	@false

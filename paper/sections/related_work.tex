@@ -12,6 +12,10 @@ not improve performance, and Klotz \cite{klotz2014numerics} relates numerical in
 formulation and finite precision. Optimal diagonal preconditioning is a broader problem: Qu et
 al.\ \cite{qu2024diagonal} use quasiconvex and semidefinite formulations, while Demmel
 \cite{demmel2023block} gives block-Jacobi guarantees.
+Ruiz's iterative infinity-norm equilibration scales rows and columns
+\cite{ruiz2001scaling}. Our controlled comparison fixes its column factors to one,
+so that external scaling preserves the MILP variable space; its four-step implementation
+and safeguards are specified in \cref{subsec:design-oms}.
 Beyond the comparison of scaling methods for simplex by Elble and Sahinidis
 \cite{elble2012scaling}, we ask which mechanism produces an apparent numerical gain and
 which original-unit accuracy guarantee survives the representation change.
@@ -65,5 +69,8 @@ Gleixner and Steffy \cite{cheung2017certificates} provide certificates for
 integer-programming results, and Hoen and Gleixner \cite{hoen2024correctness} analyze
 individual branch-and-bound decisions. Our rational residual checks address primal acceptance,
 and independent enumeration supplies optimality on the small binary instances.
-What this paper adds to these lines of work is attribution: matched comparisons of actual
-exports that separate what a scaling policy changes from which information causes the change.
+Our contribution at this interface is an implementable combination of row-factor admissibility,
+finite-precision export and original-unit checks, evaluated with controls that distinguish
+kernel effects from metadata effects. It complements modeling-system scale attributes and
+solver-side scaling; it neither replaces integer-aware presolve nor supplies general MIP
+optimality certificates.

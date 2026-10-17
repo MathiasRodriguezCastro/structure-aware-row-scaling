@@ -5,8 +5,12 @@ scipy==1.15.3
 pandas==2.3.3
 matplotlib==3.10.9
 pytest==9.0.3
+highspy==1.15.1
 
-# Fresh HiGHS experiment only: python3 -m pip install highspy==1.15.1
+# HiGHS supplies the license-free LP reader for OMS dispatch replay as well as fresh runs.
 # Fresh Gurobi arm (license required): python3 -m pip install gurobipy==13.0.2
 # PDF compilation additionally needs pdfLaTeX, BibTeX and standard TeX packages.
 # C++ export integration additionally needs GNU Make and g++ with C++17 support.
+
+# Activation witnesses are verified from supplied rational data without SoPlex.
+# Regenerating them optionally uses SoPlex 8.1.0 with GMP, rational read/solve mode.

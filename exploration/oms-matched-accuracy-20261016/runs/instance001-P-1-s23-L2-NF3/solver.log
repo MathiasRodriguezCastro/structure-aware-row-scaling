@@ -1,0 +1,88 @@
+
+Gurobi 13.0.2 (linux64) logging started Fri Oct 16 12:09:22 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-matched-accuracy-20261016/runs/instance001-P-1-s23-L2-NF3/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 3.7252902984619141e-09
+Set parameter ScaleFlag to value -1
+Set parameter IntegralityFocus to value 0
+Set parameter NumericFocus to value 3
+Set parameter Presolve to value -1
+Set parameter Seed to value 23
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+IntFeasTol  3.7252902984619141e-09
+MIPGap  0.01
+LogToConsole  0
+NumericFocus  3
+Seed  23
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0xd42668c8
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [1e-09, 1e+01]
+  Objective range  [9e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [3e+00, 5e+05]
+Warning: Model contains large bounds
+
+Found heuristic solution: objective 5.019439e+08
+Presolve removed 917 rows and 496 columns
+Presolve time: 0.09s
+Presolved: 9163 rows, 5624 columns, 21609 nonzeros
+Found heuristic solution: objective 5.018433e+08
+Variable types: 4228 continuous, 1396 integer (1396 binary)
+
+Root relaxation: objective -1.188491e+06, 5142 iterations, 0.24 seconds (0.39 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -1188491.0    0 1334 5.0184e+08 -1188491.0   100%     -    0s
+     0     0 -1188491.0    0 1334 5.0184e+08 -1188491.0   100%     -    0s
+H    0     0                    2.258495e+07 -1185474.0   105%     -    0s
+     0     2 -1185474.0    0 1334 2.2585e+07 -1185474.0   105%     -    1s
+H   59    66                    2.258224e+07 -1156169.2   105%  19.1    1s
+H   60    66                    2.258109e+07 -1156169.2   105%  19.0    1s
+H  120   122                    2.257429e+07 -1156169.2   105%  10.6    1s
+H  135   137                    2.254662e+07 -1156169.2   105%   9.6    1s
+H  181   183                    2.254327e+07 -1156169.2   105%   8.1    2s
+H  189   191                    2.239091e+07 -1156169.2   105%   7.9    2s
+H  244   250                    2.238588e+07 -1156169.2   105%   7.2    2s
+H  256   265                    1988562.8726 -1156169.2   158%   7.0    2s
+H  296   314                    1980166.8430 -1156169.2   158%   6.4    2s
+H  304   314                    1979636.7311 -1156169.2   158%   6.3    2s
+H  359   384                    1971824.0797 -1156169.2   159%   5.6    2s
+H  361   383                    1959522.7121 -1156169.2   159%   5.6    2s
+H  559   564                    1930922.5199 -1156169.2   160%   4.7    3s
+H  590   589                    1648083.5405 -1156169.2   170%   4.6    3s
+* 1181  1052             367    1156739.2333 -1156169.2   200%   5.1    4s
+H 1447  1298                    1153911.6789 -1156169.2   200%   4.9    4s
+H 1448  1297                    1152475.0767 -1156169.2   200%   4.9    4s
+H 1449  1297                    1149281.7062 -1156169.2   201%   4.9    4s
+  1856  1855 -1073169.3  280  761 1149281.71 -1156169.2   201%   4.7    5s
+H 2573  2447                    1144447.5837 -1156169.2   201%   6.6    6s
+* 2625  1985             649    211872.00556 -1156169.2   646%   6.7    6s
+H 3697   840                    -989879.4735 -1156169.2  16.8%   5.8    7s
+  4077   484 -1056308.4  351 1375 -989879.47 -1071387.0  8.23%   8.9   10s
+  4278   419 -1023886.2  181  335 -989879.47 -1023886.2  3.44%  13.9   15s
+
+Explored 4455 nodes (81217 simplex iterations) in 15.99 seconds (30.40 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: -989879 211872 1.14445e+06 ... 1.95952e+06
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -9.898794735172e+05, best bound -9.959387491436e+05, gap 0.6121%

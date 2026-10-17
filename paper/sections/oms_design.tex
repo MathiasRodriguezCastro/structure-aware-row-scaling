@@ -1,0 +1,74 @@
+\subsection{Controlled row-only Ruiz comparison and final-policy ablation}
+\label{subsec:design-oms}
+An additional compact experiment uses exactly the 30 operational inputs, including
+instance077 and the scenarios affected by the documented input defect. It compares Base,
+Flat-GM, Role-Hybrid and Ruiz-R4 through fresh solver-free LP exports imported directly
+by Gurobi. This import path is part of the additional protocol and is kept separate from
+the historical generator-to-solver campaign. Ruiz-R4 is
+a coefficient-only, row-only restriction of Ruiz's
+infinity-norm iteration \cite{ruiz2001scaling}. Starting with $d_r=1$ and
+$M_r=\max_j|a_{rj}|$, each of four half-steps multiplies $d_r$ and the current row by
+$M_r^{-1/2}$; columns remain fixed. The cumulative candidate is therefore
+$M_r^{-15/16}$. It passes the same closed identity band $[1/2,2]$ and coefficient-window
+veto $[10^{-9},10^9]$ as the final kernels, applied once to the cumulative candidate.
+The RHS is multiplied by the accepted factor but does not enter the norm.
+This restricted control is neither the full row-and-column algorithm nor the historical
+C++ option that combines Ruiz iterations with block normalization.
+
+The prospective protocol fixes Gurobi 13.0.2, four threads, seed 42, a 1\% relative gap,
+120 seconds, \texttt{FeasibilityTol}$=10^{-6}$, \texttt{IntFeasTol}$=10^{-5}$,
+and default presolve and internal scaling. A separate six-call, 60-second cost pilot is
+excluded. Calls run sequentially on an Intel i7-13620H, with a fixed shuffled policy order
+within each instance. Total time includes measured generator/export time, the Ruiz
+transformation where applicable, model loading and optimization; checking is excluded.
+Work and total-time ratios use the subset completed by all four policies in each class.
+Completion counts and mean PAR10 use all 15, assigning 1,200 seconds to an unfinished run.
+These local measurements are kept separate from the 1,800-second campaign above.
+
+Conditioning uses the stored named Base LP basis for each input, verified against the
+new Base export by SHA-256. Structural columns use each policy's own coefficients;
+basic slacks remain unit columns. We report the largest 1-norm inverse estimate across
+seeds 0, 1 and 2, before and after ten passes of the documented power-of-two
+equilibration. Named full-matrix checks verify row proportionality, RHS, objective,
+bounds and integer domains before optimization.
+
+The stage ablation uses positions 1, 8 and 15 of each archived instance list, six models
+in total, without outcome-based selection. Two additional exports disable respectively
+the coupling and local stage of the final Role-Hybrid implementation. Their nonunit row
+supports are disjoint and their factors multiply to the full-policy factors within the
+serialization tolerance. Base and full-policy runs are shared with the comparison.
+The resulting 132 calls and their stored incumbents support original-row, bound and
+integrality checks. Physical verification additionally uses exact rational arithmetic
+on the original binary64 coefficients and the returned binary64 point; it certifies
+primal residuals for those stored data, not optimality of the dispatch MILP.
+
+Three application-precision scenarios are fixed before the campaign. Power and water
+budgets are 0.01\,MW and 100\,m\textsuperscript{3} (demanding),
+0.1\,MW and 1{,}000\,m\textsuperscript{3} (reference), and
+1\,MW and 10{,}000\,m\textsuperscript{3} (permissive). These are study objectives, not UTE
+operating tolerances: the reference expresses power to a tenth of a MW and water to
+a thousandth of a cubic hectometre, with one-decade sensitivity in either direction.
+Each physical budget is converted to algebraic row units using the coefficient of
+the named generation or storage variable, or the 3,600-second hourly flow conversion.
+The audit covers power identities and demand caps, plant generation definitions,
+production envelopes and water balances; other rows have no declared physical budget.
+For each row and scenario it retains the proposed factor, inward-rounded admissible
+interval, projected factor and any incompatibility. The interval audit uses zero
+rounding allowance and the conditional exported-row hypothesis $\epsilon=10^{-6}$;
+actual residuals and pointwise coefficient/RHS export defects are checked separately.
+The physical checks use the raw stored incumbent without rounding integer coordinates;
+contracts for rounded assignments require the separate allowance in
+\eqref{eq:rounding-budget}.
+
+A separate exploratory activation follow-up uses the six archived SG-Ter-Mer models
+without the documented demand inversion, seeds 1, 7 and 42, and the same 120-second
+local limit. It applies the previously declared numerical volume goals to activation
+thresholds, rather than treating them as operator tolerances. L2 with coefficient-window
+projection and Budget-L2 share a budget-guided integer allowance; the global-tight control
+uses primal and integer tolerances of $10^{-9}$. Additional mechanism controls and a
+presolve-off comparison on three fresh seeds are kept separate. Exact witnesses are
+obtained by fixing observed integer states and solving the remaining LP with SoPlex
+\cite{gleixner2016refinement,gleixner2020oracles}, then checking every original binary64
+row, bound and integer domain independently with rational arithmetic. These are feasible
+points, not global MILP optimality certificates. Supplementary Material~1 gives the full
+protocol, native-export identities and preparation-cost measurements.

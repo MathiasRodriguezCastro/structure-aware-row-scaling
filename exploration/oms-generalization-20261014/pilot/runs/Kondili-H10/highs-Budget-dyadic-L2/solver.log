@@ -1,0 +1,71 @@
+Running HiGHS 1.15.1 (git hash: 04024d7): Copyright (c) 2026 under MIT licence terms
+Includes third-party software components, see THIRD_PARTY_NOTICES.md for full details
+MIP Budget-dyadic-L2 has 409 rows; 321 cols; 1157 nonzeros; 88 integer variables (88 binary)
+Coefficient ranges:
+  Matrix  [5e-02, 5e+01]
+  Cost    [1e+00, 1e+00]
+  Bound   [1e+00, 1e+00]
+  RHS     [5e-01, 2e+02]
+Presolving model
+209 rows, 252 cols, 801 nonzeros 0s
+153 rows, 195 cols, 650 nonzeros 0s
+120 rows, 163 cols, 536 nonzeros 0s
+95 rows, 132 cols, 399 nonzeros 0s
+83 rows, 109 cols, 341 nonzeros 0s
+82 rows, 107 cols, 337 nonzeros 0s
+Presolve reductions: rows 82(-327); columns 107(-214); nonzeros 337(-820) 
+
+Solving MIP model with:
+   82 rows
+   107 cols (38 binary, 0 integer, 0 implied int., 69 continuous, 0 domain fixed)
+   337 nonzeros
+   Thread count 4 (of 16 threads). Using 1 max workers. Parallel search off
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic;
+     I => Shifting; J => Feasibility jump; L => Sub-MIP; P => Empty MIP; R => Randomized rounding;
+     S => Solve LP; T => Evaluate node; U => Unbounded; X => User solution; Y => HiGHS solution;
+     Z => ZI Round; l => Trivial lower; p => Trivial point; u => Trivial upper; z => Trivial zero
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+ J       0       0         0   0.00%   -inf            0                  Large        0      0      0         0     0.0s
+ R       0       0         0   0.00%   -2908.36        -2572             13.08%        0      0      0        90     0.0s
+ L       0       0         0   0.00%   -2844.443049    -2744.375          3.65%      495     42      0       225     0.0s
+
+15.8% inactive integer columns, restarting
+Model after restart has 69 rows, 88 cols (30 bin., 0 int., 0 impl., 58 cont., 0 dom.fix.), and 274 nonzeros
+
+         0       0         0   0.00%   -2843.654676    -2744.375          3.62%       15      0      0       728     0.1s
+         0       0         0   0.00%   -2843.654676    -2744.375          3.62%       15     13      0       765     0.1s
+         3       0         1 100.00%   -2770.341514    -2744.375          0.95%      615     31     11      1941     0.3s
+
+Solving report
+  Model             Budget-dyadic-L2
+  Status            Optimal
+  Primal bound      -2744.375
+  Dual bound        -2770.34151362
+  Gap               0.946% (tolerance: 1%)
+  P-D integral      0.0113988623905
+  Solution status   feasible
+                    -2744.375 (objective)
+                    0 (bound viol.)
+                    3.01980662698e-14 (int. viol.)
+                    0 (row viol.)
+  Timing            0.26
+                    0.01 (Presolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.01 [17]
+                    0.24 (Solve)
+                        MIP    time [calls] = 0.10 [1]
+                        subMIP time [calls] = 0.14 [17]
+                    0.00 (Postsolve)
+                        MIP    time [calls] = 0.00 [1]
+                        subMIP time [calls] = 0.00 [17]
+  Max sub-MIP depth 4
+  Nodes             3
+  Repair LPs        0
+  LP iterations     1941
+                    472 (strong br.)
+                    290 (separation)
+                    982 (heuristics)

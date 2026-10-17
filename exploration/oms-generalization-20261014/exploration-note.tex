@@ -1,0 +1,133 @@
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype,amsmath,booktabs,graphicx,xurl,xcolor}
+\usepackage[colorlinks=true,allcolors=blue!45!black]{hyperref}
+\title{Exploración preliminar: contratos de precisión en fuentes MILP independientes}
+\author{Documento de trabajo separado del paper OMS}
+\date{14 de octubre de 2026}
+\begin{document}\maketitle
+\noindent\textbf{Conclusión.} El piloto comprueba transferencia de código, verificaciones
+y abstenciones, pero no una ventaja de aceptación primal de Budget-L2 frente a su
+control. Se conserva intacta la entrega \texttt{v1.3.5-oms-submission}.
+No se añade una contribución ni resultados al artículo en esta etapa.
+
+\section{Diseño y alcance}
+Se fijaron dos modelos de producción por lotes del generador independiente
+STN-Scheduler (Kondili, H=10 y H=12), y tres grupos distintos del tag Numerics de
+MIPLIB seleccionados antes de resolver, por número de no ceros y dimensiones.
+Se conservan 55 brazos, 52 puntos, dos abstenciones y un fallo de importación.
+Gurobi y HiGHS usan presolve normal, cuatro hilos, semilla 17, gap 1\% y límite 15 s.
+Las exportaciones son diádicas exactas, con los intervalos ya implementados y
+coeficientes en $[10^{-9},10^9]$. Objetivo, cotas, dominios y proporcionalidad de
+filas/RHS se cotejan antes de aceptar una importación.
+
+En STN el presupuesto de cantidades es $10^{-5}$ kg (10 mg), un objetivo numérico
+elegido para el estudio; filas lógicas $10^{-5}$ y monetarias $10^{-3}$ en las
+unidades de la fuente. No son tolerancias industriales. Los contratos modifican
+88 y 104 factores de capacidad, respectivamente. L2 y Budget comparten una
+tolerancia entera guiada; en HiGHS su parámetro MIP también afecta la precisión
+primal. MIPLIB usa $10^{-4}\max(1,|b_r|)$ en unidades algebraicas experimentales,
+sin interpretación física; su contrato cubre el punto crudo y el redondeado se
+comprueba después. El archivo actual de cinca tiene 4.350 no ceros, frente a
+3.678 de la ficha; se conserva esa discrepancia.
+
+\section{Resultados conservados}
+V: punto entero dentro de presupuestos de todas las filas/cotas. F: punto que falla.
+A: abstención. I: importación fallida. Guion: control no disponible.
+V no significa factibilidad exacta, cota dual válida u óptimo global. L2 y GM son
+sus variantes diádicas exactas; ``tight'' reduce tolerancias a $10^{-9}$.
+\begin{center}\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llrrrrrr}\toprule
+Modelo & Solver & Base & GM & L2 & Budget & Tight & NF3\\\midrule
+Kondili{-}H10 & gurobi & V & V & V & V & V & V\\
+Kondili{-}H10 & highs & V & V & V & V & V & --\\
+Kondili{-}H12 & gurobi & V & V & V & V & V & V\\
+Kondili{-}H12 & highs & V & V & V & V & V & --\\
+control30{-}3{-}2{-}3 & gurobi & F & F & F & F & F & F\\
+control30{-}3{-}2{-}3 & highs & V & V & V & V & V & --\\
+neos{-}3421095{-}cinca & gurobi & V & F & F & A & F & F\\
+neos{-}3421095{-}cinca & highs & I & V & V & A & V & --\\
+ta1{-}UUM & gurobi & V & V & V & V & V & F\\
+ta1{-}UUM & highs & V & V & V & V & V & --\\
+\bottomrule\end{tabular}\end{center}
+
+Un checker separado, sin importar el runner ni un solver, revisa 52 puntos con
+\texttt{Fraction}: 41 pasan tras redondear y 42 antes. Las cuentas combinan
+configuraciones y no son tasas poblacionales ni un ranking.
+
+En STN todas las políticas pasan: cambiar factores no aporta una ganancia de
+precisión necesaria cuando los controles ya cumplen. En control30-3-2-3,
+Budget reduce el ratio crudo Gurobi de 26.526 a 0,302, pero el entero falla con
+ratio 146.563; Base y GM también cumplían en crudo. Todas las variantes Gurobi
+fallan el chequeo entero. HiGHS lo supera, pero llega al límite en todas sus llamadas.
+
+En cinca hay 96 intervalos continuos vacíos para el contrato. Esto limita la
+garantía uniforme: Gurobi Base y varios controles HiGHS sí producen puntos que
+cumplen después de redondear. La importación Base de HiGHS falla con coeficientes
+de hasta $10^{17}$. En ta1-UUM el contrato cambia 55 factores y ambos L2 pasan;
+se alcanza el límite, y NumericFocus falla en Gurobi. No hay mejora propia de
+Budget en aceptación respecto de su control directo.
+
+\section{Costo y diagnóstico}
+Tiempos de una llamada por configuración, de optimización solamente; no incluyen
+selección, importación o verificación. Trabajo corresponde exclusivamente a Gurobi.
+No se infiere velocidad general de este piloto.
+\begin{center}\small
+\begin{tabular}{llrrrr}\toprule
+Modelo & Solver & L2 (s) & Budget (s) & L2 trabajo & Budget trabajo\\\midrule
+Kondili-H10 & gurobi & 0.0100 & 0.0126 & 0.00478 & 0.00574\\
+Kondili-H10 & highs & 0.2563 & 0.2572 & -- & --\\
+Kondili-H12 & gurobi & 0.0158 & 0.0182 & 0.00691 & 0.00778\\
+Kondili-H12 & highs & 0.0860 & 0.0769 & -- & --\\
+\bottomrule\end{tabular}\end{center}
+
+El indicador previo es $\mu_r=(\epsilon/\alpha_r+
+\gamma\sum_{j\in I}|a_{rj}|)/\delta_r$, con parámetros nominales por solver.
+En 31 puntos que pasan, $\mu>1$: ausencia de garantía suficiente no predice un
+fallo. También se comprueban las hipótesis exportada y entera realmente observadas.
+No se entrenó un predictor ni se validó sobre datos de confirmación.
+
+\section{Prototipo y componente matemático}
+El ciclo finito de intento, comprobación, alternativa y abstención devuelve
+solamente el punto entero que verifica y conserva la optimalidad como no verificada.
+Su replay de diez pares devuelve nueve asignaciones y se abstiene en
+Gurobi/control30-3-2-3; HiGHS/cinca pasa de la importación Base fallida a L2.
+Es un replay de brazos fijos, sin medida prospectiva de costo adaptativo.
+Siete tests cubren etiquetas óptimas que no pueden anular fallos, redondeo, dominios enteros exactos,
+importaciones no cotejadas, datos no finitos y soporte contra todos los vértices.
+
+Sean $e=\alpha a-\widehat a$ y $e_b=\alpha b-\widehat b$. Sobre una caja válida,
+\[
+ R^+=\sum_j\max(e_jl_j,e_ju_j)-e_b,\qquad
+ v(x^{\rm int})\le\max\{0,(\epsilon+R^+)/\alpha+E\}.
+\]
+La pertenencia del punto crudo a la caja y las hipótesis de residuo/redondeo son
+necesarias. Para igualdad se evalúan ambos signos. Los términos con error cero
+no requieren extremos finitos. Es una descomposición elemental, no una novedad
+demostrada. En el piloto diádico el error de exportación es exactamente cero.
+
+\section{Decisión y reproducción}
+La verificación, reparación y certificación tienen antecedentes fuertes; el posible
+aporte sigue siendo la integración trazable de presupuestos, selección y aceptación,
+con utilidad adicional comprobada. Este piloto no basta para proclamarla.
+La siguiente fase útil sería una política prospectiva, requisitos defendibles,
+modelos/semillas nuevos, controles fuertes, abstenciones y costo total declarado.
+Se conserva la versión OMS actual.
+
+El documento completo \texttt{RESULTADOS.md} y \texttt{PILOT\_PROTOCOL.md}
+describen cada precisión, control y alcance. El artefacto conserva los cinco modelos,
+55 registros, puntos, logs, decisiones y replays sin licencias para verificar.
+Se necesitan Python/NumPy y pytest para los tests; generar modelos/soluciones nuevas
+requiere además las dependencias registradas. No se atribuyen certificados de
+optimalidad a este estudio.
+
+\paragraph{Fuentes primarias}
+\href{https://github.com/jckantor/STN-Scheduler}{STN-Scheduler};
+\href{https://miplib.zib.de/tag_numerics.html}{MIPLIB Numerics};
+\href{https://arxiv.org/abs/2101.09141}{Eifler y Gleixner (2021), reparación exacta};
+\href{https://arxiv.org/abs/1611.08832}{Cheung, Gleixner y Steffy, certificados};
+\href{https://optimization-online.org/wp-content/uploads/2019/12/7507.pdf}{Gleixner y Steffy, oráculos de precisión limitada};
+\href{https://docs.gurobi.com/projects/optimizer/en/current/concepts/numericguide/tolerances_scaling.html}{guía numérica de Gurobi}.
+\end{document}

@@ -66,3 +66,51 @@ paper/coap/*.bbl
 
 # Byte-identical copies named for separate Editorial Manager uploads
 paper/submission/editorial-manager/
+
+# OMS build intermediates and local submission packages
+paper/oms/*.aux
+paper/oms/*.log
+paper/oms/*.out
+paper/oms/*.blg
+paper/oms/*.bbl
+paper/oms/*.fls
+paper/oms/*.fdb_latexmk
+paper/submission/oms/*.zip
+paper/submission/oms/uploads/
+paper/submission/oms/releases/
+
+# Isolated exploration dependencies; not part of OMS delivery.
+exploration/oms-generalization-20261014/.deps/
+
+# Regenerated OMS mirrors; the canonical sources are under paper/.
+paper/oms/main_oms.tex
+paper/oms/abstract.txt
+paper/oms/research-references.bib
+paper/oms/sections/
+paper/oms/tables/
+paper/oms/figs/
+paper/oms/*.pdf
+
+# Local upload/deposit preparation and editorial previews.
+paper/submission/oms/zenodo-deposit/
+paper/submission/oms/portal-preparation/
+paper/validation/oms-editorial-requirements-*/
+paper/validation/oms-template-comparison-*/
+exploration/oms-review-*/
+
+# Closed bundles duplicate the expanded, versioned scientific evidence.
+exploration/**/*.zip
+
+# Rebuildable experiment intermediates. Preserve the two inventoried reference
+# executables because their exact hashes are part of the native timing record.
+exploration/**/build/*
+!exploration/oms-native-selector-20261016/source/build/SistemaElectrico
+!exploration/oms-native-selector-20261016/first-pass/source/build/SistemaElectrico
+exploration/**/*.aux
+exploration/**/*.out
+exploration/**/*.bbl
+exploration/**/*.blg
+exploration/**/*.fls
+exploration/**/*.fdb_latexmk
+exploration/**/*.toc
+**/.pytest_cache/

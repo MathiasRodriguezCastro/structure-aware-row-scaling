@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-14",
+  "phase": "mechanism",
+  "instances": [
+    {
+      "class": "sgtm",
+      "instance": "instance046",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance046.txt",
+      "ablation": true
+    }
+  ],
+  "seeds": [
+    1,
+    7,
+    42
+  ],
+  "policies": [
+    "L2-PresolveOff",
+    "L2-NumericFocus3",
+    "L2-dyadic",
+    "Budget-dyadic",
+    "GM-IntFocus",
+    "GM-tight-M",
+    "GM-indicators",
+    "Base",
+    "Ruiz-R4"
+  ],
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-05,
+    "ScaleFlag": -1,
+    "Presolve": -1
+  },
+  "budget_scenario": "Demanding, declared before this exploration: 0.01 MW/100 m3",
+  "activation_budget_meaning": "study numerical consistency target on the volume threshold of a binary activation, not an operator standard; new row scope explicitly separated from water balances",
+  "coefficient_window": [
+    1e-09,
+    1000000000.0
+  ],
+  "l2_control": "pure coefficient row L2 factor projected onto the coefficient window; no identity-band veto",
+  "guided_integrality": "per model, largest dyadic gamma no greater than 100/(2*max_activation_M), capped by default 1e-5; minimum supported Gurobi gamma 1e-9",
+  "budgets": {
+    "MW": 0.01,
+    "m3": 100.0
+  },
+  "exact_verification": "raw and integer-rounded original binary64 rows, including activation rows; whole-model diagnostics are separate",
+  "no_optimality_certificate": true,
+  "comparison": "L2-matched-int isolates factor selection using identical guided integer tolerance; L2-global-tight uses both primal and integer tolerance 1e-9; GM controls assess existing alternative remedies",
+  "pilot_excluded_from_confirmatory_results": true,
+  "finite_export_allowance": "on activation rows, reserve 2^-52 times sum(|a_j|*X_j)+|b| with finite variable boxes; check scaled nonzero data are normal; other rows retain pointwise post-solve verification",
+  "amendment_from_pilot": "reserve finite-export error in activation factors; add independent dyadic-export and solver-mechanism controls; pilot source and all pilot results retained",
+  "source_sha256": "df2b67c94b2daa1dbb9e03e154f85be3a9a3348314a6a550288e2126b2ac427e",
+  "prepared": [
+    {
+      "instance": "instance046",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 12494793414.4504,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance046.txt",
+          "sha256": "1484e69f45d338dc1a5c82e1682e9d931dee4f2001ee190713b41292b17f6657"
+        }
+      },
+      "exports": {
+        "Base": "995be38dd217aeeeddcc0c8bc1d479596e2be3364ec195674409544ef9acdd7c",
+        "GM": "6289ca00dba60d5ef8672112336bda668281d605803e059f97e0502399f8447d",
+        "Ruiz-R4": "454843bf901ff25451678cd1aa1607339d935ad492abafb1d54d12be606b4019",
+        "L2-window": "4ef72252f478dcb231b5c134ab73057be5ca7171edacda2b60952e549c2048ab",
+        "Budget-L2": "22fb23298e562f5ddfe1375c83df331fcb26d82ac4a3198d3b6238a19a57908a",
+        "L2-dyadic": "829ac6f9bfc9565649f277a55b94d6423d657a34c253b47bf948866840a40554",
+        "Budget-dyadic": "ae7f513ebf9e7dd5f5ddcf75e0e36aae71d9aeee0d2540be9f1fe075073e5429"
+      }
+    }
+  ]
+}

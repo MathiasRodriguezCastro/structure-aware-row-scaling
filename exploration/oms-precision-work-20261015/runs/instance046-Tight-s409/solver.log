@@ -1,0 +1,96 @@
+
+Gurobi 13.0.2 (linux64) logging started Thu Oct 15 00:22:02 2026
+
+Set parameter OutputFlag to value 1
+Set parameter LogToConsole to value 0
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  15
+WorkLimit  16
+FeasibilityTol  1e-09
+IntFeasTol  1e-09
+MIPGap  0.001
+IntegralityFocus  1
+LogToConsole  0
+Seed  409
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0x236585d1
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [6e-04, 1e+10]
+  Objective range  [3e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [4e+01, 1e+10]
+Warning: Model contains large matrix coefficient range
+Warning: Model contains large rhs
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 3.600000e+10
+Presolve removed 1494 rows and 535 columns
+Presolve time: 0.09s
+Presolved: 8586 rows, 5585 columns, 20532 nonzeros
+Found heuristic solution: objective 3.560078e+08
+Variable types: 4183 continuous, 1402 integer (1402 binary)
+
+Root relaxation: objective -8.382232e+05, 7691 iterations, 0.20 seconds (0.32 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -838223.19    0  958 3.5601e+08 -838223.19   100%     -    0s
+H    0     0                    1.396906e+07 -838223.19   106%     -    0s
+     0     0 -835671.62    0  966 1.3969e+07 -835671.62   106%     -    0s
+H    0     0                    1.167970e+07 -835577.46   107%     -    0s
+H    0     0                    1851648.7309 -835370.89   145%     -    0s
+     0     0 -835370.89    0  967 1851648.73 -835370.89   145%     -    0s
+     0     0 -835369.12    0  967 1851648.73 -835369.12   145%     -    0s
+     0     0 -835155.24    0  968 1851648.73 -835155.24   145%     -    1s
+     0     0 -835062.71    0  968 1851648.73 -835062.71   145%     -    1s
+H    0     0                    1733198.2953 -835062.71   148%     -    1s
+     0     0 -835062.71    0  968 1733198.30 -835062.71   148%     -    1s
+     0     0 -834305.84    0  968 1733198.30 -834305.84   148%     -    1s
+     0     0 -834305.84    0  968 1733198.30 -834305.84   148%     -    1s
+     0     2 -834305.84    0  968 1733198.30 -834305.84   148%     -    1s
+H  461   433                    976133.04098 -830000.62   185%  18.5    3s
+*  519   429              93    858623.24340 -829187.07   197%  17.0    3s
+H  593   250                    616785.65723 -828970.36   234%  17.1    3s
+*  599   224             183    585768.40191 -828970.36   242%  17.0    3s
+   956   414 -826143.08  153  835 585768.402 -827479.39   241%  16.3    5s
+* 1199   453             208    571368.41279 -827479.39   245%  15.7    5s
+* 1200   419             208    538734.76350 -827479.39   254%  15.7    5s
+* 1221   372             200    506125.31698 -827479.39   263%  16.0    5s
+* 1222   315             200    483633.91952 -827479.39   271%  16.0    5s
+* 1233   306             202    476370.05038 -827479.39   274%  16.1    5s
+* 1343   302             221    472930.29050 -823227.03   274%  29.0    6s
+* 1356   231             228    301765.63111 -823227.03   373%  29.7    6s
+* 1362   231             231    301157.90403 -823227.03   373%  29.6    6s
+  1391    87 -40215.720  173 1154 301157.904 -822949.09   373%  30.8   11s
+
+Cutting planes:
+  Gomory: 60
+  Implied bound: 2
+  MIR: 23
+  Flow cover: 420
+  RLT: 345
+  Relax-and-lift: 14
+
+Explored 1654 nodes (126097 simplex iterations) in 14.52 seconds (16.02 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: 301158 301158 301766 ... 585768
+
+Work limit reached
+Warning: max constraint violation (4.7684e-07) exceeds tolerance
+Best objective 3.011579040307e+05, best bound -8.229490889927e+05, gap 373.2617%
+
+User-callback calls 8136, time in user-callback 0.04 sec

@@ -1,0 +1,64 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage[colorlinks=true,allcolors=black]{hyperref}
+\pagestyle{empty}
+\begin{document}
+\noindent Mathias Rodr\'iguez Castro\\
+Facultad de Ingenier\'ia, Universidad de la Rep\'ublica\\
+Montevideo, Uruguay\\
+\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}
+
+\bigskip
+\noindent To the Editors of \emph{Optimization Methods and Software}
+
+\bigskip
+\noindent Dear Editors,
+
+\medskip
+Please consider ``Pre-Export Row Scaling for Generated Mixed-Integer Programs: Accuracy
+Contracts and Software Evaluation'' as a research article in \emph{Optimization Methods
+and Software}.
+
+Generated mixed-integer models can have very different numerical representations
+without changing their meaning in exact arithmetic. Better matrix conditioning,
+however, does not ensure that solver tolerances correspond to the accuracy required
+in the original units. The paper addresses this gap through explicit numerical
+specifications and independently checked software evaluation.
+
+The work makes two connected contributions. First, matched scaling controls separate
+exported conditioning from effects surviving subsequent equilibration and identify
+the numerical kernel behind an apparent structural advantage. Second, residual-budget
+contracts characterize admissible row factors under original-unit accuracy requirements
+and coefficient limits. The construction includes incompatibility, integer-rounding
+allowances and exact binary64 export. A reference workflow connects factor selection,
+model export, optimization and verification, keeping primal accuracy separate from
+the validity of reported mixed-integer bounds.
+
+The evaluation combines hydrothermal dispatch and independently generated
+batch-scheduling models, matched scaling controls and enumerated stress tests on
+several solvers. A prespecified dispatch study identifies a configuration with lower
+work than NumericFocus=3 and no detected contradictions. A paired native-implementation
+benchmark reduces complete-process time on a shared host while preserving all 18
+paired solver endpoints. Accuracy recovery, adverse outcomes, unresolved bound checks
+and parameter sensitivity delimit the findings. Factor admissibility is not a MILP
+optimality certificate.
+
+These contributions address the journal's interests in problem scaling, error
+sensitivity, validity analysis and optimization software evaluation. Supplementary
+Material~1 supplies proofs and protocols; Supplementary Material~2 supplies the
+versioned code, data and independent saved-result checks. The public historical
+baseline and the current OMS snapshot are identified separately.
+
+I am the sole author and declare no competing interests. No external financial funding
+or research grant was received; the historical use of ClusterUY computing resources is
+acknowledged in the manuscript.
+The manuscript documents AI assistance and my responsibility for its scientific content.
+The work has not been published as a journal article and is not under consideration
+elsewhere.
+
+\bigskip
+\noindent Sincerely,\\[6pt]
+Mathias Rodr\'iguez Castro
+\end{document}

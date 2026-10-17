@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-14",
+  "phase": "pilot",
+  "instances": [
+    {
+      "class": "sgtm",
+      "instance": "instance046",
+      "input": "data/entradas/entrada-SG-Ter-Mer/instance046.txt",
+      "ablation": true
+    }
+  ],
+  "seeds": [
+    17
+  ],
+  "policies": [
+    "GM",
+    "L2-window",
+    "L2-matched-int",
+    "Budget-L2",
+    "L2-global-tight",
+    "GM-IntFocus",
+    "GM-tight-M",
+    "GM-indicators"
+  ],
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 60.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-05,
+    "ScaleFlag": -1,
+    "Presolve": -1
+  },
+  "budget_scenario": "Demanding, declared before this exploration: 0.01 MW/100 m3",
+  "activation_budget_meaning": "study numerical consistency target on the volume threshold of a binary activation, not an operator standard; new row scope explicitly separated from water balances",
+  "coefficient_window": [
+    1e-09,
+    1000000000.0
+  ],
+  "l2_control": "pure coefficient row L2 factor projected onto the coefficient window; no identity-band veto",
+  "guided_integrality": "per model, largest dyadic gamma no greater than 100/(2*max_activation_M), capped by default 1e-5; minimum supported Gurobi gamma 1e-9",
+  "budgets": {
+    "MW": 0.01,
+    "m3": 100.0
+  },
+  "exact_verification": "raw and integer-rounded original binary64 rows, including activation rows; whole-model diagnostics are separate",
+  "no_optimality_certificate": true,
+  "comparison": "L2-matched-int isolates factor selection using identical guided integer tolerance; L2-global-tight uses both primal and integer tolerance 1e-9; GM controls assess existing alternative remedies",
+  "pilot_excluded_from_confirmatory_results": true,
+  "source_sha256": "af55fcf28a7538f230f9159073fffc57619ec16b4733eb8ebc92525320616956",
+  "prepared": [
+    {
+      "instance": "instance046",
+      "guided_gamma": 3.725290298461914e-09,
+      "max_activation_M": 12494793414.4504,
+      "budget_changed_rows": 1440,
+      "default_rounding_exhausted_rows": 1440,
+      "inputs": {
+        "original_input": {
+          "path": "data/entradas/entrada-SG-Ter-Mer/instance046.txt",
+          "sha256": "1484e69f45d338dc1a5c82e1682e9d931dee4f2001ee190713b41292b17f6657"
+        }
+      },
+      "exports": {
+        "Base": "995be38dd217aeeeddcc0c8bc1d479596e2be3364ec195674409544ef9acdd7c",
+        "GM": "6289ca00dba60d5ef8672112336bda668281d605803e059f97e0502399f8447d",
+        "L2-window": "4ef72252f478dcb231b5c134ab73057be5ca7171edacda2b60952e549c2048ab",
+        "Budget-L2": "be2959b585f96b8b905eeac1e6155ecb8389b391ffbbca1d3744f59307278b3d"
+      }
+    }
+  ]
+}

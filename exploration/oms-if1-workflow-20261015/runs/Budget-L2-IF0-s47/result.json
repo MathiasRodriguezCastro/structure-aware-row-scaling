@@ -1,0 +1,112 @@
+{
+  "job": {
+    "policy": "Budget-L2",
+    "focus": 0,
+    "seed": 47,
+    "id": "Budget-L2-IF0-s47"
+  },
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 3.725290298461914e-09,
+    "ScaleFlag": -1,
+    "Presolve": 0,
+    "IntegralityFocus": 0,
+    "Seed": 47
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 9,
+    "native_completed": true,
+    "work": 5.028158747835623,
+    "nodes": 2100.0,
+    "native_runtime": 4.7882091999053955,
+    "objective": -792710.8637699953,
+    "bound": -797900.0452973355,
+    "gap": 0.006546121372250855
+  },
+  "checks": {
+    "candidate_present": true,
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 1440,
+        "raw_max": 1.0357486152311064e-13,
+        "rounded_max": 1.0357486152311064e-13,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(208)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 360,
+        "raw_max": 3.943512183468556e-13,
+        "rounded_max": 3.943512183468556e-13,
+        "rounded_limiting_row": "a1_g4h_def(17)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 1440,
+        "raw_max": 1.4781951904296875e-05,
+        "rounded_max": 1.4781951904296875e-05,
+        "rounded_limiting_row": "a1_activacion_2(247)"
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 360,
+        "raw_max": 4.933099262416363e-07,
+        "rounded_max": 4.933099262416363e-07,
+        "rounded_limiting_row": "a1_balance(280)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 720,
+        "raw_max": 8.526512829121202e-14,
+        "rounded_max": 8.526512829121202e-14,
+        "rounded_limiting_row": "gh_total(18)"
+      }
+    ],
+    "raw_max_ratio": 1.4781951904296875e-07,
+    "rounded_max_ratio": 1.4781951904296875e-07,
+    "max_integer_violation": 0.0,
+    "raw_bound_violation": 0.0,
+    "rounded_bound_violation": 0.0,
+    "raw_maximum_activity_normalized_violation": 1.0448797291290082e-15,
+    "rounded_maximum_activity_normalized_violation": 1.0448797291290082e-15,
+    "original_point_objective_exact": "-3833314522802248353257326442603/4835703278458516698824704",
+    "original_point_objective_display": -792710.8637699952,
+    "known_witness_objective_exact": "-475677546187972462924320781131392512622768204302574351400375497238554325126692168527354369191699370708430289088133505154675433323291676516857830786668930973319945003563011347588208100486827873409469754640332456860367888588743669302543813238927039087838956933748352935762817005618138271845477028744150524931736390835316811778061819127991893728874972561694782426290392429616007557152013455771939557569360889412061994859162576680110668306702652299331021461009790791234223308053197163328537843425067294896431973246947064816080517695773849149635190933469598109360955482881981786471473166766215705089928878963875441002464051584796179180567620418075841749891/595276964049106848088121590653110128901137360263539290087069822815073340968917139680239931589904344337538431166069469715799400333480303806728477105614969247806884750191796433993524021497303173099354255341917348170192839507102493189411160654145650869835270503313758361657201832691029659808984797370273483954066732979442552956992269656118526422718309243615827193758974250041240011208884237369751277188872063640459468919658713845153354842238371100211088074030574837762865933585985414285671501523675974867402244016585871355805187219125042663668152147633077794506913028695709521372520015800301378051118968758670677944433440575674782353905790190878720",
+    "bound_contradiction": true,
+    "completion_contradiction": false,
+    "audited_primal_budgets_pass": true
+  },
+  "input_sha256": "1484e69f45d338dc1a5c82e1682e9d931dee4f2001ee190713b41292b17f6657",
+  "base_sha256": "995be38dd217aeeeddcc0c8bc1d479596e2be3364ec195674409544ef9acdd7c",
+  "export_sha256": "22fb23298e562f5ddfe1375c83df331fcb26d82ac4a3198d3b6238a19a57908a",
+  "native_import": {
+    "rows": 10080,
+    "columns": 6120,
+    "nonzeros": 22679,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "timing_stages_seconds": {
+    "generator_construction_base_export": 0.11464982899997267,
+    "read_canonical_metadata": 0.13046461999999792,
+    "factor_selection": 0.5000495070000852,
+    "scaled_export": 0.05023565700003019,
+    "integrity_and_reference_read": 0.035565660999964166,
+    "native_environment_import_parameters": 0.017041759999983697,
+    "native_import_check": 0.07985815699998966,
+    "solve": 4.788360140999998,
+    "extract_and_point_persistence": 0.015887105000047086,
+    "verification": 0.2265928450000274,
+    "native_cleanup": 0.010671344000002136
+  },
+  "worker_internal_seconds_before_result": 6.1451923010000655,
+  "native_global_optimality_independently_validated": false
+}

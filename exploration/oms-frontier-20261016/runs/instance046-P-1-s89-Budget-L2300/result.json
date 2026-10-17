@@ -1,0 +1,116 @@
+{
+  "job": {
+    "instance": "instance046",
+    "presolve": -1,
+    "seed": 89,
+    "policy": "Budget-L2",
+    "budget": 300,
+    "key": "B300",
+    "id": "instance046-P-1-s89-Budget-L2300"
+  },
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Presolve": -1,
+    "Seed": 89
+  },
+  "base_sha256": "995be38dd217aeeeddcc0c8bc1d479596e2be3364ec195674409544ef9acdd7c",
+  "export_sha256": "d4f89c71d39ff21f39f50985172d125885ed1ceae69d777078f5c262ab0c7503",
+  "native_import": {
+    "rows": 10080,
+    "columns": 6120,
+    "nonzeros": 22679,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 10,
+    "native_completed": true,
+    "work": 19.928101483872997,
+    "nodes": 3304.0,
+    "native_runtime": 22.996768951416016,
+    "objective": -797577.8346063882,
+    "bound": -797655.3218800598
+  },
+  "checks": {
+    "known_witness_objective_exact": "-530630739169055510851526661066252000621130076657675562639027376348387786685212478302719570384104849836326783738500947291553011612530728479039463479754464707452791017637469945076560388212049628954437447303531137167604322164928201816500161325946284179821064560385447213665117119117579844504408087836630703460045683432209719559625557503476103329939365200377133924911429085698102339171900183480519153594077914178806351828460443847177905105094976526681780439787912795528480166770305342134514761120230737952814095893212645302662269730589950951555930616624477248056020354360287901556136428195055542184887328522843182539257053252170468757867499400919126370711/664047016671389383500638516919569425653999929348902374199151350466397283772134267176309668879576828582920093876669043720753438070471514942466947798543417697419905865268554452720439797870296387033444164041625562721610210840683629323190255916585555315759155557418427228569312471912825230201402406574005368268862182473832980570010797098083536487762172731018031182122297641271928476881984588181828605125314215785418576610749717626351327267344181130431333305474327945132513341462558692676508997748706998679993704457027768341127423431703865190216276041275062461339518405867481432150894563413970073418992422799553560170651072284540394583102395955281920",
+    "bound_contradiction": true,
+    "completion_contradiction": false,
+    "candidate_present": true,
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 1440,
+        "raw_max": 8.29712674910039e-14,
+        "rounded_max": 8.29712674910039e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(25)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 360,
+        "raw_max": 3.055333763768431e-13,
+        "rounded_max": 3.055333763768431e-13,
+        "rounded_limiting_row": "a1_g4h_def(2)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 1440,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 360,
+        "raw_max": 4.933099262416363e-07,
+        "rounded_max": 4.933099262416363e-07,
+        "rounded_limiting_row": "a1_balance(280)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 720,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      }
+    ],
+    "point_objective_exact": "-30854797997055648783884149933275/38685626227668133590597632",
+    "max_integer_violation": 0.0,
+    "observed_exported_physical_max_violation": 9.686449543422835e-11,
+    "exported_physical_rows_exceeding_epsilon": 0,
+    "integer_gamma_hypothesis_holds": true
+  },
+  "factor_info": {
+    "incompatible": [],
+    "incompatible_count": 0,
+    "projected_rows": 1440,
+    "max_integer_rounding_reserve_m3": 12.4947934144504
+  },
+  "stages_seconds": {
+    "generator": 0.11523632300122699,
+    "parse_original": 0.1153979110004002,
+    "matrix_metadata": 0.05211532799876295,
+    "factor_selection": 0.7117415480006457,
+    "scaled_export": 0.08148549399993499,
+    "export_metadata": 0.05976510400068946,
+    "native_import": 0.027275636999547714,
+    "native_equality_check": 0.12994136099950993,
+    "solve": 22.99696737600061,
+    "extraction": 0.016652280999551294,
+    "verification": 0.41742012800023076,
+    "cleanup": 0.0070671180001227185
+  },
+  "worker_internal_seconds_before_result": 24.96529019599984,
+  "global_optimality_independently_verified": false
+}

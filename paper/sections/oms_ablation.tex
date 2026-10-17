@@ -1,0 +1,15 @@
+\subsection{Complementary check of applied final-policy transformations}
+\label{subsec:results-ablation}
+The six-model stage check in Table~\ref{tab:oms-ablation} records which transformations
+were actually applied by the final Role-Hybrid implementation. Its factor audit checks
+that the local and coupling stages have disjoint nonunit supports and compose to the
+full export. This is an implementation check on the stated subset.
+
+\input{tables/oms-ablation}
+
+On all six models, every coupling candidate is suppressed by the final identity band:
+Coupling-only is byte-identical to Base, and Local-only is byte-identical to Role-Hybrid.
+The full policy's effort is therefore reproduced by its local stage, with total-time
+differences between identical exports reflecting measurement variation. This identifies
+the active transformation in this guarded implementation; it does not test the benefit
+of an active coupling transformation or establish a general local-stage dominance result.

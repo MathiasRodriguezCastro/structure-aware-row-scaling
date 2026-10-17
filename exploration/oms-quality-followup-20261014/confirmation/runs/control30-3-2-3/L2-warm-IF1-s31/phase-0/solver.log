@@ -1,0 +1,73 @@
+
+Gurobi 13.0.2 (linux64) logging started Wed Oct 14 14:25:38 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-quality-followup-20261014/confirmation/runs/control30-3-2-3/L2-warm-IF1-s31/phase-0/solver.log"
+Set parameter Threads to value 4
+Set parameter MIPGap to value 0.01
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-05
+Set parameter Seed to value 31
+Set parameter TimeLimit to value 1
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  1
+MIPGap  0.01
+LogToConsole  0
+Seed  31
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 512 rows, 332 columns and 1472 nonzeros (Min)
+Model fingerprint: 0xc9974a57
+Model has 2 linear objective coefficients
+Variable types: 242 continuous, 90 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e-07, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [4e-02, 5e-01]
+
+Presolve removed 258 rows and 83 columns
+Presolve time: 0.00s
+Presolved: 254 rows, 249 columns, 949 nonzeros
+Variable types: 174 continuous, 75 integer (75 binary)
+Found heuristic solution: objective 18259.127162
+
+Root relaxation: objective -3.200475e+01, 170 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  -32.00475    0   36 18259.1272  -32.00475   100%     -    0s
+H    0     0                    8357.8232226  -32.00475   100%     -    0s
+     0     0  -30.42981    0   40 8357.82322  -30.42981   100%     -    0s
+H    0     0                    2665.6949284  -30.42980   101%     -    0s
+     0     0  -30.42980    0   40 2665.69493  -30.42980   101%     -    0s
+H    0     0                     145.0286024  -30.42980   121%     -    0s
+     0     0  -29.87014    0   42  145.02860  -29.87014   121%     -    0s
+     0     0  -20.14515    0   42  145.02860  -20.14515   114%     -    0s
+H    0     0                     -31.9718786  -31.97188  0.00%     -    0s
+     0     0  -29.86817    0   47  -31.97188  -31.97188  0.00%     -    0s
+
+Cutting planes:
+  Gomory: 20
+  Implied bound: 5
+  MIR: 19
+  Flow cover: 14
+  Relax-and-lift: 13
+
+Explored 1 nodes (307 simplex iterations) in 0.07 seconds (0.04 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 6: -31.9719 -31.9719 145.029 ... 18259.1
+No other solutions better than -31.9719
+
+Optimal solution found (tolerance 1.00e-02)
+Warning: max integrality violation (1.8692e-05) exceeds tolerance
+Best objective -3.197187863399e+01, best bound -3.197187863399e+01, gap 0.0000%

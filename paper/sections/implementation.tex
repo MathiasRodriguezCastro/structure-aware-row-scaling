@@ -1,0 +1,114 @@
+\subsection{Implementation and verification workflow}
+\label{sec:implementation}
+The software separates dispatch-model export from the reference implementation of the
+residual-budget selector. The C++ generator implements the policies of
+\cref{tab:policies}, preserves named rows and columns, and writes LP text without invoking
+an optimizer. The Python module \path{scripts/research/budget_scaling.py} implements
+\cref{prop:budget,prop:dyadic} and supplies the budget-aware factors to the enumerated
+experiment. The application-budget audit calls the same selector on stored dispatch rows and
+projects each final-policy proposal onto its admissible interval. It retains per-row
+decisions and checks paired dispatch incumbents in physical units. When no factor changes,
+the budgeted export is identical and needs no separate optimization call. The stress
+experiment and dispatch audit assess complementary components of the workflow.
+
+\subsubsection{Row-factor selection}
+For a finite, nonconstant row, the selector receives its coefficients, a declared budget
+$\delta$, an exported-residual hypothesis $\epsilon$, a coefficient window $[\ell,U]$,
+and an optional rounding allowance $E$. The dyadic selector also receives the RHS. A GM
+candidate minimizes the logarithmic coefficient objective in exact arithmetic; an L2 candidate can be projected
+onto the same interval without acquiring that minimax characterization.
+The following procedure makes the implementation choices explicit.
+\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=3pt]
+\item Validate finite inputs, positive budget and residual hypothesis, and a nonempty
+positive coefficient window. Constant rows require a separate feasibility check.
+Compute the nonzero coefficient extremes $m$ and $M$. If $\delta\le E$, return an
+abstention with reason \texttt{rounding\_budget\_exhausted}.
+\item Form $L=\max\{\epsilon/(\delta-E),\ell/m\}$ and $H=U/M$ as exact rational
+expressions in the supplied binary64 inputs. If $L>H$, report incompatibility.
+This step tests the specification before attempting to center the coefficients.
+\item For an arbitrary binary64 factor, round $L$ upward and $H$ downward. Abstain if
+the resulting interval contains no positive finite factor. Evaluate the GM or L2
+candidate using logarithms and clip it to that interval. For exact power-of-two export,
+instead intersect with the integer exponent bounds of \cref{prop:dyadic} and choose
+the admissible exponent minimizing the coefficient objective, comparing candidates
+as exact rational numbers.
+\item Return the factor, admissible endpoints and a decision reason. Multiply the
+whole row and its RHS by that factor, retaining the original row, budget and factor
+for verification. In the stress driver, one abstaining row causes the whole model to
+abstain before an optimizer is called.
+\end{enumerate}
+
+The arbitrary-factor API returns a \texttt{RowDecision} containing the selected factor,
+inward-rounded endpoints, unprojected candidate and decision reason. Its \texttt{factor}
+field is \texttt{None} on abstention. Distinguishing an empty real
+interval from an interval containing no binary64 factor makes the numerical failure
+reviewable. Extrema and norm computation require a linear scan of the row; the exact
+checks additionally use integer-ratio arithmetic whose cost depends on the operand
+bit lengths. No factor-selection step requires an optimization solve.
+
+\subsubsection{Representation and returned-point checks}
+Factor admissibility and exact row export are separate properties. Inward rounding
+certifies the factor's interval membership for the stored input numbers. With an arbitrary
+factor, independently rounded products can still change proportionality. The dyadic
+selector checks every coefficient and the RHS against exact rational products and assumes
+gradual underflow. The C++ LP serializer uses
+\texttt{std::numeric\_limits<double>::max\_digits10} significant digits to preserve each
+stored binary64 value on readback. Decimal round-trip preservation avoids an additional
+serialization error; it does not undo multiplication rounding.
+
+The budget conclusion remains conditional on the actual exported-row residual.
+The stress checker therefore evaluates original-row residuals exactly as rational
+expressions in the stored binary64 data and returned coordinates, then checks bounds,
+integrality and the rounded assignment against an independently enumerated optimum.
+The dispatch checker uses floating-point residuals against retained original rows.
+Those checks are useful diagnostics, but they do not certify the intended pre-rounding
+physical data or the correctness of a solver's dual bounds.
+
+\begin{table}[tb]
+\centering\small
+\caption{Software components and their verification responsibilities. Paths are relative to
+the accompanying source and data archive.}
+\label{tab:software-components}
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+Component & Implementation & Responsibility\\
+\midrule
+Dispatch export & C++ \texttt{PreprocesamientoMIP} and \texttt{ProblemaLp}
+& Matched scaling policies; whole-row/RHS transformation; decimal serialization\\
+Budget selector & \path{scripts/research/budget_scaling.py}
+& Admissible factors, abstention reasons, dyadic product checks and exact residuals\\
+Stress driver & \path{scripts/research/residual_budget_experiment.py}
+& Fixed models, solver settings, returned points and separate verification labels\\
+Application audit & \path{scripts/research/oms_dispatch_validation.py}
+& Three precision scenarios, factor intervals and physical-unit checks\\
+Activation follow-up & \path{exploration/oms-followup-20261014}
+& Finite-box export reserves, matched controls and exact feasible witnesses\\
+Independent audit & \path{scripts/research/verify_manuscript_claims.py}
+& Re-enumeration, saved acceptance labels, native operational logs and matrix comparisons\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Reproducible evaluation}
+The artifact retains original inputs, factors or policy configurations, input hashes,
+solver versions and settings, and returned points or operational records. Policy comparisons
+match coverage, row roles, kernels and safeguards whenever an information effect is tested.
+Fixed-basis conditioning is recomputed after a documented solver-style equilibration;
+operational evaluation records both completed-run effort and failures on the assigned pool.
+The historical numerical-claim audit reads stored data without importing an optimizer or
+the experiment driver. The additional dispatch replay checks preserved exports and
+incumbents, independently forms rational interval bounds, and recomputes reported
+aggregates; its physical-residual replay shares the reference checker. Both require no
+optimization calls. Supplementary Material~1 provides the protocols and
+commands; Supplementary Material~2 contains the code and analysis inputs.
+
+An isolated C++ integration applies the same selector to the generator's in-memory
+rows before export. On six known models it reproduces the Python factors and
+binary64 models exactly while reducing standalone preparation cost.
+A separate randomized complete-cycle comparison uses the same isolated executable
+with the native selector enabled or disabled, matching all ordered model data.
+Across 18 model/seed pairs, both implementations return identical points and native
+endpoints with identical work; the paired geometric-mean C++/Python full-process
+time ratio is 0.824 on the shared host (Supplementary Material~1, Table~S18).
+Compilation and prior witness acquisition are separate costs. This measures the
+implementation cost of the same scaling policy, with no reduction in solver work.

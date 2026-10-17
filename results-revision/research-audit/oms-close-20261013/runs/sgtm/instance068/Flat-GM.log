@@ -1,0 +1,87 @@
+
+Gurobi 13.0.2 (linux64) logging started Tue Oct 13 22:50:01 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/results-revision/research-audit/oms-close-20261013/runs/sgtm/instance068/Flat-GM.log"
+Set parameter Threads to value 4
+Set parameter Seed to value 42
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-05
+Set parameter ScaleFlag to value -1
+Set parameter Presolve to value -1
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+MIPGap  0.01
+LogToConsole  0
+Seed  42
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0x89cfd1ee
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [1e-05, 9e+04]
+  Objective range  [1e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [9e+01, 3e+07]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 7.142485e+08
+Presolve removed 1061 rows and 406 columns
+Presolve time: 0.06s
+Presolved: 9019 rows, 5714 columns, 21459 nonzeros
+Variable types: 4291 continuous, 1423 integer (1423 binary)
+
+Root relaxation: objective -1.810234e+05, 7599 iterations, 0.10 seconds (0.12 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -181023.36    0  199 7.1425e+08 -181023.36   100%     -    0s
+H    0     0                    -84927.23605 -181023.36   113%     -    0s
+     0     0 -153299.98    0  214 -84927.236 -153299.98  80.5%     -    0s
+     0     0 -151962.84    0  211 -84927.236 -151962.84  78.9%     -    0s
+     0     0 -151830.30    0  212 -84927.236 -151830.30  78.8%     -    0s
+     0     0 -150322.16    0  201 -84927.236 -150322.16  77.0%     -    0s
+     0     0 -150184.34    0  210 -84927.236 -150184.34  76.8%     -    0s
+     0     0 -150184.34    0  215 -84927.236 -150184.34  76.8%     -    0s
+     0     0 -149508.09    0  226 -84927.236 -149508.09  76.0%     -    0s
+H    0     0                    -123464.9311 -149508.09  21.1%     -    0s
+     0     0 -148649.35    0  227 -123464.93 -148649.35  20.4%     -    0s
+     0     0 -147753.73    0  241 -123464.93 -147753.73  19.7%     -    0s
+     0     0 -147646.34    0  241 -123464.93 -147646.34  19.6%     -    0s
+     0     0 -147445.93    0  240 -123464.93 -147445.93  19.4%     -    0s
+     0     0 -146443.12    0  240 -123464.93 -146443.12  18.6%     -    0s
+     0     0 -146443.12    0  240 -123464.93 -146443.12  18.6%     -    0s
+     0     2 -146443.12    0  240 -123464.93 -146443.12  18.6%     -    0s
+*  380   219              86    -128170.9951 -144750.22  12.9%  12.7    1s
+*  386   219              92    -128536.2537 -144750.22  12.6%  12.9    1s
+*  414   209              99    -132472.1517 -143639.41  8.43%  13.5    1s
+*  417   209             100    -133080.7241 -143639.41  7.93%  13.4    1s
+*  935   202              92    -133081.0247 -135665.14  1.94%  16.8    2s
+
+Cutting planes:
+  Gomory: 43
+  Implied bound: 212
+  MIR: 96
+  Flow cover: 52
+  RLT: 33
+  Relax-and-lift: 25
+
+Explored 1093 nodes (27846 simplex iterations) in 2.33 seconds (3.26 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 8: -133081 -133081 -132472 ... 7.14248e+08
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -1.330810246983e+05, best bound -1.343850114072e+05, gap 0.9798%

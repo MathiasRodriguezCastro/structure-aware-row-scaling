@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
-"""Cross-run certificate audit: solver claims contradicted by a verified feasible point.
+"""Reaggregate historical cross-run discrepancies from numerical screening records.
 
-Every run of these campaigns stores the point the solver returned, re-evaluated against the
-original unscaled model with exact residuals. Runs on one instance are therefore comparable
-whatever policy, solver, gap or seed produced them, and any verified point is an upper bound on
-that instance's optimum. Two levels are reported, in increasing strength:
-
-  dual bound    the reported dual bound lies above such a point, so the two are inconsistent;
-  certificate   the run also reported completion at an objective further from that point than
-                the gap it was asked for.
-
-Only witnesses of the strict tier are used: points whose residuals against the original model
-are at most 1e-9 in relative activity, in bounds and in integrality. A point the campaign
-tolerance merely accepted can be slightly infeasible, and would not bound the optimum.
+The strict tier screens original-model relative activity, bounds and integrality
+at 1e-9. This is not exact feasibility verification: its discrepancy flags are
+numerical diagnostics, distinct from the rational feasible witnesses in the newer
+activation studies. Historical column names are retained for traceability.
 
 Neither campaign is a census. The solver-robustness campaign was stopped by decision and the
 operational replication covers a fixed 30-instance subset, so these counts describe occurrences
@@ -40,9 +32,7 @@ def tru(v):
 
 
 def summarize(path):
-    """Counts under the strict tier only: witnesses whose residuals against the original
-    model are at round-off, so the comparison does not rest on a point that the campaign
-    tolerance merely accepted."""
+    """Counts under the stored strict numerical screen, not an exact certificate."""
     all_rows = list(csv.DictReader(path.open()))
     rows = [r for r in all_rows if tru(r["dual_bound_invalid_strict"])]
     strong = [r for r in all_rows if tru(r["optimality_claim_contradicted_strict"])]
@@ -73,6 +63,11 @@ def main():
                     default=ROOT / "results-revision/research-audit/certificate-audit.json")
     args = ap.parse_args()
 
+    # Missing saved inputs must fail the audit rather than silently drop a campaign.
+    for label,cpath,rpath in SOURCES:
+        for path in (cpath,rpath):
+            if not path.is_file():raise FileNotFoundError(f'required {label} analysis input missing: {path}')
+
     out = {}
     main = [r"\begin{tabular}{lrrrr}", r"\toprule",
             r"Campaign & Runs & Dual bound & Certificate & Instances \\",
@@ -81,10 +76,8 @@ def main():
               r"Campaign & Level & Runs & Inst. & " + " & ".join(POLICIES) + r" \\",
               r"\midrule"]
     for label, cpath, rpath in SOURCES:
-        if not cpath.exists():
-            continue
         s = summarize(cpath)
-        total = len(list(csv.DictReader(rpath.open()))) if rpath.exists() else None
+        total = len(list(csv.DictReader(rpath.open())))
         s["campaign_runs"] = total
         out[label] = s
         main.append(f"{label} & {total:,} & {s['rows']} & {s['strong_runs']} & "

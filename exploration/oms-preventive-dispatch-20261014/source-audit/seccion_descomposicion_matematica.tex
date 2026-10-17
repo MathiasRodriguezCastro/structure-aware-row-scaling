@@ -1,0 +1,451 @@
+% =============================================================================
+% Seccion: Descomposicion matematica del problema de despacho.
+% Fuente incluida desde Tesis/desarrollo.tex mediante Tesis/generados/.
+% Mantener este archivo como fuente y sincronizar con `make sync` en Tesis/.
+% =============================================================================
+\section{Descomposición matemática del problema de despacho}
+\label{sec:descomposicion_despacho}
+
+Se reformula el despacho por agentes mediante un maestro de Dantzig--Wolfe y subproblemas locales, y se precisan las cotas de pricing necesarias para certificar su cierre. En el régimen lineal ensayado se reproduce el costo monolítico a la precisión reportada, con mayor tiempo de resolución. La línea permanece en desarrollo; la evaluación experimental y la extensión entera siguen abiertas.
+
+La Sección~\ref{sec:marco_dw} presenta el criterio de elección por restricciones o variables complicantes~\cite{ConejoEtAl2006}; sus antecedentes hidrotérmicos se revisan en la Sección~\ref{sec:descomposicion-sthc} \cite{JimenezRedondoConejo1999,BorghettiEtAl2003,SifuentesVargas2007,ScuzziatoEtAl2018,ColonettiEtAl2022,SugishitaGrotheyMcKinnon2024}.
+
+La estructura de la Sección~\ref{sec:analisis_estructural_modelo} separa Río Negro, Salto Grande y térmicas en bloques $x_i\in X_i$, con costo $C_i(x_i)$ y aporte horario $G_{i,t}(x_i)$. Este último incluye la participación nacional $r$ de Salto Grande. Los selectores $L_i$ agregan las generaciones locales; la falla $s_t=d_t-g_t\ge0$ equivale a limitar $g_t\le d_t$. Su costo $C_f(s)$ es la envolvente por tramos de~\eqref{eq:costo_falla_tramos}, representada por epígrafe. El problema acoplado es
+
+\begin{align}
+    \min_{x_1,\ldots,x_N,g,s}
+    \quad
+    &
+    \sum_{i=1}^{N} C_i(x_i)
+    +
+    C_f(s)
+    \label{eq:despacho_descomp_obj}
+    \\
+    \text{s.a.}
+    \quad
+    &
+    x_i \in X_i,
+    \qquad i=1,\ldots,N,
+    \label{eq:despacho_descomp_local}
+    \\
+    &
+    g_{i,t}=G_{i,t}(x_i),
+    \qquad i=1,\ldots,N,\quad t=1,\ldots,T,
+    \label{eq:despacho_descomp_generacion_local}
+    \\
+    &
+    \sum_{i=1}^{N} g_{i,t} - g_t = 0,
+    \qquad t=1,\ldots,T,
+    \label{eq:despacho_descomp_acoplamiento}
+    \\
+    &
+    g_t+s_t=d_t,
+    \qquad t=1,\ldots,T,
+    \label{eq:despacho_descomp_demanda}
+    \\
+    &
+    s_t\geq 0,
+    \qquad t=1,\ldots,T.
+    \label{eq:despacho_descomp_falla}
+\end{align}
+La Figura~\ref{fig:dw_estructura_matriz} resume la estructura: bloques locales y filas globales que vinculan las trayectorias de generación.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[every node/.style={font=\footnotesize},
+  blk/.style={ttproc, minimum size=11mm, inner sep=1pt},
+  band/.style={minimum height=6.5mm, inner sep=2pt, align=center}]
+  \node[blk] (a1) at (0,0)      {$A_1$};
+  \node[blk] (a2) at (1.2,-1.2) {$A_2$};
+  \node                at (2.1,-2.1) {$\ddots$};
+  \node[blk] (aN) at (3.0,-3.0) {$A_N$};
+  \draw[black!35] (-0.62,0.62) rectangle (3.62,-3.62);
+  \node[ttres, band, minimum width=42.4mm, anchor=north] (cpl) at (1.5,-3.95)
+     {acoplamiento\ \ $\textstyle\sum_{i} g_{i,t}-g_t=0$};
+  \node[ttdata, band, minimum width=42.4mm, anchor=north] (dem) at (1.5,-4.9)
+     {demanda/falla\ \ $g_t+s_t=d_t$};
+  \draw[ttbrace] (3.82,0.55) -- (3.82,-3.55);
+  \node[anchor=west, align=left, font=\scriptsize\itshape] at (4.0,-1.5)
+     {bloques locales\\$X_i$ (separables)};
+\end{tikzpicture}
+\caption[Estructura por bloques de la matriz de restricciones]{Bloques locales separables $A_i$ y filas globales. Solo el balance $\sum_i g_{i,t}=g_t$ cruza todos los bloques; la demanda $g_t+s_t=d_t$ los coordina indirectamente mediante $g_t$. El ancho de las bandas es esquemático: se omiten las columnas de $g_t$ y $s_t$.}
+\label{fig:dw_estructura_matriz}
+\end{figure}
+
+\subsection*{Criterio estructural y estrategias posibles}
+
+El balance~\eqref{eq:despacho_descomp_acoplamiento} constituye la restricción complicante: al retirarlo, cada bloque conserva balances hidráulicos, rezagos y condiciones térmicas. Con multiplicadores $\lambda_t$, su relajación lagrangiana es
+
+\begin{align}
+    \mathcal{L}(x_1,\ldots,x_N,g,s,\lambda)
+    =
+    \sum_{i=1}^{N}
+    \left[
+        C_i(x_i)
+        +
+        \sum_{t=1}^{T}\lambda_t G_{i,t}(x_i)
+    \right]
+    -
+    \sum_{t=1}^{T}\lambda_t g_t
+    +
+    C_f(s).
+    \label{eq:lagrangiano_despacho}
+\end{align}
+Con multiplicadores fijos, la relajación se separa por agentes; sus soluciones pueden incumplir el balance y requieren recuperación primal.
+
+Benders o Benders generalizado serían pertinentes si fijar decisiones globales dominantes, como trayectorias agregadas o decisiones estratégicas, simplificara los bloques. La descomposición por escenarios separaría realizaciones de incertidumbre y requeriría una formulación estocástica explícita; las instancias actuales son determinísticas o parametrizadas.
+
+
+\subsection*{Estrategia adoptada}
+\label{par:estrategia_descomposicion}
+
+Se adopta Dantzig--Wolfe porque el acoplamiento por restricciones permite coordinar perfiles localmente factibles en un maestro. Es una elección estructural; la Tabla~\ref{tab:dw_lp_validacion} evalúa la reformulación lineal, sin comparar empíricamente las cuatro estrategias.
+
+Para la trayectoria $G_i(x_i)=(G_{i,1}(x_i),\ldots,G_{i,T}(x_i))$, una columna $k$ es el par $(u_i^k,c_i^k)$ asociado a un perfil factible $x_i^k\in X_i$:
+\begin{equation}
+    u_i^k = G_i(x_i^k),
+    \qquad
+    c_i^k = C_i(x_i^k).
+    \label{eq:columna_dw_definicion_general}
+\end{equation}
+La columna contiene generación $u_i^k$ [MW] y costo $c_i^k$ [USD]; conservar $x_i^k$ permite reconstruir la operación. Sea $\mathcal C_i$ el conjunto de columnas: $\mathcal P_i$ para el maestro completo o $\mathcal K_i^r\subseteq\mathcal P_i$ para el restringido en la iteración $r$. Ambos comparten la formulación
+
+\begin{align}
+    \min_{\lambda,s}
+    \quad
+    &
+    \sum_{i=1}^{N}
+    \sum_{k\in\mathcal C_i}
+    c_i^k \lambda_{i,k}
+    +
+    C_f(s)
+    \label{eq:maestro_dw_obj}
+    \\
+    \text{s.a.}
+    \quad
+    &
+    \sum_{k\in\mathcal C_i}\lambda_{i,k}=1,
+    \qquad i=1,\ldots,N,
+    \label{eq:maestro_dw_convexidad}
+    \\
+    &
+    \sum_{i=1}^{N}
+    \sum_{k\in\mathcal C_i}
+    u_{i,t}^{k}\lambda_{i,k}
+    +
+    s_t
+    =
+    d_t,
+    \qquad t=1,\ldots,T,
+    \label{eq:maestro_dw_demanda}
+    \\
+    &
+    s_t\geq 0,
+    \qquad t=1,\ldots,T,
+    \label{eq:maestro_dw_falla}
+    \\
+    &
+    \lambda_{i,k}\geq 0,
+    \qquad i=1,\ldots,N,\quad k\in\mathcal C_i.
+    \label{eq:maestro_dw_lambda}
+\end{align}
+El maestro combina perfiles para cubrir demanda y penalizar falla; $g_t=\sum_i\sum_{k\in\mathcal C_i}u_{i,t}^k\lambda_{i,k}$. Como $\mathcal P_i$ no se enumera, el algoritmo resuelve maestros restringidos y utiliza sus duales para generar columnas mediante~\eqref{eq:pricing_local_obj}--\eqref{eq:pricing_local_factibilidad}. Agrega perfiles de costo reducido negativo hasta cerrar el pricing o alcanzar otro criterio de parada.
+
+La Figura~\ref{fig:dw_pipeline_despacho} muestra la inicialización, el intercambio de duales y columnas y las condiciones de parada.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=7mm and 8mm, every node/.style={font=\footnotesize}]
+  \node[ttdata, text width=28mm] (seed)
+    {\textbf{Inicialización} $\mathcal{K}_i^0$\\
+     \scriptsize columnas a precios $\gamma\,\pi$\\
+     \scriptsize \textbf{+ LP reparado}};
+  \node[ttproc, text width=28mm, right=8mm of seed] (master)
+    {\textbf{Maestro LP}\\
+     \scriptsize acoplamiento y convexidad\\
+     \scriptsize duales $(\pi_t,\mu_i)$};
+  \node[ttproc, text width=28mm, right=8mm of master] (pricing)
+    {\textbf{Pricing por agente}\\
+     \scriptsize factibilidad local $X_i$\\
+     \scriptsize columna $(u_i^k,c_i^k)$};
+  \node[ttres, text width=28mm, below=10mm of master] (stop)
+    {\textbf{Parada}\\
+     \scriptsize certificada si\\
+     \scriptsize $\ell_i-\mu_i\ge-\varepsilon_i\ \forall i$;\\
+     \scriptsize o por estancamiento\\
+     \scriptsize (heurístico)};
+  \node[ttcore, text width=28mm, right=8mm of stop] (final)
+    {\textbf{Maestro entero}\\
+     \scriptsize opcional si hay\\
+     \scriptsize variables enteras\\
+     \scriptsize $\lambda_{i,k}\in\{0,1\}$};
+  \draw[ttflow] (seed) -- (master);
+  \draw[ttflow] ([yshift=2mm]master.east) -- ([yshift=2mm]pricing.west)
+     node[midway, above, font=\scriptsize] {$\pi,\mu$};
+  \draw[ttflow] ([yshift=-2mm]pricing.west) -- ([yshift=-2mm]master.east)
+     node[midway, below=7mm, font=\scriptsize] {$\bar c_i^k<-\varepsilon$};
+  \draw[ttflowdash] (master) -- (stop);
+  \draw[ttflow] (stop) -- (final);
+\end{tikzpicture}
+\caption[Generación de columnas sobre el modelo de despacho]{Generación de columnas con precios iniciales escalados por un factor adimensional $\gamma$ y perfiles del LP reparado (Sección~\ref{subsec:dw_lp_disuelve}). Con duales óptimos del maestro original y cotas inferiores válidas $\ell_i$ del pricing, la parada certificada limita la brecha a $\sum_i\varepsilon_i$ [USD]; el estancamiento es heurístico. El maestro entero selecciona perfiles cuando los bloques conservan variables enteras; se omite bajo las hipótesis lineales de la Proposición~\ref{prop:dw_exacto_lineal}.}
+\label{fig:dw_pipeline_despacho}
+\end{figure}
+
+Si los bloques conservan variables enteras, puede resolverse al final el maestro restringido con $\lambda_{i,k}\in\{0,1\}$, definido en~\eqref{eq:maestro_dw_binario}. Su alcance es el siguiente.
+
+\begin{observacion}[Alcance del maestro entero restringido]
+\label{obs:maestro_entero_restringido}
+El cierre exacto del \emph{pricing} certifica el óptimo del maestro lineal completo.
+Con bloques enteros, ese maestro optimiza sobre los conjuntos locales convexificados;
+su valor es una cota inferior del MIP. El maestro entero restringido, si es factible,
+selecciona una columna de cada conjunto generado y satisface el acoplamiento: entrega
+una cota superior del MIP, óptima únicamente entre esas selecciones. No optimiza sobre
+la envolvente convexa de la unión de columnas de bloques diferentes.
+La igualdad de ambas cotas certifica optimalidad; para obtener garantías generales
+puede recurrirse a una exploración completa de \emph{branch-and-price}, con reglas de
+ramificación y \emph{pricing} compatibles \cite{DesrosiersLubbecke2005}.
+
+La integralidad de cada poliedro local no garantiza la integralidad del maestro acoplado.
+Si todos los bloques son continuos y convexos, en cambio, la reconstrucción mediante
+combinaciones convexas es factible y el maestro entero deja de ser necesario
+(Proposición~\ref{prop:dw_exacto_lineal}). Imponerlo sobre un conjunto finito de columnas
+puede empeorar el objetivo incluso en ese caso lineal.
+\end{observacion}
+
+Se compara costo, falla, factibilidad, tiempo, columnas e iteraciones con la resolución directa de la formulación global, denominada \emph{monolítica}. El \emph{pricing} utiliza el solver; la asistencia mediante aprendizaje se estudia en la Sección~\ref{sec:hibridacion}.
+
+\subsection{Construcci\'on de los subproblemas locales}
+\label{subsec:construccion_subproblemas_locales}
+
+Dados los precios del maestro $\pi=(\pi_1,\ldots,\pi_T)$, el agente $i$ genera un perfil factible resolviendo
+
+\begin{align}
+    \min_{x_i}
+    \quad
+    &
+    C_i(x_i)
+    -
+    \sum_{t=1}^{T}\pi_t G_{i,t}(x_i)
+    \label{eq:pricing_local_obj}
+    \\
+    \text{s.a.}
+    \quad
+    &
+    x_i\in X_i.
+    \label{eq:pricing_local_factibilidad}
+\end{align}
+El dual $\pi_t$ representa el valor marginal del aporte horario. La solución define $(u_i^k,c_i^k)$ mediante~\eqref{eq:columna_dw_definicion_general}; se conserva también $x_i^k$ para reconstruir el despacho. En los bloques hidráulicos, respetar máximos horarios no asegura balances, rezagos ni volúmenes. Por ello, las cotas
+
+\begin{equation}
+    \overline u_{i,t}
+    =
+    \max_{x_i\in X_i} G_{i,t}(x_i),
+    \qquad t=1,\ldots,T,
+    \label{eq:maximo_producible_periodo}
+\end{equation}
+son diagnósticas: los perfiles completos se generan sobre $X_i$. La Sección~\ref{sec:hibridacion} estudia propuestas aprendidas para este \emph{pricing}; la aproximación de la Sección~\ref{sec:aproximacion_redes_neuronales} propone directamente el despacho.
+
+\subsection{Construcci\'on del problema maestro}
+\label{subsec:construccion_problema_maestro}
+
+En la iteración $r$, el maestro utiliza~\eqref{eq:maestro_dw_obj}--\eqref{eq:maestro_dw_lambda} con $\mathcal C_i=\mathcal K_i^r$. Sean $\mu_i$ [USD] y $\pi_t$ [USD/MW] los duales de convexidad y demanda. El costo reducido de una columna, en USD, es
+
+\begin{equation}
+    \bar c_i^k
+    =
+    c_i^k
+    -
+    \mu_i
+    -
+    \sum_{t=1}^{T}\pi_t u_{i,t}^{k}.
+    \label{eq:costo_reducido_columna}
+\end{equation}
+El término $\mu_i$ es constante en el pricing. La columna se incorpora si $\bar c_i^k<-\varepsilon$, con tolerancia $\varepsilon>0$ [USD].
+
+El maestro entero restringido de la Observación~\ref{obs:maestro_entero_restringido} añade
+
+\begin{equation}
+    \lambda_{i,k}\in\{0,1\},
+    \qquad i=1,\ldots,N,\quad k\in\mathcal{K}_i^r.
+    \label{eq:maestro_dw_binario}
+\end{equation}
+La convexidad~\eqref{eq:maestro_dw_convexidad} impone entonces una columna por agente. Esta selección conserva la factibilidad local, con el alcance de la Observación~\ref{obs:maestro_entero_restringido}.
+
+\subsection{Límites de la descomposición del MIP}
+\label{subsec:intento_binario_dw}
+
+El primer ensayo conserva las binarias $\varphi_{i,t}^{(r)}$ de selección del tramo de altura $r$, en la hora $t$ de la central $i$.
+
+La aplicación directa no alcanza una resolución satisfactoria en los grupos multiagente de mercado. Intervienen tres dificultades: reconstruir decisiones enteras, disponer de columnas suficientes y resolver el maestro dentro del presupuesto. La selección de una columna por agente recupera integralidad, pero puede omitir perfiles necesarios (Observación~\ref{obs:maestro_entero_restringido}). En \texttt{instance024}, los costos reportados del LP compacto y del MIP son $121{,}188$ y $232{,}973$ USD; su diferencia no determina la brecha DW, cuya cota completa puede ser más fuerte.
+
+También se observan perfiles concentrados en horas de mayor precio y descenso lento del objetivo (\emph{tailing-off}). Incluso con bloques lineales pueden aparecer perfiles extremos y pivotes degenerados en el maestro: un costo reducido negativo no garantiza una mejora inmediata. Estos comportamientos no son exclusivos de las binarias, y un buen pricing local no asegura una buena selección entera en tiempo limitado.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{figs/delta_obj_dw.pdf}
+\caption[Diferencia de objetivo entre descomposición y MIP monolítico]{Diferencia relativa de objetivo de la descomposici\'on sobre el modelo \emph{binario}
+frente al monolítico, por grupo: $\Delta z^{\mathrm{rel}}=(z_{\mathrm{DW}}-z_{\mathrm{MIP}})/|z_{\mathrm{MIP}}|$, cociente adimensional expresado en porcentaje en la figura ($100\Delta z^{\mathrm{rel}}$), con escala logarítmica simétrica. El Modelo~1 reproduce la referencia; los grupos multiagente de mercado concentran la brecha. Se distinguen integralidad, selección de columnas y convergencia.}
+\label{fig:delta_obj_dw}
+\end{figure}
+
+Al inyectar las trayectorias del despacho de referencia, el maestro entero recupera su valor: esas columnas forman una selección factible y, si el despacho es óptimo, no pueden mejorarlo. El control identifica una limitación del conjunto generado, sin atribuir toda la convergencia a las binarias.
+
+Se implementaron costo de falla con \emph{big-M} controlado, columnas iniciales obtenidas del LP, \emph{pricing} por etapas, filtrado mediante relajación, estabilización dual (Neame e \emph{in-out}) y separación entre cotas garantizadas y heurísticas \cite{DesrosiersLubbecke2005,PessoaSadykovUchoaVanderbeck2018,BulaichMehamdiLacroixMartin2024,MartinBauguionMagnoucheLeguay2024,RousseauGendreauFeillet2007}. También se ensayaron \emph{branch-and-price} externo y derivación al monolítico cuando el maestro entero selecciona falla.
+
+Un bucle de cortes Dantzig--Wolfe en el espacio original reforzó el LP compacto en la raíz ($+24\%$ en \texttt{instance001}), pero su costo computacional degradó la cota final del Modelo~3.\footnote{Rama experimental no integrada en la línea principal.} La descomposición mejorada obtuvo una mediana de \emph{speedup} de $1{,}54$ en ese grupo, una mejora modesta que requiere ampliar la evaluación; en los restantes grupos el monolítico mantuvo la ventaja. La certificación entera requiere completar el \emph{branch-and-price}.
+
+Un criterio preciso permite comparar las cotas. Si $X_i$ es el conjunto entero local y
+$Q_i$ su relajación lineal, entonces $\operatorname{conv}(X_i)\subseteq Q_i$ y, para
+minimización, $z_{\mathrm{LP}}\le z_{\mathrm{DW}}\le z_{\mathrm{IP}}$.
+La igualdad $\operatorname{conv}(X_i)=Q_i$ en todos los bloques es suficiente para
+$z_{\mathrm{DW}}=z_{\mathrm{LP}}$ \cite{DesrosiersLubbecke2005}; no es necesaria para
+una instancia y un objetivo concretos, pues las dos formulaciones pueden compartir un
+óptimo aunque sus conjuntos difieran. Si $z_{\mathrm{IP}}>z_{\mathrm{LP}}$, el cociente
+$(z_{\mathrm{DW}}-z_{\mathrm{LP}})/(z_{\mathrm{IP}}-z_{\mathrm{LP}})$ mide la fracción
+de brecha cerrada, siempre que se usen valores óptimos certificados de los tres problemas.
+Una brecha pequeña para un objetivo tampoco demuestra integralidad del poliedro local.
+
+Los regímenes ofrecen márgenes distintos. En el Modelo~1, la brecha del LP compacto es $\sim0{,}015\%$ (\texttt{caso01a}: $\sim5\times10^4$ USD sobre $\sim3{,}4\times10^8$ USD), por lo que queda escaso margen para fortalecer la cota. En el Modelo~3, \texttt{instance001} registra $z_{\rm LP}=98{,}410$ USD frente a un incumbente de $230{,}516$ USD ($57\%$ por debajo); el monolítico conserva una brecha de $43{,}5\%$ tras $240\,\mathrm{s}$. El \emph{branch-and-price} en la raíz consumió $571\,\mathrm{s}$ y $21$ iteraciones, con $99{,}8\%$ del tiempo en \emph{pricing} entero de la central no lineal, sin cerrar la cota DW. Esta corrida muestra que el costo de obtener una cota más fuerte puede absorber su ventaja potencial.
+
+El costo del \emph{pricing} entero y la selección de columnas motivan la evaluación sobre cabeza congelada. La comparación cambia convexidad, coeficientes, conjuntos factibles de producción e inicialización: diagnostica un régimen distinto, sin aislar el efecto de retirar las binarias.
+
+\subsection{Exactitud de la reformulación sobre la aproximación lineal}
+\label{subsec:dw_lp_disuelve}
+
+Esta campaña obtiene la cabeza congelada mediante iteración de Picard, sin cargar una solución MIP; el posprocesamiento anclado emplea los promedios del despacho MIP (Sección~\ref{sec:exp-cabeza-congelada}). Cambiar promedios o tangentes puede producir LP distintos. La proposición siguiente demuestra la exactitud de Dantzig--Wolfe para cada LP fijado y permite reconstruir sus soluciones sin seleccionar perfiles binarios; no establece equivalencia con la producción física no lineal. Las columnas disponibles y el cierre del pricing siguen determinando la calidad del maestro restringido.
+
+\begin{proposicion}[Exactitud de Dantzig--Wolfe sobre bloques lineales]
+\label{prop:dw_exacto_lineal}
+Fíjense la cabeza y todos los coeficientes del problema acoplado
+\eqref{eq:despacho_descomp_obj}--\eqref{eq:despacho_descomp_falla}.
+Supóngase que cada $X_i$ es un poliedro no vacío y acotado, que $C_i$ y $G_i$ son afines,
+y que el costo de falla $C_f$ tiene una representación lineal mediante epígrafe.
+Supóngase además que el problema acoplado es factible y tiene óptimo finito. Entonces:
+\begin{enumerate}
+ \item[\textnormal{(a)}] toda combinación convexa $\hat x_i=\sum_k\lambda_{i,k}x_i^k$
+ de columnas factibles pertenece a $X_i$;
+ \item[\textnormal{(b)}] el maestro lineal completo, con todos los vértices de cada $X_i$,
+ tiene el mismo valor óptimo que el problema acoplado;
+ \item[\textnormal{(c)}] cualquier solución factible de un maestro restringido se reconstruye
+ mediante esos $\hat x_i$ en una solución factible del problema acoplado, al mismo costo.
+ Esa solución es óptima para el problema acoplado si también es óptima para el maestro
+ completo; el cierre exacto del \emph{pricing} proporciona ese certificado.
+\end{enumerate}
+\end{proposicion}
+\begin{proof}
+La convexidad de $X_i$ prueba (a). Por Minkowski--Weyl, cada politopo es la envolvente
+convexa de sus vértices. Por tanto, todo punto factible del problema acoplado admite la
+representación $x_i=\sum_k\lambda_{i,k}x_i^k$ y genera una solución factible del maestro
+completo. Recíprocamente, (a) reconstruye los bloques de cualquier solución del maestro.
+La afinidad y $\sum_k\lambda_{i,k}=1$ dan
+\[
+ C_i(\hat x_i)=\sum_k\lambda_{i,k}C_i(x_i^k),\qquad
+ G_i(\hat x_i)=\sum_k\lambda_{i,k}G_i(x_i^k).
+\]
+Conservar la misma falla $s$ y su epígrafe mantiene el acoplamiento y el objetivo en
+ambas direcciones. Esto prueba (b) y la primera afirmación de (c), que también vale
+para un subconjunto de columnas. La afirmación de optimalidad de (c) sigue de (b) y de
+la Proposición~\ref{prop:cierre_pricing_dw}; las variables explícitas de falla conservan
+sus restricciones duales, mientras el \emph{pricing} verifica las columnas ausentes.
+\end{proof}
+
+La acotación debe comprobarse para todas las variables locales, incluidas las auxiliares;
+si hay direcciones de recesión relevantes, deben incorporarse columnas de rayos o utilizar
+una formulación equivalente acotada. La reconstrucción es factible para el LP fijado:
+la comprobación de producción física corresponde a la auditoría de cabeza congelada.
+
+El resultado no dice que imponer $\lambda\in\{0,1\}$ conserve el óptimo. Por ejemplo,
+con un bloque $X=[0,1]$, generación $G(x)=x$, costo local cero, demanda $d=1/2$ y costo
+de falla $C_f(s)=s$, las columnas $0$ y $1$ bastan para el maestro lineal completo.
+La mezcla $(1/2,1/2)$ reconstruye $x=1/2$ con costo cero. El maestro binario sobre esas
+mismas columnas debe elegir $x=0$, pues $x=1$ excede la demanda; su costo es $1/2$.
+Incluir la columna agregada $x=1/2$ elimina esa brecha. Así, una brecha de integerización
+nula en una campaña describe el conjunto de columnas generado, no una consecuencia
+general de que los bloques sean lineales.
+
+\paragraph{Cierre, tolerancia e inicialización.}
+El certificado de~\eqref{eq:dw-cierre-tolerancia} usa mínimos globales o cotas inferiores válidas de todos los pricing, con los duales originales del maestro. Las tolerancias $\varepsilon_i$ [USD] se acumulan; el estancamiento no certifica optimalidad.
+
+En las corridas, una columna inicial obtenida de la aproximación lineal y reparada como perfil
+balanceado mejora el comportamiento dentro del presupuesto disponible. No constituye
+por sí sola un teorema de convergencia. Si se inyectan las trayectorias de un óptimo del
+mismo LP, el maestro restringido contiene ese óptimo desde el inicio; si sólo se inyecta
+una solución factible reparada, esa conclusión requiere una comprobación adicional.
+El \emph{tailing-off} puede persistir sobre bloques lineales: en \texttt{instance024}
+se reporta un objetivo aproximadamente $240\%$ superior al óptimo tras $200$
+iteraciones sin la columna inicial informada.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.96\textwidth]{figs/convergencia_dw.pdf}
+\caption[Convergencia de generación de columnas sobre el LP]{Evolución de la generación de columnas sobre cabeza congelada con columna inicial
+lineal reparada. Se muestran las medianas del objetivo del maestro restringido y del
+menor costo reducido por iteración. El objetivo no aumenta cuando se agregan columnas
+sin retirar las existentes y se resuelve el mismo maestro. Una mediana de costos
+reducidos cercana a cero no certifica el cierre en todas las instancias: el control
+requiere cotas de \emph{pricing} por bloque e instancia y la tolerancia acumulada.}
+\label{fig:dw_convergencia_lp}
+\end{figure}
+
+\subsection{Comparación numérica sobre las 306 instancias}
+\label{subsec:dw_lp_resultados}
+
+Con columna inicial reparada y parada por estancamiento, DW reproduce el objetivo del LP monolítico dentro del umbral de comparación en las $306$ instancias (Tabla~\ref{tab:dw_lp_validacion}). La brecha de selección entera también es numéricamente nula, pero depende de las columnas generadas. La coincidencia observada concuerda con la reformulación exacta; no sustituye los certificados primal y dual por instancia.
+
+\begin{table}[H]
+\centering
+\caption[Validación de Dantzig--Wolfe sobre las 306 instancias lineales]{DW frente al monolítico de cabeza congelada, en nodo dedicado del clúster. «DW $\approx$ Mono» cuenta los casos con $|\Delta z^{\rm rel}|<10^{-6}$; la brecha entera es $(z_{\rm ent}-z_{\rm LP})/|z_{\rm LP}|$. Ambos cocientes son adimensionales. El tiempo se expresa como mediana (IQR), en segundos.}
+\label{tab:dw_lp_validacion}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}Xccccc@{}}
+\toprule
+\textbf{Modelo} & $n$ & DW $\approx$ Mono & $\mathrm{med}\,|\Delta z^{\mathrm{rel}}|$ & \shortstack{Brecha entera\\(máximo)} & $T_{\mathrm{DW}}$ (s) \\
+\midrule
+Modelo~1   & $204$ & $204/204$ & $9\cdot10^{-16}$ & $0$              & $1{,}27$ ($0{,}28$) \\
+Modelo~2      & $68$  & $68/68$   & $1\cdot10^{-13}$ & $9\cdot10^{-14}$ & $0{,}91$ ($0{,}30$) \\
+Modelo~3 & $34$  & $34/34$   & $2\cdot10^{-13}$ & $0$              & $2{,}34$ ($0{,}36$) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Las instancias \texttt{instance024} (Modelo~3) e \texttt{instance071} (Modelo~2), antes dominadas por falla, coinciden con la referencia lineal. La comparación cambia tanto la aproximación de producción como la inicialización; no aísla el efecto de la convexidad.
+
+$T_{\rm DW}$ incluye maestro y pricing. El monolítico resuelve en fracciones de segundo a pocos segundos y resulta comparable o más rápido; no se registra aquí su tiempo por grupo. El aporte es reconstruir los despachos de los LP aproximados y disponer de una base para generar columnas aprendidas, con costo adicional de coordinación.
+
+
+\paragraph{Certificación por pasada de pricing.}
+La implementación revisada calcula
+$z_{\rm MR}+\sum_i\min\{0,\ell_i-\mu_i\}$ con cotas inferiores del solver
+para todos los bloques de una pasada pura. Una solución incumbente sólo se usa
+para proponer columnas. Los duales originales del maestro se conservan intactos;
+su recorte se aplica únicamente a los precios heurísticos. Las pasadas con
+maestro perturbado no certifican el problema original. El registro distingue
+la ausencia de columnas nuevas de un cierre acreditado y guarda las cotas de
+cada bloque con precisión suficiente para reproducir la suma. Una cota válida
+anterior permanece válida aunque un pricing posterior se interrumpa.
+La comparación pequeña con el LP monolítico del mismo caso y las pruebas de
+pricing truncado verifican estas distinciones. Los certificados siguen sujetos
+a las tolerancias numéricas del solver y no certifican la producción no convexa.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figs/rev_certificados_computables.pdf}
+\caption[Certificados computables de descomposición y reparación]{Certificados reproducidos en la revisión. Arriba: caso sintético SG--Ter--Mer
+ de ocho horas; el objetivo del maestro coincide pronto con el LP monolítico,
+ mientras la cota inferior mejora hasta cerrar el pricing. Abajo: tres escenarios
+ de Río Negro de 360 horas, con la reparación cuadrática corregida. La referencia
+ $w$ proviene del LP económico; $D(w)$ no se identifica con $D^\star$. El
+ certificado numérico agrega el residuo de primer orden y el error de referencia
+ de la Proposición~\ref{prop:red-cota-computable}; la línea muestra el factor del
+ caso ideal. Estas corridas no representan las campañas históricas completas.}
+\label{fig:certificados-computables}
+\end{figure}
+
+\subsection{Conclusi\'on: el rol de la descomposici\'on}
+\label{subsec:conclusion_descomposicion}
+
+La reformulación reproduce los costos de los LP ensayados sin acelerar su resolución. La extensión entera debe abordar el costo del pricing, la degeneración y la selección de perfiles; las corridas no aíslan a las binarias como causa exclusiva. Las ventajas en escalas mayores, escenarios o nuevos componentes discretos requieren evaluación. La Sección~\ref{sec:hibridacion} estudia propuestas de columnas aprendidas, sujetas a validación y al cierre del pricing.
+
+Los perfiles pueden reutilizarse si permanecen iguales todos los parámetros locales: aportes, volumen inicial, valor del agua, cabeza, tangentes y restantes restricciones. Cambiar sólo demanda y costo de falla modifica el maestro, pero exige verificar de nuevo el \emph{pricing} para certificar optimalidad. Los duales describen valores marginales del LP con su orientación de filas; pueden no ser únicos ante degeneración. Estas propiedades sustentan resolución repetida y coordinación modular, sin establecer una ventaja temporal sobre el solver directo.

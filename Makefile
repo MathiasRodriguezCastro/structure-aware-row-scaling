@@ -19,10 +19,10 @@ APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
         research-certificate-audit research-stage-ablation \
         research-grid research-budget analysis-n0 synthetic-mini sanity-check \
         research-rounding-check research-rounding-analysis \
-        research-robustness-analysis
+        research-robustness-analysis oms-package oms-validate
 
 help:
-	@echo "COAP manuscript and reproducibility (no optimizer license required):"
+	@echo "OMS manuscript and reproducibility (no optimizer license required):"
 	@echo "  make research-check-python  - mathematical tests, saved binary audit, LP hashes"
 	@echo "  make research-check         - also build and test the C++ LP serializer"
 	@echo "  make research-analysis      - regenerate current tables, figures and summaries"
@@ -34,6 +34,8 @@ help:
 	@echo "  make research-certificate-audit   - solver claims contradicted by a verified point"
 	@echo "  make research-stage-ablation      - historical local/coupling stage ablation"
 	@echo "  make paper                  - build main and supplement PDFs with pdfLaTeX"
+	@echo "  make oms-package            - prepare separate OMS upload files and archives"
+	@echo "  make oms-validate           - verify extracted packages, builds and stored claims"
 	@echo "  make audit-build            - isolated solver-free C++ build in code/build-audit"
 	@echo "Optional fresh experiments (new output directories only):"
 	@echo "  make research-fixed-basis-check - rebuild all fixed-basis matrices from LP text"
@@ -46,6 +48,12 @@ help:
 
 paper:
 	$(MAKE) -C paper
+
+oms-package: paper
+	$(PYTHON) scripts/research/package_oms.py
+
+oms-validate:
+	$(PYTHON) scripts/research/validate_oms.py
 
 research-rounding-check:
 	OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 $(PYTHON) -m pytest -q tests/test_joint_rounding_certificate.py tests/test_finite_safety_geometry.py tests/test_single_row_safety.py tests/test_certified_guards.py
@@ -60,8 +68,10 @@ audit-build:
 	$(MAKE) -C code BUILD_DIR=build-audit USE_GUROBI=0 USE_CPLEX=0 USE_CBC=0 USE_HEXALY=0
 
 research-check-python:
-	$(PYTHON) -m pytest -q tests/test_budget_scaling.py tests/test_robustness_analysis.py
+	$(PYTHON) -m pytest -q tests/test_budget_scaling.py tests/test_robustness_analysis.py tests/test_certificate_audit.py
 	$(PYTHON) scripts/research/verify_saved_experiment.py --root $(AUDIT_ROOT)/budget-final
+	$(PYTHON) scripts/research/verify_saved_experiment.py --root $(AUDIT_ROOT)/budget-final-cplex
+	$(PYTHON) scripts/research/verify_stress_coverage.py
 	cd $(AUDIT_ROOT)/identifiability-final && sha256sum --quiet -c checksums.sha256
 
 research-check: audit-build research-check-python
@@ -69,7 +79,17 @@ research-check: audit-build research-check-python
 
 research-analysis: research-budget-analysis research-matrix-analysis research-operational-analysis \
                    research-fixed-basis-analysis research-application-budgets \
-                   research-certificate-audit research-stage-ablation
+                   research-certificate-audit research-stage-ablation research-oms-tables
+
+.PHONY: research-oms-tables
+research-oms-tables:
+	$(PYTHON) scripts/research/oms_dispatch_tables.py
+	$(PYTHON) exploration/oms-followup-20261014/write_paper_tables.py
+	$(PYTHON) scripts/research/oms_incumbent_tables.py
+	$(PYTHON) scripts/research/oms_workflow_tables.py
+	$(PYTHON) scripts/research/oms_matched_tables.py
+	$(PYTHON) scripts/research/oms_frontier_tables.py
+	$(PYTHON) scripts/research/oms_followup_tables.py
 
 # Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
 research-robustness-analysis:
@@ -121,6 +141,29 @@ research-online-resources:
 
 research-claims:
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/verify_manuscript_claims.py
+
+.PHONY: research-oms-check
+research-oms-check:
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/verify_oms_dispatch.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/verify_oms_conditioning.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261014/verify_and_summarize.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-root-attribution-20261015/analyze.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-root-attribution-20261015/independent_check.py
+	$(PYTHON) scripts/research/oms_incumbent_tables.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-if1-workflow-20261015/independent_check.py
+	$(PYTHON) scripts/research/oms_workflow_tables.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-matched-accuracy-20261016/independent_check.py
+	$(PYTHON) scripts/research/oms_matched_tables.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-frontier-20261016/independent_check.py --allow-absent-historical
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-native-selector-20261016/independent_check.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-global-lp-20261016/independent_check.py
+	$(PYTHON) scripts/research/oms_frontier_tables.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/check_mechanism.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/check_external.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/external_case.py
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/check_dispatch.py tolerance
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261017/check_dispatch.py cycle
+	$(PYTHON) scripts/research/oms_followup_tables.py
 
 # The declared residual contract on one dispatch model, and how far the budgets can be
 # tightened before a kernel stops being admissible. Reads the stored LP; no solver.

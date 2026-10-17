@@ -1,0 +1,67 @@
+"""Budget LP construction and exact dyadic decimal export, without solvers."""
+from decimal import Decimal,localcontext
+from fractions import Fraction
+
+F=Fraction.from_float
+
+
+def build(model,pattern,mode,lam=Fraction(0),target=None):
+    z={int(i):Fraction(v) for i,v in pattern.items()}
+    integer_indices={i for i,v in enumerate(model['variables']) if v['integer']}
+    assert set(z)==integer_indices and all(v.denominator==1 for v in z.values())
+    for i,x in z.items():
+        v=model['variables'][i]
+        assert v['lower'] is None or x>=F(float(v['lower']))
+        assert v['upper'] is None or x<=F(float(v['upper']))
+    continuous=[i for i,v in enumerate(model['variables']) if not v['integer']]
+    index={i:j for j,i in enumerate(continuous)};parametric=mode!='cost'
+    costs=[F(float(model['variables'][i]['cost'])) for i in continuous]
+    fixed_cost=sum((F(float(model['variables'][i]['cost']))*x for i,x in z.items()),Fraction(0))
+    lp={'cost':[str(x) for x in (costs if not parametric else [Fraction(0)]*len(costs)+[Fraction(1)])],
+        'offset':str(fixed_cost if not parametric else 0),'rows':[],
+        'continuous_original_indices':continuous,'mode':mode,'lambda_exact':str(lam),'target_exact':str(target) if target is not None else None}
+    def row(terms,rhs,weight,source):
+        terms={str(j):str(a) for j,a in terms.items() if a}
+        if parametric:terms[str(len(continuous))]=str(-weight)
+        else:rhs+=lam*weight
+        terms={j:a for j,a in terms.items() if Fraction(a)}
+        lp['rows'].append({'terms':terms,'rhs':str(rhs),'weight':str(weight),'source':source})
+    for r,original in enumerate(model['rows']):
+        rhs=F(float(original['rhs']))-sum((F(float(a))*z[int(i)] for i,a in original['terms'].items() if int(i) in z),Fraction(0))
+        terms={index[int(i)]:F(float(a)) for i,a in original['terms'].items() if int(i) in index}
+        for sign in ([1,-1] if original['sense']=='=' else [1] if original['sense']=='<' else [-1]):
+            row({i:sign*a for i,a in terms.items()},sign*rhs,F(float(original['budget'])),{'row':r,'sign':sign})
+    for i in continuous:
+        v=model['variables'][i]
+        for endpoint,sign in (('lower',-1),('upper',1)):
+            if v[endpoint] is not None:row({index[i]:Fraction(sign)},sign*F(float(v[endpoint])),F(float(v['bound_budget'])),{'bound':i,'endpoint':endpoint})
+    if parametric:
+        row({len(continuous):Fraction(-1)},Fraction(0),Fraction(0),{'lambda_bound':'lower'})
+        row({len(continuous):Fraction(1)},Fraction(1),Fraction(0),{'lambda_bound':'upper'})
+        if mode=='cost-threshold':
+            assert target is not None
+            row(dict(enumerate(costs)),target-fixed_cost,Fraction(0),{'cost_threshold':True})
+        else:assert mode=='feasibility-threshold'
+    return lp
+
+
+def plain(value):
+    value=Fraction(value);assert value.denominator & (value.denominator-1)==0
+    with localcontext() as ctx:
+        ctx.prec=max(100,len(str(abs(value.numerator)))+value.denominator.bit_length()+5)
+        text=format(Decimal(value.numerator)/Decimal(value.denominator),'f')
+    assert Fraction(text)==value
+    return text
+
+
+def write(path,lp):
+    def expression(terms):
+        parts=[]
+        for j,value in terms.items():
+            q=Fraction(value)
+            if q:parts.append(('+' if q>0 else '-')+' '+plain(abs(q))+f' x{int(j):05d}')
+        return ' '.join(parts) or '0 x00000'
+    lines=['Minimize',' obj: '+expression(dict(enumerate(lp['cost']))),'Subject To']
+    for i,row in enumerate(lp['rows']):lines.append(f' r{i:05d}: '+expression(row['terms'])+' <= '+plain(row['rhs']))
+    lines+=['Bounds']+[f' x{i:05d} free' for i in range(len(lp['cost']))]+['End']
+    path.write_text('\n'.join(lines)+'\n')

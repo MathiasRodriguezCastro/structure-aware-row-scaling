@@ -1,0 +1,116 @@
+{
+  "job": {
+    "instance": "instance031",
+    "presolve": 0,
+    "seed": 89,
+    "policy": "Budget-L2",
+    "budget": 100,
+    "key": "B100",
+    "id": "instance031-P0-s89-Budget-L2100"
+  },
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Presolve": 0,
+    "Seed": 89
+  },
+  "base_sha256": "75fbdd652a9e599c207e9e19a56af5a236d0baf45503b8a731b5f80d1948d322",
+  "export_sha256": "b665b82b0d4e68532b288d5736b0df35b734cde7d34dc663e9138bdbba7f8243",
+  "native_import": {
+    "rows": 10080,
+    "columns": 6120,
+    "nonzeros": 22679,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 2,
+    "native_completed": true,
+    "work": 0.3103546451819406,
+    "nodes": 1.0,
+    "native_runtime": 0.17394113540649414,
+    "objective": -1542528.0,
+    "bound": -1542528.0
+  },
+  "checks": {
+    "known_witness_objective_exact": "-34634525563339906383782673043837854125/22453093599169622052204108054528",
+    "bound_contradiction": false,
+    "completion_contradiction": false,
+    "candidate_present": true,
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 1440,
+        "raw_max": 9.975210348575435e-14,
+        "rounded_max": 9.975210348575435e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(252)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 360,
+        "raw_max": 4.3876013933186186e-13,
+        "rounded_max": 4.3876013933186186e-13,
+        "rounded_limiting_row": "a1_g4h_def(59)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 1440,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 360,
+        "raw_max": 6.788541213609278e-07,
+        "rounded_max": 6.788541213609278e-07,
+        "rounded_limiting_row": "a1_balance(277)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 720,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      }
+    ],
+    "point_objective_exact": "-111150856416136906078125/72057594037927936",
+    "max_integer_violation": 0.0,
+    "observed_exported_physical_max_violation": 1.332761827805674e-10,
+    "exported_physical_rows_exceeding_epsilon": 0,
+    "integer_gamma_hypothesis_holds": true
+  },
+  "factor_info": {
+    "incompatible": [],
+    "incompatible_count": 0,
+    "projected_rows": 1440,
+    "max_integer_rounding_reserve_m3": 8.7787081676104
+  },
+  "stages_seconds": {
+    "generator": 0.1145336989993666,
+    "parse_original": 0.08100783100053377,
+    "matrix_metadata": 0.035818751000988414,
+    "factor_selection": 0.5277385420013161,
+    "scaled_export": 0.058147130001088954,
+    "export_metadata": 0.04069673599951784,
+    "native_import": 0.01966043699940201,
+    "native_equality_check": 0.09216654100055166,
+    "solve": 0.17409339100049692,
+    "extraction": 0.013782385000013164,
+    "verification": 0.36432614300065325,
+    "cleanup": 0.0045030399996903725
+  },
+  "worker_internal_seconds_before_result": 1.705042723000588,
+  "global_optimality_independently_verified": false
+}

@@ -1,0 +1,116 @@
+# =============================================================================
+# Build for the cleaned reproducibility platform (monolithic MIP + preprocessing).
+#
+# Solver toggles (1 = compile & link, 0 = exclude that backend entirely):
+#   USE_GUROBI, USE_CPLEX, USE_CBC, USE_HEXALY, USE_HIGHS
+#
+# Examples:
+#   make                                  # Gurobi + CPLEX + Cbc (Hexaly off)
+#   make USE_HEXALY=0                     # same as default (explicit)
+#   make USE_GUROBI=0 USE_CPLEX=0 USE_CBC=1 USE_HEXALY=0   # license-free (Cbc only, N1)
+#
+# Override solver locations as needed, e.g.:
+#   make GUROBI_HOME=/opt/gurobi/linux64 CPLEX_HOME=/opt/ibm/ILOG/CPLEX_Studio2212
+# =============================================================================
+
+CPLEX_HOME  ?= /opt/ibm/ILOG/CPLEX_Studio2212
+GUROBI_HOME ?= $(HOME)/solvers/gurobi1301/linux64
+HEXALY_HOME ?= /opt/hexaly_14_5
+HIGHS_HOME  ?= $(HOME)/solvers/highs-1.15.1
+
+# Solver toggles
+USE_GUROBI ?= 1
+USE_CPLEX  ?= 1
+USE_CBC    ?= 1
+USE_HEXALY ?= 0
+USE_HIGHS  ?= 0
+
+CXX := g++
+.DEFAULT_GOAL := all
+
+# OPT: nivel de optimizacion (vacio por defecto = build historico de las campanas).
+# Usar OPT="-O2 -DNDEBUG" para una compilacion release comparable a un despliegue real.
+OPT ?=
+CXXFLAGS := -I. -Wall -Wextra -std=c++17 -g $(OPT)
+LDLIBS   :=
+EXCLUDES :=
+
+# ---- Gurobi ----
+ifeq ($(USE_GUROBI),1)
+  CXXFLAGS += -DUSE_GUROBI -I$(GUROBI_HOME)/include
+  LDLIBS   += -L$(GUROBI_HOME)/lib -Wl,-rpath,$(GUROBI_HOME)/lib -lgurobi_c++ -lgurobi130 -lm
+else
+  CXXFLAGS += -DNO_GUROBI
+  EXCLUDES += -not -path './SystemController/Problema/ProblemaGurobi/*'
+endif
+
+# ---- CPLEX ----
+ifeq ($(USE_CPLEX),1)
+  CXXFLAGS += -DUSE_CPLEX -I$(CPLEX_HOME)/cplex/include -I$(CPLEX_HOME)/concert/include
+  LDLIBS   += -L$(CPLEX_HOME)/cplex/lib/x86-64_linux/static_pic \
+              -L$(CPLEX_HOME)/concert/lib/x86-64_linux/static_pic \
+              -lilocplex -lcplex -lconcert -lm -lpthread -ldl
+else
+  CXXFLAGS += -DNO_CPLEX
+  EXCLUDES += -not -path './SystemController/Problema/ProblemaCplex/*'
+endif
+
+# ---- CBC (open source) ----
+ifeq ($(USE_CBC),1)
+  CXXFLAGS += -I/usr/include/coin
+  LDLIBS   += -L/usr/lib/x86_64-linux-gnu -lCbcSolver -lCbc -lCgl \
+              -lOsiClp -lClp -lOsi -lCoinUtils -lz -lbz2
+else
+  CXXFLAGS += -DNO_CBC
+  EXCLUDES += -not -path './SystemController/Problema/ProblemaCbc/*'
+endif
+
+# ---- Hexaly (optional, metaheuristic) ----
+ifeq ($(USE_HEXALY),1)
+  CXXFLAGS += -DUSE_HEXALY -I$(HEXALY_HOME)/include
+  LDLIBS   += -L$(HEXALY_HOME)/bin -Wl,-rpath,$(HEXALY_HOME)/bin -lhexaly145 -lpthread -lm
+  export HX_LICENSE_PATH ?= $(HEXALY_HOME)/license.dat
+else
+  CXXFLAGS += -DNO_HEXALY
+  EXCLUDES += -not -path './SystemController/Problema/ProblemaHexaly/*'
+endif
+
+# ---- HiGHS (open source; static library built from the 1.15.1 release) ----
+ifeq ($(USE_HIGHS),1)
+  CXXFLAGS += -I$(HIGHS_HOME)/include/highs
+  LDLIBS   += -L$(HIGHS_HOME)/lib -lhighs -lpthread
+else
+  CXXFLAGS += -DNO_HIGHS
+  EXCLUDES += -not -path './SystemController/Problema/ProblemaHighs/*'
+endif
+
+BUILD_DIR := build
+TARGET    := $(BUILD_DIR)/SistemaElectrico
+
+SRCS := $(shell find . -name '*.cpp' -not -path './$(BUILD_DIR)/*' -not -path './utils/*' $(EXCLUDES))
+OBJS := $(SRCS:./%.cpp=$(BUILD_DIR)/%.o)
+DEPS := $(OBJS:.o=.d)
+-include $(DEPS)
+
+.PHONY: all clean run show-config
+
+all: $(TARGET)
+	@echo "Build done: $(TARGET)  (GUROBI=$(USE_GUROBI) CPLEX=$(USE_CPLEX) CBC=$(USE_CBC) HEXALY=$(USE_HEXALY) HIGHS=$(USE_HIGHS))"
+
+$(BUILD_DIR)/%.o: ./%.cpp Makefile
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+$(TARGET): $(OBJS)
+	$(CXX) $^ -o $@ $(LDLIBS)
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+run: $(TARGET)
+	./$(TARGET)
+
+show-config:
+	@echo "USE_GUROBI=$(USE_GUROBI) USE_CPLEX=$(USE_CPLEX) USE_CBC=$(USE_CBC) USE_HEXALY=$(USE_HEXALY) USE_HIGHS=$(USE_HIGHS)"
+	@echo "CXXFLAGS=$(CXXFLAGS)"
+	@echo "LDLIBS=$(LDLIBS)"

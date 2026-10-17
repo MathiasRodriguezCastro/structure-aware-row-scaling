@@ -81,7 +81,7 @@ def main():
         design = json.loads((args.root / "precision-check" / "design.json").read_text())
         labels = dict(CLASSES)
         lines = [r"\begin{tabular}{llrrrr}", r"\toprule",
-                 r"Class & Model & Base $\kappa_1\ge$ & Enclosure width & Flat-GM/Base estimate & Upper bound \\",
+                 r"Class & Model & Base $\kappa_1\ge$ & Bracket width & Flat-GM/Base estimate & Upper estimate \\",
                  r"\midrule"]
         summary = []
         for cls, chosen in design["selection"].items():
@@ -90,9 +90,10 @@ def main():
                 width = max(x["kappa1_upper_bound"] / x["kappa1_certified_lower"] - 1 for x in recs)
                 est = recs[1]["kappa1_estimate_seed0"] / recs[0]["kappa1_estimate_seed0"]
                 bound = recs[1]["kappa1_upper_bound"] / recs[0]["kappa1_certified_lower"]
-                summary.append({"class": cls, "instance": inst, "enclosure_width": width,
-                                "ratio_estimate": est, "ratio_upper_bound": bound,
-                                "estimates_inside_enclosure": sum(x["kappa1_certified_lower"] <= x["kappa1_estimate_seed0"]
+                summary.append({"class": cls, "instance": inst, "diagnostic_bracket_width": width,
+                                "ratio_estimate": est, "ratio_upper_estimate": bound,
+                                "upper_endpoint_formally_certified": False,
+                                "estimates_inside_bracket": sum(x["kappa1_certified_lower"] <= x["kappa1_estimate_seed0"]
                                                                  <= x["kappa1_upper_bound"] for x in recs)})
                 lines.append(f"{labels[cls]} & {Path(inst).stem} & {sci(recs[0]['kappa1_certified_lower'])} & "
                              f"{sci(width)} & {sci(est, 3)} & {sci(bound, 3)} \\\\")

@@ -47,9 +47,10 @@ def archive(name, paths):
                        'records that the analyses here read only through their summaries. They are\n'
                        'deposited as a single archive, fixed-basis-exports.tar.zst (337 MB\n'
                        'compressed, 5.18 GB in 11,585 files), whose checksum and contents are listed\n'
-                       'in data-deposit/MANIFEST.json beside this package. Only\n'
-                       '`make research-fixed-basis-check`, which rebuilds all 1,530 bases from the\n'
-                       'LP text, needs the files themselves.\n\n'
+                       'in paper/submission/data-deposit/MANIFEST.json inside the OMS artifact.\n'
+                       '`make research-fixed-basis-check` (all 1,530 bases) and a fresh\n'
+                       '`make research-fixed-basis-precision` need those bulk files. The four\n'
+                       'standard saved-result audit/analysis commands are self-contained.\n\n'
                        + '\n'.join(f'{s:>12}  {q}' for q,s in sorted(EXCLUDED)) + '\n')
     return len(paths)
 

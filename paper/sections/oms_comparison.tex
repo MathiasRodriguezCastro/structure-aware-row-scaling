@@ -1,0 +1,41 @@
+\subsection{A controlled comparison with row-only Ruiz}
+\label{subsec:results-ruiz}
+Table~\ref{tab:oms-comparison} compares four representations under the compact matched
+protocol of \cref{subsec:design-oms}. Every policy uses the same inputs and solver
+settings. The condition numbers describe named fixed bases of the exported models;
+the equilibrated column reports the same diagnostic after the documented transformation,
+not an inspection of Gurobi's internal matrices. Work and time describe completed
+runs, whereas PAR10 retains every failure at the declared limit. The physical checks
+use saved incumbents, including those from unfinished optimization calls, and do not
+turn completion at a 1\% gap into an independent optimality certificate.
+
+\input{tables/oms-comparison}
+
+On the 14 commonly completed SG-Ter-Mer models, the paired work ratios are 0.643 for
+Flat-GM, 0.575 for Role-Hybrid and 0.954 for Ruiz-R4; total-time ratios are respectively
+0.659, 0.628 and 1.121. All four policies time out on instance077 at this shorter limit.
+Mean PAR10 is consequently compressed to 95.3 seconds for Base, 91.7 for Flat-GM,
+88.6 for Role-Hybrid and 95.2 for Ruiz-R4. On Simple, Ruiz-R4 uses slightly less work
+(0.928), but its total-time ratio is 1.219; Flat-GM and Role-Hybrid are close to Base.
+
+Ruiz-R4 has the smallest median paired condition ratio after equilibration on both classes,
+0.059 on Simple and 0.072 on SG-Ter-Mer. Before equilibration its SG-Ter-Mer ratio is
+1.3, whereas GM-based policies reach $7.3\times10^{-9}$: even this controlled comparison
+changes its conditioning ordering after equilibration, and that ordering does not predict
+the work ranking. All 120 saved comparison incumbents meet the demanding physical budgets.
+Whole-model activity-normalized residual diagnostics are at most $1.2\times10^{-7}$,
+bound violations at most $1.7\times10^{-7}$ and integer deviations at most
+$3.9\times10^{-7}$; these diagnostics complement the exact physical-row audit.
+
+Nine of the fifteen SG-Ter-Mer scenarios have the documented total-demand inversion.
+Restricting this same campaign to the six without it (instance001, instance005,
+instance022, instance027, instance031 and instance046), all four policies complete.
+Paired work/time ratios to Base are 0.473/0.488 for Flat-GM, 0.472/0.502 for
+Role-Hybrid and 1.240/1.455 for Ruiz-R4. These saved-run sensitivity results
+preserve the conditional efficiency finding on that subset; they do not broaden
+the diversity of generators or certify dispatch optimality.
+
+This experiment tests competitiveness against a known row-equilibration kernel without
+changing the external variable space. Its bounded local configuration adds a controlled
+comparison to the earlier evidence; its ratios and times are not pooled with the
+1,800-second experiment or interpreted as universal method rankings.

@@ -1,0 +1,116 @@
+{
+  "job": {
+    "instance": "instance001",
+    "presolve": -1,
+    "seed": 89,
+    "policy": "L2",
+    "budget": null,
+    "key": "L2",
+    "id": "instance001-P-1-s89-L2"
+  },
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Presolve": -1,
+    "Seed": 89
+  },
+  "base_sha256": "896e16e4e4735aab8b8588dd2a2f846cf831dc4a8c1d68325f454967c08981e6",
+  "export_sha256": "acde5cf643eeced0c556ab09816012d240da84b573f1ffd48b87eaf1e54fecbe",
+  "native_import": {
+    "rows": 10080,
+    "columns": 6120,
+    "nonzeros": 22679,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 10,
+    "native_completed": true,
+    "work": 12.809066436863594,
+    "nodes": 2592.0,
+    "native_runtime": 17.831593990325928,
+    "objective": 717456.7888271817,
+    "bound": 717456.7888271817
+  },
+  "checks": {
+    "known_witness_objective_exact": "-1505402189691756825252541571342919736119182194901437079656463618735933198470138282800531729923827947551857597064441847792823512834763415049321410325240274727265072652093996143677095590886370308013092779108403896792712278481821143951892239132184100671852759303696711672889316917045494790024489043615056188704384415474556760594844142809433187843245612469/1520793419771445689106349576096356429625421975505624271370640728166532649099454596616966470895385626656204640116687780747344813384816362427995671921133688902731586724023156165277067079007053059459744647001770812003999622150460341847531050436083538288850907171345049579310155615022366642967174164723630058048288432946179889864914667527228153135104",
+    "bound_contradiction": true,
+    "completion_contradiction": true,
+    "candidate_present": true,
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 1440,
+        "raw_max": 1.358109390099922e-13,
+        "rounded_max": 1.358109390099922e-13,
+        "rounded_limiting_row": "a1_salto_grande_tangente_3(299)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 360,
+        "raw_max": 3.694822225952521e-13,
+        "rounded_max": 3.694822225952521e-13,
+        "rounded_limiting_row": "a1_g4h_def(302)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 1440,
+        "raw_max": 4.76837158203125e-07,
+        "rounded_max": 4.76837158203125e-07,
+        "rounded_limiting_row": "a1_activacion_3(15)"
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 360,
+        "raw_max": 7.246817403938621e-07,
+        "rounded_max": 7.246817403938621e-07,
+        "rounded_limiting_row": "a1_balance(198)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 720,
+        "raw_max": 1.1368683772161603e-13,
+        "rounded_max": 1.1368683772161603e-13,
+        "rounded_limiting_row": "gh_total(163)"
+      }
+    ],
+    "point_objective_exact": "1734704072941960594851574213135/2417851639229258349412352",
+    "max_integer_violation": 0.0,
+    "observed_exported_physical_max_violation": 1.4228824096186606e-10,
+    "exported_physical_rows_exceeding_epsilon": 0,
+    "integer_gamma_hypothesis_holds": true
+  },
+  "factor_info": {
+    "incompatible": [],
+    "incompatible_count": 0,
+    "projected_rows": 1440,
+    "max_integer_rounding_reserve_m3": 0.0
+  },
+  "stages_seconds": {
+    "generator": 0.11505666900120559,
+    "parse_original": 0.13056901900017692,
+    "matrix_metadata": 0.054773924999608425,
+    "factor_selection": 0.5237945600001694,
+    "scaled_export": 0.08179281000047922,
+    "export_metadata": 0.07124954299979436,
+    "native_import": 0.028366283000650583,
+    "native_equality_check": 0.13482669300174166,
+    "solve": 17.83182141100042,
+    "extraction": 0.04535976399893116,
+    "verification": 0.5361492970005202,
+    "cleanup": 0.01531253299981472
+  },
+  "worker_internal_seconds_before_result": 19.83030745399992,
+  "global_optimality_independently_verified": false
+}

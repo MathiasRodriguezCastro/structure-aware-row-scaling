@@ -6,13 +6,14 @@
 \usepackage{xurl}
 \usepackage[colorlinks=true,allcolors=blue!45!black]{hyperref}
 \usepackage{listings}
+\usepackage{placeins}
 \lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
-\title{Online Resource 1\\\large Supplement to ``Pre-Export Row Scaling in Generated Mixed-Integer Programs: Mechanism Attribution and Residual-Budget Contracts''}
+\title{Supplementary Material 1\\\large Supplement to ``Pre-Export Row Scaling for Generated Mixed-Integer Programs: Accuracy Contracts and Software Evaluation''}
 \author{Mathias Rodr\'iguez Castro\\\small Facultad de Ingenier\'ia, Universidad de la Rep\'ublica, Montevideo, Uruguay\\\small ORCID: \href{https://orcid.org/0009-0002-7235-7677}{0009-0002-7235-7677}\\\small\href{mailto:mathiasr@fing.edu.uy}{mathiasr@fing.edu.uy}}
-\date{Prepared for Computational Optimization and Applications}
+\date{Prepared for Optimization Methods and Software}
 \begin{document}
 \maketitle
 This supplement specifies the computational evidence and its limitations. Paths are
@@ -109,16 +110,18 @@ and Flat-L2. For each hash-checked basis, $\|B\|_1$ is computed in exact rationa
 Every column of $B^{-1}$ is solved in double precision; with $x_j$ the computed column and
 $\rho_j$ a bound on $\|Bx_j-e_j\|_1$ that includes the rounding-error terms of the residual
 evaluation, $\|B^{-1}\|_1\le\max_j\|x_j\|_1/(1-\max_j\rho_j)$ whenever $\max_j\rho_j<1$. This
-upper bound is evaluated in floating point with explicit error terms rather than directed
-rounding. For the five largest columns, the solution is refined with residuals computed exactly
+upper endpoint is evaluated in floating point with explicit error terms rather than directed
+rounding; the implementation does not provide a formal rounding certificate for that
+endpoint. We therefore call the resulting ranges diagnostic brackets, not certified
+enclosures. For the five largest columns, the solution is refined with residuals computed exactly
 in rational arithmetic on the stored binary64 data; since $\|B^{-1}\|_1\ge\|x\|_1/\|Bx\|_1$ for
 every nonzero $x$, the exact quotient certifies a lower bound.
 
 The largest residual bound is $6.0\times10^{-3}$, and refinement stops within two steps. The
-enclosures have relative width at most $6.0\times10^{-3}$ for Base, $4.8\times10^{-3}$ for
-Flat-L2 and $2.0\times10^{-5}$ for Flat-GM, and the resulting bound on the Flat-GM/Base ratio
+diagnostic brackets have relative width at most $6.0\times10^{-3}$ for Base, $4.8\times10^{-3}$ for
+Flat-L2 and $2.0\times10^{-5}$ for Flat-GM, and the computed upper estimate of the Flat-GM/Base ratio
 agrees with the estimated ratio to $2.1\times10^{-5}$ in all eight models
-(Table~\ref{tab:si-precision}). Twenty-three of the 24 estimates lie inside their enclosures. The
+(Table~\ref{tab:si-precision}). Twenty-three of the 24 estimates lie inside their brackets. The
 Flat-L2 estimate for Full instance046 is 2.4 times smaller than its certified lower bound, as a
 lower-bound estimator can be; this makes Flat-L2 less favorable, not more. Outputs are in
 \path{precision-check/} within the audit directory.
@@ -126,10 +129,11 @@ lower-bound estimator can be; this makes Flat-L2 less favorable, not more. Outpu
 \begin{table}[tb]
 \centering\small
 \caption{Precision check on the stress sample. ``Base $\kappa_1\ge$'' is the certified lower
-bound. ``Enclosure width'' is the largest relative width (upper over lower bound, minus one)
+bound. ``Bracket width'' is the largest relative width (computed upper endpoint over lower bound, minus one)
 among Base, Flat-GM and Flat-L2. The last two columns give the estimated ratio
-$\kappa_1(\text{Flat-GM})/\kappa_1(\text{Base})$ and its upper bound, the a posteriori upper bound
-for Flat-GM divided by the certified lower bound for Base.}\label{tab:si-precision}
+$\kappa_1(\text{Flat-GM})/\kappa_1(\text{Base})$ and its upper estimate, the floating-point upper
+endpoint for Flat-GM divided by the certified lower bound for Base. Only the lower
+bounds carry the rational certification described above.}\label{tab:si-precision}
 \input{tables/fixed-basis-precision}
 \end{table}
 
@@ -144,23 +148,26 @@ and its multithreaded incumbents cannot be replayed, so it is not used as eviden
 provenance audit is in \path{results-revision/research-audit/fixed-basis-recovery-20260914-v2/}.
 
 \section{Computing environment}
-Table~\ref{tab:environment} states, per campaign, the optimizer and version, the thread count, the time limit and
-the machine. Only one row of it can affect a reported number. The mean PAR10 of the operational
-campaign is the single quantity in this work stated in units of time, and all 240 of its
-assigned runs carry a native log naming the same processor and operating system; two further
-logs in \path{operational/precision-smoke/} come from a laptop and belong to a separate smoke
-test, not to the campaign. Everything else is reported in solver-internal units that do not
-depend on the host --- Gurobi work units for the seed replication, CPLEX deterministic ticks for
-the solver replication --- or in counts and condition numbers, which do not depend on it either.
-The two replications ran on ClusterUY under SLURM with 16 cores per task, but their node is not
-recorded, and the machine of the fixed-basis audit, of the matrix audit and of the stress
-experiment was not recorded either. No number taken from any of them would change if it had
-been.
+Table~\ref{tab:environment} separates the historical experiments from the local OMS
+campaigns. The historical operational PAR10, local Ruiz comparison and full-process
+measurements in Tables~S15--S16 use wall seconds. These depend on hardware and load;
+the local timings describe the measured prototype on a shared machine. The 144-call
+comparison also spans a documented reboot. Native Work and deterministic ticks are
+reported within their respective solver/version, without equating them with wall time
+or with each other.
+
+All 240 historical operational logs identify the same processor and operating system.
+The laptop logs in \path{operational/precision-smoke/} belong to a separate test.
+The two historical replications used ClusterUY/SLURM with 16 cores per task; their
+node models were not recorded. Historical fixed-basis, matrix and stress machine
+identities remain unrecorded. The newer dispatch logs identify an Intel i7-13620H
+running Ubuntu 22.04.5 LTS. Original records, not the current host, supply these identities.
 
 \begin{table}[tb]
 \centering\footnotesize
-\caption{Computing environment by campaign. ``Not recorded'' is stated rather than
-reconstructed; no quantity reported from those campaigns depends on the host.}
+\caption{Computing environment by campaign. Missing historical machine identities
+are not reconstructed. Local wall times depend on the shared-machine load; offline
+reference LP settings are stated in the corresponding protocols.}
 \label{tab:environment}
 \resizebox{\textwidth}{!}{\input{tables/environment}}
 \end{table}
@@ -468,8 +475,8 @@ the dashed line ordinary GM already satisfies it. This diagram concerns the cond
 row contract, before reserving any integer-rounding allowance}\label{fig:budget-compatibility}
 \end{figure}
 
-\section{The declared budgets of the application table}
-The budgets of the application table in the main text are declared by a modeller, not measured
+\section{Historical single-instance budget sensitivity}
+The historical caso46e illustration uses budgets declared by a modeller, not measured
 from an operating tolerance, so the natural objection is that admissibility was read off a
 convenient choice. Table~\ref{tab:application-budget-sensitivity} scales all six declared budgets by a common multiplier and reports,
 per constraint group, the tightest multiplier at which each kernel is still admissible on every
@@ -508,8 +515,58 @@ both tables from it. That export is written by the repository's own serializer r
 Gurobi, as the archived one was: the two differ in the last digits of their decimal output, which
 moves the reported quantities of one group by a relative $10^{-15}$ and nothing in either table.
 
+\section{Additional OMS dispatch validation}
+The additional protocol is frozen in
+\path{results-revision/research-audit/oms-close-20261013/design.json}.
+It uses the same 30 operational inputs, Gurobi 13.0.2, four threads, seed 42,
+120 seconds and a 1\% gap. The separate pilot does not enter the results.
+The six-model stage ablation selects positions 1, 8 and 15 in each archived class list.
+All 132 exports retain objective, bounds and domains and are checked by named
+row proportionality; the partial-stage factors have disjoint supports and multiply
+to the full Role-Hybrid factors. A mechanical LP-serializer correction, made before
+the first new optimization call, is recorded in \texttt{protocol-amendments.json}.
+
+Execution resumed after an interruption with identical hardware and settings. Four
+observations whose incumbent archives were empty were repeated under the unchanged
+protocol and replaced, with the superseded CSVs and recovery criterion preserved in
+\texttt{artifact-recovery.json}. They are not extra observations in the paired sample.
+
+Ruiz-R4 freezes column factors at one and performs four coefficient-only infinity-norm
+half-steps. Its final cumulative factor passes the same identity band and coefficient
+window as the other policies. The historical C++ Ruiz option is not used. All
+compressed LPs, named reference bases, factors, solution vectors and logs are stored.
+\texttt{comparison-summary.csv} and \texttt{ablation-summary.csv} retain the paired
+sample size for each aggregate; \texttt{runs.csv} preserves unfinished runs and their
+PAR10 penalties. The 120-second local experiment is never pooled with the historical
+1,800-second operational campaign.
+
+The three physical precision scenarios use 0.01, 0.1 and 1 MW for power, and 100,
+1,000 and 10,000 cubic metres for water. They are declared study objectives, not
+operator tolerances. Algebraic budgets are read from the named generation/storage
+coefficient or the hourly-flow conversion. Every row-level proposed factor, interval
+and applied factor is retained in \texttt{factor-contracts.csv.gz}; it includes the
+partial-stage policies on their six-model subset. The exported-row hypothesis is
+$10^{-6}$ with zero rounding allowance for the interval audit. Actual physical
+residuals and pointwise coefficient/RHS export defects are computed separately by
+exact rational arithmetic on binary64 generator data and saved incumbents.
+\texttt{physical-verification.csv} records these results by physical family and counts
+observed violations of the exported-row hypothesis. Whole-model row, bound and
+integrality diagnostics remain floating-point; dispatch optimality is not independently
+certified. \texttt{make research-oms-check} replays the preserved exports and points,
+checks every interval with rational endpoints and recomputes the comparison aggregates,
+without calling an optimizer. The main text reports the compact comparison, final-policy
+ablation and application-level budget sensitivity.
+
 \section{Cross-run certificate audit}
-The audit of \S7.6 of the article uses two stored campaigns: the solver-robustness campaign,
+\label{sec:stored-run-audit}
+This exploratory audit, referenced briefly in the article's discussion, compares
+reported objectives and dual bounds with numerically screened points. It includes
+an objective difference of 54.7\% in the example below, without exact dispatch
+feasibility certification or causal attribution. The separate activation study in
+Section~\ref{sec:activation-followup} supplies independently checked exact feasible
+witnesses of the actual imported exports.
+
+The audit uses two stored campaigns: the solver-robustness campaign,
 which was prepared, partly run and then stopped by decision, and the two replications of the
 operational reconstruction. Neither is a census and neither was designed to estimate how often a
 solver contradicts itself, so the counts below describe what occurred in the runs that exist.
@@ -520,7 +577,16 @@ where it has to hold, and \texttt{verif\_solver\_obj\_original} is its objective
 the campaign tolerance merely accepted can be slightly infeasible, and an infeasible point
 bounds nothing, so both the article and Table~\ref{tab:certificate-audit-detail} use only the
 \emph{strict} tier: witnesses whose relative activity residual, bound violation and integrality
-violation against the original model are each at most $10^{-9}$. The looser tier changes one
+violation against the original model are each at most $10^{-9}$. This is a numerical
+screen, not exact feasibility certification or a bound on objective perturbation.
+The stopped campaign contains 4,542 recorded runs: 76 reported bounds lie above a
+strictly screened witness across 26 instances, and 25 of those runs across nine instances
+also report completion beyond the requested gap. In the 480-run operational replication,
+the corresponding counts are 20 across six instances and nine across four. Base accounts
+for five of the 25 completion discrepancies in the stopped campaign and one of nine in
+the replication. These are counts of stored diagnostic discrepancies, not population rates
+or independently certified invalid solver bounds.
+The looser tier changes one
 run and one instance, in the weaker of the two levels of the stopped campaign (77 runs across 27
 instances instead of 76 across 26) and nothing at all elsewhere; the stored CSVs carry both
 tiers in their own columns.
@@ -528,7 +594,7 @@ tiers in their own columns.
 \begin{table}[htb]
 \centering\small
 \caption{Cross-run certificate audit by level and policy. ``Dual bound'' counts runs whose
-reported bound lies above a verified point of the same model; ``Certificate'' counts the subset
+reported bound lies above a numerically screened point of the same model; ``Certificate'' counts the subset
 that also reported completion further from that point than the requested gap. Runs and
 instances are the totals of that level.}
 \label{tab:certificate-audit-detail}
@@ -542,8 +608,9 @@ objective between $-2.893\times10^8$ and $-2.913\times10^8$. The eighth, Gurobi 
 Base export, returns $-1.317\times10^8$ with status optimal, a reported gap of zero and a dual
 bound equal to its objective. Its stored record shows one node explored against a root gap of
 $1.22$, a wall time of 6~s, and three solver warnings: large bounds, large matrix coefficients
-and large right-hand sides. Its returned point is itself feasible for the original model, with
-relative activity violation $3.2\times10^{-14}$, so the point is sound and the bound is not.
+and large right-hand sides. Its returned point also passes the original-model numerical
+screen, with relative activity violation $3.2\times10^{-14}$; the discrepancy concerns
+objectives and bounds, without certifying exact feasibility or localizing a cause.
 The strict witness of this instance is Gurobi on the Flat-GM export at $-2.909\times10^8$, with
 relative activity residual $1.1\times10^{-13}$ and no bound or integrality violation; the
 reported objective exceeds it by $1.592\times10^8$, which is $54.7\%$ of the magnitude of the
@@ -551,20 +618,28 @@ witness. A looser witness, Gurobi on Flat-L2 at $-2.913\times10^8$, does not mee
 residual threshold and is not used. CPLEX on the same unscaled file explored 6,151 nodes,
 emitted no warnings and reached $-2.904\times10^8$.
 
-Two readings are excluded by the record. The runs are not on different models, because the
-instance hash is identical across all eight. And the discrepancy is not an artifact of scaling,
-because the run that fails is the unscaled one and the same solver on two scaled exports of the
-same model does not fail. What the record does not establish is a cause inside the solver, which
-is not observable from these logs; the warnings and the single node are consistent with a
-tolerance-driven termination on a badly scaled model, and that is as far as the evidence goes.
+The identical instance hashes support comparison of the stored outcomes. The discrepant
+completion occurs on the unscaled export too, so the audit cannot attribute it uniquely to
+external scaling. Neither exact dispatch optimality nor a cause inside the solver is
+established by these records. The warnings motivate further numerical diagnosis; they do
+not prove a particular failure mechanism.
 
 \section{Independent verification and arithmetic checks}
 The independent script \path{scripts/research/verify_saved_experiment.py} imports
 neither the experiment runner nor an optimizer. For each of the 96 stored models it
 enumerates all 4,096 binary assignments using integer activities, checks the reported
 optimum, and then recomputes the acceptance decision from the saved point. It checks
-all 3,456 distinct Cartesian-product configuration keys, all 288 abstentions, factor
-admissibility, and the 768 dyadic exports with exact rational multiplication.
+the HiGHS/Gurobi archive with 3,456 distinct configuration keys, 288 abstentions and
+768 dyadic exports. Running the same script with \texttt{-{}-root} set to
+\path{results-revision/research-audit/budget-final-cplex} checks the CPLEX arm:
+1,728 keys, 144 abstentions and 384 dyadic exports. Thus the two invocations cover
+all three solvers: 5,184 planned configurations, 432 abstentions and 4,752 actual
+optimizer calls, with 1,152 exact dyadic export checks. Both use the same 96 models,
+whose CPLEX copies are byte-identical. \path{scripts/research/verify_stress_coverage.py}
+reconciles the per-root verification records; \texttt{make research-check-python}
+runs both invocations. Factor admissibility and dyadic multiplication are checked
+rationally. The separate \texttt{research-claims} audit also enumerates and checks
+the saved acceptance decisions for CPLEX.
 
 A verified optimum requires an exactly feasible rounded binary point attaining the
 enumerated objective, a returned point within $10^{-9}$ of that rounded point,
@@ -591,24 +666,629 @@ values survive decimal round-trip parsing. Serialization correctness and exact
 multiplication are separate conditions; solver-internal transformations remain
 outside both guarantees.
 
+\section{Activation contracts and exact feasible witnesses}
+\label{sec:activation-followup}
+This exploratory extension uses the six archived SG-Ter-Mer inputs without the
+documented total/local-demand inversion: instance001, instance005, instance022,
+instance027, instance031 and instance046. It does not repair or replace inputs.
+The existing numerical precision levels are applied explicitly to reservoir-volume
+activation thresholds. They are study objectives, not operator tolerances or
+measurements of error in the nonlinear plant model.
+
+The coefficient-only L2 control projects its row factor onto $[10^{-9},10^9]$,
+scales the whole row and RHS, and uses no identity band. This is a separate control,
+not a renaming of the historical Flat-L2 policy. Budget-L2 uses the same kernel
+and adds the admissible residual interval. On a volume activation
+$M\varphi-v\le M-V$, the integer reserve is $E=M\gamma$. Default
+$\gamma=10^{-5}$ exhausts the three volume budgets in this example. The guided
+allowance is the largest power of two not exceeding
+$\delta_V/(2\max_r M_r)$, capped at $10^{-5}$ and checked against Gurobi's
+supported minimum. At demanding precision it is $2^{-28}$ in all six models.
+
+For activation rows with finite boxes $|x_j|\le X_j$, we also reserve
+\[
+ \zeta_r=2^{-52}\left(\sum_j|a_{rj}|X_j+|b_r|\right).
+\]
+Normal binary64 products and round-trip decimal serialization give a conservative
+forward-error allowance independent of the positive row factor. The selector
+uses $\delta_r-E_r-\zeta_r$; rational checks subsequently verify the actual exported
+defect against that allowance. Normality, coefficient limits and every factor
+interval are checked. The resulting demanding projection changes exactly the
+1,440 activation rows in each model and no other L2 factor. On instance046,
+$\alpha$ increases from $10^{-9}$ to approximately $1.87\times10^{-8}$.
+The allowance does not assert that a solver enforces its nominal tolerance:
+observed exported and original residuals remain separate checks.
+
+\paragraph{A rounding decision in original units.}
+In the stored Base point of instance046, hour 18 has
+$\varphi=0.9999996126403118$, $v=2066844230.148119$\,m\textsuperscript{3}
+and a credited-power component $\theta=13.60595418958399$\,MW.
+The activation is $12494793414.450399\,\varphi-v\le10427944344.323$;
+the associated power bound is $\theta\le25.759667882689403\,\varphi$.
+For the stored binary64 data, fixing $\varphi=1$ with continuous quantities
+unchanged violates the activation by exactly $2537543057/524288$\,m\textsuperscript{3}.
+Fixing it to zero instead violates the power bound by 13.606\,MW.
+Thus neither binary choice meets the demanding or reference pair of study
+budgets at that fixed continuous point. This certifies a need to change continuous
+quantities or reject that rounded interpretation, not infeasibility of the MILP.
+
+\paragraph{Comparison protocol and endpoints.}
+The principal comparison has 72 assignments: six models, three seeds (1, 7, 42)
+and four policies. Gurobi 13.0.2 uses four threads, 120 s, relative gap 1\%,
+automatic internal scaling and presolve. L2-matched-int and Budget-L2 share
+$\gamma=2^{-28}$ and primal tolerance $10^{-6}$; GM uses default integer
+tolerance $10^{-5}$. L2-global-tight sets both tolerances to $10^{-9}$.
+An eight-call, 60-second pilot on seed 17 is excluded. Additional controls on
+instance046 use the same three principal seeds (27 assignments). A subsequent
+presolve-off comparison fixes new seeds 11, 23 and 47 before its nine calls.
+Preset reference/permissive sensitivity adds six calls. There are 114 nonpilot
+calls, all retained, with their native logs, parameters and incumbent vectors.
+Calls are sequential and these timings are not pooled with earlier campaigns.
+
+\begin{table}[tb]
+\centering\small
+\caption{Activation follow-up on six models and three seeds. All 18 calls per
+policy report completion. The Budgets column counts integer-rounded points passing
+exact original-unit checks on all audited physical rows and activations. $B>U$ counts
+reported bounds above an exact feasible objective of the same imported export,
+allowing the larger of $10^{-6}$ objective units and eight bound ulps for display
+rounding. Gap flags count cases satisfying $U<C-0.01|C|$, incompatible with the requested
+completion criterion. Neither an unflagged bound nor budget compliance certifies
+global optimality. Work is the geometric mean over all assigned calls, including
+flagged completions; it must be interpreted with those flags.}
+\label{tab:activation-bank}
+\input{tables/activation-bank}
+\end{table}
+
+\paragraph{Exact witness construction.}
+Observed exactly integral states are fixed, substituted into the rows, and the
+remaining LP is solved with SoPlex 8.1.0 and GMP 6.2.1 in rational mode.
+Its coefficients are full plain decimal expansions of the original binary64
+numbers, not newly rounded decimal data. A separate Python \texttt{Fraction}
+checker verifies all 10,080 original rows, all 6,120 variable bounds and all
+1,440 integer domains, and recomputes the exact objective. Twenty witnesses
+cover the native GM, L2-window and Budget-L2 exports in the six models,
+Base on instance046, and its reference-budget export. They are feasible
+points supplying upper bounds, not global optima. Each comparison identifies
+the actual imported model by SHA-256. The Base witness also applies to both
+dyadic controls after verifying exact proportionality of every coefficient
+and RHS. This prevents export-rounding differences from serving as an
+unsupported equivalence assumption. Tight-M/indicator controls have primal
+checks but no separate native-export witness in the bound comparison.
+
+\begin{table}[tb]
+\centering\small
+\caption{Controls on instance046, with columns defined in
+Table~\ref{tab:activation-bank}. Upper panel: seeds 1, 7 and 42; presolve is
+automatic except where stated. Lower panel: fresh seeds 11, 23 and 47 with
+presolve disabled throughout. A dash indicates that no native-export witness
+was supplied for that reformulation, not that its bounds were certified.
+The dyadic L2 control still has one contradicted completion despite exact
+row proportionality. NumericFocus 3 is an effective existing alternative.}
+\label{tab:activation-controls}
+\input{tables/activation-controls}
+\par\medskip
+\input{tables/activation-fresh-seeds}
+\end{table}
+
+In the fresh-seed comparison, L2 gives a 4,837.338\,m\textsuperscript{3}
+activation residual in all three calls. Budget-L2 reduces the maximum to
+$1.4782\times10^{-5}$\,m\textsuperscript{3}. Global tightening reduces it to
+zero but retains the cost near $-572330$ and zero reported gap, contradicted
+by an exact feasible cost near $-799086$. The geometric mean optimizer work is
+0.597 for L2, 4.485 for Budget-L2 and 0.577 for global tightening. The fast
+controls therefore cannot be regarded as equivalent successful computations.
+
+\begin{table}[tb]
+\centering\small
+\caption{Preset numerical volume targets on instance046 with seeds 1, 7 and 42.
+Changed rows counts differences from the coefficient-window L2 export.
+The demanding row is the corresponding subset of the principal comparison.
+All nine points meet their primal budgets, while the looser specifications
+permit contradicted completion claims. This is sensitivity of one
+configuration, not an estimated failure rate.}
+\label{tab:activation-sensitivity}
+\input{tables/activation-sensitivity}
+\end{table}
+
+Selection and round-trip export are measured separately in three fixed-order
+paired repeats per model, including budget-specific unit lookup and reserves
+but excluding common LP reading. Every timed export is byte-identical to its
+frozen counterpart. Median times are 0.354--0.360 s for L2-window and
+0.497--0.505 s for Budget-L2, an additional approximately 0.14 s.
+The solver-call times include import and optimization, exclude these preparation
+measurements and verification, and are preserved separately. All data and
+solver-free replay programs are under
+\path{exploration/oms-followup-20261014}. The observed benefits concern the
+chosen target, generator, solver and settings; the reference sensitivity and
+remaining bound discrepancies explicitly exclude an optimality guarantee.
+
+\FloatBarrier
+\section{Sensitivity to incumbent initialization}
+\label{sec:si-incumbent}
+\begingroup
+\widowpenalty=10000
+\clubpenalty=10000
+\paragraph{Diagnostic question and protocol.}
+This auxiliary experiment tests whether the observed completion advantage of external
+scaling persists when both representations receive the same incumbent. Three known
+SG-Ter-Mer models are selected retrospectively: instance001 and instance003 previously
+favored GM, while instance042 favored Base. They are not an independent validation
+sample. Each retains 6,120 variables, 10,080 rows and 1,440 binaries. The bank uses native
+MPS inputs and frozen power-of-two GM factors, rather than the historical LP exporter and
+arbitrary-factor policies; it does not retrospectively identify the cause of that campaign.
+Base and GM change only complete rows and their RHS, with exact proportionality checked.
+The GM policy uses the coefficient window $[10^{-9},10^9]$ and an identity band
+$[0.5,2]$ on proposals, followed by projection onto the admissible power-of-two grid.
+
+Base/GM, without a supplied incumbent (Cold) or with a common MIP start (CommonStart),
+and three new seeds (503, 509, 521) give 36 sequential MILP calls. Gurobi 13.0.2 uses
+four threads, limits of 12 seconds and 12 work units, relative gap $10^{-3}$, primal
+tolerance $10^{-6}$, integer tolerance $10^{-5}$, IntegralityFocus=0, and automatic
+presolve and internal scaling. The schedule and source/input hashes are fixed before
+the calls. All assignments, limits, native logs, candidates and endpoints are retained.
+
+\paragraph{Common reference and its cost.}
+For each case, only the integer pattern of the archived GM run at seed 307 is used.
+A single SoPlex 8.1.0/GMP continuation, limited to 15 seconds, produces an exactly
+feasible point and matching primal/dual values for that fixed-pattern LP. These are
+not global MILP optima. The same binary64 conversion of the rational point is supplied
+to Base and GM; original-row, exported-row, bound and integer checks are retained
+separately. All 18 starts are loaded, and their integer pattern and objective are
+observed at node zero and zero recorded work. Acceptance is checked rather than assumed.
+
+The three new reference acquisitions, including LP export and checking, take
+1.79--1.84 seconds each. Their patterns were obtained by earlier GM runs requiring
+approximately 8.186, 4.931 and 0.451 native work units for 001, 003 and 042 respectively.
+The reference is therefore offline diagnostic information, not a free input to a
+proposed solution algorithm. Acquisition, construction and checking costs are separate
+from the optimizer-work comparison in Table~\ref{tab:incumbent-initialization}.
+
+\begin{table}[tb]
+\centering\small
+\caption{Auxiliary common-incumbent diagnostic on three known cases and seeds 503,
+509 and 521. Completion counts calls reaching the requested native gap, not certified
+global optimality. Work is the median over all three assigned calls, including censored
+ones; ratios involving those censored calls are not speedups. Both zero work values on
+warm instance042 are native reports, not zero total cost, and are not divided into ratios.}
+\label{tab:incumbent-initialization}
+\input{tables/incumbent-initialization}
+\end{table}
+
+With the common start, the paired GM/Base work ratios are 1.0555, 1.0519 and 1.3686
+on 001, and 0.9957, 1.1114 and 0.7683 on 003. Thus the cold-start completion advantage
+disappears in both cases; GM has higher work in all three warm 001 pairs and mixed
+differences on 003. Where a root relaxation is logged, objectives coincide at printed
+precision in all 15 Base/GM pairs. This is neither exact LP certification nor an
+independent contribution: positive row scaling preserves the mathematical LP in exact
+arithmetic. Some root objectives change between Cold and CommonStart, and no root LP
+is logged for warm 042. A start can affect objective cutoffs, presolve and later search;
+the intervention does not isolate one heuristic or prove a unique cause of the effect.
+
+\paragraph{Independent checks and reproducibility.}
+All 15 unique final integer patterns enter a queue fixed before the posthoc exact-LP
+checks, with a five-second limit and no replacements. Thirteen have matching exact
+primal/dual optima; two remain unknown, both from Base-Cold 001, which did not reach
+the requested gap. The common-start comparisons have certified continuations at
+comparable costs. Conditional pattern optima are not global MILP lower bounds.
+No reported bound exceeds the common exact feasible objective in this experiment;
+absence of contradiction does not validate global bounds.
+
+The independent replay reconstructs references and fixed-pattern LPs from original
+binary64 rows, verifies their rational primals and duals, checks row proportionality,
+recomputes candidate objectives and final-point residuals after integer rounding,
+and verifies start acceptance and all final-pattern assignments. Four endpoint tests
+passed before the MILP calls. Data, protocols, sources, native records, exact certificates
+and the two unknown outcomes are supplied under
+\path{exploration/oms-root-attribution-20261015/}. This selected-case diagnostic
+qualifies mechanism attribution; it provides neither a general scaling ranking nor
+a new incumbent-generation algorithm.
+
+\FloatBarrier
+\endgroup
+\section{Matched IntegralityFocus control and complete workflow cost}
+\label{sec:si-if1-workflow}
+Twelve principal calls repeat instance046: L2-matched-int/Budget-L2,
+IntegralityFocus=0/1 and seeds 11, 23, 47. Each fresh process constructs the original
+C++ model once and runs selection, export, import, solve and verification. Exports
+match their historical SHA-256 values. Gurobi 13.0.2 uses four threads, 120 seconds,
+1\% gap, primal/integer tolerances $10^{-6}$/$2^{-28}$, presolve off, automatic
+internal scaling and no MIP start. Budgets, reserves and factors are unchanged.
+
+IF1 and IF0 produce identical saved points, objectives, bounds and work in all six
+matched pairs. All returned integer coordinates are exactly integral. L2 retains
+the 4,837.338\,m\textsuperscript{3} activation violation; Budget-L2 limits it to
+$1.4782\times10^{-5}$\,m\textsuperscript{3}, while two of its three reported bounds
+still exceed exact feasible objectives. Thus IF1 does not repair this configuration;
+the result makes no claim about its general effectiveness or MILP optimality.
+
+The three Budget-L2 Work values, unchanged from the earlier presolve-off campaign,
+are 3.6054776613, 4.9754950464 and 5.0281587478 for seeds 11, 23 and 47.
+Their geometric mean is 4.4847271866 (4.485 in Table~S12 and historical main-text Table~11 of v1.3.8);
+their median is 4.9754950464 (4.975 here and in the workflow note). The different
+summaries, rather than a configuration change, explain the apparent discrepancy.
+
+\begin{table}[tb]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Matched IF control and full prototype costs. Upper: budget and bound/gap
+definitions follow Table~S11; Work is the median. Lower: median wall seconds.
+Generate includes C++ launch, input, construction and Base writing; Select/export
+covers factors and scaled writing; Import/check covers native setup and model equality.
+Total includes the entire fresh process, also startup, reading, metadata, integrity,
+extraction and persistence. Stages shown are not exhaustive; medians need not add.
+Shared-machine timings describe this prototype and do not establish general performance.}
+\label{tab:if1-workflow}
+\input{tables/if1-accuracy}
+\par\medskip
+\input{tables/workflow-cost}
+\end{table}
+
+The first twelve-call pass repeatedly copied binding vectors in
+the import checker. Caching them once and repeating all treatments leaves every
+point and native endpoint unchanged. These 24 calls are not pooled as independent
+samples; principal timings use the second pass. Compilation and prior witness
+acquisition are offline costs; revalidating both exact witnesses is timed separately.
+The independent replay checks 103,680 physical row/point combinations before/after
+rounding and the same-model bound/gap refutations. Sources, all stages, both passes,
+the two existing witnesses and four endpoint tests are supplied under
+\path{exploration/oms-if1-workflow-20261015/}.
+
+\FloatBarrier
+\section{Fully matched accuracy and numerical-remedy comparison}
+\label{sec:si-matched-accuracy}
+A fixed factorial comparison uses the same six demand-inversion-free models as
+Section~\ref{sec:activation-followup}, seeds 11, 23, 47, automatic/off presolve,
+and L2, Budget-L2, L2-tight and L2-NF3. The 144 terminal comparisons use Gurobi
+13.0.2, four threads, 120 seconds, 1\% gap, ScaleFlag=$-1$,
+IntegralityFocus=0 and no MIP start. L2 and Budget-L2 share primal/integer
+tolerances $10^{-6}$/$2^{-28}$; L2-tight uses $10^{-9}$ for both; L2-NF3 adds
+NumericFocus=3 to the matched L2 settings. Each fresh process constructs the C++
+model once. Base and scaled exports reproduce their archived hashes exactly;
+only the 1,440 activation factors differ between L2 and Budget-L2 in each model.
+The original-unit targets, conversion, integer and export reserves are unchanged.
+
+The randomized order and endpoints were fixed before optimization. A host reboot
+interrupted the 38th attempt; its partial files are preserved, the preceding
+37 complete calls are retained, and only the interrupted assignment is repeated
+before continuing the original order. Thus 145 native attempts produce 144 terminal
+comparisons, with one separately recorded external failure of delivery. There are
+no new reference LP solves. The reader-only replay rechecks twelve supplied exact
+feasible witnesses and all saved candidates using rational binary64 arithmetic.
+
+All policies meet the primal budgets under automatic presolve. With presolve off,
+only L2 on instance046 fails them, in all three seeds. Budget-L2 and both numerical
+remedies meet every primal budget. Budget-L2 retains one/three bound discrepancies
+under automatic/off presolve, whereas NumericFocus=3 has none detected in either
+panel. Their paired geometric-mean Work ratios, Budget-L2/NumericFocus=3, are
+0.361 and 0.227 respectively over all 18 pairs per panel. These compare terminal
+primal delivery, not equally certified optimization outcomes; absence of a known
+contradiction is not a bound certificate. The fully matched controls clarify the
+cost and remaining limitation without extending primal recovery to a second model.
+
+\begin{table}[tb]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Fully matched numerical remedies. Upper: each policy has 18 terminal calls
+per presolve setting; ``Budgets'' counts points meeting all 4,320 audited rows after
+integer rounding. Max. $v_V$ is the largest activation violation in
+m\textsuperscript{3}; $B>U$ and Gap flags follow Table~S11. Limits counts native
+time limits. Work is the geometric mean of all terminal calls, including flagged
+completions; Total is the median entire fresh-process time in seconds. Lower:
+per-model compliance among three seeds with presolve disabled. Absence of a bound
+or gap flag does not certify optimality. The interrupted attempt is retained
+separately rather than imputed or counted as a completed replicate.}
+\label{tab:matched-accuracy}
+\resizebox{\linewidth}{!}{\input{tables/matched-accuracy}}
+\par\medskip
+\input{tables/matched-cases}
+\end{table}
+
+Complete process times include startup, C++ generation/Base writing, metadata,
+factor selection, scaled export, native import/equality checks, optimization,
+extraction, verification and persistence. Disjoint stages and objectives are
+retained for every call. Compilation and prior witness acquisition are offline;
+current witness revalidation is timed separately. Wall times span a reboot and
+changing shared-machine load, so native Work is the primary effort measure.
+The endpoint is terminal budget delivery at the native stopping rule, not time
+to the first verified incumbent or a precision--cost frontier over multiple budgets.
+Known models and previously used seeds provide within-family confirmation,
+not external validation. Sources, every outcome, the interrupted attempt and
+paired cost summaries are supplied under
+\path{exploration/oms-matched-accuracy-20261016/}.
+
+\FloatBarrier
+\section{Multi-budget precision--effort sensitivity}
+\label{sec:si-frontier}
+The six known SG-Ter-Mer models are paired at seeds 59,71,89 under automatic/off
+presolve, seven volume targets and a fixed 0.01 MW power target. The common
+integer tolerance is $10^{-9}$, selected before optimization to study the full
+budget range; it differs from $2^{-28}$ in Table~S16. Other settings match that
+study, including 120 seconds, four threads and a 1\% requested gap. L2-tight uses
+both tolerances $10^{-9}$; L2-NF3 adds NumericFocus=3 to the matched L2 control.
+Of 360 randomized assignments, 30 abstain before solving because the uniform
+integer-rounding reserve exhausts 10\,m\textsuperscript{3} in five models. The
+sixth admits that budget. This is incompatibility of a sufficient contract, not
+MILP infeasibility. All remaining 330 calls and 31 exact native-export feasible
+witness acquisitions are retained. No fresh MILP run is needed for the replay.
+
+The criterion fixed before solving requires at least four models to meet the
+targets in all three seeds at two adjacent budgets, with lower paired geometric
+work than NF3, no more detected bound contradictions and at most 1\% worsening
+in candidate cost. All six qualify at 30 and 100\,m\textsuperscript{3} under
+automatic presolve. Both policies pass every primal target and have zero detected
+bound/gap contradictions there. Work ratios by model range from 0.128 to 0.668
+at 30\,m\textsuperscript{3}, and 0.072 to 0.585 at 100\,m\textsuperscript{3}.
+This is a descriptive comparison within known models, not external validation
+or certification of their reported MILP bounds. Primal recovery over L2 still
+occurs only on instance046 with presolve disabled.
+
+\begin{table}[tb]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Prespecified sensitivity. Calls counts executed Budget-L2 calls out of
+18 assignments; the missing 15 at 10\,m\textsuperscript{3} in each panel are
+abstentions. Budgets counts successful rounded points. B/G denotes bound/gap
+contradictions against exactly feasible witnesses of the same binary64 export.
+NF3 has zero detected B/G flags and satisfies all targets in both panels.
+Work and complete-time ratios are paired geometric means against NF3 on the
+same executed cases/seeds. All controls are resolved once per case/seed/presolve
+and checked at every target. At 3,000 and 10,000\,m\textsuperscript{3}, Budget
+exports equal L2; these are not independent representations. Lower effort or
+absence of a detected contradiction does not certify MILP optimality.}
+\label{tab:precision-frontier}
+\resizebox{\linewidth}{!}{\input{tables/precision-frontier}}
+\end{table}
+
+Complete process time includes startup, generation once, metadata, selection,
+export, import/equality checking, solving, extraction, original-row verification
+and persistence. Compilation and witness acquisition are separate. On the shared
+host, the aggregate time ratios at 30/100\,m\textsuperscript{3} are 0.704/0.629;
+the 30\,m\textsuperscript{3} cycle is nevertheless slower in three inexpensive
+models. No isolated hardware speedup is claimed. The 36 automatic-presolve
+Budget points in this band satisfy the observed exported-row hypothesis:
+no audited row exceeds $\epsilon=10^{-6}$ and the maximum is below $1.5\times10^{-10}$.
+That observation is checked separately from factor admissibility and original-unit
+residuals. With larger budgets or presolve off, Table~S17 retains adverse results.
+Sources and all outcomes are in \path{exploration/oms-frontier-20261016/}.
+
+\FloatBarrier
+\section{Isolated native-selector integration}
+An experimental hook applies the selector to the C++ generator's in-memory rows,
+choosing all factors before modifying any row and exporting only once. The
+original generator and its formulation are unchanged. Both arms use the same
+isolated $-O2$ executable: Python disables the hook, exports Base, reconstructs
+metadata and applies the reference selector; C++ enables the hook. Exact rational
+intervals and reserves use Boost 1.74 multiprecision. At 0.01 MW/100\,m\textsuperscript{3}
+and integer allowance $10^{-9}$, all factors, matrix/RHS values, objectives, bounds
+and integer domains match the Python implementation on all six models, for L2
+and Budget-L2. The independent replay checks 120,960 paired rows and 25,920 contracts.
+
+\begin{table}[tb]
+\centering\small
+\caption{Two separate Budget-L2 implementation benchmarks. Preparation reports
+medians of seven repeats per arm/model; speedup is Python/C++.
+The complete cycle reports geometric means over seeds 59, 71, 89; its ratio is
+C++/Python, with aggregate paired ratio 0.824. The former includes startup,
+generation, selection, export and persistence; the latter additionally includes
+native import/data checks, solving and physical verification. Compilation and
+prior witness acquisition are separate. These are shared-host measurements,
+not general hardware speedups.}
+\label{tab:native-selection-cost}
+\textbf{Standalone preparation}\par\smallskip
+\input{tables/native-selection-cost}
+\par\medskip\textbf{Complete process}\par\smallskip
+\input{tables/native-cycle-cost}
+\end{table}
+
+The corrected pass contains 168 timed preparations across both kernels, plus 24
+preflight preparations. An earlier complete pass is retained: its C++ audit CSV
+failed to quote row names containing commas. After correcting that format, the
+entire identical design was repeated; every model export matches the first pass.
+Thus 336 timed and 48 preflight preparations are supplied, with no optimizer call.
+Part of standalone startup savings may overlap imports needed by a full solver
+workflow, so the speedup is not applied to historical optimization times.
+The prototype is under \path{exploration/oms-native-selector-20261016/}.
+
+The subsequent complete-cycle benchmark fixes 36 calls in randomized paired
+blocks on the same six models. Both arms read original-model metadata within
+the measured process; Python disables the native selector and C++ enables it
+in the same executable. All ordered binary64 model data, including row and
+column order, match. All 18 pairs have identical points, native endpoints and
+work. Paired time ratios by model range from 0.731 to 0.987, with aggregate
+0.824; the 3.70--6.37 preparation speedups therefore are not extrapolated.
+No other research solver campaign was run concurrently with this benchmark;
+system load was recorded and all repetitions retained. Complete records and
+independent checks are under
+\path{exploration/oms-followup-20261017/native-cycle/}.
+
+\FloatBarrier
+\section{Exact global-LP reference intervals}
+The six original Base models admit a supplementary verification independent of
+their reported solver bounds. All 1,440 binary variables are relaxed, preserving
+their $[0,1]$ bounds; no integer pattern is fixed in this LP. SoPlex 8.1.0 with
+GMP obtains an exact primal/dual solution using the rational values of the original
+binary64 coefficients, RHS, costs and bounds. The checker independently rebuilds
+all inequalities, including variable bounds, verifies dual signs and $A^T\pi=c$,
+and checks primal/dual objective equality. The dual therefore provides a genuine
+global lower bound $L$ for the original MILP.
+
+Separately, exactly feasible integer witnesses provide $U$. Their construction
+uses a fixed-pattern LP, but only their verified primal vectors are used here;
+that LP's dual is not a global MILP bound. Table~S19 reports the resulting
+intervals. Negative objectives use width $(U-L)/|U|$. Equality is tested rationally,
+not by comparing rounded displays. Three reference witnesses are certified within
+1\%, and instance031 is certified exactly optimal. Wider intervals on the other
+three models do not certify their reported 1\% gaps. These are original-Base
+reference certificates, not a claim that a floating row export, a tolerance-feasible
+native vector or every point in Tables~S16--S17 has a certified optimality gap.
+
+\begin{table}[tb]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Verified original-model intervals from six unfixed exact LP relaxations
+and six complete exact integer witnesses. Displayed costs are rounded; certificates
+retain exact rationals. A width over 1\% is an unresolved interval, not evidence
+that the integer optimum is known or that the relaxation gap equals that width.}
+\label{tab:global-lp-certificates}
+\resizebox{\linewidth}{!}{\input{tables/global-lp-certificates}}
+\end{table}
+
+The six global-LP construction/solve/check cycles cost 23.98 seconds in total on
+the shared host; acquisition of the six integer witnesses is additional and
+recorded separately. Replaying supplied primal/dual certificates requires no
+optimizer. Sources and duals are under \path{exploration/oms-global-lp-20261016/};
+the supplied \path{exploration/oms-joint-contracts-20261016/base-witnesses/} holds
+the original-Base integer witnesses. The separate row/column research prototype
+is outside the row-scaling claims of this manuscript.
+
+\FloatBarrier
+\section{Independent batch-scheduling transfer}
+Eight prescribed horizons (8,10,12,16,20,24,32,40) use the archived
+STN-Scheduler implementation of the Kondili batch-scheduling example, independent
+of the hydrothermal generator. Horizons 10 and 12 are known anchors from an
+earlier pilot that found no added primal benefit; the other six are new horizons
+of the same external example, not six independent application families.
+Source commit, license and complete model data are retained in the artifact.
+Mass budgets are $10^{-5}$ kg (10 mg), logical budgets $10^{-5}$ and financial
+budgets $10^{-3}$ source monetary units. These are numerical study goals,
+not industrial accuracy standards.
+
+All four controls use exact dyadic row/RHS export, the same coefficient window,
+integer tolerance $10^{-9}$, automatic presolve, four threads, a 30-second limit
+and a requested 1\% gap. Seeds 131,137,149 and all 96 assignments are fixed before
+solving. L2-tight changes FeasibilityTol from $10^{-6}$ to $10^{-9}$; NF3 adds
+NumericFocus=3. The integer tolerance is already $10^{-9}$ in every arm.
+A pre-optimization construction check exposed the upstream dependence of
+ConstraintList names/order on Python sets. The correction verifies the complete
+mathematical row multiset, including duplicates, then restores the already frozen
+row order. The failed preflight and source-only amendment are retained; no model,
+export, assignment or optimizer result was changed.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{Independent batch-scheduling checks. Entries count returned points meeting
+all original-row and variable-bound budgets after integer rounding. All integers
+are retained. Changed rows compares exact dyadic Budget-L2 with matched dyadic L2.
+The final row totals 24 calls per policy. Budget delivery is not exact feasibility
+or a certificate of the reported MILP bound or gap. NF3's sole failing point has
+111.041 mg capacity violation against 10 mg; the contractual bound is 8.2 mg.}
+\label{tab:external-transfer}
+\input{tables/external-transfer}
+\end{table}
+
+Table~S20 verifies transfer of the procedure: Budget-L2, L2 and L2-tight each pass
+24/24 checks, and NF3 passes 23/24. At horizon 40 and seed 149, the NF3 point has
+$W=0$ and $B=1.110407442\times10^{-4}$ kg in the capacity row $B-200W\le0$.
+Its violation is 111.041 mg against the 10 mg target, despite exact integer
+coordinates. L2's factor $2^{-8}$ yields observed exported violation
+$4.338\times10^{-7}<10^{-6}$. Budget-L2 selects $2^{-3}$: its conditional
+rounded-original-row bound is $8+0.2=8.2$ mg, within the target. The checked
+Budget-L2 point meets the target. Matched L2 also passes all checks; this example
+does not establish a unique primal recovery over that control or general
+computational superiority. Native solves are short and process overhead dominates.
+
+Eight separate NF3 reference calls at seed 127 supply patterns for eight single
+10-second exact LP attempts. One yields an independently verified feasible
+witness; seven terminate without a certified solution and are retained as unknown,
+not infeasibility proofs. Thus only 12 comparison-bound checks have this reference;
+the other 84 are unknown. No replacement pattern was sought. These references do
+not certify the native reports. The independent replay checks all 104 saved points,
+factor intervals, exact proportionality and the retained witness without optimizing.
+Data and programs are under \path{exploration/oms-followup-20261017/external/}.
+
+\FloatBarrier
+\section{Integer-tolerance sensitivity and activation-factor path}
+The follow-up matches six known dispatch models, seeds 59,71,89, automatic
+presolve, the 0.01 MW target and volume budgets 30/100\,m\textsuperscript{3} at
+integer tolerances $10^{-9}$ and $2^{-28}$. All other native parameters match.
+Contract factors are recomputed consistently with the integer allowance, so this
+tests the whole workflow's tolerance sensitivity. The NF3 representation is
+unchanged and isolates its native parameter change. Fifty-four low-tolerance
+calls are reused from Table~S17; the high-tolerance design adds 36 calls and
+18 contractual abstentions. Twelve existing exact-export witnesses suffice;
+their equality to the corresponding new exports is checked and no LP is rerun.
+
+\begin{table}[!htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Matched tolerance sensitivity. Calls and abstentions refer to Budget-L2;
+Budgets counts successful rounded points. B/G uses the exact feasible references
+and thresholds of Table~S16. NF3 has no detected B/G flags in either tolerance
+panel. Work ratios are paired geometric means against NF3 at the same tolerance.
+An abstention concerns the sufficient precision specification, not MILP infeasibility.}
+\label{tab:integer-tolerance}
+\input{tables/integer-tolerance}
+\end{table}
+
+At $2^{-28}$, the integer-rounding reserve alone exceeds 30\,m\textsuperscript{3}
+in every model. At 100\,m\textsuperscript{3}, every point passes, with work ratio
+0.356 but one contradicted bound. The zero-detected-contradiction result at the
+smaller tolerance therefore does not establish robustness across these values.
+
+A separate replay uses existing exports only. At every tested volume target from
+30 through 1,000\,m\textsuperscript{3}, exactly 8,640 factors differ from L2,
+all on activation rows; 319,680 nonactivation rows across compatible exports
+are checked unchanged. With $R_i$ denoting the recorded combined integer/export
+reserve, the observed activation factors satisfy
+\[
+\alpha_i=\operatorname{ceil}_{64}\!\left(\max\left\{10^{-9},
+\frac{\epsilon}{\delta_V-R_i}\right\}\right).
+\]
+Independent arithmetic checks 53,280 compatible factors and 7,200 incompatible
+activation intervals directly, without importing the selector or experiment driver.
+The L2-admissibility thresholds $R_i+\epsilon/10^{-9}$ range from 1,008.779 to
+1,013.068\,m\textsuperscript{3}. Thus the factor magnitudes, rather than the
+number of modified rows, change within the favorable and adverse tested targets.
+All automatic-presolve outputs in that sensitivity meet the observed exported-row
+hypothesis, including cases with contradicted bounds. This locates the changed
+representation; it does not distinguish internal presolve, factorization or search
+causes of the observed bound discrepancies. The figure and complete row records
+are retained in \path{exploration/oms-followup-20261017/mechanism/}.
+
+\FloatBarrier
 \section{Reproduction and artifact layout}
+The accompanying locally frozen snapshot is \path{v1.3.13-oms-submission}, revised
+17 October 2026 and supplied as Supplementary Material~2. Its metadata distinguish
+the publicly archived \path{v1.2-coap-submission} baseline from the new Ruiz comparison,
+complementary implementation check, expanded physical-budget audit, activation
+follow-up with exact native-export feasible witnesses and the auxiliary
+common-incumbent diagnostic, matched IntegralityFocus control, fully matched
+accuracy/remedy comparison, complete workflow costs, the multi-budget sensitivity,
+native-selector preparation benchmark and global-LP reference certificates.
+\path{paper/submission/oms/OMS_DATA_MANIFEST.json} inventories every new experiment
+file and required replay program/input with a SHA-256; \texttt{SNAPSHOT.json} identifies
+the version and counts. All compressed new LPs, named bases, row factors, native logs,
+saved incumbents and physical-row audit inputs are supplied. The new-result replay uses
+these files without the historical bulk archive or any optimizer call, including
+the twenty supplied activation witnesses. SoPlex is only needed to generate new
+witnesses, not to check those provided. No separate
+Zenodo version DOI is claimed for the OMS snapshot.
+
 The root README and \path{environment/research-requirements.txt} specify the
 recorded analysis environment. The following commands need no optimizer license:
 \begin{lstlisting}
+make research-oms-check      # includes matched controls and full workflow replay
 make research-check-python  # tests, saved binary audit, matrix hashes
 make research-check         # also builds/tests the native C++ exporter
 make research-analysis      # current tables and vector figures
 make research-fixed-basis-check  # rebuild all 1,530 bases from LP text
 make paper                  # article and this supplement
 \end{lstlisting}
-The reproducibility archive carries the analyses, the aggregates and the inputs they read, and
-lists in \path{EXCLUDED.txt} the bulk files it leaves out: the exported LP text and bases of the
-fixed-basis audit, about 5~GB that stay in the repository. The fixed-basis rebuild reads those
-exports and therefore needs them.
+The four audit/analysis commands above are self-contained in Material~2: they use
+the supplied new OMS files and stored historical analysis inputs. The stopped-campaign
+screening tables use the supplied \texttt{runs.csv} and \texttt{contradictions.csv}
+under \path{results-revision/solver-robustness/analysis/}; these are numerical
+screening records, not exact feasibility certificates. Historical basis
+reconstruction and rerunning its stress-sample precision calculation additionally
+require \texttt{fixed-basis-exports.tar.zst}, archived with
+\path{v1.2-coap-submission} at \url{https://doi.org/10.5281/zenodo.23145294}.
+That separate archive contains 337 MB compressed and 5.18 GB uncompressed in
+11,585 files. \path{EXCLUDED.txt} identifies omitted bulk files; their sizes and
+hashes are in \path{paper/submission/data-deposit/MANIFEST.json} and
+\path{paper/submission/data-deposit/SHA256SUMS}. Extract at the repository root
+before \texttt{make research-fixed-basis-check}; the 1,530-basis reconstruction
+is not part of the self-contained four-command replay.
 The full export check needs GNU Make and a C++17 compiler. PDF compilation uses
 pdfLaTeX, BibTeX and standard TeX packages. Figures are generated with matplotlib from stored data or explicit
 mathematical expressions.
 
+\begin{samepage}
 Fresh experiments write to separate directories and are not required for verification:
 \begin{lstlisting}
 make research-grid GRID_OUT=results-revision/research-audit/reruns/grid
@@ -617,11 +1297,12 @@ make research-fixed-basis \
 make research-budget BUDGET_SOLVERS=highs \
   BUDGET_OUT=results-revision/research-audit/reruns/highs
 \end{lstlisting}
+\end{samepage}
 The default two-solver budget rerun also requires Gurobi and a suitable license.
 Runtime measurements need not reproduce bit for bit across hardware or solver
 versions. Source snapshots and hashes in the final budget directory identify the
 implementation that generated the reported results; later arithmetic edge-case
 repairs are recorded separately, with a comparison against all saved row factors.
-The accompanying source/data archive (Online Resource 2) preserves the inputs needed
+The accompanying source/data archive (Supplementary Material 2) preserves the inputs needed
 to regenerate the current main tables and figures.
 \end{document}

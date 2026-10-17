@@ -1,0 +1,104 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2cm]{geometry}
+\usepackage{booktabs,hyperref,array}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\begin{document}
+\begin{center}{\Large Escalamiento interno y valor del generador}\\[4pt]
+Exploración independiente para OMS --- octubre de 2026\end{center}
+\textbf{Decisión: mantener OMS v1.3.5 sin cambios.} El escalamiento externo
+produce beneficios en algunos casos con parámetros normales, pero no aparece
+una ventaja atribuible a información adicional ni una regla predictiva validada.
+
+\textbf{Diseño.} Seis modelos SG--Ter--Mer de 360 períodos, 6120 variables,
+10080 filas y 1440 enteras cada uno. Descubrimiento: 001,014,042, elegidos por
+resultados históricos; reserva: 002,003,004, fijados antes de optimizar. Se
+conserva la integralidad original. No se usan los tres MPS continuos de Benders.
+Se exportan MPS nativos desde el ejecutable existente, sin modificar fuentes.
+No es una réplica de los LP antiguos DummyLp: cambian exportador, orden,
+semillas, factores dyádicos y gap.
+
+Gurobi 13.0.2, cuatro hilos, semillas 307,331,353, 12 s y 12 unidades de trabajo,
+gap 0.1\%, tolerancias 1e-6/1e-5, sin starts. Factorial Base/Structural por
+escalamiento interno auto/off y presolve auto/off, más controles GM y Ruiz.
+Reserva con parámetros normales. Todas las resoluciones fueron secuenciales.
+126 brazos, 108 llamadas MILP reales al deduplicar y 42 LP diagnósticos.
+Un LP racional posterior se informa aparte. Diagnóstico y verificación no se
+incluyen en el tiempo de optimización; sus costos están registrados.
+
+\textbf{Atribución.} Un selector común elige potencias de dos dentro de una
+ventana [1e-9,1e9], con banda identidad [0.5,2]. Se comprueba exactamente cada
+producto de coeficiente/RHS y se conservan cotas, dominios y objetivo.
+Algebraic usa GM; Structural cambia a L2 en acoplamientos. En los seis modelos,
+ambos candidatos de acoplamiento quedan en la banda identidad y el resto usa
+GM: \textbf{Algebraic=Structural en todas las filas}. Generator aplica además
+presupuestos físicos: tampoco cambia factores. No se fuerza actividad reduciendo
+presupuestos. Ruiz conserva columnas y usa cuatro medias iteraciones.
+
+\begin{center}\begin{tabular}{lrrrr}\toprule
+Escenario & MW & m$^3$ & Admisibles & Modificados/incompatibles\\\midrule
+Exigente & .01 & 100 & 100\% & 0/0\\
+Referencia & .1 & 1000 & 100\% & 0/0\\
+Permisivo & 1 & 10000 & 100\% & 0/0\\\bottomrule
+\end{tabular}\end{center}
+Las unidades algebraicas se convierten por los coeficientes físicos de cada
+fila; son objetivos numéricos del estudio, no tolerancias de UTE. La garantía
+residuo original $\leq10^{-6}/\alpha$ es condicional al residuo exportado.
+Los máximos observados divididos por presupuesto, sobre todos los puntos
+finales/políticas, fueron 9.699e-05, 9.699e-06, 9.699e-07. Se evaluaron racionalmente y no se confunden
+con la garantía. La igualdad de factores impide identificar una ventaja
+operacional de la información física en este banco; no demuestra inutilidad
+universal de esa información.
+
+\newpage
+\textbf{Resultado con escalamiento interno y presolve normales.}
+Cada celda indica corridas que declaran OPTIMAL al gap pedido sobre tres, y
+mediana de trabajo incluyendo las censuradas. GM agrupa Algebraic y Structural.
+
+\begin{center}\begin{tabular}{llrrr}\toprule
+Caso & Etapa & Base & GM & Ruiz\\\midrule
+001 & D & 0/3; 12 & 3/3; 7.805 & 0/3; 12.01 \\
+014 & D & 3/3; 0.453 & 3/3; 0.3963 & 3/3; 0.4278 \\
+042 & D & 3/3; 0.3291 & 3/3; 0.4943 & 3/3; 0.3913 \\
+002 & R & 0/3; 12.04 & 0/3; 12.13 & 0/3; 12 \\
+003 & R & 0/3; 12 & 2/3; 4.931 & 0/3; 12 \\
+004 & R & 3/3; 0.2682 & 3/3; 0.3541 & 3/3; 0.2581 \\
+\bottomrule\end{tabular}\end{center}
+D: descubrimiento; R: reserva. Una mediana de trabajo menor con peor cota o
+incumbente no es una aceleración. RESULTADOS.md y los CSV conservan todos los
+estados, gaps, cotas, objetivos, tiempos y el factorial completo. No se informa
+una razón de aceleración cuando uno no termina o la calidad primal difiere.
+
+\textbf{Qué revela presolve.} En 6 de seis casos Base y GM tienen
+exactamente la misma huella de filas normalizadas, dominios y objetivo tras
+el diagnóstico presolve normal, aunque sus magnitudes y trabajo difieren.
+La relajación LP normal coincide numéricamente. Ni esa huella ni la reducción
+de rangos permiten afirmar una ventaja universal. No se ha localizado un corte,
+pivote o factor interno que explique causalmente las diferencias.
+
+\textbf{Comprobación posterior.} Un testigo racional factible de costo 0 refuta 4 cotas inferiores del factorial; 4 provenían de corridas con estado OPTIMAL. Todas tenían ScaleFlag=0. Se verificaron sin tolerancias filas, cotas e integridad del testigo. Esto certifica una contradicción de cotas, no el óptimo del MILP.
+El intento racional usa un patrón entero del descubrimiento, todas las filas y
+cotas originales y costo $\leq0$, con 30 s de SoPlex. Está fuera de los tiempos
+del factorial y es una validación posterior, no evidencia prospectiva.
+
+\textbf{Límites y decisión.} Se fijaron conclusiones y hashes del descubrimiento
+antes de abrir resultados de reserva. No se ajustó un predictor a tres casos
+ni se reajustó con los reservados. Es un ensayo acotado de una familia y un
+solver: no prueba una ventaja nueva generator-aware, un mecanismo interno
+específico o una predicción útil fuera de muestra. Por eso se archiva separado
+y no se amplía el manuscrito. El diagnóstico compacto LP--DW, la frontera
+precisión--trabajo y los límites conjuntos del escalamiento siguen pendientes.
+
+\textbf{Reproducción y fuentes.} El paquete incluye entradas, MPS, datos
+canónicos, factores, puntos, trazas, logs, protocolo y scripts. Un replay sin
+solver reimporta los seis MPS y comprueba los residuos con aritmética racional.
+La entrega OMS y los siete paquetes anteriores se verifican por SHA256.
+La documentación de \href{https://docs.gurobi.com/projects/optimizer/en/current/reference/python/model.html#Model.presolve}{Gurobi, Model.presolve}
+advierte que su modelo puede diferir del usado por optimize: no es la matriz
+realmente escalada internamente. Véanse también
+\href{https://docs.gurobi.com/projects/optimizer/en/current/reference/parameters.html#parameter:ScaleFlag}{ScaleFlag}
+y el \href{https://soplex.zib.de/doc/html/EXACT.php}{modo racional de SoPlex}.
+\end{document}

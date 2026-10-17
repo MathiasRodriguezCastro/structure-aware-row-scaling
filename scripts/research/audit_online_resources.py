@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Mechanical audit of the two Online Resources before submission.
+"""Mechanical audit of the two Supplementary Materials before submission.
 
 Checks, from the sources and the rendered PDFs rather than by reading them:
-  1. every "Online Resource 1, Table Sx" of the article exists in the supplement and carries
+  1. every "Supplementary Material 1, Table Sx" of the article exists in the supplement and carries
      that number;
   2. every numbered table of the supplement is pointed at from the article;
   3. every value the article quotes next to such a pointer appears in that table;
   4. every path the two documents name exists in the repository;
   5. the supplement carries the article title, the journal, the author, the affiliation and the
-     contact address, and the artifact identifies itself as Online Resource 2.
+     contact address, and the artifact identifies itself as Supplementary Material 2.
 Exits non-zero on the first category that fails, and prints a line per check either way.
 """
 import re
@@ -33,6 +33,13 @@ QUOTED = {
            "48"],
     "S9": ["10"],
     "S10": ["76", "26", "25", "9", "20", "6", "4"],
+    "S14": ["001", "003", "042", "Cold", "CommonStart", "0/3", "3/3"],
+    "S15": ["IF0", "IF1", "Generate", "Select/export", "Verify", "Total", "4,837.338"],
+    "S16": ["18/18", "15/18", "1.106", "0.6023", "3.063", "2.648"],
+    "S17": ["0.362", "0.629", "30", "100"],
+    "S18": ["0.824", "0.731", "0.987"],
+    "S20": ["24/24", "23/24", "111.041", "8.2"],
+    "S21": ["0.356", "18/18"],
 }
 
 
@@ -123,11 +130,11 @@ def main():
         failures.append(f"paths named but absent: {absent}")
 
     # The article states two figures that Table S2 does not print literally: the largest
-    # enclosure width and how closely the certified bounds agree with the estimates. Check them
+    # diagnostic bracket width and agreement of numerical upper endpoints with estimates. Check them
     # against the stored data, which is stronger than matching the table text.
     width, agree = derived_s2_values()
-    for value, claim, name in ((width, "6\\times10^{-3}", "enclosure width"),
-                               (agree, "2.1\\times10^{-5}", "bound/estimate agreement")):
+    for value, claim, name in ((width, "6\\times10^{-3}", "diagnostic bracket width"),
+                               (agree, "2.1\\times10^{-5}", "upper-endpoint/estimate agreement")):
         quoted = float(re.sub(r"\\times10\^\{(-?\d+)\}", r"e\1", claim))
         ok = value <= quoted * 1.05 and value >= quoted * 0.5
         print(f"[3] S2 derived {name}: data {value:.3e}, article says {quoted:.1e} "
@@ -137,20 +144,31 @@ def main():
         if claim.replace("\\times10^{", "").replace("}", "") and claim not in MAIN.read_text():
             failures.append(f"article no longer states {claim} for the {name}")
 
-    required = ["Pre-Export Row Scaling", "Computational Optimization and Applications",
+    # Row-path thresholds are supporting text, not cells of tolerance Table S21.
+    import json
+    mechanism = json.loads((ROOT / "exploration/oms-followup-20261017/mechanism/INDEPENDENT_VALIDATION.json").read_text())
+    thresholds = mechanism["L2_budget_switch_threshold_range_m3"]
+    for value in thresholds:
+        literal = f"{value:,.3f}"
+        if literal not in main_src or literal not in si_txt:
+            failures.append("activation-factor threshold absent or inconsistent: " + literal)
+    print("[3] S21 supporting activation thresholds independently traced: "
+          + ", ".join(f"{v:,.3f}" for v in thresholds))
+
+    required = ["Pre-Export Row Scaling", "Optimization Methods and Software",
                 "Rodr\\'iguez Castro", "Universidad de la Rep\\'ublica", "mathiasr@fing.edu.uy",
-                "Online Resource 1"]
+                "Supplementary Material 1"]
     missing = [r for r in required if r not in si_src]
     print(f"[5] supplement front matter: {len(required) - len(missing)}/{len(required)} present"
           + (f" --- MISSING {missing}" if missing else ""))
     if missing:
         failures.append(f"supplement front matter missing {missing}")
     readme = (ROOT / "README.md").read_text()
-    for r in ("Online Resource 2", "mathiasr@fing.edu.uy", "Universidad de la Rep\u00fablica"):
+    for r in ("Supplementary Material 2", "mathiasr@fing.edu.uy", "Universidad de la Rep\u00fablica"):
         if r not in readme:
             failures.append(f"README does not identify itself: missing {r!r}")
-    print("[5] the artifact identifies itself as Online Resource 2"
-          if "Online Resource 2" in readme else "[5] FAILED")
+    print("[5] the artifact identifies itself as Supplementary Material 2"
+          if "Supplementary Material 2" in readme else "[5] FAILED")
 
     if failures:
         print("\nFAILED:")

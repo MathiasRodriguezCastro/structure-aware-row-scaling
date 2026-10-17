@@ -1,0 +1,87 @@
+SoPlex version 8.1.0 [mode: optimized] [precision: 8 byte] [rational: GMP 6.2.1] [PaPILO n/a] [GitHash: NoGitInfo]
+Copyright (c) 1996-2026 Zuse Institute Berlin (ZIB)
+
+External libraries:
+  Boost 1.74.0         Boost C++ Libraries (boost.org)
+  GMP 6.2.1            GNU Multiple Precision Arithmetic Library developed by T. Granlund (gmplib.org)
+
+Loading settings file </home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-certificate-feedback-20261014/branches/gurobi-s109-B-restart/phase-1/audit/exact.set> . . .
+int:syncmode = 1
+int:readmode = 1
+int:solvemode = 2
+int:checkmode = 2
+real:feastol = 0.00000000e+00
+real:opttol = 0.00000000e+00
+real:timelimit = 2.00000000e+00
+
+Reading (rational) LP file </home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-certificate-feedback-20261014/branches/gurobi-s109-B-restart/phase-1/audit/model.lp> . . .
+Reading took 0.02 seconds.
+
+LP has 5168 rows 1539 columns and 6309 nonzeros.
+
+Initial floating-point solve . . .
+Simplifier removed 3647 rows, 27 columns, 2169 nonzeros, 567 col bounds, 1784 row bounds
+Reduced LP has 1521 rows 1512 columns 4140 nonzeros
+Equilibrium scaling LP
+
+type |   time |   iters | facts |    shift | viol sum | viol num | obj value 
+  L  |0.0     |0        | 1     | 0.00e+00 | 1.65e+15 | 360      | 0.00000000e+00
+  L  |0.0     |95       | 2     | 0.00e+00 | 2.53e+06 | 271      | 1.83520000e+06
+
+Floating-point infeasible.
+Setting up LP to test for feasibility.
+Initial floating-point solve . . .
+Simplifier removed 3418 rows, 0 columns, 1720 nonzeros, 0 col bounds, 1870 row bounds
+Reduced LP has 1750 rows 1540 columns 4976 nonzeros
+Equilibrium scaling LP
+
+  L  |0.0     |0        | 1     | 0.00e+00 | 5.83e+01 | 387      | -1.00000000e+00
+  L  |0.0     |100      | 1     | 0.00e+00 | 7.86e+00 | 387      | -2.49909499e-01
+  L  |0.0     |300      | 2     | 2.00e-07 | 1.81e+00 | 208      | -2.49909491e-01
+  E  |0.0     |408      | 4     | 0.00e+00 | 0.00e+00 | 0        | -2.49909499e-01
+  E  |0.0     |408      | 4     | 0.00e+00 | 0.00e+00 | 0        | -2.49909499e-01
+
+ --- unsimplifying solution and basis
+Store basis as old basis (from solver - testing feasibility)
+Floating-point optimal.
+Max. bound violation = 0, ofm = 1e0
+Max. row violation = 13/549755813888, ofm = 1e-10
+Max. reduced cost violation = 179/1152921504606846976, ofm = 1e-16
+Max. dual violation = 0, ofm = 1e0
+Performing rational reconstruction . . .
+Reconstructed solution primal infeasible (4).
+Refined floating-point solve . . .
+
+  L  |0.0     |0        | 1     | 0.00e+00 | 0.00e+00 | 0        | -4.06701920e+04
+  L  |0.0     |0        | 1     | 0.00e+00 | 0.00e+00 | 0        | -4.06701920e+04
+
+Store basis as old basis (from solver - testing feasibility)
+Floating-point optimal.
+Max. bound violation = 0, ofm = 1e0
+Max. row violation = 31/19807040628566084398385987584, ofm = 1e-27
+Max. reduced cost violation = 75/20769187434139310514121985316880384, ofm = 1e-33
+Max. dual violation = 0, ofm = 1e0
+Performing rational reconstruction . . .
+Reconstructed solution dual infeasible (3).
+Refined floating-point solve . . .
+
+  L  |0.0     |0        | 0     | 0.00e+00 | 0.00e+00 | 0        | 4.12989848e+21
+  L  |0.0     |0        | 0     | 0.00e+00 | 0.00e+00 | 0        | 4.12989848e+21
+
+Store basis as old basis (from solver - testing feasibility)
+Floating-point optimal.
+Max. bound violation = 0, ofm = 1e0
+Max. row violation = 1/2787593149816327892691964784081045188247552, ofm = 1e-42
+Max. reduced cost violation = 141/23384026197294446691258957323460528314494920687616, ofm = 1e-47
+Max. dual violation = 0, ofm = 1e0
+Performing rational reconstruction . . .
+Reconstructed solution dual infeasible (3).
+Performing rational factorization . . .
+Tolerances reached.
+Primal infeasible.  Dual Farkas ray available.
+
+SoPlex status       : problem is solved [infeasible]
+Solving time (sec)  : 0.05
+Iterations          : 503
+Objective value     : 1.00000000e+100
+

@@ -1,0 +1,140 @@
+{
+  "stage": "preliminary pilot; not confirmatory or manuscript evidence",
+  "source_sha256": "f2469e5418ac854187b606eb541fede497318ac6a0fff543ecef54d290683d3c",
+  "preprocessing": "existing dyadic representability interval and L2 projection; exact proportionality of full rows and RHS",
+  "coefficient_window": [
+    1e-09,
+    1000000000.0
+  ],
+  "epsilon_hypothesis": 1e-06,
+  "budgets": {
+    "STN_mass_kg": 1e-05,
+    "STN_logical": 1e-05,
+    "STN_financial": 0.001,
+    "MIPLIB": "1e-4 * max(1, abs(original RHS)), experimental algebraic units"
+  },
+  "models": [
+    {
+      "name": "Kondili-H10",
+      "family": "independent batch scheduling",
+      "rows": 409,
+      "columns": 321,
+      "guided_gamma": 1.4901161193847656e-08,
+      "contract_modified_rows": 88,
+      "exports": {
+        "Dyadic-GM": "c6335d08de740d7974fc998b1ece025df84ab2102c6d62738b4a48fddca11f42",
+        "Dyadic-L2": "a4da9140fcd783c05171ae14702d12e16ee17a6cf393f82241d259ed27c77692",
+        "Budget-dyadic-L2": "f763dfa426df0a60c4210c68f1de2f3da80ccc80d7cd523ddeea6951c2f28426",
+        "Base": "c799ec7e1947051909cf6eaad5290d95d657379c5234d4c901300c894f6dfcdb"
+      },
+      "incompatible_rows": {
+        "Dyadic-GM": 0,
+        "Dyadic-L2": 0,
+        "Budget-dyadic-L2": 0,
+        "Base": 0
+      }
+    },
+    {
+      "name": "Kondili-H12",
+      "family": "independent batch scheduling",
+      "rows": 483,
+      "columns": 379,
+      "guided_gamma": 1.4901161193847656e-08,
+      "contract_modified_rows": 104,
+      "exports": {
+        "Dyadic-GM": "ee862010ea4160991987be91729f61aa70a7b89698831af860f3dc80475d6fbc",
+        "Dyadic-L2": "7060476b1621b9c5c070ac2f3000bfec892f9254f6c7b31fb7f6584e2357f897",
+        "Budget-dyadic-L2": "48db360c984e4b1ab1b90d0b1f3d0a450e2330d536153d5c1754a7321bc82746",
+        "Base": "ae176468e6d75e92c7fb929bb847ce4b8b9b22a3a2f1a0830bb2905d6a923956"
+      },
+      "incompatible_rows": {
+        "Dyadic-GM": 0,
+        "Dyadic-L2": 0,
+        "Budget-dyadic-L2": 0,
+        "Base": 0
+      }
+    },
+    {
+      "name": "control30-3-2-3",
+      "family": "MIPLIB Numerics",
+      "rows": 512,
+      "columns": 332,
+      "guided_gamma": null,
+      "contract_modified_rows": 228,
+      "exports": {
+        "Dyadic-GM": "37c9db3002b1e99b6a86336b2106789a7a49fed67e1dd3fc7f4e46414662a609",
+        "Dyadic-L2": "aa812c390121692e17aadcb2d65ca8319053cb9f5cc96f21b8f8f2431dd3a458",
+        "Budget-dyadic-L2": "3c47462c99963861cb1a365009f52492a9b1ad123a91521af9c2f13dd2bf86d5",
+        "Base": "b3678476a40962a69c8c60b0ac6037ae9ab20746d52d936ac19b8f0ac9d2ab02"
+      },
+      "incompatible_rows": {
+        "Dyadic-GM": 0,
+        "Dyadic-L2": 0,
+        "Budget-dyadic-L2": 0,
+        "Base": 0
+      }
+    },
+    {
+      "name": "neos-3421095-cinca",
+      "family": "MIPLIB Numerics",
+      "rows": 1218,
+      "columns": 896,
+      "guided_gamma": null,
+      "contract_modified_rows": 0,
+      "exports": {
+        "Dyadic-GM": "23e8829bfdf2f764ccf151243c9432c2af7608c46d2cce973efef4809dae535a",
+        "Dyadic-L2": "a8845a7efb187c03c2bcc012c93de3dd557aeef4432ae9f7c9bde7f3e437c1c2",
+        "Base": "927473feedcdb1fbb17f3cab56ce2f18c4ec2973ee03a2947b2e20fac937af11"
+      },
+      "incompatible_rows": {
+        "Dyadic-GM": 0,
+        "Dyadic-L2": 0,
+        "Budget-dyadic-L2": 96,
+        "Base": 0
+      }
+    },
+    {
+      "name": "ta1-UUM",
+      "family": "MIPLIB Numerics",
+      "rows": 439,
+      "columns": 2288,
+      "guided_gamma": null,
+      "contract_modified_rows": 55,
+      "exports": {
+        "Dyadic-GM": "ab4c96582b21eb5ddb92bf55ff4e5942a63123d7d9feff7a75e35d7bcbe95ecc",
+        "Dyadic-L2": "ef013a8b54ca1d01e1b3035c6ad07d884d2b916cb2a199f7e89e913e7e9817af",
+        "Budget-dyadic-L2": "5e290474f170738f753b524ae2a7a84d929654b71e74c5f4684ab2a4477c41c7",
+        "Base": "0c99062476c9a19f1d3b537ff1c641f1fe6cc95700231e6fd65c710f41d46261"
+      },
+      "incompatible_rows": {
+        "Dyadic-GM": 0,
+        "Dyadic-L2": 0,
+        "Budget-dyadic-L2": 0,
+        "Base": 0
+      }
+    }
+  ],
+  "seed": 17,
+  "solvers": [
+    "gurobi",
+    "highs"
+  ],
+  "policies": [
+    "Base",
+    "Dyadic-GM",
+    "Dyadic-L2",
+    "Budget-dyadic-L2",
+    "Dyadic-L2-tight",
+    "Dyadic-L2-NumericFocus3"
+  ],
+  "parameters": {
+    "threads": 4,
+    "time_limit_seconds": 15,
+    "relative_gap": 0.01,
+    "presolve": "normal/automatic",
+    "internal_scaling": "normal/default"
+  },
+  "MIPLIB_rounding_scope": "selection certifies raw-point transfer only; rounded full-model point checked independently",
+  "STN_rounding_scope": "shared budget-guided integer allowance on Dyadic-L2 and Budget; source kg units",
+  "acceptance": "all original-row numerical budgets, variable bounds and integer-rounded domains; no optimality certificate"
+}

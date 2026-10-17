@@ -1,0 +1,95 @@
+
+Gurobi 13.0.2 (linux64) logging started Fri Oct 16 14:48:39 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-joint-contracts-20261016/ablation/Row-contract/solve-runs/instance001-s71/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-09
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter IntegralityFocus to value 0
+Set parameter NumericFocus to value 0
+Set parameter Seed to value 71
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  71
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 10080 rows, 6120 columns and 22679 nonzeros (Min)
+Model fingerprint: 0xd9c4b3a1
+Model has 721 linear objective coefficients
+Variable types: 4680 continuous, 1440 integer (1440 binary)
+Coefficient statistics:
+  Matrix range     [8e-06, 1e+05]
+  Objective range  [9e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [4e+01, 3e+09]
+Warning: Model contains large rhs
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 5.019439e+08
+Presolve removed 1378 rows and 496 columns
+Presolve time: 0.10s
+Presolved: 8702 rows, 5624 columns, 21074 nonzeros
+Found heuristic solution: objective 5.018433e+08
+Variable types: 4228 continuous, 1396 integer (1396 binary)
+
+Root relaxation: objective -1.188251e+06, 7084 iterations, 0.25 seconds (0.44 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -1188251.1    0 1354 5.0184e+08 -1188251.1   100%     -    0s
+H    0     0                    2.258495e+07 -1188251.1   105%     -    0s
+H    0     0                    -989850.3271 -1175802.8  18.8%     -    0s
+     0     0 -1164958.3    0 1347 -989850.33 -1164958.3  17.7%     -    1s
+     0     0 -1151222.0    0 1322 -989850.33 -1151222.0  16.3%     -    1s
+     0     0 -1149820.7    0 1322 -989850.33 -1149820.7  16.2%     -    1s
+     0     0 -1149819.3    0 1322 -989850.33 -1149819.3  16.2%     -    1s
+     0     0 -1058854.1    0  710 -989850.33 -1058854.1  6.97%     -    1s
+     0     0 -1058854.1    0  707 -989850.33 -1058854.1  6.97%     -    2s
+     0     0 -1044934.0    0  662 -989850.33 -1044934.0  5.56%     -    2s
+     0     0 -1043980.4    0  661 -989850.33 -1043980.4  5.47%     -    2s
+     0     0 -1038432.2    0  662 -989850.33 -1038432.2  4.91%     -    2s
+     0     0 -1037446.8    0  663 -989850.33 -1037446.8  4.81%     -    2s
+     0     0 -1036572.1    0  663 -989850.33 -1036572.1  4.72%     -    2s
+     0     0 -1032362.2    0  546 -989850.33 -1032362.2  4.29%     -    3s
+     0     0 -1032008.6    0  546 -989850.33 -1032008.6  4.26%     -    3s
+     0     0 -1031952.0    0  546 -989850.33 -1031952.0  4.25%     -    3s
+     0     0 -1031161.5    0  546 -989850.33 -1031161.5  4.17%     -    3s
+     0     0 -1031097.9    0  546 -989850.33 -1031097.9  4.17%     -    3s
+     0     0 -1030662.8    0  546 -989850.33 -1030662.8  4.12%     -    3s
+     0     0 -1030212.0    0  546 -989850.33 -1030212.0  4.08%     -    3s
+     0     0 -1030212.0    0  546 -989850.33 -1030212.0  4.08%     -    3s
+     0     2 -1030212.0    0  546 -989850.33 -1030212.0  4.08%     -    3s
+   304    21 -1007308.6   84  362 -989850.33 -1027095.7  3.76%  57.6    5s
+* 1012   154             312    -989879.4735 -1014905.8  2.53%  42.8    6s
+
+Cutting planes:
+  Gomory: 2
+  Implied bound: 264
+  MIR: 47
+  Flow cover: 389
+  RLT: 69
+  Relax-and-lift: 102
+
+Explored 1474 nodes (91681 simplex iterations) in 7.37 seconds (8.02 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 5: -989879 -989850 2.25849e+07 ... 5.01944e+08
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -9.898794735172e+05, best bound -9.988353710682e+05, gap 0.9047%
