@@ -40,7 +40,7 @@ to the separately supplied Supplementary Material 1.
 The numerical data include the archived `v1.2-coap-submission` baseline and the additional
 OMS dispatch comparison, stage ablation and physical-budget audit in
 `results-revision/research-audit/oms-close-20261013`. The OMS revision is
-locally frozen as `v1.3.15-oms-submission` and has no new Zenodo version DOI. The default build does not regenerate the historical
+locally frozen as `v1.3.17-oms-submission` and has no new Zenodo version DOI. The default build does not regenerate the historical
 COAP folder. Authorship, funding, competing interests and AI assistance remain stated in
 the manuscript. The manuscript is outside the source-code and data licenses.
 
@@ -80,3 +80,13 @@ unchanged. Main Table 12 includes the unscaled controls; Supplementary Table S23
 separates work, verified numerical quality and contemporaneous full-process timing.
 The comparison remains within six known models and does not demonstrate additional
 primal recovery over Base or general MILP certification.
+
+Version v1.3.16 adds no optimizer calls. Main Table 13 exposes per-model
+complete-process timings from the existing interleaved study, and the abstract
+identifies paired geometric means explicitly. The complete delivery includes a
+reproduction guide and the successful clean-extraction validation report;
+Supplementary Material 2 is included in that ZIP. The frozen v1.3.15 remains intact.
+
+Version v1.3.17 corrects the portal helper's outdated no-DOI text check and
+explicitly names GM in the condensed conditioning discussion. Existing scientific
+records and numerical results are unchanged; the complete package is revalidated.

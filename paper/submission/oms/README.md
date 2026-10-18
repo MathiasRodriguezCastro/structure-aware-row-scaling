@@ -30,8 +30,12 @@ python3 scripts/research/validate_oms.py
 OMS sources and numerical audits from a clean extraction of the artifact. `SHA256SUMS`
 identifies the files generated locally. The package is not a published release and does not
 assert that the manuscript has been submitted.
+The complete `oms-delivery.zip` includes Supplementary Material 2 and also
+`REPRODUCE.md` and `REPRODUCTION-VALIDATION.json`. The latter reports `passed`
+only after the clean-extraction checks succeed and identifies the inner archives
+by SHA-256. A small PDF-only review ZIP is not the full reproducibility package.
 
-The locally frozen OMS version is `v1.3.15-oms-submission`. `SNAPSHOT.json` records the
+The locally frozen OMS version is `v1.3.17-oms-submission`. `SNAPSHOT.json` records the
 historical/new-data distinction, and `OMS_DATA_MANIFEST.json` inventories every new OMS
 experiment file and required replay program/input with SHA-256. After validation,
 `python3 scripts/research/freeze_oms.py` creates a non-overwriting versioned copy of the
@@ -201,3 +205,26 @@ remains deferred.
 Validated v1.3.15 layout: 36 manuscript pages, 30 supplementary pages, one cover
 page and a one-page control note. The abstract has 183 words. The 90 new calls
 and all 126 audited points are retained; the current tables are reproducible.
+
+## Editorial closure v1.3.16 — 18 October 2026
+
+No new optimizer calls. Main Table 13 reports all six models' existing
+interleaved complete-process times and paired ratios against Base/Base-tight;
+the abstract names paired geometric means. The cover letter distinguishes lower
+work from preparation overhead on inexpensive models. Optimality limitations,
+native scientific records and previously frozen releases are preserved.
+The complete delivery now carries the replay guide and validation report next
+to both supplements; the new Zenodo version DOI remains deferred.
+The layout remains 36 manuscript pages, 30 supplementary pages and one cover
+page. Repeated discussion of conditioning diagnostics was consolidated to
+accommodate the timing table without extending the article. The abstract is
+below 200 words.
+
+## Portal preparation correction v1.3.17 — 18 October 2026
+
+The portal helper now accepts the manuscript's current statement that the local
+snapshot has no separate Zenodo DOI, as well as the earlier wording containing
+“version DOI”. Its generated form fields, declarations and source extraction
+were checked on the frozen v1.3.16 before this revision. The conditioning summary
+explicitly names GM scaling. Scientific records and the timing table are unchanged.
+Both v1.3.15 and v1.3.16 remain preserved; the definitive delivery uses v1.3.17.

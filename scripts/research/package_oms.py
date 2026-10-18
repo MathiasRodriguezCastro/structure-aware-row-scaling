@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Prepare local OMS sources, reproducibility artifact and separate upload copies."""
 import hashlib
+import json
 from pathlib import Path
 import shutil
 import zipfile
@@ -10,10 +11,38 @@ from oms_snapshot import write_metadata, followup_files, incumbent_files, workfl
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "paper/submission/oms"
+UPLOAD_FILES = {
+    "main_oms.pdf": ROOT / "paper/oms/main_oms.pdf",
+    "oms-submission.zip": OUT / "oms-submission.zip",
+    "cover-letter.pdf": ROOT / "paper/oms/cover-letter.pdf",
+    "supplementary-material-1.pdf": ROOT / "paper/supporting-information.pdf",
+    "reproducibility-artifact.zip": OUT / "reproducibility-artifact.zip",
+}
+DELIVERY_FILES = (*UPLOAD_FILES, "UPLOAD_INSTRUCTIONS.md", "REPRODUCE.md",
+                  "REPRODUCTION-VALIDATION.json", "SHA256SUMS")
 
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def build_delivery(validation=None):
+    """Bind replay evidence to the inner archives without a self-referential hash."""
+    uploads = OUT / "uploads"
+    report = {"snapshot_version": VERSION,
+              "status": "passed" if validation is not None else "not_yet_validated",
+              "scope": "Replay of saved results and independent source builds; no new research MIP runs.",
+              "validation": validation}
+    (uploads / "REPRODUCTION-VALIDATION.json").write_text(json.dumps(report, indent=2) + "\n")
+    (uploads / "SHA256SUMS").write_text("".join(
+        f"{sha(uploads/n)}  {n}\n" for n in DELIVERY_FILES if n != "SHA256SUMS"))
+    with zipfile.ZipFile(OUT / "oms-delivery.zip", "w", zipfile.ZIP_DEFLATED,
+                         compresslevel=9) as archive:
+        for name in DELIVERY_FILES:
+            archive.write(uploads / name, name)
+    paths = [*UPLOAD_FILES.values(), OUT / "oms-delivery.zip"]
+    (OUT / "SHA256SUMS").write_text("".join(
+        f"{sha(p)}  {p.relative_to(ROOT)}\n" for p in paths))
 
 
 def sources():
@@ -86,16 +115,8 @@ def main():
     source_count = sources()
     uploads = OUT / "uploads"
     uploads.mkdir(exist_ok=True)
-    files = {
-        "main_oms.pdf": ROOT / "paper/oms/main_oms.pdf",
-        "oms-submission.zip": OUT / "oms-submission.zip",
-        "cover-letter.pdf": ROOT / "paper/oms/cover-letter.pdf",
-        "supplementary-material-1.pdf": ROOT / "paper/supporting-information.pdf",
-        "reproducibility-artifact.zip": OUT / "reproducibility-artifact.zip",
-    }
-    for name, origin in files.items():
+    for name, origin in UPLOAD_FILES.items():
         shutil.copy2(origin, uploads / name)
-    (uploads / "SHA256SUMS").write_text("".join(f"{sha(uploads/n)}  {n}\n" for n in files))
     (uploads / "UPLOAD_INSTRUCTIONS.md").write_text(f"""# OMS separate upload files
 
 Extract oms-delivery.zip before assigning individual files in the submission portal.
@@ -129,13 +150,59 @@ That page returned HTTP 403 during preparation. This is the locally frozen OMS s
 does not identify the new Ruiz, stage-check or physical-budget experiments. The artifact
 includes SNAPSHOT.json and OMS_DATA_MANIFEST.json with every new-data file checksum.
 """)
-    with zipfile.ZipFile(OUT / "oms-delivery.zip", "w", zipfile.ZIP_DEFLATED,
-                         compresslevel=9) as archive:
-        for name in (*files, "UPLOAD_INSTRUCTIONS.md", "SHA256SUMS"):
-            archive.write(uploads / name, name)
-    paths = [*files.values(), OUT / "oms-delivery.zip"]
-    (OUT / "SHA256SUMS").write_text("".join(
-        f"{sha(p)}  {p.relative_to(ROOT)}\n" for p in paths))
+    (uploads / "REPRODUCE.md").write_text(f"""# Complete OMS package: {VERSION}
+
+Supplementary Material 2 is **reproducibility-artifact.zip**, included here.
+This complete package differs from the small PDF-only review ZIP.
+The five submission files and their upload roles are listed in UPLOAD_INSTRUCTIONS.md.
+
+## Check this delivery
+
+From this extracted directory:
+
+```sh
+sha256sum -c SHA256SUMS
+```
+
+REPRODUCTION-VALIDATION.json records the checks performed on these exact inner
+archives. Its status must be `passed`; a freshly prepared but unchecked package
+instead says `not_yet_validated`. The report records the inner archive SHA-256
+values, source compilation and all four replay commands. The outer ZIP hash is
+recorded separately in the frozen release's VALIDATION.json, avoiding a circular hash.
+
+## Replay the saved evidence
+
+Extract reproducibility-artifact.zip into an empty directory and enter it:
+
+```sh
+sha256sum --quiet -c CONTENTS.sha256
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r environment/research-requirements.txt
+make research-oms-check
+make research-check-python
+make research-check
+make research-analysis
+```
+
+Use a C++ compiler and the prerequisites in README.md and environment/apt-packages.txt;
+LaTeX is needed for rebuilding the documents, not for reading them.
+The four commands check saved evidence without rerunning the research MILPs
+or requiring a commercial solver license. Mathematical tests include small
+SciPy reference LPs. The unscaled-control checks cover all 90 new calls and
+126 saved points (including 36 reused Budget-L2 points), exact witnesses,
+original-row residuals, paired work and contemporaneous complete-process time.
+Analysis regenerates all final tables and figures from the included inputs.
+
+Rerunning timed MIPs is a different task, requires the documented Gurobi version
+and license, and does not reproduce wall-clock times exactly on another host.
+Reconstructing all 1,530 historical bases additionally requires the separate
+baseline bulk archive; it is not needed by these four saved-result commands.
+
+This local snapshot has no new Zenodo version DOI yet. The historical DOI
+identifies the earlier baseline, not these OMS experiments.
+""")
+    build_delivery()
     print(f"Prepared OMS sources ({source_count} files), artifact ({count} files) and delivery in {OUT}")
 
 

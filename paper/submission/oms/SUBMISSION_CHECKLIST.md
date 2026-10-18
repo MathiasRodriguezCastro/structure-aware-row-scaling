@@ -1,6 +1,6 @@
 # OMS submission checklist
 
-Scientific snapshot: `v1.3.15-oms-submission`, 18 October 2026.
+Scientific snapshot: `v1.3.17-oms-submission`, 18 October 2026.
 The manuscript, supplements and frozen delivery are validated locally. No journal
 submission or new public data deposit has been performed.
 
@@ -9,6 +9,7 @@ submission or new public data deposit has been performed.
 - [x] Application-unit budgets and independent residual verification supplied.
 - [x] Full precision sensitivity retains abstentions and adverse bound/gap outcomes.
 - [x] Directed matched Base/Base-tight controls and interleaved complete-process confirmation (S23).
+- [x] Per-model complete-process times in main Table 13; paired geometric means explicit in abstract.
 - [x] Secondary model/seed deletion analysis and external complete-cost controls checked (S22).
 - [x] Independent batch-scheduling transfer and integer-tolerance sensitivity documented.
 - [x] Native C++ and Python complete-cycle comparison retains all 18 paired endpoints.
@@ -20,6 +21,7 @@ submission or new public data deposit has been performed.
 - [x] Four standard commands passed from a clean Supplementary Material 2 extraction.
 - [x] All current tables and three analysis figures reproduced; native C++ test passed.
 - [x] Final PDFs, data inventories, checksums and separate upload roles verified.
+- [x] Complete ZIP includes Supplementary Material 2, reproduction guide and archive-bound replay report.
 - [x] Portal form text and local Zenodo files prepared as distribution outputs.
 - [ ] Confirm current OMS instructions, reference style, categories and upload limits in the portal.
 - [ ] Complete the author declarations and funding form in the portal.

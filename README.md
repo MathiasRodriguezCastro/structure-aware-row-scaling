@@ -10,7 +10,7 @@ residual-budget contracts in original application units, explicit factor-selecti
 finite-precision export and independent verification. The C++ dispatch exporter and Python
 budget selector are separate components. The archived numerical baseline is retained, with
 a controlled row-only Ruiz comparison, final-policy stage ablation, and three application
-precision scenarios on the same 30 operational models added for OMS. The locally frozen `v1.3.15-oms-submission` snapshot includes those additions. It has not
+precision scenarios on the same 30 operational models added for OMS. The locally frozen `v1.3.17-oms-submission` snapshot includes those additions. It has not
 been submitted or published as a separate Zenodo release and has no version DOI.
 
 The OMS activation follow-up adds 114 nonpilot solver calls, 20 exact feasible witnesses, and matched numerical controls on six archived scenarios without the documented demand inversion. [Findings and limits](exploration/oms-followup-20261014/RESULTADOS.md) distinguish original-unit precision from MILP-bound validity; `make research-oms-check` verifies the supplied data without optimizing.
@@ -37,6 +37,10 @@ Budget-L2/Base and Budget-L2/Base-tight work ratios are 0.317 and 0.264, with al
 three policies meeting every tested primal budget and less than 0.1% maximum
 candidate-cost worsening. These are comparisons on six known models, with no
 additional primal recovery over Base or general MILP optimality certificate.
+Main Table 13 exposes the existing interleaved complete-process times: scaling
+is faster on models 001, 027 and 046, and slower on 005, 022 and 031. All ratios
+are paired geometric means; these shared-host observations are not a predictive
+selection rule for unseen instances.
 
 ## Manuscript and supplements
 
@@ -50,7 +54,9 @@ additional primal recovery over Base or general MILP optimality certificate.
 | `paper/submission/oms/oms-delivery.zip` | Local package with separate files and upload instructions |
 
 Supplementary Material 2 includes `paper/supporting-information.pdf`, byte-identical to
-Supplementary Material 1. See the [OMS submission checklist](paper/submission/oms/SUBMISSION_CHECKLIST.md)
+Supplementary Material 1. The complete delivery also includes `REPRODUCE.md` and
+`REPRODUCTION-VALIDATION.json`, identifying the exact inner archives checked from
+clean extractions. See the [OMS submission checklist](paper/submission/oms/SUBMISSION_CHECKLIST.md)
 and [adaptation notes](paper/oms/OMS_NOTES.md). File roles must be selected in the journal's
 submission portal; its detailed current author instructions could not be retrieved.
 
@@ -60,12 +66,12 @@ This version is archived at Zenodo DOI [10.5281/zenodo.23145294](https://doi.org
 The repository uses the Zenodo concept DOI
 [10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949).
 [CITATION.cff](CITATION.cff) and `.zenodo.json` describe the local OMS snapshot
-`v1.3.15-oms-submission`, frozen 2026-10-18. The former root metadata for the published
+`v1.3.17-oms-submission`, frozen 2026-10-18. The former root metadata for the published
 baseline are preserved in `artifacts/baseline-metadata/`; the baseline DOI belongs to
 `v1.2-coap-submission`, not to the new OMS experiments. The version metadata and new-data
 inventory are in `paper/submission/oms/SNAPSHOT.json` and `OMS_DATA_MANIFEST.json`.
 After package validation, `python3 scripts/research/freeze_oms.py` creates the immutable
-local copy under `paper/submission/oms/releases/v1.3.15-oms-submission/`, with hashes and both
+local copy under `paper/submission/oms/releases/v1.3.17-oms-submission/`, with hashes and both
 supplements. It does not publish to Zenodo or create a remote Git tag. The prior locally frozen `v1.3-oms-submission` copy is retained; this revision clarifies
 two main contributions supported by computational evidence. Earlier editorial
 files remain in `paper/coap/`; `make paper` builds OMS.

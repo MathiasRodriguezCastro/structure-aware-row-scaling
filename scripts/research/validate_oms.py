@@ -11,6 +11,7 @@ import subprocess
 import tempfile
 import zipfile
 from oms_snapshot import VERSION, REVISION_DATE, verify_manifest
+from package_oms import build_delivery, DELIVERY_FILES
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "paper/submission/oms"
@@ -191,9 +192,14 @@ def main():
             "work_aggregation_reconciled": json.loads((folder/'paper/validation/oms-work-reconciliation.json').read_text()),
             "oms_if_workflow_details": json.loads((folder/'exploration/oms-if1-workflow-20261015/VALIDATION.json').read_text())}
     print("OMS artifact: supplement, stored claims and regenerated sources passed", flush=True)
-    expected = {"main_oms.pdf", "oms-submission.zip", "cover-letter.pdf",
-                "supplementary-material-1.pdf", "reproducibility-artifact.zip",
-                "UPLOAD_INSTRUCTIONS.md", "SHA256SUMS"}
+    result["documents"] = {name: pdf_info(path) for name, path in (
+        ("manuscript", ROOT / "paper/oms/main_oms.pdf"),
+        ("supplement", ROOT / "paper/supporting-information.pdf"),
+        ("cover_letter", ROOT / "paper/oms/cover-letter.pdf"))}
+    # Include successful clean-extraction evidence in the complete delivery.
+    # This report identifies the inner archives; the final outer hash stays here.
+    build_delivery(result)
+    expected = set(DELIVERY_FILES)
     with tempfile.TemporaryDirectory(prefix="oms-delivery-") as tmp:
         folder = Path(tmp)
         with zipfile.ZipFile(OUT / "oms-delivery.zip") as bundle:
@@ -201,13 +207,12 @@ def main():
             bundle.extractall(folder)
         run(["sha256sum", "--quiet", "-c", "SHA256SUMS"], folder)
         assert all(sha(folder / n) == sha(OUT / "uploads" / n) for n in expected)
+        report=json.loads((folder/'REPRODUCTION-VALIDATION.json').read_text())
+        assert report['status']=='passed' and report['snapshot_version']==VERSION
+        assert report['validation']==result
         result["delivery"] = {"files": sorted(expected), "checksums_verified": True,
                               "upload_copies_verified": True, "sha256": sha(OUT / "oms-delivery.zip")}
     run(["sha256sum", "--quiet", "-c", str(OUT / "SHA256SUMS")], ROOT)
-    result["documents"] = {name: pdf_info(path) for name, path in (
-        ("manuscript", ROOT / "paper/oms/main_oms.pdf"),
-        ("supplement", ROOT / "paper/supporting-information.pdf"),
-        ("cover_letter", ROOT / "paper/oms/cover-letter.pdf"))}
     (OUT / "VALIDATION.json").write_text(json.dumps(result, indent=2) + "\n")
     print("OMS delivery and all checksums passed. Wrote paper/submission/oms/VALIDATION.json")
 

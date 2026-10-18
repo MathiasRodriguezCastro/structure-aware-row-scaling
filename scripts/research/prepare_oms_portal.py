@@ -74,7 +74,9 @@ def main():
     tex = source_bytes['main_oms.tex'].decode()
     pdf_text = subprocess.check_output(
         ['pdftotext', '-layout', str(release / 'main_oms.pdf'), '-'], text=True)
-    abstract_pdf = ' '.join(pdf_text.split('ABSTRACT', 1)[1].split('KEYWORDS', 1)[0].split())
+    abstract_text = pdf_text.split('ABSTRACT', 1)[1].split('KEYWORDS', 1)[0]
+    abstract_text = re.sub(r'(?<=\w)-[ \t]*\n[ \t]*(?=\w)', '-', abstract_text)
+    abstract_pdf = ' '.join(abstract_text.split())
     abstract_pdf_words = len(abstract_pdf.split())
     assert 0 < abstract_pdf_words <= 200
     # Restore superscript notation lost by text extraction, without changing meaning.
@@ -106,7 +108,8 @@ def main():
     availability = re.search(r'\\section\*\{Data and software availability\}(.*?)\\section\*\{', tex, re.S)
     assert availability is not None
     availability_text = '\n\n'.join(plain(p) for p in re.split(r'\n\s*\n', availability[1].strip()))
-    assert VERSION in availability_text and 'no separate Zenodo version DOI' in availability_text
+    assert VERSION in availability_text
+    assert re.search(r'\bno separate Zenodo(?: version)? DOI\b', availability_text)
     fields = {'snapshot': VERSION, 'preparation_date': REVISION_DATE,
               'journal': 'Optimization Methods and Software',
               'proposed_article_type': 'Research Article', 'title': title,

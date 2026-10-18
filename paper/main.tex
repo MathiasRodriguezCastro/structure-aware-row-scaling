@@ -43,12 +43,13 @@ rounding and exact binary64 export. Kernel-matched and Ruiz controls separate ex
 equilibration and solver effort on 306 dispatch models.
 A directed control study on six known dispatch models and three seeds compares
 Budget-L2 with no external scaling at matched settings. At a 100\,m\textsuperscript{3}
-volume budget with automatic presolve and IntFeasTol=$10^{-9}$, it requires
-0.317 times the solver work of Base and 0.264 times
-that of Base with strict tolerances. All three policies meet every primal budget
+volume budget with automatic presolve and IntFeasTol=$10^{-9}$, paired
+geometric-mean solver-work ratios are 0.317 against Base and 0.264 against
+Base with strict tolerances. All three policies meet every primal budget
 without detected bound or completion contradictions; Budget-L2 candidate costs
-worsen by less than 0.1\%. An interleaved repeat takes 0.621 times Base's
-complete-process time on the shared host, with slower short solves.
+worsen by less than 0.1\%. An interleaved repeat yields a paired geometric-mean
+complete-process time ratio of 0.621 against Base on the shared host;
+short solves are slower.
 These comparisons do not establish equally certified
 MILP gaps. Primal recovery over conventional L2 remains confined to one presolve-off
 model. Independent batch-scheduling tests verify budget delivery without added
@@ -775,8 +776,10 @@ A contemporaneous 54-call repeat interleaves all three policies at
 100\,m\textsuperscript{3}; all points and native endpoints repeat exactly.
 Paired complete-process ratios are 0.621 against Base and 0.570 against
 Base-tight on the shared host. Only 9/18 pairs are faster against either control:
-preparation overhead slows the three inexpensive models. Table~S23 separates
-these timings from the historical comparison.
+preparation overhead slows the three inexpensive models. Table~\ref{tab:base-controls-time}
+shows this distinction by model; Table~S23 separates these timings from the
+historical comparison. These observations describe the tested models, rather
+than a predictive rule for selecting scaling on unseen instances.
 
 \begin{table}[tb]
 \centering\small\setlength{\tabcolsep}{3.5pt}
@@ -790,6 +793,20 @@ Material~1, Table~S23 gives the directed protocol; Table~S17 retains the full
 seven-budget study. No MILP optimality certificate is implied.}
 \label{tab:precision-frontier-main}
 \input{tables/base-controls-main}
+\end{table}
+
+\begin{table}[tb]
+\centering\small\setlength{\tabcolsep}{5pt}
+\caption{Complete-process times in the interleaved confirmation at
+100\,m\textsuperscript{3}. Seconds are geometric means of three seeds per
+model; ratios are paired geometric means against each control. B denotes
+Budget-L2. Time includes generation, selection/export where applicable,
+import checks, solving and returned-point verification in a fresh process.
+Compilation and acquisition of historical witnesses are separate. Ratios below
+one indicate a faster process on the shared host; they do not establish a
+hardware-independent threshold for applying scaling.}
+\label{tab:base-controls-time}
+\input{tables/base-controls-time}
 \end{table}
 
 Primal recovery over L2 remains localized; larger budgets and presolve-off
@@ -828,14 +845,14 @@ bound checks have exact feasible references; 84 remain unknown
 \label{sec:discussion}
 \subsection{Implications for scaling software}
 \paragraph{Row scaling changes the exported representation, and part of that reaches the
-solver} With the basis held fixed, the representation alone moves the condition number of the
-exported file by six to eight orders of magnitude in the median, and the kernel decides whether
-it does. That figure describes the file. A solver-style equilibration applied to the same bases
-recovers most of it --- ten to fourteen orders on the unscaled model --- and what the choice of
-export is still worth afterwards is a factor of about six in two classes and two in the third.
-The pre-export choice is not erased, because an infinity-norm equilibration does not undo a row
-scaling, but it is worth far less than the file-level number suggests, and on one class it
-inverts: the kernel that ranks last on the file ranks first after that equilibration.
+solver} With the basis held fixed, GM scaling reduces median condition numbers
+by six to eight orders of magnitude. Subsequent solver-style equilibration recovers
+most of that difference, leaving factors of about six in two classes and two in the
+third. On one class it reverses the kernel ranking
+(\cref{subsec:results-bridge}). File-level diagnostics require no optimizer license,
+but evaluation must recompute them after documented equilibration and measure solver
+endpoints separately. This diagnostic does not identify what a particular solver's
+internal scaling leaves.
 
 \paragraph{The mechanism is simpler than the metadata explanation} Under exact GM local
 normalization, the extrema-based post-local block statistic carries no block-scale information
@@ -859,14 +876,6 @@ stage actually active in that implementation, rather than estimating the effect 
 active coupling transformation. The synthetic mechanism audit and the operational
 ablation consequently answer different questions: a coupling kernel explains a spectral
 comparison, while local transformations account for the changed dispatch representation.
-
-\paragraph{A condition number of an exported file does not rank scaling policies}
-File-level diagnostics require no optimizer license. Across 306 models,
-\cref{subsec:results-bridge} finds that subsequent solver-style equilibration reverses
-the kernel ordering on one class and compresses differences by six orders of magnitude
-on the others. Evaluation should therefore recompute diagnostics after documented
-equilibration and measure solver endpoints separately. This diagnostic does not identify
-what a particular solver's internal scaling leaves.
 
 \paragraph{Residual budgets are a meaningful invariant quantity} A residual budget carried
 consistently with its row defines a contract that is invariant under consistent re-emission ---
@@ -991,7 +1000,7 @@ original inputs, stored results and replay programs. The public historical basel
 (concept DOI \doi{10.5281/zenodo.20648949}). Those identifiers describe the baseline,
 not the new OMS experiments.
 
-The frozen OMS snapshot \path{v1.3.15-oms-submission}, dated 18 October 2026,
+The frozen OMS snapshot \path{v1.3.17-oms-submission}, dated 18 October 2026,
 is supplied as Supplementary Material~2. It contains all new comparison data,
 native exports/logs, saved points, exact witnesses, unit conversions, checking
 programs and required historical analysis inputs. \texttt{SNAPSHOT.json} records

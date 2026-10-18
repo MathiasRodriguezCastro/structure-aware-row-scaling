@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "paper/submission/oms"
-VERSION = "v1.3.15-oms-submission"
+VERSION = "v1.3.17-oms-submission"
 REVISION_DATE = "2026-10-18"
 NEW_DATA = Path("results-revision/research-audit/oms-close-20261013")
 BASELINE = {"version": "v1.2-coap-submission", "version_doi": "10.5281/zenodo.23145294",
@@ -167,8 +167,8 @@ def write_metadata():
     snapshot = {"version": VERSION, "revision_date": REVISION_DATE,
                 "status": "locally frozen submission snapshot, not a published Zenodo release",
                 "version_doi": None, "published": False, "submission_performed": False,
-                "previous_local_snapshot": "v1.3.14-oms-submission",
-                "editorial_revision": "Add the omitted matched unscaled controls to the favorable dispatch experiment: 36 Base/Base-tight calls and a conditional 54-call interleaved complete-cycle confirmation. Retain the historical sensitivity and all adverse outcomes. Distinguish effort at verified precision from additional primal recovery or general MILP certification.",
+                "previous_local_snapshot": "v1.3.16-oms-submission",
+                "editorial_revision": "Close the per-model timing and paired-geometric-mean presentation with no new optimizer calls. Correct the portal helper to accept the current accurate no-DOI wording and check its generated forms before delivery. Include the complete clean-extraction replay report and guide; preserve previous local releases and all scientific records. The new Zenodo DOI remains deferred.",
                 "unscaled_control": {
                     "root": "exploration/oms-base-control-20261018",
                     "known_models": 6, "seeds": [59,71,89],

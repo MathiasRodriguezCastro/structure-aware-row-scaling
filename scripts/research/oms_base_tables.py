@@ -2,6 +2,7 @@
 """Tables for the directed unscaled-control audit; all numbers from saved replay."""
 import csv
 import json
+import math
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -46,6 +47,26 @@ def main():
             both=sum(p['both_budgets_pass']=='True' for p in paired if p['control']==r['control'])
             rows.append(['Interleaved','100',r['control'],f"{both}/18",
                 f"{r['paired_work_ratio']:.3f}",f"{r['paired_full_time_ratio']:.3f}",f"{r['max_cost_deterioration_percent']:.4f}"])
+        # Recompute timings from all matched saved observations, not rounded summaries.
+        timed=list(csv.DictReader((HERE/'confirmation/verified-runs.csv').open()))
+        points={(r['instance'],int(r['seed']),r['policy']):float(r['total_seconds']) for r in timed}
+        assert len(points)==len(timed)==54
+        gm=lambda values: math.exp(math.fsum(math.log(v) for v in values)/len(values))
+        timing_rows=[]
+        for instance in sorted({r['instance'] for r in timed}):
+            seeds=sorted({s for i,s,p in points if i==instance})
+            assert seeds==[59,71,89]
+            ratios={p:gm([points[instance,s,'Budget-L2']/points[instance,s,p] for s in seeds])
+                    for p in ('Base','Base-tight')}
+            for p,ratio in ratios.items():
+                saved=next(m for a in c['paired'] if a['control']==p for m in a['per_model'] if m['instance']==instance)
+                assert math.isclose(ratio,saved['total_time_ratio'],rel_tol=1e-12)
+            timing_rows.append([instance.removeprefix('instance'),
+                f"{gm([points[instance,s,'Base'] for s in seeds]):.2f}",
+                f"{gm([points[instance,s,'Budget-L2'] for s in seeds]):.2f}",
+                f"{ratios['Base']:.3f}",f"{ratios['Base-tight']:.3f}"])
+        table('base-controls-time.tex','lrrrr',
+            r'Model & Base (s) & Budget-L2 (s) & $T_{\rm B}/T_{\rm Base}$ & $T_{\rm B}/T_{\rm Base\text{-}tight}$',timing_rows)
     table('base-controls-supplement.tex','llrrrrr',
         r'Stage & $\delta_V$ & Control & Both pass & $W_{\rm B}/W_{\rm C}$ & $T_{\rm B}/T_{\rm C}$ & Max cost (\%)',rows)
 
