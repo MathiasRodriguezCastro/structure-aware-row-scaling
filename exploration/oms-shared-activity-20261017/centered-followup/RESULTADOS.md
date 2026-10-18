@@ -1,0 +1,132 @@
+# Normalización sujeta a precisión: resultado
+
+Procesos completados: 360/360. Campaña completa.
+
+| Modelo | Presupuesto | Política | Precisión | Calidad | Trabajo mediano | Ciclo mediano (s) |
+|---|---:|---|---:|---:|---:|---:|
+| beasleyC3 | 1e-04 | Centered-individual | 3/3 | 1/3 | 5 | 5.048 |
+| beasleyC3 | 1e-04 | Centered-shared | 3/3 | 1/3 | 5 | 4.957 |
+| beasleyC3 | 1e-04 | Coefficient-SOS | 3/3 | 2/3 | 5.003 | 4.543 |
+| beasleyC3 | 1e-04 | Indicator-budget | 3/3 | 2/3 | 5.001 | 6.007 |
+| beasleyC3 | 1e-04 | Minimum-shared | 3/3 | 3/3 | 5 | 5.05 |
+| beasleyC3 | 1e-04 | Tight-coefficient-SOS | 3/3 | 0/3 | 5.001 | 4.825 |
+| beasleyC3 | 1e-04 | Tight-raw | 3/3 | 3/3 | 2.597 | 2.697 |
+| beasleyC3 | 1e-04 | Unconstrained-shared | 3/3 | 1/3 | 5 | 4.665 |
+| beasleyC3 | 1e-06 | Centered-individual | 3/3 | 3/3 | 5.006 | 5.421 |
+| beasleyC3 | 1e-06 | Centered-shared | 3/3 | 3/3 | 5.006 | 5.407 |
+| beasleyC3 | 1e-06 | Coefficient-SOS | 3/3 | 2/3 | 5.003 | 4.583 |
+| beasleyC3 | 1e-06 | Indicator-budget | 3/3 | 2/3 | 5.001 | 6.004 |
+| beasleyC3 | 1e-06 | Minimum-shared | 3/3 | 3/3 | 5.006 | 5.291 |
+| beasleyC3 | 1e-06 | Tight-coefficient-SOS | 3/3 | 0/3 | 5.001 | 4.779 |
+| beasleyC3 | 1e-06 | Tight-raw | 3/3 | 3/3 | 2.597 | 2.681 |
+| beasleyC3 | 1e-06 | Unconstrained-shared | 3/3 | 1/3 | 5 | 4.636 |
+| beasleyC3 | 1e-08 | Centered-individual | 3/3 | 0/3 | 5.002 | 5.047 |
+| beasleyC3 | 1e-08 | Centered-shared | 3/3 | 0/3 | 5.002 | 5.055 |
+| beasleyC3 | 1e-08 | Coefficient-SOS | 3/3 | 2/3 | 5.003 | 4.565 |
+| beasleyC3 | 1e-08 | Indicator-budget | 3/3 | 2/3 | 5.001 | 6.005 |
+| beasleyC3 | 1e-08 | Minimum-shared | 3/3 | 0/3 | 5.002 | 4.927 |
+| beasleyC3 | 1e-08 | Tight-coefficient-SOS | 3/3 | 0/3 | 5.001 | 4.763 |
+| beasleyC3 | 1e-08 | Tight-raw | 3/3 | 3/3 | 2.716 | 2.685 |
+| beasleyC3 | 1e-08 | Unconstrained-shared | 3/3 | 1/3 | 5 | 4.627 |
+| control30-3-2-3 | 1e-04 | Centered-individual | 0/3 | 0/3 | 0.559 | 0.7643 |
+| control30-3-2-3 | 1e-04 | Centered-shared | 0/3 | 0/3 | 1.295 | 1.122 |
+| control30-3-2-3 | 1e-04 | Coefficient-SOS | 1/3 | 0/3 | 3.377 | 2.143 |
+| control30-3-2-3 | 1e-04 | Indicator-budget | 3/3 | 0/3 | 5.004 | 3.852 |
+| control30-3-2-3 | 1e-04 | Minimum-shared | 0/3 | 0/3 | 0.5681 | 0.693 |
+| control30-3-2-3 | 1e-04 | Tight-coefficient-SOS | 3/3 | 0/3 | 5.024 | 3.029 |
+| control30-3-2-3 | 1e-04 | Tight-raw | 3/3 | 0/3 | 5.014 | 3.072 |
+| control30-3-2-3 | 1e-04 | Unconstrained-shared | 0/3 | 0/3 | 1.295 | 1.044 |
+| control30-3-2-3 | 1e-06 | Centered-individual | 0/3 | 0/3 | 5.008 | 2.981 |
+| control30-3-2-3 | 1e-06 | Centered-shared | 0/3 | 0/3 | 5.007 | 2.888 |
+| control30-3-2-3 | 1e-06 | Coefficient-SOS | 0/3 | 0/3 | 1.954 | 1.257 |
+| control30-3-2-3 | 1e-06 | Indicator-budget | 0/3 | 0/3 | 5.013 | 3.119 |
+| control30-3-2-3 | 1e-06 | Minimum-shared | 0/3 | 0/3 | 5.007 | 2.892 |
+| control30-3-2-3 | 1e-06 | Tight-coefficient-SOS | 2/3 | 0/3 | 5.016 | 2.857 |
+| control30-3-2-3 | 1e-06 | Tight-raw | 2/3 | 0/3 | 5.007 | 3.647 |
+| control30-3-2-3 | 1e-06 | Unconstrained-shared | 0/3 | 0/3 | 0.5104 | 0.6163 |
+| control30-3-2-3 | 1e-08 | Centered-individual | 2/3 | 0/3 | 5.004 | 2.905 |
+| control30-3-2-3 | 1e-08 | Centered-shared | 0/3 | 0/3 | 5.021 | 2.809 |
+| control30-3-2-3 | 1e-08 | Coefficient-SOS | 0/3 | 0/3 | 3.537 | 2.194 |
+| control30-3-2-3 | 1e-08 | Indicator-budget | 3/3 | 0/3 | 5.021 | 2.684 |
+| control30-3-2-3 | 1e-08 | Minimum-shared | 0/3 | 0/3 | 5.021 | 2.758 |
+| control30-3-2-3 | 1e-08 | Tight-coefficient-SOS | 1/3 | 0/3 | 5.018 | 2.848 |
+| control30-3-2-3 | 1e-08 | Tight-raw | 3/3 | 0/3 | 5.007 | 3.236 |
+| control30-3-2-3 | 1e-08 | Unconstrained-shared | 0/3 | 0/3 | 0.5061 | 0.6309 |
+| k16x240b | 1e-04 | Centered-individual | 3/3 | 0/3 | 5.047 | 3.744 |
+| k16x240b | 1e-04 | Centered-shared | 3/3 | 0/3 | 5.047 | 3.767 |
+| k16x240b | 1e-04 | Coefficient-SOS | 3/3 | 1/3 | 5.017 | 3.736 |
+| k16x240b | 1e-04 | Indicator-budget | 3/3 | 3/3 | 5.015 | 3.966 |
+| k16x240b | 1e-04 | Minimum-shared | 3/3 | 2/3 | 5.009 | 3.809 |
+| k16x240b | 1e-04 | Tight-coefficient-SOS | 3/3 | 1/3 | 5.052 | 3.629 |
+| k16x240b | 1e-04 | Tight-raw | 3/3 | 2/3 | 5.051 | 3.132 |
+| k16x240b | 1e-04 | Unconstrained-shared | 3/3 | 0/3 | 5.047 | 3.674 |
+| k16x240b | 1e-06 | Centered-individual | 3/3 | 0/3 | 5.043 | 3.741 |
+| k16x240b | 1e-06 | Centered-shared | 3/3 | 0/3 | 5.043 | 3.792 |
+| k16x240b | 1e-06 | Coefficient-SOS | 3/3 | 1/3 | 5.017 | 3.718 |
+| k16x240b | 1e-06 | Indicator-budget | 3/3 | 3/3 | 5.015 | 3.99 |
+| k16x240b | 1e-06 | Minimum-shared | 3/3 | 0/3 | 5.043 | 3.745 |
+| k16x240b | 1e-06 | Tight-coefficient-SOS | 3/3 | 1/3 | 5.052 | 3.637 |
+| k16x240b | 1e-06 | Tight-raw | 3/3 | 2/3 | 5.022 | 3.105 |
+| k16x240b | 1e-06 | Unconstrained-shared | 3/3 | 0/3 | 5.047 | 3.651 |
+| k16x240b | 1e-08 | Centered-individual | 3/3 | 1/3 | 5.049 | 3.703 |
+| k16x240b | 1e-08 | Centered-shared | 3/3 | 1/3 | 5.049 | 3.698 |
+| k16x240b | 1e-08 | Coefficient-SOS | 3/3 | 1/3 | 5.017 | 3.717 |
+| k16x240b | 1e-08 | Indicator-budget | 3/3 | 3/3 | 5.015 | 3.981 |
+| k16x240b | 1e-08 | Minimum-shared | 3/3 | 1/3 | 5.049 | 3.674 |
+| k16x240b | 1e-08 | Tight-coefficient-SOS | 3/3 | 1/3 | 5.052 | 3.647 |
+| k16x240b | 1e-08 | Tight-raw | 3/3 | 2/3 | 5.014 | 3.197 |
+| k16x240b | 1e-08 | Unconstrained-shared | 3/3 | 0/3 | 5.047 | 3.68 |
+| neos-1112787 | 1e-04 | Centered-individual | 3/3 | 3/3 | 5.044 | 4.112 |
+| neos-1112787 | 1e-04 | Centered-shared | 3/3 | 3/3 | 5.044 | 4.107 |
+| neos-1112787 | 1e-04 | Coefficient-SOS | 3/3 | 3/3 | 5.006 | 3.698 |
+| neos-1112787 | 1e-04 | Indicator-budget | 3/3 | 3/3 | 1.539 | 1.821 |
+| neos-1112787 | 1e-04 | Minimum-shared | 1/3 | 1/3 | 5.027 | 3.816 |
+| neos-1112787 | 1e-04 | Tight-coefficient-SOS | 3/3 | 2/3 | 5.027 | 3.656 |
+| neos-1112787 | 1e-04 | Tight-raw | 3/3 | 3/3 | 2.24 | 2.165 |
+| neos-1112787 | 1e-04 | Unconstrained-shared | 3/3 | 3/3 | 5.044 | 3.663 |
+| neos-1112787 | 1e-06 | Centered-individual | 3/3 | 0/3 | 5.045 | 3.773 |
+| neos-1112787 | 1e-06 | Centered-shared | 3/3 | 0/3 | 5.045 | 3.776 |
+| neos-1112787 | 1e-06 | Coefficient-SOS | 3/3 | 3/3 | 5.006 | 3.719 |
+| neos-1112787 | 1e-06 | Indicator-budget | 3/3 | 3/3 | 1.539 | 1.833 |
+| neos-1112787 | 1e-06 | Minimum-shared | 3/3 | 0/3 | 5.045 | 3.636 |
+| neos-1112787 | 1e-06 | Tight-coefficient-SOS | 3/3 | 2/3 | 5.027 | 3.678 |
+| neos-1112787 | 1e-06 | Tight-raw | 3/3 | 3/3 | 0.8623 | 1.241 |
+| neos-1112787 | 1e-06 | Unconstrained-shared | 2/3 | 2/3 | 5.044 | 3.659 |
+| neos-1112787 | 1e-08 | Centered-individual | 3/3 | 3/3 | 5.064 | 4.162 |
+| neos-1112787 | 1e-08 | Centered-shared | 3/3 | 3/3 | 5.064 | 4.163 |
+| neos-1112787 | 1e-08 | Coefficient-SOS | 3/3 | 3/3 | 5.006 | 3.679 |
+| neos-1112787 | 1e-08 | Indicator-budget | 3/3 | 3/3 | 1.539 | 1.813 |
+| neos-1112787 | 1e-08 | Minimum-shared | 3/3 | 3/3 | 5.064 | 3.946 |
+| neos-1112787 | 1e-08 | Tight-coefficient-SOS | 2/3 | 2/3 | 5.027 | 3.677 |
+| neos-1112787 | 1e-08 | Tight-raw | 3/3 | 3/3 | 0.5463 | 1.016 |
+| neos-1112787 | 1e-08 | Unconstrained-shared | 1/3 | 1/3 | 5.044 | 3.664 |
+| neos-3421095-cinca | 1e-04 | Centered-individual | 3/3 | 3/3 | 5.013 | 3.854 |
+| neos-3421095-cinca | 1e-04 | Centered-shared | 3/3 | 3/3 | 5.013 | 3.928 |
+| neos-3421095-cinca | 1e-04 | Coefficient-SOS | 3/3 | 3/3 | 5.014 | 3.928 |
+| neos-3421095-cinca | 1e-04 | Indicator-budget | 1/3 | 1/3 | 5.004 | 3.71 |
+| neos-3421095-cinca | 1e-04 | Minimum-shared | 2/3 | 2/3 | 5.007 | 4.509 |
+| neos-3421095-cinca | 1e-04 | Tight-coefficient-SOS | 3/3 | 3/3 | 5.01 | 4.593 |
+| neos-3421095-cinca | 1e-04 | Tight-raw | 3/3 | 3/3 | 2.211 | 2.733 |
+| neos-3421095-cinca | 1e-04 | Unconstrained-shared | 3/3 | 3/3 | 5.013 | 3.808 |
+| neos-3421095-cinca | 1e-06 | Centered-individual | 0/3 | 0/3 | 5.001 | 4.675 |
+| neos-3421095-cinca | 1e-06 | Centered-shared | 0/3 | 0/3 | 5.001 | 4.677 |
+| neos-3421095-cinca | 1e-06 | Coefficient-SOS | 3/3 | 3/3 | 5.014 | 3.994 |
+| neos-3421095-cinca | 1e-06 | Indicator-budget | 0/3 | 0/3 | 5.002 | 3.695 |
+| neos-3421095-cinca | 1e-06 | Minimum-shared | 0/3 | 0/3 | 5.001 | 4.698 |
+| neos-3421095-cinca | 1e-06 | Tight-coefficient-SOS | 3/3 | 3/3 | 5.01 | 4.609 |
+| neos-3421095-cinca | 1e-06 | Tight-raw | 3/3 | 3/3 | 2.296 | 3.008 |
+| neos-3421095-cinca | 1e-06 | Unconstrained-shared | 3/3 | 3/3 | 5.013 | 3.817 |
+| neos-3421095-cinca | 1e-08 | Centered-individual | 3/3 | 3/3 | 5.019 | 3.78 |
+| neos-3421095-cinca | 1e-08 | Centered-shared | 3/3 | 3/3 | 5.019 | 3.726 |
+| neos-3421095-cinca | 1e-08 | Coefficient-SOS | 3/3 | 3/3 | 5.014 | 3.901 |
+| neos-3421095-cinca | 1e-08 | Indicator-budget | 3/3 | 3/3 | 5.007 | 4.878 |
+| neos-3421095-cinca | 1e-08 | Minimum-shared | 3/3 | 3/3 | 5.019 | 3.684 |
+| neos-3421095-cinca | 1e-08 | Tight-coefficient-SOS | 3/3 | 3/3 | 5.01 | 4.506 |
+| neos-3421095-cinca | 1e-08 | Tight-raw | 3/3 | 3/3 | 2.066 | 2.829 |
+| neos-3421095-cinca | 1e-08 | Unconstrained-shared | 3/3 | 3/3 | 5.013 | 3.815 |
+
+Calidad: punto que cumple todos los presupuestos, con objetivo recalculado dentro del
+margen del 1% de la referencia fijada. No es certificación de optimalidad.
+Trabajo y ciclo solo se comparan como ventaja cuando ambos brazos alcanzan esa calidad.
+Ciclo desde JSON preservado: excluye descarga, contracción común y generador original.
+Presupuestos distintos no son aplicaciones independientes.

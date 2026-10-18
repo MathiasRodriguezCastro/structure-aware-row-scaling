@@ -1,0 +1,92 @@
+
+Gurobi 13.0.2 (linux64) logging started Sat Oct 17 21:58:32 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-shared-activity-20261017/pilot/runs/control30-3-2-3/SOS-unit-u+0/191/solver.log"
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  30
+WorkLimit  5
+MIPGap  0.01
+LogToConsole  0
+PreSOS1BigM  0
+Seed  191
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 578 rows, 662 columns and 1604 nonzeros (Min)
+Model fingerprint: 0x894b23de
+Model has 2 linear objective coefficients
+Model has 264 SOS constraints
+Variable types: 572 continuous, 90 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e-02, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+07]
+  RHS range        [4e-02, 1e+00]
+
+Presolve removed 144 rows and 95 columns
+Presolve time: 0.00s
+Presolved: 434 rows, 567 columns, 1295 nonzeros
+Presolved model has 260 SOS constraint(s)
+Variable types: 434 continuous, 133 integer (133 binary)
+Found heuristic solution: objective 18262.153854
+Found heuristic solution: objective 14450.899091
+Found heuristic solution: objective 12089.789948
+
+Root relaxation: objective -5.412931e+07, 257 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -5.413e+07    0  106 12089.7899 -5.413e+07      -     -    0s
+H    0     0                    6757.9863298 -5.413e+07      -     -    0s
+H    0     0                    5347.6155828 -5.413e+07      -     -    0s
+H    0     0                    4473.8772801 -5.413e+07      -     -    0s
+H    0     0                    3797.7410889 -5.413e+07      -     -    0s
+     0     0 -2.008e+07    0  230 3797.74109 -2.008e+07      -     -    0s
+     0     0 -2.008e+07    0  234 3797.74109 -2.008e+07      -     -    0s
+     0     0 -2.008e+07    0  233 3797.74109 -2.008e+07      -     -    0s
+H    0     0                       5.6506308 -2.008e+07      -     -    0s
+     0     0 -1.333e+07    0  227    5.65063 -1.333e+07      -     -    0s
+     0     0 -1.326e+07    0  227    5.65063 -1.326e+07      -     -    0s
+     0     0 -1.326e+07    0  220    5.65063 -1.326e+07      -     -    0s
+     0     2 -1.326e+07    0  220    5.65063 -1.326e+07      -     -    0s
+H 1160   954                       4.4782174 -1.326e+07      -   7.2    0s
+H 1221   953                       4.4782039 -1.287e+07      -   7.9    0s
+H 2269  1442                       4.2675018 -7487739.5      -   8.4    0s
+H 2757  1622                       4.2456527 -7487739.5      -   8.3    0s
+H 3866  2116                       2.4853960 -5370402.8      -   8.5    0s
+H 4872  2701                       2.2171386 -4695700.9      -   8.4    0s
+H 5933  3371                       2.2171386 -4193625.3      -   8.3    0s
+H 6056  3453                       2.2171386 -4193625.3      -   8.3    0s
+H 6084  3453                       2.2171371 -4193625.3      -   8.3    0s
+* 7446  4240              43       2.0049918 -3702559.9      -   8.2    1s
+* 7496  4380              45       0.6181711 -3701475.6      -   8.2    1s
+*15548  9259              44       0.5732928 -2765135.5      -   8.6    2s
+*15695  9237              46       0.5326227 -2765135.5      -   8.7    2s
+*15697  8853              46       0.1909651 -2765135.5      -   8.7    2s
+*15698  8798              46       0.1695178 -2765135.5      -   8.7    2s
+
+Cutting planes:
+  Gomory: 7
+  Implied bound: 112
+  Projected implied bound: 1
+  MIR: 18
+  Flow cover: 18
+  Inf proof: 3
+  Relax-and-lift: 1
+
+Explored 19484 nodes (164261 simplex iterations) in 2.32 seconds (5.03 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: 0.169518 0.169518 0.190965 ... 2.21714
+
+Work limit reached
+Warning: max constraint violation (3.9122e-01) exceeds tolerance
+Warning: max SOS violation (3.9122e-01) exceeds tolerance
+         (possibly due to large variable bounds)
+Best objective 1.695177666136e-01, best bound -2.527165226154e+06, gap 1490796773.7866%

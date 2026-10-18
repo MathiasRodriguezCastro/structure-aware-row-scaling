@@ -1,0 +1,82 @@
+
+Gurobi 13.0.2 (linux64) logging started Sat Oct 17 22:08:35 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-shared-activity-20261017/centered-followup/pilot/runs/control30-3-2-3/1e-04/Minimum-shared/197/solver.log"
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  30
+WorkLimit  5
+MIPGap  0.01
+LogToConsole  0
+PreSOS1BigM  0
+Seed  197
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 578 rows, 464 columns and 1604 nonzeros (Min)
+Model fingerprint: 0x7baad373
+Model has 2 linear objective coefficients
+Model has 66 SOS constraints
+Variable types: 374 continuous, 90 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [3e-02, 8e+01]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 2e+06]
+  RHS range        [4e-02, 1e+00]
+
+Presolve removed 144 rows and 91 columns
+Presolve time: 0.00s
+Presolved: 434 rows, 373 columns, 1295 nonzeros
+Presolved model has 66 SOS constraint(s)
+Variable types: 240 continuous, 133 integer (133 binary)
+Found heuristic solution: objective 18262.153853
+Found heuristic solution: objective 14450.899090
+Found heuristic solution: objective 12089.789947
+
+Root relaxation: objective -5.412931e+07, 192 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -5.413e+07    0   62 12089.7899 -5.413e+07      -     -    0s
+H    0     0                    5899.6823893 -5.413e+07      -     -    0s
+H    0     0                    4668.4370068 -5.413e+07      -     -    0s
+H    0     0                    3905.6685981 -5.413e+07      -     -    0s
+H    0     0                    3588.8534871 -4.229e+07      -     -    0s
+     0     0 -4.103e+07    0  166 3588.85349 -4.103e+07      -     -    0s
+     0     0 -4.103e+07    0  171 3588.85349 -4.103e+07      -     -    0s
+H    0     0                       4.2552231 -4.079e+07      -     -    0s
+H    0     0                       2.9696510 -2.378e+07      -     -    0s
+     0     0 -2.049e+07    0  193    2.96965 -2.049e+07      -     -    0s
+     0     0 -1.872e+07    0  193    2.96965 -1.872e+07      -     -    0s
+     0     0 -1.607e+07    0  183    2.96965 -1.607e+07      -     -    0s
+     0     0 -1.607e+07    0  183    2.96965 -1.607e+07      -     -    0s
+     0     0 -1.607e+07    0  183    2.96965 -1.607e+07      -     -    0s
+     0     2 -1.607e+07    0  183    2.96965 -1.607e+07      -     -    0s
+H  423   422                       2.9696510 -1.326e+07      -   6.8    0s
+H  443   422                       2.9696509 -1.326e+07      -   6.8    0s
+H  455   422                       2.9696495 -1.326e+07      -   6.7    0s
+* 1249  1069              37     -11.8516594  -17.08044  44.1%   6.2    0s
+* 1250  1023              37     -11.8538630  -17.08044  44.1%   6.2    0s
+* 1294   964              39     -17.0216409  -17.08044  0.35%   6.1    0s
+
+Cutting planes:
+  Gomory: 17
+  Implied bound: 52
+  MIR: 11
+  Flow cover: 12
+
+Explored 1357 nodes (8621 simplex iterations) in 0.40 seconds (0.57 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: -17.0216 -17.0216 -11.8539 ... 5899.68
+
+Optimal solution found (tolerance 1.00e-02)
+Warning: max constraint violation (1.0000e+00) exceeds tolerance
+Warning: max SOS violation (1.0000e+00) exceeds tolerance
+         (model may be infeasible or unbounded - try turning presolve off)
+Best objective -1.702164091622e+01, best bound -1.708044357080e+01, gap 0.3455%

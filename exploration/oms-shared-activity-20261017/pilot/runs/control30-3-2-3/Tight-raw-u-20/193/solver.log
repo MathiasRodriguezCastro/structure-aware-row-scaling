@@ -1,0 +1,87 @@
+
+Gurobi 13.0.2 (linux64) logging started Sat Oct 17 22:00:18 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-shared-activity-20261017/pilot/runs/control30-3-2-3/Tight-raw-u-20/193/solver.log"
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  30
+WorkLimit  5
+FeasibilityTol  1e-09
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+PreSOS1BigM  0
+Seed  193
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 512 rows, 332 columns and 1472 nonzeros (Min)
+Model fingerprint: 0x3d25f527
+Model has 2 linear objective coefficients
+Variable types: 242 continuous, 90 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [2e-05, 2e+02]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [4e-02, 5e-01]
+
+Presolve removed 185 rows and 71 columns
+Presolve time: 0.00s
+Presolved: 327 rows, 261 columns, 1085 nonzeros
+Variable types: 174 continuous, 87 integer (87 binary)
+
+Root relaxation: objective -2.352752e+01, 276 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0  -23.52752    0   84          -  -23.52752      -     -    0s
+H    0     0                    8360.8497299  -23.52752   100%     -    0s
+     0     0   -1.81831    0   74 8360.84973   -1.81831   100%     -    0s
+H    0     0                     508.0812509   -1.81831   100%     -    0s
+     0     0   -1.81831    0   81  508.08125   -1.81831   100%     -    0s
+     0     0   -1.81831    0   83  508.08125   -1.81831   100%     -    0s
+     0     0   -1.81831    0   83  508.08125   -1.81831   100%     -    0s
+     0     0   -1.81831    0   83  508.08125   -1.81831   100%     -    0s
+     0     2   -1.81831    0   83  508.08125   -1.81831   100%     -    0s
+*  207   232              43       6.7787321   -1.81831   127%   4.1    0s
+*  217   232              42       4.7821485   -1.81831   138%   4.0    0s
+*  251   257              42       4.7801993   -1.81831   138%   3.7    0s
+*  897   774              32       4.3440692   -1.81831   142%   3.8    0s
+*  987   774              34       4.3159210   -1.81831   142%   3.8    0s
+* 1667  1132              81       3.4660490   -1.30741   138%   4.0    0s
+* 2182  1382              84       2.7891231   -0.94496   134%   3.7    0s
+* 3006  1655              75       2.4900928   -0.55317   122%   3.4    0s
+* 3008  1611              75       2.4342105   -0.55317   123%   3.4    0s
+* 3069  1550              75       2.4142109   -0.54552   123%   3.4    0s
+* 3268  1595              77       1.7147528   -0.48401   128%   3.3    0s
+* 3899  2014              76       1.5217644   -0.34395   123%   3.2    0s
+* 3905  2010              76       1.4999554   -0.34395   123%   3.2    0s
+H13412  8039                       1.4999470   -0.12911   109%   2.7    0s
+H14376  8308                       1.4779436   -0.12783   109%   2.7    1s
+H15395  8797                       1.4610092   -0.12502   109%   2.7    1s
+H16763  9516                       1.4395289   -0.12238   109%   2.7    1s
+H16831  9486                       1.3750618   -0.12238   109%   2.7    1s
+H18094 10102                       1.3750618   -0.11856   109%   2.7    1s
+H18196 10222                       1.3733386   -0.11856   109%   2.7    1s
+H18229 10222                       1.3733074   -0.11856   109%   2.7    1s
+H20202 11212                       1.3733053   -0.11367   108%   2.7    1s
+H23696 13324                       1.3732276   -0.10604   108%   3.0    2s
+
+Cutting planes:
+  Gomory: 22
+  Implied bound: 3
+  MIR: 12
+  Flow cover: 14
+
+Explored 31229 nodes (105172 simplex iterations) in 2.94 seconds (5.02 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: 1.37323 1.37334 1.37506 ... 2.41421
+
+Work limit reached
+Best objective 1.373227647135e+00, best bound -9.715435974399e-02, gap 107.0749%

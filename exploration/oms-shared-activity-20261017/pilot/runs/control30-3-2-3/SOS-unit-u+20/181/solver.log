@@ -1,0 +1,91 @@
+
+Gurobi 13.0.2 (linux64) logging started Sat Oct 17 21:55:28 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-shared-activity-20261017/pilot/runs/control30-3-2-3/SOS-unit-u+20/181/solver.log"
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  30
+WorkLimit  5
+MIPGap  0.01
+LogToConsole  0
+PreSOS1BigM  0
+Seed  181
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 578 rows, 662 columns and 1604 nonzeros (Min)
+Model fingerprint: 0xf019aab0
+Model has 2 linear objective coefficients
+Model has 264 SOS constraints
+Variable types: 572 continuous, 90 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e-06, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 1e+13]
+  RHS range        [4e-02, 1e+00]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Presolve removed 144 rows and 95 columns
+Presolve time: 0.00s
+Presolved: 434 rows, 567 columns, 1295 nonzeros
+Presolved model has 260 SOS constraint(s)
+Variable types: 434 continuous, 133 integer (133 binary)
+Found heuristic solution: objective 18262.153854
+Found heuristic solution: objective 14450.899091
+Found heuristic solution: objective 12089.789948
+
+Root relaxation: objective -5.412931e+07, 307 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -5.413e+07    0  106 12089.7899 -5.413e+07      -     -    0s
+H    0     0                    6757.9863298 -5.413e+07      -     -    0s
+H    0     0                    5347.6155820 -5.413e+07      -     -    0s
+H    0     0                    4473.8772793 -5.413e+07      -     -    0s
+H    0     0                    4258.9871209 -2.378e+07      -     -    0s
+     0     0  -42.55204    0  119 4258.98712  -42.55204   101%     -    0s
+H    0     0                    2819.5064005  -42.55204   102%     -    0s
+H    0     0                      11.3305724  -42.55204   476%     -    0s
+     0     0  -42.55202    0  127   11.33057  -42.55202   476%     -    0s
+     0     0  -42.55202    0  126   11.33057  -42.55202   476%     -    0s
+     0     0  -42.55200    0  133   11.33057  -42.55200   476%     -    0s
+     0     0  -42.55200    0  133   11.33057  -42.55200   476%     -    0s
+     0     0  -42.55200    0  131   11.33057  -42.55200   476%     -    0s
+     0     2  -42.55200    0  131   11.33057  -42.55200   476%     -    0s
+H  172   191                      11.3305426  -21.54226   290%  14.6    0s
+H  280   287                      11.3305421  -21.54226   290%  16.9    0s
+*  288   300              40       9.9671237  -21.54212   316%  16.8    0s
+H  289   296                       6.6408655  -21.54212   424%  16.8    0s
+H  299   291                       4.1464017  -21.54212   620%  18.6    0s
+H 1127   959                       4.1463352  -11.43463   376%  19.1    0s
+H 1135   915                       4.1463352   -7.59226   283%  18.9    0s
+H 1136   870                       3.2611010   -7.35664   326%  18.9    0s
+H 2138  1460                       3.2084314   -1.90961   160%  12.9    0s
+* 2925  1773              40       2.0169835   -1.47653   173%  10.6    0s
+* 3413  1766              41       1.4239494   -1.13938   180%   9.6    0s
+H 6486  3849                       1.4239494   -1.13594   180%   7.0    1s
+H19378 10680                       1.3913991   -1.11688   180%   5.0    2s
+
+Cutting planes:
+  Gomory: 18
+  Implied bound: 62
+  MIR: 22
+  Mixing: 1
+  Flow cover: 63
+  Inf proof: 2
+  Relax-and-lift: 1
+
+Explored 20657 nodes (102304 simplex iterations) in 2.91 seconds (5.00 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: 1.3914 1.3914 1.42395 ... 6.64087
+
+Work limit reached
+Best objective 1.391398529703e+00, best bound -1.114398402597e+00, gap 180.0920%
