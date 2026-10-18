@@ -91,6 +91,7 @@ research-oms-tables:
 	$(PYTHON) scripts/research/oms_frontier_tables.py
 	$(PYTHON) scripts/research/oms_followup_tables.py
 	$(PYTHON) exploration/oms-evidence-audit-20261017/write_tables.py
+	$(PYTHON) scripts/research/oms_base_tables.py
 
 # Aggregates of the solver-robustness campaign; the raw per-run records are not in the repository.
 research-robustness-analysis:
@@ -145,6 +146,8 @@ research-claims:
 
 .PHONY: research-oms-check
 research-oms-check:
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-base-control-20261018/check.py --allow-absent-historical
+	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-base-control-20261018/confirmation.py check
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/verify_oms_dispatch.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) scripts/research/verify_oms_conditioning.py
 	OPENBLAS_NUM_THREADS=1 $(PYTHON) exploration/oms-followup-20261014/verify_and_summarize.py

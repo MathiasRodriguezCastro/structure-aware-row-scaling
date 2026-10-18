@@ -1289,15 +1289,80 @@ products. Scripts, all deletion results and the input hashes are supplied in
 \path{exploration/oms-evidence-audit-20261017/}. No optimization calls are added.
 
 \FloatBarrier
+\section{Directed unscaled control of the favorable dispatch result}
+\label{sec:si-base-controls}
+The original seven-budget study omitted Base at its matched settings. This
+subsequent directed study fixes its design after observing the earlier results,
+before its 36 Base/Base-tight calls. It uses the same six models, seeds 59,71,89,
+automatic presolve, four threads, 120 seconds, 1\% gap, ScaleFlag=$-1$,
+IntegralityFocus=0 and IntFeasTol=$10^{-9}$, on the same shared host with
+Gurobi 13.0.2. Base means no external scaling; internal scaling remains automatic.
+Base-tight changes only FeasibilityTol from $10^{-6}$ to $10^{-9}$. No starts,
+WorkLimit or generator changes are introduced. Each generated Base matches its
+historical hash; native matrix/RHS, objective, bounds and domains are preserved.
+The controls are solved once per model/seed and checked at both targets.
+
+Independent replay checks the 36 new points and 36 saved Budget-L2 points against
+all 10,080 original rows before/after integer rounding, bounds, domains and
+objectives. It rechecks 18 existing rational feasible witnesses of the actual
+exports, without new reference LPs. All policies meet every physical target,
+with zero detected bound/completion contradictions or time limits. All stored
+integers are exactly integral. Maximum rounded nonphysical residuals are below
+$2.9\times10^{-7}$ (Base), $5.4\times10^{-13}$ (Base-tight) and
+$6.5\times10^{-14}$ (Budget-L2); bound violations stay below
+$4.6\times10^{-13}$. Floating points are not exact MILP-feasibility certificates.
+
+\begin{table}[tb]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Directed comparison: B is Budget-L2 and C is the named control.
+Both pass counts pairs meeting every rounded target at 0.01 MW and the listed
+volume budget, in m\textsuperscript{3}. Ratios are geometric means of 18 pairs.
+Max cost is the maximum $100(C_{\rm B}-C_{\rm C})/|C_{\rm C}|$ of recomputed
+candidate costs, not certified gaps. Initial work uses 36 new controls and
+36 saved Budget-L2 calls; their times are not combined. The interleaved panel
+uses contemporaneous fresh-process repeats. All logs and points are retained.}
+\label{tab:base-controls}
+\resizebox{\linewidth}{!}{\input{tables/base-controls-supplement}}
+\end{table}
+
+At 100\,m\textsuperscript{3}, model-level work ratios range from 0.0422 to
+0.9926 against Base and 0.0346 to 0.8042 against Base-tight. The advantage over Base
+on instance031 is small. Budget-L2 uses less work in 17/18 individual Base pairs
+and 18/18 Base-tight pairs, with cost worsening below 0.008\% and 0.097\%,
+respectively. At 30\,m\textsuperscript{3}, worsening stays below 0.841\% against
+either control. Both targets pass the locally fixed confirmation gate: lower
+work in aggregate and at least four models against both controls, all budgets
+met, no additional detected contradictions and at most 1\% cost worsening.
+The conditional confirmation fixes 54 fresh-process calls at
+100\,m\textsuperscript{3}, in 18 consecutive model/seed blocks with randomized
+policy order. All 54 points, objectives, bounds, work and native endpoints repeat
+exactly; all budgets pass, with zero detected contradictions or time limits.
+Complete-process time includes startup, generation once, any selection/export,
+import/equality checks, solving, extraction, verification and persistence;
+compilation and historical witness acquisition are separate. Paired time ratios
+are 0.621/0.570 against Base/Base-tight. Only 9/18 pairs are faster against each:
+models 005,022,031 are slower. These are interleaved shared-host measurements,
+not an isolated hardware benchmark or validation on unknown seeds.
+
+This fills the omitted baseline without establishing external generality,
+primal recovery over Base or a solver-internal cause. Base's water residuals are
+smaller, though both policies are far below budget. Absence of a detected contradiction
+does not certify global optimality. Designs, hashes, all outcomes and replay commands
+are in \path{exploration/oms-base-control-20261018/}; \texttt{make research-oms-check}
+checks them without optimizing. Its absent-history flag skips only unavailable
+frozen historical PDF copies, never scientific inputs or numerical checks.
+
+\FloatBarrier
 \section{Reproduction and artifact layout}
-The accompanying locally frozen snapshot is \path{v1.3.14-oms-submission}, revised
-17 October 2026 and supplied as Supplementary Material~2. Its metadata distinguish
+The accompanying locally frozen snapshot is \path{v1.3.15-oms-submission}, revised
+18 October 2026 and supplied as Supplementary Material~2. Its metadata distinguish
 the publicly archived \path{v1.2-coap-submission} baseline from the new Ruiz comparison,
 complementary implementation check, expanded physical-budget audit, activation
 follow-up with exact native-export feasible witnesses and the auxiliary
 common-incumbent diagnostic, matched IntegralityFocus control, fully matched
 accuracy/remedy comparison, complete workflow costs, the multi-budget sensitivity,
-native-selector preparation benchmark and global-LP reference certificates.
+native-selector preparation benchmark, global-LP reference certificates and the
+directed unscaled-control study of the favorable dispatch result.
 \path{paper/submission/oms/OMS_DATA_MANIFEST.json} inventories every new experiment
 file and required replay program/input with a SHA-256; \texttt{SNAPSHOT.json} identifies
 the version and counts. All compressed new LPs, named bases, row factors, native logs,
@@ -1307,8 +1372,7 @@ the twenty supplied activation witnesses. SoPlex is only needed to generate new
 witnesses, not to check those provided. No separate
 Zenodo version DOI is claimed for the OMS snapshot.
 
-The root README and \path{environment/research-requirements.txt} specify the
-recorded analysis environment. The following commands need no optimizer license:
+The root README specifies the environment. These commands need no optimizer license:
 \begin{lstlisting}
 make research-oms-check      # includes matched controls and full workflow replay
 make research-check-python  # tests, saved binary audit, matrix hashes
@@ -1346,10 +1410,9 @@ make research-budget BUDGET_SOLVERS=highs \
 \end{lstlisting}
 \end{samepage}
 The default two-solver budget rerun also requires Gurobi and a suitable license.
-Runtime measurements need not reproduce bit for bit across hardware or solver
-versions. Source snapshots and hashes in the final budget directory identify the
-implementation that generated the reported results; later arithmetic edge-case
-repairs are recorded separately, with a comparison against all saved row factors.
+Runtime depends on hardware and solver versions. Supplied snapshots and hashes
+identify the recorded runs; subsequent arithmetic repairs and comparisons against
+saved factors are documented separately.
 The accompanying source/data archive (Supplementary Material 2) preserves the inputs needed
 to regenerate the current main tables and figures.
 \end{document}

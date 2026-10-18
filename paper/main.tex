@@ -37,23 +37,23 @@
 \maketitle
 \begin{abstract}
 We present and evaluate a software workflow for pre-export row scaling in generated
-mixed-integer programs. Residual-budget contracts characterize
-admissible factors under original-unit accuracy requirements and coefficient limits,
-including integer rounding and exact binary64 export. Across 306 hydrothermal dispatch
-models, geometric-mean scaling reduces fixed-basis condition numbers by six to eight
-orders of magnitude in class medians, although solver-style equilibration recovers
-most of that advantage. Kernel-matched controls distinguish numerical choices from
-metadata; a Ruiz comparison separates conditioning from solver-effort rankings. A prespecified study finds favorable precision--effort outcomes
-at 30 and 100\,m\textsuperscript{3} under automatic presolve
-with IntFeasTol=$10^{-9}$ across six known dispatch models and three new seeds: Budget-L2 satisfies every tested
-primal budget without detected bound or completion contradictions. At 100\,m\textsuperscript{3},
-it requires 0.362 times the solver work and 0.629 times the complete-process time of
-NumericFocus=3 on a shared host. Dispatch primal recovery over L2 remains confined to one presolve-off model;
-other configurations retain refuted bounds. Independent batch-scheduling tests verify
-budget delivery, without added primal benefit over L2.
-Enumerated stress tests show solver dependence and stronger integer-aware controls.
-Benefits remain configuration-dependent. Contracts require exported-residual hypotheses
-and original-unit verification; they do not certify MILP optimality.
+mixed-integer programs. Residual-budget contracts characterize admissible factors
+under original-unit accuracy requirements and coefficient limits, including integer
+rounding and exact binary64 export. Kernel-matched and Ruiz controls separate exported conditioning from subsequent
+equilibration and solver effort on 306 dispatch models.
+A directed control study on six known dispatch models and three seeds compares
+Budget-L2 with no external scaling at matched settings. At a 100\,m\textsuperscript{3}
+volume budget with automatic presolve and IntFeasTol=$10^{-9}$, it requires
+0.317 times the solver work of Base and 0.264 times
+that of Base with strict tolerances. All three policies meet every primal budget
+without detected bound or completion contradictions; Budget-L2 candidate costs
+worsen by less than 0.1\%. An interleaved repeat takes 0.621 times Base's
+complete-process time on the shared host, with slower short solves.
+These comparisons do not establish equally certified
+MILP gaps. Primal recovery over conventional L2 remains confined to one presolve-off
+model. Independent batch-scheduling tests verify budget delivery without added
+primal benefit over L2. Contracts require exported-residual hypotheses and
+original-unit verification; they do not certify MILP optimality.
 \end{abstract}
 \noindent\textbf{Keywords:} mixed-integer programming; row scaling; optimization software;
 residual budgets; numerical verification; finite-precision arithmetic.
@@ -127,14 +127,12 @@ tested factors remain admissible and unchanged, establishing precision
 interpretation and checked residuals rather than a budget-induced performance gain.
 An activation-row follow-up makes factors change and adds exact feasible witnesses
 and matched numerical controls.
-The stress experiments identify when budgets change verified outcomes. A prespecified
-330-call multi-budget study then identifies favorable results at 30 and 100\,m\textsuperscript{3}
-under automatic presolve on six known models and three new seeds. Budget-L2 meets
-all tested primal budgets without detected bound or completion contradictions; at
-100\,m\textsuperscript{3}, paired geometric-mean work and complete-time ratios against
-NumericFocus=3 are 0.362 and 0.629 (\cref{tab:precision-frontier-main}). These are
-comparisons of terminal outputs within one application family, not external validation
-or equally certified MILP gaps. The evaluation keeps conditioning, solver effort,
+A 330-call sensitivity identifies favorable dispatch results at 30 and
+100\,m\textsuperscript{3}. Subsequent directed controls compare Budget-L2 with
+the omitted unscaled baseline and separate work from complete-process time
+(\cref{tab:precision-frontier-main}). All three policies meet the budgets;
+the lower work is not additional primal recovery over Base. This within-family
+evidence does not establish equally certified MILP gaps. The evaluation keeps conditioning, solver effort,
 factor admissibility and checked solution quality separate
 (\cref{sec:experiments,sec:results}). Exact optimality is checked systematically in
 the enumerated stress family; separate exact global-LP bounds and integer witnesses
@@ -753,45 +751,50 @@ and the complete protocol.}
 \input{tables/matched-main}
 \end{table}
 
-An additional prespecified sensitivity study varies the volume target over
-10, 30, 100, 300, 1,000, 3,000 and 10,000\,m\textsuperscript{3}, holding
-power at 0.01 MW and the common integer tolerance at $10^{-9}$.
-It retains 330 MILP calls and 30 contractual abstentions on the same six known
-models, with seeds 59, 71 and 89. Table~\ref{tab:precision-frontier-main} summarizes
-automatic presolve; Supplementary Material~1, Table~S17 retains both presolve panels
-and the complete protocol. The common integer tolerance differs from $2^{-28}$
-in the preceding 144-call comparison; all controls within the sensitivity are matched.
-Under automatic presolve, the 30 and 100\,m\textsuperscript{3} targets identify
-a regime in which Budget-L2 meets every primal target, has no detected bound or
-completion contradiction, and uses less work than NumericFocus=3 in every model,
-without more than 1\% deterioration in the compared candidate costs.
-At 100\,m\textsuperscript{3}, paired geometric-mean Budget-L2/NumericFocus=3
-ratios are 0.362 for work and 0.629 for complete process time on the shared host.
-All 18 paired work ratios are below one at each target. A secondary analysis
-omitting any one model leaves geometric-mean work ratios of 0.373--0.519 at
-30\,m\textsuperscript{3} and 0.329--0.499 at 100\,m\textsuperscript{3}
-(Supplementary Material~1, Table~S22). These are descriptive checks on known
-models, not confidence intervals or equally certified MILP gaps.
-The primal recovery relative to L2 remains localized; larger budgets and
-presolve-off configurations retain adverse outcomes. The sensitivity therefore
-identifies a tested precision--effort regime rather than a generally superior rule.
+A prespecified sensitivity fixes power at 0.01 MW and IntFeasTol at $10^{-9}$,
+and varies volume over 10, 30, 100, 300, 1,000, 3,000 and
+10,000\,m\textsuperscript{3}. It retains 330 MILP calls and 30 contractual
+abstentions on six known models and seeds 59,71,89. Supplementary Material~1,
+Table~S17 gives both presolve panels; Table~S22 gives descriptive model/seed
+deletion checks. The integer tolerance differs from $2^{-28}$ above.
+With automatic presolve, Budget-L2 meets every target at 30 and
+100\,m\textsuperscript{3} without detected bound/completion contradictions.
+At 100\,m\textsuperscript{3}, its paired work ratio against NumericFocus=3 is
+0.362; Table~S17 retains historical complete-process costs.
+
+That sensitivity omitted the unscaled baseline. A subsequent directed study adds
+36 Base/Base-tight calls at the same settings and seeds. Base-tight changes only
+FeasibilityTol to $10^{-9}$. Both controls meet both targets in 18/18 calls,
+without detected bound/completion contradictions. At 100\,m\textsuperscript{3},
+Budget-L2/Base and Budget-L2/Base-tight work ratios are 0.317 and 0.264
+(Table~\ref{tab:precision-frontier-main}). Every model's mean is lower, but one
+individual Base call is cheaper. Candidate-cost worsening stays below 0.008\%
+against Base and 0.097\% against Base-tight. This is an effort benefit at the
+tested accuracy, rather than additional primal recovery over Base.
+A contemporaneous 54-call repeat interleaves all three policies at
+100\,m\textsuperscript{3}; all points and native endpoints repeat exactly.
+Paired complete-process ratios are 0.621 against Base and 0.570 against
+Base-tight on the shared host. Only 9/18 pairs are faster against either control:
+preparation overhead slows the three inexpensive models. Table~S23 separates
+these timings from the historical comparison.
 
 \begin{table}[tb]
-\centering\small\setlength{\tabcolsep}{5pt}
-\caption{Precision--effort sensitivity under automatic presolve: six known models,
-seeds 59, 71, 89, power budget 0.01 MW and common integer tolerance $10^{-9}$.
-Calls counts executed Budget-L2 calls out of 18 assignments; the missing 15 at
-10\,m\textsuperscript{3} are contractual abstentions. Budgets counts points meeting
-every audited primal target after integer rounding. B/G counts bound/completion
-contradictions as in Table~\ref{tab:activation-summary}. NF3 meets every target
-with zero detected B/G flags. Work and complete-process time ratios are paired
-geometric means against NF3 on the same executed cases and seeds. Time is measured
-on a shared host and excludes compilation and witness acquisition. At 3,000 and
-10,000\,m\textsuperscript{3}, Budget-L2 exports equal L2; these are repeated
-representations. Absence of a detected flag does not certify MILP optimality.}
+\centering\small\setlength{\tabcolsep}{3.5pt}
+\caption{Matched controls on six known models and seeds 59,71,89; automatic
+presolve, power target 0.01 MW and IntFeasTol=$10^{-9}$. Each row has 18 calls;
+control budgets pass at each listed volume target, in m\textsuperscript{3}.
+B/G follows Table~\ref{tab:activation-summary}. Work is the geometric mean of all
+terminal calls, including flagged reports; ratios are paired by model/seed.
+The 36 Base/Base-tight calls follow the original sensitivity. Supplementary
+Material~1, Table~S23 gives the directed protocol; Table~S17 retains the full
+seven-budget study. No MILP optimality certificate is implied.}
 \label{tab:precision-frontier-main}
-\input{tables/precision-frontier-main}
+\input{tables/base-controls-main}
 \end{table}
+
+Primal recovery over L2 remains localized; larger budgets and presolve-off
+configurations retain adverse outcomes. These controls strengthen the
+within-family effort comparison without establishing a generally superior rule.
 
 Supplementary Material~1, Table~S18 isolates native-selector preparation costs
 and reports complete-cycle implementation timings with identical exports and solver
@@ -965,8 +968,11 @@ primal accuracy relative to L2 only on instance046 with presolve disabled.
 NumericFocus=3 meets every tested budget with more work and no detected bound/gap
 contradiction; Budget-L2 retains four contradicted bounds in that comparison.
 At the tested 30 and 100\,m\textsuperscript{3} targets under automatic presolve,
-Budget-L2 uses less work than NumericFocus=3 across the six known models with
-no detected contradictions, at a different matched integer tolerance.
+Budget-L2 uses less work than NumericFocus=3 at a different matched integer
+tolerance. Subsequent unscaled controls also show lower work than Base and
+Base-tight at these targets, with all policies meeting the budgets; this is
+an effort benefit rather than additional primal recovery over Base. Complete
+process costs still increase on the three inexpensive models.
 The matched tolerance follow-up limits that regime to its tested setting.
 Independent batch-scheduling checks demonstrate transfer of the primal-budget
 workflow, and native integration reduces measured complete-cycle overhead while
@@ -979,34 +985,26 @@ factor admissibility nor primal-budget compliance certifies MILP optimality.
 
 \section*{Data and software availability}
 The repository at \url{https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling}
-contains the C++ generator, scaling kernels, Python residual-budget implementation,
-original inputs, stored results, analysis and checking scripts. Two versions must be
-distinguished. The historical baseline, \path{v1.2-coap-submission}, is publicly archived
-at \doi{10.5281/zenodo.23145294}; its concept DOI is \doi{10.5281/zenodo.20648949}.
-It supplies the earlier fixed-basis, matrix, operational and stress experiments. Those
-public identifiers describe the baseline and do not identify the new OMS experiments.
+contains the C++ generator, scaling kernels, residual-budget implementation,
+original inputs, stored results and replay programs. The public historical baseline,
+\path{v1.2-coap-submission}, is archived at \doi{10.5281/zenodo.23145294}
+(concept DOI \doi{10.5281/zenodo.20648949}). Those identifiers describe the baseline,
+not the new OMS experiments.
 
-The frozen OMS snapshot is \path{v1.3.14-oms-submission}, dated 17 October 2026,
-supplied as Supplementary Material~2. It retains the historical analysis inputs and adds
-the controlled row-only Ruiz comparison, final-policy implementation check and three-scenario
-physical-budget audit, activation studies, common-incumbent diagnostic and matched
-numerical controls. The latter accuracy comparison retains 144 terminal outcomes and
-one externally interrupted attempt. It also supplies the multi-budget sensitivity,
-an isolated C++ selector integration benchmark and exact global-LP reference certificates
-(Supplementary Material~1, Tables~S17--S19). Original inputs, scaled exports, named bases,
-row factors, native logs, saved incumbents, exact feasible witnesses, unit conversions
-and independent checking programs are supplied. \texttt{SNAPSHOT.json} records the
-campaigns and versions; \texttt{OMS\_DATA\_MANIFEST.json} inventories the new files
-by SHA-256. Archive checksums accompany the delivery. This snapshot has no separate
-Zenodo version DOI.
+The frozen OMS snapshot \path{v1.3.15-oms-submission}, dated 18 October 2026,
+is supplied as Supplementary Material~2. It contains all new comparison data,
+native exports/logs, saved points, exact witnesses, unit conversions, checking
+programs and required historical analysis inputs. \texttt{SNAPSHOT.json} records
+campaigns and versions; \texttt{OMS\_DATA\_MANIFEST.json} inventories files by
+SHA-256. Delivery checksums are supplied. This snapshot has no separate Zenodo DOI.
 
 Supplementary Material~1 gives proofs, protocols and reproduction instructions;
-its exact PDF is also inside Material~2. Saved-result audits require no optimizer
-calls or commercial solver license and reconstruct all 120 new named bases.
-Fresh commercial-solver runs require the corresponding licenses. Rebuilding all
-1,530 historical bases additionally requires the baseline's separate
-\texttt{fixed-basis-exports.tar.zst} (337 MB compressed, 5.18 GB uncompressed); it is not
-needed for the self-contained replay of the new OMS results.
+its exact PDF is included in Material~2. Saved-result replay needs no optimizer
+calls or commercial license and reconstructs all 120 new named bases.
+Rebuilding all 1,530 historical bases additionally requires the baseline's
+\texttt{fixed-basis-exports.tar.zst} (337 MB compressed, 5.18 GB uncompressed).
+That bulk archive is unnecessary for the self-contained new-result replay.
+Fresh commercial-solver runs require the corresponding licenses.
 
 \section*{Acknowledgements}
 The historical campaigns used ClusterUY, the national supercomputing facility of Uruguay

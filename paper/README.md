@@ -40,7 +40,7 @@ to the separately supplied Supplementary Material 1.
 The numerical data include the archived `v1.2-coap-submission` baseline and the additional
 OMS dispatch comparison, stage ablation and physical-budget audit in
 `results-revision/research-audit/oms-close-20261013`. The OMS revision is
-locally frozen as `v1.3.14-oms-submission` and has no new Zenodo version DOI. The default build does not regenerate the historical
+locally frozen as `v1.3.15-oms-submission` and has no new Zenodo version DOI. The default build does not regenerate the historical
 COAP folder. Authorship, funding, competing interests and AI assistance remain stated in
 the manuscript. The manuscript is outside the source-code and data licenses.
 
@@ -73,3 +73,10 @@ model/seed deletion checks and all external control costs. Its solver-free
 programs are under `exploration/oms-evidence-audit-20261017/`. The favorable
 dispatch work result survives removal of each observed model or seed; external
 complete-process time does not improve over L2. No optimizer calls are added.
+
+Version v1.3.15 adds directed matched Base/Base-tight controls to the previously
+favorable dispatch sensitivity. The original sensitivity and prior releases remain
+unchanged. Main Table 12 includes the unscaled controls; Supplementary Table S23
+separates work, verified numerical quality and contemporaneous full-process timing.
+The comparison remains within six known models and does not demonstrate additional
+primal recovery over Base or general MILP certification.

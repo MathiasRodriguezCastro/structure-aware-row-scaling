@@ -5,8 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "paper/submission/oms"
-VERSION = "v1.3.14-oms-submission"
-REVISION_DATE = "2026-10-17"
+VERSION = "v1.3.15-oms-submission"
+REVISION_DATE = "2026-10-18"
 NEW_DATA = Path("results-revision/research-audit/oms-close-20261013")
 BASELINE = {"version": "v1.2-coap-submission", "version_doi": "10.5281/zenodo.23145294",
             "concept_doi": "10.5281/zenodo.20648949"}
@@ -20,7 +20,8 @@ REPLAY_PROGRAMS = ["scripts/research/verify_oms_dispatch.py",
     "scripts/research/reconcile_oms_work.py", "paper/validation/oms-work-reconciliation.json",
     "scripts/research/oms_matched_tables.py", "scripts/research/verify_stress_coverage.py",
     "paper/validation/oms-stress-coverage.json", "paper/validation/oms-certificate-replay-fix.json",
-    "scripts/research/oms_frontier_tables.py", "scripts/research/oms_followup_tables.py"]
+    "scripts/research/oms_frontier_tables.py", "scripts/research/oms_followup_tables.py",
+    "scripts/research/oms_base_tables.py"]
 INCUMBENT = Path("exploration/oms-root-attribution-20261015")
 WORKFLOW = Path("exploration/oms-if1-workflow-20261015")
 MATCHED = Path("exploration/oms-matched-accuracy-20261016")
@@ -120,6 +121,10 @@ def strengthening_files():
     for p in (ROOT/'exploration/oms-evidence-audit-20261017').rglob('*'):
         if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.aux','.out','.zip'):
             yield p.relative_to(ROOT)
+    # Directed unscaled controls and conditional, interleaved complete-cycle confirmation.
+    for p in (ROOT/'exploration/oms-base-control-20261018').rglob('*'):
+        if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.aux','.out','.zip'):
+            yield p.relative_to(ROOT)
 
 
 def write_metadata():
@@ -162,8 +167,15 @@ def write_metadata():
     snapshot = {"version": VERSION, "revision_date": REVISION_DATE,
                 "status": "locally frozen submission snapshot, not a published Zenodo release",
                 "version_doi": None, "published": False, "submission_performed": False,
-                "previous_local_snapshot": "v1.3.13-oms-submission",
-                "editorial_revision": "Foreground the software contribution using established residual-transfer identities; add independently checked model/seed deletion analyses and external complete-cost controls; distinguish the two tested favorable budgets from an untested interval. No new optimizer calls or stronger generalization claim.",
+                "previous_local_snapshot": "v1.3.14-oms-submission",
+                "editorial_revision": "Add the omitted matched unscaled controls to the favorable dispatch experiment: 36 Base/Base-tight calls and a conditional 54-call interleaved complete-cycle confirmation. Retain the historical sensitivity and all adverse outcomes. Distinguish effort at verified precision from additional primal recovery or general MILP certification.",
+                "unscaled_control": {
+                    "root": "exploration/oms-base-control-20261018",
+                    "known_models": 6, "seeds": [59,71,89],
+                    "directed_base_calls": 36, "reused_budget_calls": 36,
+                    "interleaved_confirmation_calls": 54, "new_lp_calls": 0,
+                    "replay": "make research-oms-check", "table": "S23",
+                    "interpretation": "within-family effort comparison at matched verified primal budgets and candidate-cost quality; no additional recovery over Base, no independent-family validation or global MILP optimality certificate"},
                 "work_reconciliation": {"geometric_mean": 4.484727186569008,
                     "median": 4.97549504639489, "same_per_seed_work": True,
                     "proof": "paper/validation/oms-work-reconciliation.json"},

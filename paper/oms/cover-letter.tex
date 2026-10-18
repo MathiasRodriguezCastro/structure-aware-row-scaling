@@ -39,7 +39,10 @@ the validity of reported mixed-integer bounds.
 The evaluation combines hydrothermal dispatch and independently generated
 batch-scheduling models, matched scaling controls and enumerated stress tests on
 several solvers. A prespecified dispatch study identifies a configuration with lower
-work than NumericFocus=3 and no detected contradictions. A paired native-implementation
+work than NumericFocus=3 and no detected contradictions. Directed matched unscaled
+controls also show lower work than Base and Base with strict tolerances at the
+tested accuracy, without establishing an additional primal recovery over Base.
+A paired native-implementation
 benchmark reduces complete-process time on a shared host while preserving all 18
 paired solver endpoints. Accuracy recovery, adverse outcomes, unresolved bound checks
 and parameter sensitivity delimit the findings. Factor admissibility is not a MILP

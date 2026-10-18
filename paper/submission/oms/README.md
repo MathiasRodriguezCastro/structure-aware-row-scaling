@@ -1,6 +1,6 @@
 # OMS local submission package
 
-Target: **Optimization Methods and Software**. Revised 2026-10-17.
+Target: **Optimization Methods and Software**. Revised 2026-10-18.
 Article: **Pre-Export Row Scaling for Generated Mixed-Integer Programs: Accuracy Contracts
 and Software Evaluation**.
 
@@ -31,7 +31,7 @@ OMS sources and numerical audits from a clean extraction of the artifact. `SHA25
 identifies the files generated locally. The package is not a published release and does not
 assert that the manuscript has been submitted.
 
-The locally frozen OMS version is `v1.3.14-oms-submission`. `SNAPSHOT.json` records the
+The locally frozen OMS version is `v1.3.15-oms-submission`. `SNAPSHOT.json` records the
 historical/new-data distinction, and `OMS_DATA_MANIFEST.json` inventories every new OMS
 experiment file and required replay program/input with SHA-256. After validation,
 `python3 scripts/research/freeze_oms.py` creates a non-overwriting versioned copy of the
@@ -184,3 +184,20 @@ not tested. Earlier frozen releases remain unchanged; the new DOI stays deferred
 
 Validated layout: 36 manuscript pages, 29 supplementary pages and one cover page.
 The rendered abstract has 193 words; all 39 tables are regenerated from saved data.
+
+## Directed unscaled controls v1.3.15 — 18 October 2026
+
+The previously omitted Base and Base-tight comparisons are added at exactly the
+settings and seeds of the favorable dispatch sensitivity: 36 new calls and
+36 reused Budget-L2 calls. A conditional, interleaved 54-call confirmation records
+complete fresh-process time without mixing it with historical measurements.
+No new reference LP is required. Main Table 12 gives the unscaled and scaled
+controls together; S23 gives the directed protocol, quality checks and paired
+comparisons. Base also meets the numerical budgets: the new result concerns
+solver effort, not unique primal recovery or external generalization. The earlier
+v1.3.14 delivery and all native scientific records are preserved. The new DOI
+remains deferred.
+
+Validated v1.3.15 layout: 36 manuscript pages, 30 supplementary pages, one cover
+page and a one-page control note. The abstract has 183 words. The 90 new calls
+and all 126 audited points are retained; the current tables are reproducible.

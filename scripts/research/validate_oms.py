@@ -180,6 +180,8 @@ def main():
             "oms_native_complete_cycle_details": json.loads((folder/'exploration/oms-followup-20261017/native-cycle/VALIDATION.json').read_text()),
             "oms_activation_factor_path_details": json.loads((folder/'exploration/oms-followup-20261017/mechanism/INDEPENDENT_VALIDATION.json').read_text()),
             "oms_secondary_evidence_audit": json.loads((folder/'exploration/oms-evidence-audit-20261017/VALIDATION.json').read_text()),
+            "oms_unscaled_control": json.loads((folder/'exploration/oms-base-control-20261018/VALIDATION.json').read_text()),
+            "oms_unscaled_interleaved_confirmation": json.loads((folder/'exploration/oms-base-control-20261018/confirmation/VALIDATION.json').read_text()),
             "four_standard_commands": command_results,
             "all_final_tables_regenerated_identically": len(all_tables),
             "all_plots_regenerated_with_identical_rendered_content": len(rendered_figures),
