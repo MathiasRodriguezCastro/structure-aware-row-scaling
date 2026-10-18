@@ -1,0 +1,85 @@
+
+Gurobi 13.0.2 (linux64, Python) logging started Sun Oct 18 14:03:11 2026
+
+Set parameter LogToConsole to value 0
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-structure-screen-20261018/runs/r05.1/Flat-L2-NF3/native.log"
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Read LP format model from file /home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-structure-screen-20261018/exports/r05.1/Flat-L2.lp.gz
+Reading time = 0.01 seconds
+obj: 310 rows, 1560 columns, 4560 nonzeros
+Set parameter Threads to value 4
+Set parameter Seed to value 223
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter IntFeasTol to value 1e-09
+Set parameter MIPGap to value 0.01
+Set parameter WorkLimit to value 0.25
+Set parameter TimeLimit to value 10
+Set parameter FeasibilityTol to value 1e-06
+Set parameter NumericFocus to value 3
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  10
+WorkLimit  0.25
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+NumericFocus  3
+Seed  223
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 310 rows, 1560 columns and 4560 nonzeros (Min)
+Model fingerprint: 0x56492e0c
+Model has 1560 linear objective coefficients
+Variable types: 1500 continuous, 60 integer (60 binary)
+Coefficient statistics:
+  Matrix range     [7e-04, 1e+00]
+  Objective range  [2e+01, 1e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [5e+00, 3e+01]
+
+Presolve time: 0.00s
+Presolved: 310 rows, 1560 columns, 4560 nonzeros
+Variable types: 1500 continuous, 60 integer (60 binary)
+Found heuristic solution: objective 156889.00000
+
+Root relaxation: objective 1.105209e+05, 120 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 110520.907    0   25 156889.000 110520.907  29.6%     -    0s
+     0     0 110520.907    0   25 156889.000 110520.907  29.6%     -    0s
+H    0     0                    125493.00000 111485.002  11.2%     -    0s
+     0     2 111485.002    0   25 125493.000 111485.002  11.2%     -    0s
+H    4     5                    125209.00000 112224.974  10.4%   2.2    0s
+H   54    54                    125055.00000 112574.714  10.0%   2.8    0s
+H   59    54                    124651.00000 112574.714  9.69%   2.8    0s
+H   65    54                    124263.00000 112574.714  9.41%   2.7    0s
+H   98    85                    124253.00000 113862.913  8.36%   2.7    0s
+H  113   102                    123887.00000 113862.913  8.09%   2.6    0s
+H  123   102                    123504.00000 113862.913  7.81%   2.6    0s
+H  338   180                    123201.00000 116643.304  5.32%   3.9    0s
+H  339   180                    123085.00000 116643.304  5.23%   3.9    0s
+H  342   180                    123061.00000 116643.304  5.22%   3.9    0s
+*  344   180              25    123003.00000 116643.304  5.17%   3.9    0s
+
+Cutting planes:
+  Cover: 13
+  Implied bound: 2
+
+Explored 809 nodes (4475 simplex iterations) in 0.17 seconds (0.26 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: 123003 123061 123201 ... 125209
+
+Work limit reached
+Best objective 1.230030000000e+05, best bound 1.193717618107e+05, gap 2.9522%

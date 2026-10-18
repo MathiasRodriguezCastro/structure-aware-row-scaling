@@ -1,0 +1,181 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{amsmath,amssymb,booktabs,array}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\title{Diagnóstico estructural del escalado\\en redes multicommodity}
+\author{Nota separada del manuscrito OMS}
+\date{18 de octubre de 2026}
+\begin{document}\maketitle
+\noindent\textbf{Resultado.} Se encontraron modelos externos con bloques locales,
+acoplamiento efectivo y contratos activos. Las 773 filas de acoplamiento de doce
+modelos cambian tanto con Role-Hybrid como al imponer el presupuesto $10^{-5}$.
+Sin embargo, las 210 soluciones de siete políticas ya satisfacen $10^{-7}$,
+y la réplica no acredita una ventaja general frente al modelo sin escalar.
+El manuscrito OMS v1.3.14 permanece intacto.
+
+\section{Selección por estructura antes de resolver}
+La pregunta era adecuada: la selección debe permitir probar el mecanismo que
+motiva el método. Se fijaron seis problemas R de cargos fijos de CommaLAB,
+R01.1 a R06.1, y las dos primeras matrices de demandas por orden lexicográfico
+de cada uno de los tres grupos Günlük de expansión de capacidad.\footnote{\url{https://commalab.di.unipi.it/datasets/mmcf/}}
+Los problemas R tienen diez nodos, 35 o 60 arcos y 10, 25 o 50 mercancías.
+Los grupos Günlük tienen respectivamente 15/22/210, 27/51/702 y 16/49/240
+nodos/enlaces/mercancías según los archivos nativos. Las dos demandas de cada
+grupo comparten matriz: no son seis matrices independientes.
+Las dos colecciones constituyen formulaciones y procedencias distintas dentro
+de redes; no equivalen a dos dominios de aplicación independientes.
+
+La formulación R conserva balances $Bx_k=d_k$ y capacidades
+$\sum_k x_{ke}\le U_e y_e$, con $y_e$ binaria.
+La expansión utiliza capacidad bidireccional: cada sentido queda acotado por
+la misma capacidad instalada $u_e+y_{e,1}+\lambda y_{e,2}$, con instalaciones
+enteras no negativas. No se suman ambos sentidos como en capacidad no dirigida.
+La distinción está respaldada por la clasificación de los autores.\footnote{\url{https://arxiv.org/html/1711.10147}, secciones 1 y 3.}
+Los datos nativos no se perturban ni se reescalan artificialmente.
+El rango de coeficientes es 613--2640 en R y solo 4 en Günlük: allí la
+densidad de las filas activa L2 sin un rango extremo de coeficientes.
+
+También se inspeccionaron los diez problemas presentes en el ZIP SSLP de
+SIPLIB.\footnote{\url{https://www2.isye.gatech.edu/~sahmed/siplib/sslp/sslp.html}}
+Sus filas de recurso tocan un único escenario y las columnas de primera etapa:
+no hay filas entre dos bloques de recurso distintos. No se introdujeron copias
+de variables para forzar una estructura diferente.
+
+\section{Qué hipótesis se cumplen}
+Los doce modelos tienen la estructura angular
+\[
+ A=\begin{bmatrix}I_K\otimes B&0\\
+ \mathbf{1}_K^{\mathsf T}\otimes I&D\end{bmatrix},
+\]
+donde la última fila de bloques representa varias filas de capacidad.
+Los bloques $B$ son incidencias rectangulares, con rango $n-1$ y dependencias
+de conservación. Por tanto, \textbf{no se aplica el teorema triangular con bloques
+identidad}: escalar filas no convierte estas incidencias en identidades.
+Los contratos de residuos sí son aplicables sin esa hipótesis.
+
+Todos los coeficientes locales no nulos son $\pm1$. La media geométrica local
+elige uno y, en estos modelos, Role-Hybrid coincide con Coupling-only.
+La etapa de acoplamiento actúa sobre las 773 filas, a diferencia de la ablación
+histórica de despacho. Esto permite aislar el mecanismo, sin atribuirle
+información adicional de propiedad de columnas.
+
+El diagnóstico conserva todas las filas. Calcula $\kappa_2^+$ mediante una
+descomposición ortogonal analítica entre el promedio de las mercancías y sus
+contrastes; no transforma las variables del MIP. La fórmula se contrastó con
+120 SVD completas y la equilibración se contrastó elemento a elemento.
+Son medidas de la matriz completa, no del condicionamiento de una base LP.
+Las diez pasadas diádicas de equilibración constituyen un sustituto declarado;
+no observan la implementación interna propietaria del solver.
+
+\begin{center}\small
+\begin{tabular}{lrrrr}
+\toprule
+&\multicolumn{2}{c}{R01.1}&\multicolumn{2}{c}{Noruega, demanda 1}\\
+Política&Antes&Tras 10 pasadas&Antes&Tras 10 pasadas\\\midrule
+Base&320.44&3.39&35.89&18.32\\
+Role-Hybrid&3.42&3.42&5.50&5.95\\
+Flat-L2&1.58&2.51&7.87&5.79\\
+Budget-L2&82.17&2.46&11.48&10.32\\\bottomrule
+\end{tabular}
+\end{center}
+La mejora inicial de centrado o condición no implica superioridad posterior.
+Las doce instancias mejoran con Role-Hybrid antes de equilibrar; después,
+solo seis superan a Base según esta medida. Flat-L2 supera a Base en las doce.
+
+\section{Contratos activos y verificación independiente}
+Se fijaron metas absolutas $10^{-3}$, $10^{-5}$ y $10^{-7}$ en unidades de flujo
+de la fuente, como objetivos del estudio. La hipótesis de residuo exportado es
+$\epsilon=10^{-6}$ y la distancia uniforme de redondeo entero es
+$\eta=10^{-9}$. Los factores usan ventana $[10^{-9},10^9]$ y banda cerrada
+de identidad $[1/2,2]$. Son adaptadores Python explícitos; no se afirma identidad
+binaria con el exportador C++.
+
+\begin{center}\small
+\begin{tabular}{lrrr}\toprule
+Presupuesto&Filas de acoplamiento&Factores modificados&Incompatibles\\\midrule
+$10^{-3}$&773&40&0\\
+$10^{-5}$&773&773&0\\
+$10^{-7}$&773&517&256\\\bottomrule
+\end{tabular}
+\end{center}
+Los contratos incompatibles corresponden a la cota uniforme de redondeo en
+problemas R. No prueban inviabilidad del modelo ni incumplimiento del presupuesto
+por soluciones observadas. En una capacidad R, el presupuesto suficiente sin
+defecto de exportación es
+\[
+ \delta\ge\epsilon/\alpha+U_e\eta.
+\]
+El término $U_e\eta$ no se corrige mediante escalado de filas. Si las variables
+enteras entregadas son exactamente enteras, su error real de redondeo es cero:
+la incompatibilidad uniforme puede coexistir con una solución precisa.
+
+Las 60 exportaciones se comprobaron tras importarlas: matriz, RHS, nombres,
+objetivo, cotas y dominios. Las multiplicaciones por factores reales redondean
+los datos; el verificador mide exactamente el defecto puntual. Los balances,
+capacidades, cotas, dominios y costos se reconstruyen desde arcos y demandas
+nativos con racionales, separando punto bruto y redondeado. No se usan los
+atributos de factibilidad del optimizador. Se verifican las hipótesis de
+transferencia, incluido el defecto de exportación; el parámetro nominal de
+tolerancia no sustituye esas comprobaciones.
+
+\section{Piloto y réplica con calidad común}
+El piloto conserva 84 ejecuciones: doce modelos y siete políticas, con semilla
+223, Gurobi 13.0.2, cuatro hilos, presolve y escalado internos automáticos,
+WorkLimit$=0.25$, TimeLimit$=10$ s y brecha nominal del 1\%.
+IntFeasTol$=10^{-9}$ es común. Se comparan Base, Ruiz-R4, Flat-L2,
+Role-Hybrid, Budget-L2 a $10^{-5}$, Flat-L2-tight con tolerancia primal
+$10^{-9}$ y Flat-L2 con NumericFocus$=3$.
+Coupling-only es un alias demostrado y no se cuenta como evidencia adicional.
+Los seis problemas de expansión alcanzan el límite de trabajo: sus incumbentes
+no se presentan como óptimos certificados.
+
+Las 84 soluciones cumplen $10^{-7}$ con todos los controles. El mayor residuo
+original bruto o redondeado es $2.3284\cdot10^{-12}$. Budget-L2 usa menos
+trabajo que L2 en las seis R, pero los costos y los esfuerzos de cierre de cota
+difieren. Esa comparación inicial no basta para declarar una ventaja práctica.
+
+Se registró después una réplica sobre las seis R completas, con semillas nuevas
+227, 229 y 233: 126 ejecuciones. Todas las políticas buscan el mismo costo,
+1.01 veces un costo factible exacto del piloto, mediante BestObjStop, conservando
+los otros límites. Es una referencia factible, no un óptimo certificado.
+Las 126 entregas cumplen el objetivo común y $10^{-7}$; el mayor residuo es
+$1.2435\cdot10^{-14}$.
+
+\begin{center}\small
+\begin{tabular}{lrr}\toprule
+Control&Trabajo Budget/control&Ciclo Budget/control\\\midrule
+Base&1.009&1.129\\
+Flat-L2&0.884&1.071\\
+Flat-L2-tight&0.884&1.067\\
+Flat-L2-NF3&0.599&0.970\\
+Role-Hybrid&0.905&1.089\\
+Ruiz-R4&0.921&0.921\\\bottomrule
+\end{tabular}
+\end{center}
+Se informan medias geométricas de 18 razones emparejadas. El ciclo suma
+construcción, selección y exportación medidas por separado, carga y resolución;
+excluye verificación posterior. Los procesos son nuevos y secuenciales. Los
+tiempos son cortos, descriptivos y sensibles a la máquina compartida; las
+semillas no convierten seis modelos en dieciocho instancias independientes.
+El ciclo parte de los datos nativos cargados y excluye arranque del intérprete,
+lectura inicial e inicialización de la licencia.
+
+\section{Decisión científica}
+La selección estructural fue pertinente: se comprobaron acoplamiento activo,
+contratos activos y cambios que sobreviven parcialmente a la equilibración
+de diagnóstico. No se encontró una recuperación exclusiva de precisión;
+tampoco una ventaja general sobre Base a calidad común. La reducción de
+trabajo frente a L2 no se traduce en menor ciclo total medido.
+Estos resultados se conservan fuera del artículo: no justifican presentar
+una nueva contribución competitiva ni extender el alcance del teorema.
+Buscar recuperación de precisión exige además dificultades numéricas nativas:
+un contrato activo no demuestra que la solución sin contrato viole el presupuesto.
+
+\noindent\textbf{Reproducción.} La carpeta incluye archivos nativos, diseños,
+60 exportaciones, 210 registros del optimizador, puntos, comprobaciones racionales
+y sumarios. Los verificadores funcionan sin licencia comercial. Las URL y
+SHA-256 quedan vinculadas en los manifiestos; se conserva la evidencia adversa.
+\end{document}

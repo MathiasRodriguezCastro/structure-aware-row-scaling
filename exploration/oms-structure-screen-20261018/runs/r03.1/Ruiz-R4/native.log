@@ -1,0 +1,79 @@
+
+Gurobi 13.0.2 (linux64, Python) logging started Sun Oct 18 14:03:24 2026
+
+Set parameter LogToConsole to value 0
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-structure-screen-20261018/runs/r03.1/Ruiz-R4/native.log"
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Read LP format model from file /home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-structure-screen-20261018/exports/r03.1/Ruiz-R4.lp.gz
+Reading time = 0.01 seconds
+obj: 535 rows, 1785 columns, 5285 nonzeros
+Set parameter Threads to value 4
+Set parameter Seed to value 223
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter IntFeasTol to value 1e-09
+Set parameter MIPGap to value 0.01
+Set parameter WorkLimit to value 0.25
+Set parameter TimeLimit to value 10
+Set parameter FeasibilityTol to value 1e-06
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  10
+WorkLimit  0.25
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  223
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 535 rows, 1785 columns and 5285 nonzeros (Min)
+Model fingerprint: 0x812ec6d8
+Model has 1785 linear objective coefficients
+Variable types: 1750 continuous, 35 integer (35 binary)
+Coefficient statistics:
+  Matrix range     [6e-04, 2e+00]
+  Objective range  [1e+01, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+01, 1e+02]
+
+Found heuristic solution: objective 1272646.0000
+Presolve removed 2 rows and 8 columns
+Presolve time: 0.01s
+Presolved: 533 rows, 1777 columns, 5275 nonzeros
+Variable types: 1746 continuous, 31 integer (31 binary)
+
+Root relaxation: objective 4.654433e+05, 451 iterations, 0.01 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 465443.294    0   16 1272646.00 465443.294  63.4%     -    0s
+H    0     0                    487951.00000 465443.294  4.61%     -    0s
+H    0     0                    487375.00000 465443.294  4.50%     -    0s
+     0     0          -    0      487375.000 483023.921  0.89%     -    0s
+
+Cutting planes:
+  Gomory: 7
+  Cover: 3
+  Implied bound: 11
+  MIR: 18
+  Flow cover: 67
+  Flow path: 37
+  Network: 7
+  Relax-and-lift: 3
+
+Explored 1 nodes (479 simplex iterations) in 0.04 seconds (0.02 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 3: 487375 487951 1.27265e+06 
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective 4.873750000000e+05, best bound 4.830239213221e+05, gap 0.8928%

@@ -1,0 +1,92 @@
+
+Gurobi 13.0.2 (linux64, Python) logging started Sun Oct 18 14:03:14 2026
+
+Set parameter LogToConsole to value 0
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-structure-screen-20261018/runs/r06.1/Flat-L2-NF3/native.log"
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Read LP format model from file /home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-structure-screen-20261018/exports/r06.1/Flat-L2.lp.gz
+Reading time = 0.01 seconds
+obj: 560 rows, 3060 columns, 9060 nonzeros
+Set parameter Threads to value 4
+Set parameter Seed to value 223
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter IntFeasTol to value 1e-09
+Set parameter MIPGap to value 0.01
+Set parameter WorkLimit to value 0.25
+Set parameter TimeLimit to value 10
+Set parameter FeasibilityTol to value 1e-06
+Set parameter NumericFocus to value 3
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  10
+WorkLimit  0.25
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+NumericFocus  3
+Seed  223
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 560 rows, 3060 columns and 9060 nonzeros (Min)
+Model fingerprint: 0x6e292612
+Model has 3060 linear objective coefficients
+Variable types: 3000 continuous, 60 integer (60 binary)
+Coefficient statistics:
+  Matrix range     [4e-04, 1e+00]
+  Objective range  [1e+01, 3e+03]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e+00, 3e+01]
+
+Presolve removed 0 rows and 1 columns
+Presolve time: 0.00s
+Presolved: 560 rows, 3059 columns, 9059 nonzeros
+Variable types: 3000 continuous, 59 integer (59 binary)
+Found heuristic solution: objective 292519.00000
+
+Root relaxation: objective 2.214311e+05, 325 iterations, 0.01 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 221431.063    0   34 292519.000 221431.063  24.3%     -    0s
+     0     0 221431.063    0   34 292519.000 221431.063  24.3%     -    0s
+H    0     0                    262807.00000 222990.959  15.2%     -    0s
+H    0     0                    260972.00000 222990.959  14.6%     -    0s
+     0     2 222990.959    0   34 260972.000 222990.959  14.6%     -    0s
+H    2     4                    260774.00000 222990.959  14.5%   2.0    0s
+H   26    32                    256335.00000 225234.791  12.1%  11.7    0s
+H  152   137                    255249.00000 225913.452  11.5%   7.7    0s
+H  153   137                    253252.00000 225913.452  10.8%   7.7    0s
+H  171   172                    252978.00000 227948.362  9.89%   7.6    0s
+H  182   172                    251876.00000 227948.362  9.50%   7.4    0s
+H  189   172                    250830.00000 227948.362  9.12%   7.5    0s
+H  199   209                    249425.00000 227948.362  8.61%   7.4    0s
+H  204   209                    249288.00000 227948.362  8.56%   7.5    0s
+H  219   209                    248578.00000 227948.362  8.30%   7.5    0s
+H  226   209                    248057.00000 227948.362  8.11%   7.4    0s
+H  228   209                    247946.00000 227948.362  8.07%   7.5    0s
+*  246   219              36    247807.00000 227948.362  8.01%   7.4    0s
+H  256   219                    247114.00000 228636.189  7.48%   7.2    0s
+H  257   219                    245944.00000 228636.189  7.04%   7.2    0s
+*  259   219              40    245936.00000 228636.189  7.03%   7.2    0s
+
+Cutting planes:
+  Cover: 5
+  Implied bound: 11
+
+Explored 356 nodes (3240 simplex iterations) in 0.18 seconds (0.25 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: 245936 247114 247807 ... 252978
+
+Work limit reached
+Best objective 2.459360000000e+05, best bound 2.304903346103e+05, gap 6.2804%
