@@ -1,0 +1,161 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{amsmath,amssymb,amsthm,booktabs}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\newtheorem{proposition}{Proposición}
+\title{Escalado de acoplamiento con bloques de incidencia\\Extensión espectral acotada}
+\author{Nota separada del manuscrito OMS}\date{18 de octubre de 2026}
+\begin{document}\maketitle
+\noindent\textbf{Alcance.} Se obtiene una fórmula cerrada para el mejor factor común
+en una subclase con capacidades uniformes, sin blanquear los bloques locales ni
+suponer rango completo. Para capacidades heterogéneas se obtiene una condición
+suficiente verificable. Son resultados de condicionamiento, no mejoras de tiempo,
+precisión de puntos u optimalidad MILP. No se ha establecido prioridad bibliográfica.
+
+\section{Descomposición exacta y ceros}
+Sean $B\in\mathbb R^{r\times n}$, $C\in\mathbb R^{s\times n}$,
+$D\in\mathbb R^{s\times p}$, $K\ge1$, y $\Gamma$ diagonal positiva. Considerar
+\[
+ A_\Gamma=\begin{bmatrix}I_K\otimes B&0\\
+ \mathbf1_K^{\mathsf T}\otimes\Gamma C&\Gamma D\end{bmatrix},
+ \qquad
+ M_\Gamma=\begin{bmatrix}B&0\\\sqrt K\Gamma C&\Gamma D\end{bmatrix}.
+\]
+\begin{proposition}
+Los valores singulares positivos de $A_\Gamma$, con multiplicidades, son los de
+$M_\Gamma$ y $K-1$ copias de los de $B$. Incluidos todos los ceros, la identidad
+inequívoca es
+\[
+ \operatorname{spec}(A_\Gamma^{\mathsf T}A_\Gamma)=
+ \operatorname{spec}(M_\Gamma^{\mathsf T}M_\Gamma)
+ \uplus (K-1)\operatorname{spec}(B^{\mathsf T}B).
+\]
+\end{proposition}
+\begin{proof}
+Elegir una matriz ortogonal $Q$ cuya primera columna sea
+$\mathbf1_K/\sqrt K$. Multiplicar las filas locales por
+$Q^{\mathsf T}\otimes I_r$ y las columnas locales por $Q\otimes I_n$.
+El bloque local sigue siendo $I_K\otimes B$, mientras el acoplamiento se convierte
+en $[\sqrt K\Gamma C,0,\ldots,0]$. Permutar filas y columnas da la suma directa
+rectangular de $M_\Gamma$ y las $K-1$ copias de $B$.
+\end{proof}
+La unión de las SVD económicas puede omitir ceros cuando los bloques tienen
+distintas orientaciones rectangulares. Por ejemplo, $K=2$, $B=[1\ 0]$,
+$C=[I_2;0\ 0]$ y $D=[0\ 0\ 1]^{\mathsf T}$ dan una matriz $A$ de $5\times5$
+con rango cuatro: su SVD tiene cinco valores, pero las SVD económicas de $M$ y
+$B$ aportan solo cuatro. La identidad sobre valores positivos permanece válida.
+
+\section{Mejor factor común con capacidad uniforme}
+Ahora $C=I_n$, $D=dI_n$, $d>0$, $\Gamma=\gamma I_n$, $\gamma>0$, y
+$B\ne0$ puede ser rectangular y deficiente de rango. Sean
+$a=\sigma_{\min}^+(B)$ y $b=\sigma_{\max}(B)$.
+\begin{proposition}
+El único factor común que minimiza $\kappa_2^+(A_\gamma)$ es
+\[
+ \boxed{\gamma_* =\sqrt{\frac{ab}{K+d^2}}.}
+\]
+Con $\theta=d^2/(K+d^2)$ y $q=b/a$, el mínimo es
+\[
+ \kappa_* = \frac{1+q+\sqrt{(1+q)^2-4\theta q}}{2\sqrt\theta}.
+\]
+Sobre $0<L\le\gamma\le H$, el óptimo es $\min(H,\max(L,\gamma_*))$.
+\end{proposition}
+\begin{proof}
+Una SVD de $B$ reduce el problema a bloques de dos dimensiones. Escribir
+$t=(K+d^2)\gamma^2$. Para cada valor singular $s>0$, los cuadrados de los
+valores singulares correspondientes son
+\[
+ \lambda_\pm(s^2,t)=\frac{s^2+t\pm\sqrt{(s^2+t)^2-4\theta s^2t}}2.
+\]
+Los modos del núcleo de $B$ aportan valores positivos $\sqrt t$ y ceros.
+La mayor raíz aumenta con $s$, la menor también aumenta y es menor que $s^2$;
+además $\lambda_+(s^2,t)\ge t$ y $\lambda_-(s^2,t)\le\theta t$.
+Por tanto, incluidos los contrastes de mercancías,
+\[
+ \kappa_2^+(A_\gamma)^2
+ =\frac{\lambda_+(b^2,t)}{\lambda_-(a^2,t)}
+ =\frac{\lambda_+(b^2,t)\lambda_+(a^2,t)}{\theta a^2t}.
+\]
+Definir $h(u)=\tfrac12\log\theta+
+\operatorname{arcosh}(\cosh(u/2)/\sqrt\theta)$. Entonces
+$\log\lambda_+(s^2,t)=\tfrac12\log(s^2t)+h(\log t-\log s^2)$.
+La función $h$ es par y estrictamente convexa, pues $0<\theta<1$ y
+\[
+ h''(u)=\frac{(1-\theta)\cosh(u/2)}{4(\cosh^2(u/2)-\theta)^{3/2}}>0.
+\]
+El objetivo logarítmico es una constante más
+$h(\log t-\log a^2)+h(\log t-\log b^2)$. Su mínimo único está en
+$\log t=\tfrac12(\log a^2+\log b^2)$, es decir, $t=ab$.
+Sustituir da ambas fórmulas. La convexidad demuestra la proyección sobre el intervalo.
+\end{proof}
+El teorema admite directamente matrices de incidencia. La capacidad uniforme
+es una hipótesis real de esta fórmula; no se atribuye su optimalidad a matrices
+$D$ heterogéneas ni a factores diagonales independientes.
+
+\section{Capacidades heterogéneas: condición suficiente}
+Sea ahora $C=I_n$, $\Gamma=\gamma I_n$ y
+$0<d_-^2I\preceq DD^{\mathsf T}\preceq d_+^2I$.
+Definir
+\[
+ \Lambda_+(s^2,d,\gamma)=\frac{s^2+\gamma^2(K+d^2)+
+ \sqrt{(s^2+\gamma^2(K+d^2))^2-4s^2d^2\gamma^2}}2.
+\]
+El orden de Loewner entre los Gram de filas, junto con la sección anterior,
+proporciona
+\[
+ \kappa_2^+(A_\gamma)^2\le
+ U(\gamma):=\frac{\Lambda_+(b^2,d_+,\gamma)
+ \Lambda_+(a^2,d_-,\gamma)}{a^2d_-^2\gamma^2}.
+\]
+Los núcleos de esos Gram coinciden: $D$ tiene rango completo de filas, por lo
+que cualquier vector del núcleo tiene componente de acoplamiento cero y
+componente local en $\ker B^{\mathsf T}$. Por ello el orden se aplica también
+a los menores autovalores positivos. Si se verifica
+$U(\gamma)<\kappa_2^+(A_1)^2$, se certifica una mejora estricta.
+Una cota inferior rigurosa para el segundo miembro basta para comprobarlo.
+
+\section{Certificados sobre las seis R nativas}
+En la formulación dirigida R, $D=-\operatorname{diag}(U_e)$ y el grafo es
+conexo. Se aislaron exactamente las raíces del polinomio entero de $BB^{\mathsf T}$
+para acotar $a^2$ y $b^2$. Se usaron cotas racionales superiores de las raíces
+cuadradas en $U(\gamma)$; no se infiere el certificado de una SVD flotante.
+Para el modelo sin escalar,
+\[
+ \kappa_2^+(A_1)^2\ge\frac{K+U_{\max}^2}{H},\qquad
+ H=\min_{u<v}\frac{L_{uu}+L_{vv}-2L_{uv}}2,\quad L=BB^{\mathsf T}.
+\]
+La fila de máxima capacidad acota el máximo autovalor por debajo; un vector
+local $e_u-e_v$, ortogonal al núcleo, acota el mínimo positivo por arriba.
+
+Los factores son diádicos y cumplen en todas las capacidades
+$10^{-6}/\gamma+U_e10^{-9}\le10^{-5}$, además de la ventana de coeficientes.
+Se verifica la desigualdad estricta entre cotas racionales en los seis casos.
+Las cifras siguientes son aproximaciones para lectura; las fracciones exactas
+se conservan en \texttt{results.json}.
+\begin{center}\small
+\begin{tabular}{lrrr}\toprule
+Caso&$\gamma$&Cota inferior de $\kappa(A_1)$&Cota superior de $\kappa(A_\gamma)$\\\midrule
+R01.1&$1/8$&274.15&40.09\\
+R02.1&$1/8$&633.71&103.74\\
+R03.1&$1/4$&1125.70&335.16\\
+R04.1&$1/8$&198.89&26.91\\
+R05.1&$1/8$&459.74&60.70\\
+R06.1&$1/4$&856.53&233.50\\\bottomrule
+\end{tabular}
+\end{center}
+Esto certifica el condicionamiento de la matriz completa en aritmética real.
+No es una cota de error de una solución ni del trabajo del optimizador. El
+experimento previo sobre estas mismas redes ya mostró que mejores matrices no
+implican una ventaja práctica. Los certificados no sustituyen esa evidencia.
+
+\section{Comprobaciones y decisión}
+Se verifican 40 identidades de espectros Gram, un contraejemplo para el conteo de
+ceros, 135 comparaciones de la fórmula con SVD densas y seis certificados nativos
+con racionales e intervalos algebraicos exactos. No se ejecutó otro MIP para esta nota.
+Se conserva separada del artículo. La optimización diagonal y por bloques tiene
+antecedentes clásicos y modernos; esta búsqueda acotada no acredita novedad de
+la fórmula.\footnote{\url{https://web.stanford.edu/~boyd/lmibook/lmibook.pdf}, capítulo 3;
+\url{https://arxiv.org/abs/2209.00809}.}
+\end{document}

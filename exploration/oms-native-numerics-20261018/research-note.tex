@@ -1,0 +1,151 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{amsmath,amssymb,booktabs,array}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\title{Contratos ante dificultades numéricas nativas\\Selección estructural, precisión y controles fuertes}
+\author{Nota separada del manuscrito OMS}\date{18 de octubre de 2026}
+\begin{document}\maketitle
+\noindent\textbf{Resultado.} La búsqueda encontró dos grupos nuevos donde Budget-L2
+recupera presupuestos incumplidos por L2 y NumericFocus$=3$. En uno se verificó
+además que el patrón entero rechazado es imposible y que el patrón contractual
+admite costo exacto cuatro. Sin embargo, Base y L2 estricto también cumplen las
+metas y Budget no mejora frente a esos controles. Se conserva el resultado fuera
+de OMS v1.3.14. No se confunde recuperación frente a un control con superioridad
+frente a todos los controles pertinentes.
+
+\section{Selección antes de resolver}
+Se inventarió la colección completa de 193 instancias MIPLIB con etiqueta
+Numerics, no solo el conjunto Benchmark.\footnote{\url{https://miplib.zib.de/tag_numerics.html}}
+Se fijaron doce candidatas, mixtas y de tamaño acotado: ocho representantes de
+grupos nuevos con etiqueta de descomposición; gasprod1-2, cmflsp50-24-10-4 y
+minutedispatchstrategy como ejemplos industriales/energéticos; y ta2-UUE como
+una nueva instancia de un grupo ya conocido, no nueva familia independiente.
+Los ejemplos industriales corresponden a producción de gases, lotificación con
+capacidad y despacho de una microrred según sus fichas originales.\footnote{Fichas de
+\href{https://miplib.zib.de/instance_details_gasprod1-2.html}{gasprod1-2},
+\href{https://miplib.zib.de/instance_details_cmflsp50-24-10-4.html}{cmflsp50-24-10-4} y
+\href{https://miplib.zib.de/instance_details_minutedispatchstrategy.html}{minutedispatchstrategy}.}
+
+Se utilizaron los MPS y DEC originales, sin perturbaciones de unidades,
+coeficientes o demandas. Las filas se cotejan por nombre y las columnas usadas
+por varios bloques se clasifican como compartidas. Una fila de acoplamiento
+debe tocar columnas privadas de al menos dos bloques. Nueve candidatas cumplen
+el filtro fijado de heterogeneidad, factores modificados y contratos compatibles;
+ocho admiten esa estructura de roles. Australia-abs-cta solo se evalúa mediante
+los contratos generales. Tres candidatas se excluyen conservando su diagnóstico.
+El análisis de los DEC no acredita el teorema triangular del artículo.
+
+Las metas absolutas son $10^{-1},10^{-3},10^{-5},10^{-7}$ en unidades algebraicas
+originales. Para cada modelo se elige, antes de resolver, la más exigente compatible
+en todas las filas. Se usan $\epsilon=10^{-6}$ y margen uniforme entero
+$\eta=10^{-9}$. Son metas experimentales, no tolerancias operativas.
+Los factores de L2 y Budget son diádicos, con la misma norma y ventana
+$[10^{-9},10^9]$; Budget añade únicamente la restricción de precisión.
+Se comprobaron exactamente las multiplicaciones, sin descartar coeficientes
+pequeños, y la importación completa: matriz, RHS, objetivo, cotas y dominios.
+
+\section{Diagnóstico y recuperación observada}
+Primero se ejecutaron 45 controles: nueve modelos por Base, Base-tight, L2,
+L2-tight y L2 con NumericFocus$=3$. Se fijaron Gurobi 13.0.2, cuatro hilos,
+semilla 239, presolve y escalado internos automáticos, tolerancia entera
+$10^{-9}$, WorkLimit$=1$, TimeLimit$=20$ s y brecha nominal del 1\%.
+La tolerancia primal es $10^{-6}$ o $10^{-9}$ en los controles estrictos.
+Solo después de verificar los puntos se lanzó Budget en los dos modelos con
+fallos observados, con las mismas metas, semilla y límites.
+
+\begin{center}\small
+\begin{tabular}{lrr}\toprule
+&\multicolumn{1}{c}{neos-619167}&\multicolumn{1}{c}{neos-3762025-ognon}\\
+Meta original&$0.1$&$0.001$\\\midrule
+Base&$2.8023\cdot10^{-13}$&$1.5477\cdot10^{-8}$\\
+L2&$1$&$138.1454$\\
+L2-tight&$1.8569\cdot10^{-13}$&$1.2048\cdot10^{-7}$\\
+L2-NumericFocus3&$1$&$270.2157$\\
+Budget-L2&$9.3342\cdot10^{-15}$&$2.5697\cdot10^{-7}$\\\bottomrule
+\end{tabular}
+\end{center}
+La tabla informa el máximo residuo original tras redondear enteros, no el residuo
+exportado ni un atributo del optimizador. Se comprueban además puntos brutos,
+cotas, dominios, costos e hipótesis condicionales con racionales sobre los
+datos binary64 almacenados.
+
+En una fila de neos-619167, el residuo original uno se transforma bajo L2 en
+$2^{-20}=9.5367\cdot10^{-7}$: satisface la hipótesis exportada a pesar de
+violar la meta original. Con el factor contractual $2^{-16}$, el mismo punto
+excedería esa hipótesis. Esto es una transferencia puntual comprobada, no una
+identificación causal de toda la trayectoria del solver.
+En ognon, algunas filas de L2/NF3 exceden incluso el residuo exportado $10^{-6}$.
+Los parámetros nominales no se tratan como garantías. Ambos puntos Budget
+satisfacen las hipótesis verificadas y los presupuestos originales.
+
+\section{Los casos inicialmente sin puntos}
+En lotificación y microrred, los cinco controles iniciales no devolvieron ningún
+incumbente. Se registró una ampliación finita, con semilla 241, WorkLimit$=16$
+y TimeLimit$=90$ s, manteniendo metas y exportaciones. No es confirmación
+independiente de un resultado favorable ni selección de una configuración ganadora.
+
+Los cinco controles de microrred entregan puntos dentro de la meta. En lotificación,
+solo L2 entrega un punto, también preciso; las otras cuatro llamadas quedan
+desconocidas. No se ejecuta Budget porque no aparece un incumplimiento que remediar.
+No se concluye que esas formulaciones sean numéricamente seguras bajo otros límites.
+
+La campaña acumula 57 llamadas MIP, 40 puntos conservados, 36 dentro de las metas,
+cuatro incumplimientos y 17 llamadas sin punto. Estas cuentas mezclan modelos,
+controles y límites y no son tasas poblacionales. Una ausencia de incumbente
+no se cuenta como fallo de precisión.
+
+\section{Patrones y costos con certificación exacta}
+Se fijaron los enteros observados de las seis políticas de los dos casos de
+recuperación: doce referencias a ocho patrones distintos. Se conservaron los LP
+condicionales y certificados de SoPlex; el verificador reconstruye también esos
+LP desde los MPS originales, en vez de confiar en la matriz del certificado.
+
+Siete patrones admiten una continuación primal exacta y tienen óptimo LP
+condicional certificado por dualidad. El patrón de L2/NF3 en neos-619167 es
+imposible. En el LP $Ax\le b$ con variables libres, se comprueba un rayo
+$\pi\le0$ tal que
+\[
+ A^{\mathsf T}\pi=0,\qquad b^{\mathsf T}\pi=1>0.
+\]
+Si existiera un punto factible, multiplicar sus desigualdades daría $0\ge1$.
+Es un certificado exacto de inviabilidad de ese patrón, no del MILP completo.
+
+Base, L2 estricto y Budget comparten otro patrón con costo exacto $4$.
+En ognon, el patrón Budget admite costo exacto aproximadamente
+$609824.5554908613$. Estas validaciones distinguen una entrega con residuos
+pequeños de un costo respaldado por una continuación factible. Una reparación
+posterior no se acredita al punto original ni al tiempo de su método.
+No se presenta ningún óptimo LP condicional como óptimo MILP global.
+
+Hubo ocho adquisiciones LP iniciales y dos alternativas de certificación.
+Dos adquisiciones encontraron un error de looping. Una única alternativa,
+sin presolve y con escalado geométrico, obtuvo ambos certificados. Se retienen
+los intentos adversos. Una recuperación del wrapper después de un solve nativo
+completo se documenta sin repetirlo ni inventar su tiempo ausente.
+
+\section{Comparación y decisión para OMS}
+En neos-619167, Budget, Base y L2 estricto alcanzan la misma calidad exacta de
+costo y consumen aproximadamente una unidad de trabajo; Budget añade preparación.
+En ognon, Budget requiere $2.729$ veces el trabajo de L2 estricto, con costo final
+algo mayor; ambos cumplen la meta y Base también. No se utiliza el poco trabajo
+de un punto inexacto como evidencia de una ventaja de velocidad.
+
+Los tiempos son exploratorios en una máquina compartida. El ciclo medido suma
+la selección de factores, exportación, carga y resolución desde datos nativos ya cargados;
+excluye lectura inicial, arranque del intérprete/licencia y verificación independiente.
+Una eventual afirmación favorable de tiempo exigiría medir el proceso completo
+y mantener un objetivo común de calidad verificado.
+
+No se activa la regla de confirmación: no hay recuperación exclusiva frente a
+controles fuertes ni mejora del 20\% del ciclo a igual calidad. Se cierra esta
+campaña acotada conservando los casos de precisión recuperada, sus certificados
+y sus límites. OMS v1.3.14 permanece sin cambios. La extensión espectral para
+incidencias se presenta en otra nota y no sustituye esta evaluación computacional.
+
+\noindent\textbf{Reproducción.} Se incluyen fuentes nativas, protocolos, diseños,
+57 registros MIP, puntos, diez registros LP auxiliares, fracciones exactas y
+verificadores que no requieren licencia ni ejecutan optimización. El diagnóstico
+completo por fila se conserva comprimido sin pérdida y con su hash original.
+\end{document}

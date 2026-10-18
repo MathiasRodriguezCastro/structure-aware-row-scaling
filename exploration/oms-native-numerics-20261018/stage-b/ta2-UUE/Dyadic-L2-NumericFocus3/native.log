@@ -1,0 +1,76 @@
+
+Gurobi 13.0.2 (linux64, Python) logging started Sun Oct 18 15:21:12 2026
+
+Set parameter LogToConsole to value 0
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-native-numerics-20261018/stage-b/ta2-UUE/Dyadic-L2-NumericFocus3/native.log"
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Read LP format model from file /home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-native-numerics-20261018/exports/ta2-UUE/Dyadic-L2.lp.gz
+Reading time = 0.02 seconds
+obj: 2687 rows, 9241 columns, 26533 nonzeros
+Set parameter Threads to value 4
+Set parameter Seed to value 239
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter IntFeasTol to value 1e-09
+Set parameter MIPGap to value 0.01
+Set parameter WorkLimit to value 1
+Set parameter TimeLimit to value 20
+Set parameter FeasibilityTol to value 1e-06
+Set parameter NumericFocus to value 3
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  20
+WorkLimit  1
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+NumericFocus  3
+Seed  239
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 2687 rows, 9241 columns and 26533 nonzeros (Min)
+Model fingerprint: 0x56fc7d54
+Model has 1189 linear objective coefficients
+Variable types: 8053 continuous, 1188 integer (1188 binary)
+Coefficient statistics:
+  Matrix range     [6e-08, 1e+00]
+  Objective range  [4e+04, 4e+07]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [3e-02, 3e+06]
+
+Presolve removed 701 rows and 2219 columns
+Presolve time: 0.03s
+Presolved: 1986 rows, 7022 columns, 21556 nonzeros
+Variable types: 6618 continuous, 404 integer (404 binary)
+Found heuristic solution: objective 6.546842e+07
+Found heuristic solution: objective 6.530626e+07
+Found heuristic solution: objective 6.521780e+07
+
+Root relaxation: objective 3.696401e+07, 3420 iterations, 0.25 seconds (0.34 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 3.6964e+07    0   16 6.5218e+07 3.6964e+07  43.3%     -    0s
+     0     0 3.6964e+07    0   16 6.5218e+07 3.6964e+07  43.3%     -    0s
+H    0     0                    4.976838e+07 3.6969e+07  25.7%     -    0s
+     0     2 3.6969e+07    0   16 4.9768e+07 3.6969e+07  25.7%     -    0s
+H    1     4                    4.182253e+07 3.6969e+07  11.6%   0.0    0s
+H    2     4                    4.148347e+07 3.6969e+07  10.9%  27.0    0s
+H    3     8                    3.916901e+07 3.6969e+07  5.62%   176    0s
+
+Explored 11 nodes (5472 simplex iterations) in 0.72 seconds (1.00 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 7: 3.9169e+07 4.14835e+07 4.18225e+07 ... 6.54684e+07
+
+Work limit reached
+Best objective 3.916900875000e+07, best bound 3.699697168843e+07, gap 5.5453%

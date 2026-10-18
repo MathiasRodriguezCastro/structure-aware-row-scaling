@@ -1,0 +1,73 @@
+{
+  "screened_models": 12,
+  "numerically_eligible": 9,
+  "counts": {
+    "calls": 57,
+    "stored_points": 40,
+    "within_budget": 36,
+    "observed_failures": 4,
+    "unknown_no_point": 17
+  },
+  "remedy_cases": [
+    {
+      "instance": "neos-619167",
+      "budget": 0.1,
+      "L2_original_max": 1.0,
+      "NF3_original_max": 1.0,
+      "Budget_original_max": 9.334187068440845e-15,
+      "budget_over_tight_work": 0.9999718649146174,
+      "budget_over_base_work": 0.9922812712779516,
+      "budget_over_tight_measured_cycle": 1.0962211220738787,
+      "budget_over_base_measured_cycle": 1.3237890204524096,
+      "Base_and_tight_already_meet_budget": true,
+      "independent_confirmation_gate_passed": false
+    },
+    {
+      "instance": "neos-3762025-ognon",
+      "budget": 0.001,
+      "L2_original_max": 138.14542299687025,
+      "NF3_original_max": 270.21571505518875,
+      "Budget_original_max": 2.569645829453293e-07,
+      "budget_over_tight_work": 2.72899864508511,
+      "budget_over_base_work": 0.8412195624005347,
+      "budget_over_tight_measured_cycle": 4.113066195651033,
+      "budget_over_base_measured_cycle": 2.2336472852649925,
+      "Base_and_tight_already_meet_budget": true,
+      "independent_confirmation_gate_passed": false
+    }
+  ],
+  "counterfactual_rows": [
+    {
+      "instance": "neos-619167",
+      "row": "R4381",
+      "original_violation_exact": "1",
+      "L2_factor_exact": "1/1048576",
+      "Budget_factor_exact": "1/65536",
+      "L2_exported_violation_exact": "1/1048576",
+      "same_point_Budget_exported_violation_exact": "1/65536",
+      "L2_point_satisfies_exported_hypothesis": true,
+      "same_point_Budget_violates_exported_hypothesis": true,
+      "interpretation": "counterfactual exact row rejection under the residual hypothesis, not a causal identification of proprietary solver internals"
+    },
+    {
+      "instance": "neos-3762025-ognon",
+      "row": "R1151",
+      "original_violation_exact": "1244303351063288875/9007199254740992",
+      "L2_factor_exact": "1/134217728",
+      "Budget_factor_exact": "1/512",
+      "L2_exported_violation_exact": "1244303351063288875/1208925819614629174706176",
+      "same_point_Budget_exported_violation_exact": "1244303351063288875/4611686018427387904",
+      "L2_point_satisfies_exported_hypothesis": false,
+      "same_point_Budget_violates_exported_hypothesis": true,
+      "interpretation": "counterfactual exact row rejection under the residual hypothesis, not a causal identification of proprietary solver internals"
+    }
+  ],
+  "exact_unique_patterns": 8,
+  "exact_feasible_patterns": 7,
+  "exact_infeasible_patterns": 1,
+  "native_exact_LP_calls": 10,
+  "decision": "retain outside OMS: two recoveries versus L2/NF3, but Base and strict L2 already succeed and Budget does not beat those strong controls",
+  "unresolved_scope": "four of five controls have no incumbent for lot sizing even at WorkLimit16; do not infer accuracy safety or failure for those calls",
+  "speed_scope": "exploratory timings; preparation starts from loaded native model data and excludes initial data parsing, interpreter/license startup, and independent verification",
+  "global_optimality_claim": false
+}

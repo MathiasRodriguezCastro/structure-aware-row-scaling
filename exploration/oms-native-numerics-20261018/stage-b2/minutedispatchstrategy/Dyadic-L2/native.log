@@ -1,0 +1,82 @@
+
+Gurobi 13.0.2 (linux64, Python) logging started Sun Oct 18 15:25:10 2026
+
+Set parameter LogToConsole to value 0
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2849920
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-native-numerics-20261018/stage-b2/minutedispatchstrategy/Dyadic-L2/native.log"
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Read LP format model from file /home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/oms-native-numerics-20261018/exports/minutedispatchstrategy/Dyadic-L2.lp.gz
+Reading time = 0.11 seconds
+obj: 80194 rows, 41761 columns, 239480 nonzeros
+Set parameter Threads to value 4
+Set parameter Seed to value 241
+Set parameter Presolve to value -1
+Set parameter ScaleFlag to value -1
+Set parameter IntFeasTol to value 1e-09
+Set parameter MIPGap to value 0.01
+Set parameter WorkLimit to value 16
+Set parameter TimeLimit to value 90
+Set parameter FeasibilityTol to value 1e-06
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  90
+WorkLimit  16
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  241
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 80194 rows, 41761 columns and 239480 nonzeros (Min)
+Model fingerprint: 0xddd9a6e9
+Model has 1446 linear objective coefficients
+Variable types: 21605 continuous, 20156 integer (20156 binary)
+Coefficient statistics:
+  Matrix range     [2e-07, 1e+00]
+  Objective range  [1e+00, 3e+02]
+  Bounds range     [1e+00, 1e+05]
+  RHS range        [2e-04, 7e+02]
+
+Presolve removed 30652 rows and 18962 columns
+Presolve time: 0.47s
+Presolved: 49542 rows, 22799 columns, 153311 nonzeros
+Variable types: 14159 continuous, 8640 integer (8640 binary)
+
+Deterministic concurrent LP optimizer: primal and dual simplex (primal and dual model)
+Showing primal log only...
+
+Root relaxation presolved: 48148 rows, 21407 columns, 149412 nonzeros
+
+Concurrent spin time: 0.00s
+
+Solved with dual simplex
+
+Root relaxation: objective 2.012668e+03, 28472 iterations, 2.80 seconds (5.07 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 2012.66789    0 2880          - 2012.66789      -     -    3s
+H    0     0                    3563.2196069 2012.66789  43.5%     -    3s
+     0     0 2015.42863    0 5425 3563.21961 2015.42863  43.4%     -    6s
+
+Cutting planes:
+  Cover: 1439
+  MIR: 4
+  Flow cover: 5
+  GUB cover: 13
+
+Explored 1 nodes (29939 simplex iterations) in 9.53 seconds (16.01 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 1: 3563.22 
+
+Work limit reached
+Best objective 3.563219606939e+03, best bound 2.015428625743e+03, gap 43.4380%
