@@ -1,0 +1,96 @@
+{
+  "job": {
+    "instance": "new-h072-02",
+    "seed": 173,
+    "policy": "Base-tight",
+    "id": "new-h072-02-s173-Base-tight"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-09,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 173
+  },
+  "representation": "Base",
+  "base_sha256": "841a9f1a5220e1e217d67eb40f1bc6bcc411faf082ddc4f5f4dd67a3f8f09113",
+  "export_sha256": "841a9f1a5220e1e217d67eb40f1bc6bcc411faf082ddc4f5f4dd67a3f8f09113",
+  "native_import": {
+    "rows": 2016,
+    "columns": 1224,
+    "nonzeros": 4535,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 10,
+    "work": 0.5212362596063486,
+    "nodes": 514.0,
+    "runtime": 0.5044479370117188,
+    "objective": -684402.9051505708,
+    "bound": -685417.326368361
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 288,
+        "raw_max": 8.842653710266922e-14,
+        "rounded_max": 8.842653710266922e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(12)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 72,
+        "raw_max": 1.616484723854228e-13,
+        "rounded_max": 1.616484723854228e-13,
+        "rounded_limiting_row": "a1_g4h_def(2)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 288,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 72,
+        "raw_max": 1.17692252388224e-07,
+        "rounded_max": 1.17692252388224e-07,
+        "rounded_limiting_row": "a1_balance(66)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 144,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-1654784686111574089919780915631/2417851639229258349412352"
+  },
+  "stages_seconds": {
+    "generation": 0.032168657999136485,
+    "parse": 0.02850490599666955,
+    "metadata": 0.01044217999879038,
+    "export_metadata": 0.008036434999667108,
+    "native_import": 0.005566323998209555,
+    "import_check": 0.021624018001602963,
+    "solve": 0.5044811100015067,
+    "verification": 0.0592666709999321
+  },
+  "global_optimality_independently_verified": false
+}

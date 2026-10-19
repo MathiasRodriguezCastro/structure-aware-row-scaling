@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Audit the ORF sources, preserved science and full clean-extraction replay."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -8,7 +9,7 @@ import subprocess
 import tempfile
 import unicodedata
 import zipfile
-from orf_config import ROOT, PAPER, ORF, OUT, VERSION, PARENT, TITLE, sha
+from orf_config import ROOT, PAPER, ORF, OUT, VERSION, PARENT, TITLE, FOLLOWUP_ARCHIVE, sha
 from package_orf import FILES, EXTRAS, SCIENCE, build_delivery, write_json
 from build_orf import relabel
 
@@ -59,12 +60,24 @@ def scientific_preservation(science,sources):
     begin=r'\section{Scaling framework}';end=r'\section{Discussion and conclusions}'
     old_core=old.split(begin,1)[1].split(end,1)[0]
     new_core=new.split(begin,1)[1].split(end,1)[0]
+    addition=r'\subsection{Prospective scenario validation}'
+    assert addition in new_core
+    new_core=new_core.split(addition,1)[0]
     new_core=re.sub(r'\\paragraph\{Research-tool documentation\}.*?\n\n','',new_core,flags=re.S)
     assert normalized(old_core)==normalized(new_core),'Scientific sections changed'
     for start,finish in [(r'\subsection{Scope and limitations}',r'\section*{Data and software availability}')]:
         assert normalized(old.split(start,1)[1].split(finish,1)[0])==normalized(new.split(start,1)[1].split(finish,1)[0])
     old_si=expand('supporting-information.tex',science/'paper')
     new_si=expand('ESM_1.tex',sources)
+    addition=r'\section{Prospective scenario validation}'
+    assert addition in new_si
+    new_si=new_si.split(addition,1)[0]+r'\section{Finite-export residual accounting}'+new_si.split(r'\section{Finite-export residual accounting}',1)[1]
+    extra_start=r'\section{Finite-export residual accounting}'
+    extra_end=r'\section{Reproduction and artifact layout}'
+    assert extra_start in new_si
+    extension=new_si.split(extra_start,1)[1].split(extra_end,1)[0]
+    assert 'eq:orf-export-transfer' in extension and 'eq:orf-export-contract' in extension
+    new_si=new_si.split(extra_start,1)[0]+extra_end+new_si.split(extra_end,1)[1]
     old_si=old_si.split(r'\section{Proof for the triangular model}',1)[1].split(r'\section{Reproduction and artifact layout}',1)[0]
     new_si=new_si.split(r'\section{Proof for the triangular model}',1)[1].split(r'\section{Reproduction and artifact layout}',1)[0]
     assert normalized(old_si)==normalized(new_si),'Scientific supplement changed'
@@ -82,7 +95,8 @@ def scientific_preservation(science,sources):
         'scope_and_conclusions_preserved':True,'technical_supplement_preserved':True,
         'theorem_definition_example_and_proof_environments':len(old_math),
         'displayed_math_blocks_preserved':len(old_display),'numerical_table_files_identical':len(tables),
-        'new_optimization_experiments':0}
+        'additional_elementary_export_bound_documented':True,
+        'new_optimization_experiments':720,'new_exact_LP_attempts':96}
 
 
 def abstract_normalized(text):
@@ -101,8 +115,13 @@ def render_hashes(root):
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--reuse-parent-replay',type=Path,
+        help='Reuse an earlier full replay only for a byte-identical parent evidence archive; current sources and prospective evidence are still checked.')
+    args=parser.parse_args()
     result={'version':VERSION,'title':TITLE,'target':'Operations Research Forum',
-            'new_optimization_experiments':0,'submitted':False,'published':False,'version_doi':None}
+            'new_optimization_experiments':720,'new_exact_LP_attempts':96,
+            'submitted':False,'published':False,'version_doi':None}
     uploads=OUT/'uploads'
     with tempfile.TemporaryDirectory(prefix='orf-complete-audit-') as tmp:
         workspace=Path(tmp)
@@ -119,6 +138,9 @@ def main():
         pdf=run(['pdftotext','-layout','main_orf.pdf','-'],sources)
         assert 'Supplementary Material' not in pdf and 'Optimization Methods and Software' not in pdf
         assert 'Online Resource' in pdf and '??' not in pdf
+        assert 'ORCID' not in pdf.split('\f',1)[0]
+        titlepage=run(['pdftotext','title-page.pdf','-'],sources)
+        assert '0009-0002-7235-7677' in titlepage
         fields=json.loads((uploads/'FORM_FIELDS.json').read_text())
         abstract=pdf.split('Abstract',1)[1].split('Keywords:',1)[0]
         assert abstract_normalized(abstract)==abstract_normalized(fields['abstract'])
@@ -141,17 +163,47 @@ def main():
         assert f'version: "{VERSION}"' in (esm/'CITATION.cff').read_text()
         science=workspace/'scientific-evidence'
         extract(esm/SCIENCE,science)
+        assert sha(esm/FOLLOWUP_ARCHIVE)==snapshot['prospective_archive_sha256']
+        extract(esm/FOLLOWUP_ARCHIVE,science)
         result['scientific_preservation']=scientific_preservation(science,sources)
         before={p.name:p.read_bytes() for p in (science/'paper/tables').glob('*.tex')}
         figures=render_hashes(science)
         command_results={}
-        for target in ('research-oms-check','research-check-python','research-check','research-analysis'):
-            print('Extracted scientific evidence: '+target,flush=True)
-            output=run(['make',target],science)
-            command_results[target]={'passed':True,'output_sha256':hashlib.sha256(output.encode()).hexdigest()}
-            if target=='research-check':
-                assert '1 passed' in output and 'skipped' not in output
-                assert (science/'code/build-audit/SistemaElectrico').is_file()
+        if args.reuse_parent_replay:
+            prior=json.loads(args.reuse_parent_replay.read_text())
+            assert prior['scientific_parent']['archive_sha256']==sha(esm/SCIENCE)
+            assert prior['scientific_parent']['byte_identical_to_audited_parent']
+            assert prior['replay']['cpp_roundtrip_passed_without_skip']
+            assert prior['replay']['final_tables_regenerated_identically']==len(before)
+            assert prior['replay']['figures_with_identical_rendered_content']==len(figures)
+            command_results=prior['replay']['four_standard_commands']
+            assert set(command_results)=={'research-oms-check','research-check-python','research-check','research-analysis'}
+            assert all(r['passed'] for r in command_results.values())
+            result['parent_replay_reuse']={'validation_record_sha256':sha(args.reuse_parent_replay),
+                'parent_archive_sha256':sha(esm/SCIENCE),
+                'reason':'Editorial revalidation; identical parent evidence was fully replayed in the supplied earlier audit.'}
+            print('Reusing full parent replay for the checked byte-identical archive',flush=True)
+        else:
+            for target in ('research-oms-check','research-check-python','research-check','research-analysis'):
+                print('Extracted scientific evidence: '+target,flush=True)
+                output=run(['make',target],science)
+                command_results[target]={'passed':True,'output_sha256':hashlib.sha256(output.encode()).hexdigest()}
+                if target=='research-check':
+                    assert '1 passed' in output and 'skipped' not in output
+                    assert (science/'code/build-audit/SistemaElectrico').is_file()
+        print('Prospective scenario archive: rational point/certificate replay',flush=True)
+        followup=science/'exploration/orf-confirmatory-20261018'
+        output=run(['python3',str(followup/'check.py')],science)
+        followup_validation=json.loads((followup/'VALIDATION.json').read_text())
+        assert followup_validation['status']=='passed' and followup_validation['MIP_calls']==360
+        assert sha(followup/'VALIDATION.json')==snapshot['prospective_validation_sha256']
+        run(['python3',str(followup/'check.py'),'--logging-confirmation'],science)
+        logging_validation=json.loads((followup/'logging-confirmation/VALIDATION.json').read_text())
+        assert logging_validation['MIP_calls']==360 and logging_validation['complete_native_logs']==360
+        result['logging_confirmation']=logging_validation
+        run(['python3',str(followup/'check_export_bound.py')],science)
+        result['prospective_replay']=followup_validation
+        result['finite_export_bound_checks']=json.loads((followup/'EXPORT_BOUND_VALIDATION.json').read_text())
         for name,value in before.items():
             assert (science/'paper/tables'/name).read_bytes()==value==(sources/'tables'/name).read_bytes(),name
         assert render_hashes(science)==figures

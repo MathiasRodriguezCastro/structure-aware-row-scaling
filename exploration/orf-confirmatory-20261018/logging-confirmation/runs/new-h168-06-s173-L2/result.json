@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h168-06",
+    "seed": 173,
+    "policy": "L2",
+    "id": "new-h168-06-s173-L2"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 173
+  },
+  "representation": "L2",
+  "base_sha256": "b5cdd19046d06955ec7e6baca0300cbc4d8e66c400dc96bda4448c12dc8da76c",
+  "export_sha256": "8e3e6dfa9200ccd55c0cc4d3bbf3151f3d9c55230bfb76bb60b1fb322bc696e7",
+  "native_import": {
+    "rows": 4704,
+    "columns": 2856,
+    "nonzeros": 10583,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 9,
+    "work": 0.70927247884848,
+    "nodes": 615.0,
+    "runtime": 0.873164176940918,
+    "objective": -947053.7815464347,
+    "bound": -949752.5809472919
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 672,
+        "raw_max": 9.682796423510927e-14,
+        "rounded_max": 9.682796423510927e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(80)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 168,
+        "raw_max": 2.1316282072803006e-13,
+        "rounded_max": 2.1316282072803006e-13,
+        "rounded_limiting_row": "a1_g4h_def(27)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 672,
+        "raw_max": 1.1920928955078125e-07,
+        "rounded_max": 1.1920928955078125e-07,
+        "rounded_limiting_row": "a1_activacion_1(18)"
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 168,
+        "raw_max": 2.8067006496712565e-07,
+        "rounded_max": 2.8067006496712565e-07,
+        "rounded_limiting_row": "a1_balance(144)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 336,
+        "raw_max": 5.684341886080802e-14,
+        "rounded_max": 5.684341886080802e-14,
+        "rounded_limiting_row": "gh_total(99)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-18318684305202522789026493907235/19342813113834066795298816"
+  },
+  "stages_seconds": {
+    "generation": 0.0650717030002852,
+    "parse": 0.05977011299546575,
+    "metadata": 0.021816977998241782,
+    "selection": 0.2302860369964037,
+    "export": 0.0333137080015149,
+    "export_metadata": 0.021829037999850698,
+    "native_import": 0.012989980001293588,
+    "import_check": 0.054025208999519236,
+    "solve": 0.8733473700049217,
+    "verification": 0.16403019000426866
+  },
+  "global_optimality_independently_verified": false
+}

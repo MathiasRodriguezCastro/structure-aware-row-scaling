@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h072-06",
+    "seed": 101,
+    "policy": "Budget-L2",
+    "id": "new-h072-06-s101-Budget-L2"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 101
+  },
+  "representation": "Budget-L2",
+  "base_sha256": "f32afc567f61c39ff1e8dd01bb849dfe613e61ab1ad11fc168afc7b951fd4f78",
+  "export_sha256": "3cafb6243f990b51a84b745f99d7732cd68f16cb48608a837abc34971760bcac",
+  "native_import": {
+    "rows": 2016,
+    "columns": 1224,
+    "nonzeros": 4535,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 3,
+    "work": 0.04913820598249809,
+    "nodes": 1.0,
+    "runtime": 0.06186509132385254,
+    "objective": -3894358.795126942,
+    "bound": -3915663.494217897
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 288,
+        "raw_max": 8.094094537320649e-14,
+        "rounded_max": 8.094094537320649e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(57)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 72,
+        "raw_max": 1.900701818158268e-13,
+        "rounded_max": 1.900701818158268e-13,
+        "rounded_limiting_row": "a1_g4h_def(58)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 288,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 72,
+        "raw_max": 3.157329047098756e-07,
+        "rounded_max": 3.157329047098756e-07,
+        "rounded_limiting_row": "a1_balance(40)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 144,
+        "raw_max": 1.1368683772161603e-13,
+        "rounded_max": 1.1368683772161603e-13,
+        "rounded_limiting_row": "gen_menor_demanda(36)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-4707990898272276883220353979825/1208925819614629174706176"
+  },
+  "stages_seconds": {
+    "generation": 0.03245456000149716,
+    "parse": 0.030222214001696557,
+    "metadata": 0.008504354998876806,
+    "selection": 0.12536642300256062,
+    "export": 0.013394445006269962,
+    "export_metadata": 0.009020386001793668,
+    "native_import": 0.006889678996230941,
+    "import_check": 0.021558084001298994,
+    "solve": 0.062000551995879505,
+    "verification": 0.049899990000994876
+  },
+  "global_optimality_independently_verified": false
+}

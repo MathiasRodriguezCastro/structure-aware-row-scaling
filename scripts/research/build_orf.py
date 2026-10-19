@@ -21,16 +21,25 @@ def main():
     source = r'\section{Introduction}' + source
     opening_end = source.index('Evaluation presents a second problem.')
     source = r'\section{Introduction}'+'\n'+(ORF/'editorial/opening.tex').read_text()+'\n'+source[opening_end:]
+    source = source.replace('Evaluation presents a second problem.',
+        (ORF/'editorial/workflow.tex').read_text()+'\nEvaluation presents a second problem.',1)
+    start = source.index('Evaluation presents a second problem.')
+    end = source.index('This paper makes two main contributions', start)
+    source = source[:start]+(ORF/'editorial/evaluation-framing.tex').read_text()+'\n'+source[end:]
     items = re.search(r'(This paper makes two main contributions.*?)(\\begin\{enumerate\}.*?\n)(.*?)(\\end\{enumerate\})', source, re.S)
     assert items is not None
     contributions = re.split(r'(?=\\item )', items[3])
     contributions = [s for s in contributions if s.startswith(r'\item ')]
     assert len(contributions)==2
-    first = contributions[1].replace('Accuracy-aware scaling and verification software',
-                                    'Accuracy-aware model generation and verification')
-    second = contributions[0].replace('Numerical impact and mechanism attribution',
-                                     'Computational evaluation and mechanism attribution')
-    source = source[:items.start(3)] + first + second + source[items.end(3):]
+    source = source[:items.start(3)] + (ORF/'editorial/contributions.tex').read_text() + source[items.end(3):]
+    start = source.index(r'\paragraph{Computational validation.}')
+    end = source.index(r'\input{sections/related_work}', start)
+    source = source[:start]+(ORF/'editorial/validation-overview.tex').read_text()+'\n'+source[end:]
+    source = source.replace(r'\section{Discussion and conclusions}',
+        (ORF/'editorial/prospective-main.tex').read_text()+'\n'+r'\section{Discussion and conclusions}',1)
+    start = source.index(r'\subsection{Implications for scaling software}')
+    end = source.index(r'\subsection{Scope and limitations}', start)
+    source = source[:start]+(ORF/'editorial/discussion.tex').read_text()+'\n'+source[end:]
     source = source.replace(r'\subsection{Scope and limitations}',
         (ORF/'editorial/practical.tex').read_text()+'\n'+r'\subsection{Scope and limitations}',1)
     start = source.index(r'\section*{Data and software availability}')
@@ -38,11 +47,10 @@ def main():
     source = source[:start]+(ORF/'editorial/availability.tex').read_text()+'\n'+source[end:]
     # Springer asks for methodological documentation of use beyond copy editing.
     disclosure = ('\\paragraph{Research-tool documentation}\n'
-        'Assistive use of OpenAI ChatGPT and Codex and Anthropic Claude covered software\n'
-        'development, verification code, drafting, literature organization and checks of\n'
-        'mathematical derivations. The author independently verified the arguments,\n'
-        'protocols, results and interpretations and retains responsibility for them.\n'
-        'The declaration at the end of the article records the same scope of use.\n\n')
+        'OpenAI ChatGPT and Codex and Anthropic Claude assisted software development,\n'
+        'verification code, mathematical checks and manuscript preparation. The AI\n'
+        'declaration under Statements and Declarations documents their use and the\n'
+        "author's verification responsibilities.\n\n")
     source = source.replace(r'\label{sec:experiments}'+'\n',
                             r'\label{sec:experiments}'+'\n'+disclosure,1)
     # The class selects sn-basic.bst itself; Numbered selects bracketed citations.
@@ -65,22 +73,20 @@ def main():
     preamble = preamble.replace(r'\usepackage[numbers,sort&compress]{natbib}'+'\n','')
     preamble = preamble.replace(r'\usepackage[colorlinks=true,allcolors=blue!45!black]{hyperref}'+'\n','')
     preamble = preamble.replace(r'\usepackage{lineno}'+'\n','')
+    preamble += '\\usepackage{tikz}\n'
     front = r"""
 \hypersetup{pdftitle={TITLE},pdfauthor={Mathias Rodr\'iguez Castro}}
 \graphicspath{{figs/research/}}
 \emergencystretch=1.5em
 \raggedbottom
 \setcounter{secnumdepth}{3}
-% The distributed class refers to an ORCID logo absent from its ZIP. A text
-% hyperlink carries the same author identifier without an external image.
-\renewcommand{\orcid}[1]{\href{#1}{\textsuperscript{\normalfont ORCID}}}
 % These tables have no threeparttable notes. Its automatic tabular measurement
 % conflicts with boxed external inputs; retain the underlying publisher float.
 \let\table\tableorg
 \let\endtable\endtableorg
 \begin{document}
 \title[Accuracy-aware row scaling]{TITLE}
-\author*[1]{\fnm{Mathias} \sur{Rodr\'iguez Castro}\,\orcid{https://orcid.org/0009-0002-7235-7677}}
+\author*[1]{\fnm{Mathias} \sur{Rodr\'iguez Castro}}
 \email{mathiasr@fing.edu.uy}
 \affil*[1]{\orgname{Facultad de Ingenier\'ia, Universidad de la Rep\'ublica},
 \orgaddress{\city{Montevideo}, \country{Uruguay}}}
@@ -98,7 +104,7 @@ Accuracy contracts, Computational optimization, Reproducibility}
     supplement = supplement.replace('Prepared for Optimization Methods and Software','Prepared for Operations Research Forum')
     supplement = supplement.replace('v1.3.17-oms-submission', VERSION)
     reproduction = supplement.index(r'\section{Reproduction and artifact layout}')
-    supplement = supplement[:reproduction]+(ORF/'editorial/reproduction.tex').read_text()+'\n'+r'\end{document}'+'\n'
+    supplement = supplement[:reproduction]+(ORF/'editorial/prospective-supplement.tex').read_text()+'\n'+(ORF/'editorial/export-errors.tex').read_text()+'\n'+(ORF/'editorial/reproduction.tex').read_text()+'\n'+r'\end{document}'+'\n'
     supplement = relabel(supplement)
     # The original SI reproduction recipe refers to the unchanged scientific archive.
     marker = 'This supplement specifies the computational evidence and its limitations.'

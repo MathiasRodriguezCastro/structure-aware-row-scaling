@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h024-08",
+    "seed": 137,
+    "policy": "Budget-L2",
+    "id": "new-h024-08-s137-Budget-L2"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 137
+  },
+  "representation": "Budget-L2",
+  "base_sha256": "e20703d78d3dbc92cff5f20a3c71184383f718680264c3772bcc167f6e389908",
+  "export_sha256": "9581e5d49dae3c888e8cb0a9eb801ce041ded0ea956052d15816d434c1ad06ec",
+  "native_import": {
+    "rows": 672,
+    "columns": 408,
+    "nonzeros": 1511,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 2,
+    "work": 0.0089476586601308,
+    "nodes": 1.0,
+    "runtime": 0.010907173156738281,
+    "objective": -4584685.753914977,
+    "bound": -4586684.061966852
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 96,
+        "raw_max": 5.915011162500829e-14,
+        "rounded_max": 5.915011162500829e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(10)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 24,
+        "raw_max": 1.4210854715202004e-13,
+        "rounded_max": 1.4210854715202004e-13,
+        "rounded_limiting_row": "a1_g4h_def(22)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 96,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 24,
+        "raw_max": 3.169225237797946e-07,
+        "rounded_max": 3.169225237797946e-07,
+        "rounded_limiting_row": "a1_balance(2)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 48,
+        "raw_max": 2.1316282072803006e-14,
+        "rounded_max": 2.1316282072803006e-14,
+        "rounded_limiting_row": "gh_total(2)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-22170179930908712105121559830357/4835703278458516698824704"
+  },
+  "stages_seconds": {
+    "generation": 0.007967186000314541,
+    "parse": 0.005591959001321811,
+    "metadata": 0.002422819998173509,
+    "selection": 0.032657185998687055,
+    "export": 0.0035630970014608465,
+    "export_metadata": 0.0024731579978833906,
+    "native_import": 0.003130336001049727,
+    "import_check": 0.0060023730038665235,
+    "solve": 0.011007155000697821,
+    "verification": 0.01297405299555976
+  },
+  "global_optimality_independently_verified": false
+}

@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h024-08",
+    "seed": 137,
+    "policy": "L2-NF3",
+    "id": "new-h024-08-s137-L2-NF3"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 3,
+    "Seed": 137
+  },
+  "representation": "L2",
+  "base_sha256": "e20703d78d3dbc92cff5f20a3c71184383f718680264c3772bcc167f6e389908",
+  "export_sha256": "b3e7d06b27abf6cceb7d2493d35c882c75b3bf8f8e216e6e6938382af0703618",
+  "native_import": {
+    "rows": 672,
+    "columns": 408,
+    "nonzeros": 1511,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 2,
+    "work": 0.01476791393733953,
+    "nodes": 1.0,
+    "runtime": 0.014967918395996094,
+    "objective": -4584652.340991454,
+    "bound": -4586641.369296015
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 96,
+        "raw_max": 7.921738131146258e-14,
+        "rounded_max": 7.921738131146258e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(19)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 24,
+        "raw_max": 8.304468224196171e-14,
+        "rounded_max": 8.304468224196171e-14,
+        "rounded_limiting_row": "a1_g4h_def(21)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 96,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 24,
+        "raw_max": 2.2782114683650434e-07,
+        "rounded_max": 2.2782114683650434e-07,
+        "rounded_limiting_row": "a1_balance(1)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 48,
+        "raw_max": 5.684341886080802e-14,
+        "rounded_max": 5.684341886080802e-14,
+        "rounded_limiting_row": "gh_total(21)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-86601634202831590753707222087/18889465931478580854784"
+  },
+  "stages_seconds": {
+    "generation": 0.008142380997014698,
+    "parse": 0.00574724000034621,
+    "metadata": 0.0025209580053342506,
+    "selection": 0.022009405998687726,
+    "export": 0.0035071279999101534,
+    "export_metadata": 0.002433604997349903,
+    "native_import": 0.003047532998607494,
+    "import_check": 0.006135719995654654,
+    "solve": 0.0149844010011293,
+    "verification": 0.012343621005129535
+  },
+  "global_optimality_independently_verified": false
+}

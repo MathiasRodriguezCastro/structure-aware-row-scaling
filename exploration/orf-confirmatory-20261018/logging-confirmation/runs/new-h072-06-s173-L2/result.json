@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h072-06",
+    "seed": 173,
+    "policy": "L2",
+    "id": "new-h072-06-s173-L2"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 173
+  },
+  "representation": "L2",
+  "base_sha256": "f32afc567f61c39ff1e8dd01bb849dfe613e61ab1ad11fc168afc7b951fd4f78",
+  "export_sha256": "6ca711e989fbc0b4379354cc068e4df9964608505cd26e7d9992dd3eeddcb09a",
+  "native_import": {
+    "rows": 2016,
+    "columns": 1224,
+    "nonzeros": 4535,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 4,
+    "work": 0.05770937625614356,
+    "nodes": 1.0,
+    "runtime": 0.07957696914672852,
+    "objective": -3894367.4274563678,
+    "bound": -3915640.3441857714
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 288,
+        "raw_max": 8.094094537320649e-14,
+        "rounded_max": 8.094094537320649e-14,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(57)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 72,
+        "raw_max": 1.900701818158268e-13,
+        "rounded_max": 1.900701818158268e-13,
+        "rounded_limiting_row": "a1_g4h_def(58)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 288,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 72,
+        "raw_max": 3.157329047098756e-07,
+        "rounded_max": 3.157329047098756e-07,
+        "rounded_limiting_row": "a1_balance(40)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 144,
+        "raw_max": 1.1368683772161603e-13,
+        "rounded_max": 1.1368683772161603e-13,
+        "rounded_limiting_row": "gen_menor_demanda(36)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-18832005336472810432317992083123/4835703278458516698824704"
+  },
+  "stages_seconds": {
+    "generation": 0.03263013099785894,
+    "parse": 0.029506855993531644,
+    "metadata": 0.00853929300501477,
+    "selection": 0.08392095899762353,
+    "export": 0.013358929005335085,
+    "export_metadata": 0.00883104699460091,
+    "native_import": 0.00648192399967229,
+    "import_check": 0.021768090002296958,
+    "solve": 0.07973504900292028,
+    "verification": 0.05064804499852471
+  },
+  "global_optimality_independently_verified": false
+}

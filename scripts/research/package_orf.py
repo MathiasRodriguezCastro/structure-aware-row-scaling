@@ -7,7 +7,7 @@ import re
 import shutil
 import unicodedata
 import zipfile
-from orf_config import ROOT, PAPER, ORF, OUT, VERSION, DATE, TITLE, PARENT, PARENT_DIR, sha
+from orf_config import ROOT, PAPER, ORF, OUT, VERSION, DATE, TITLE, PARENT, PARENT_DIR, FOLLOWUP, FOLLOWUP_ARCHIVE, sha
 
 FILES = ('main_orf.pdf','orf-editable-sources.zip','cover-letter.pdf','title-page.pdf','ESM_1.pdf','ESM_2.zip')
 EXTRAS = ('REPRODUCE.md','UPLOAD_INSTRUCTIONS.md','ONLINE_RESOURCE_CAPTIONS.txt',
@@ -76,12 +76,20 @@ def main():
             if p.is_file() and p.suffix in ('.tex','.pdf'):entries[p.relative_to(ORF).as_posix()]=p
     entries['README.md']='Current ORF editable sources. Run make in this directory with pdfLaTeX and BibTeX.\n'
     source_zip=OUT/'orf-editable-sources.zip';archive(source_zip,entries)
+    followup_validation=json.loads((FOLLOWUP/'VALIDATION.json').read_text())
+    assert followup_validation['status']=='passed' and followup_validation['MIP_calls']==360
+    logging_validation=json.loads((FOLLOWUP/'logging-confirmation/VALIDATION.json').read_text())
+    assert logging_validation['status']=='passed' and logging_validation['MIP_calls']==360
+    assert logging_validation['complete_native_logs']==360
+    followup_entries={p.relative_to(ROOT).as_posix():p for p in FOLLOWUP.rglob('*')
+        if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.zip')}
+    followup_zip=OUT/FOLLOWUP_ARCHIVE;archive(followup_zip,followup_entries)
     # Canonical editorial inputs and build tools, distinct from the scientific archive.
     revision={}
     roots=['README.md','CITATION.cff','.zenodo.json','LICENSE','DATA_LICENSE.md','Makefile',
            'paper/Makefile','paper/README.md','paper/main.tex','paper/supporting-information.tex',
            'paper/research-references.bib','paper/orf/Makefile','paper/orf/README.md',
-           'paper/orf/TEMPLATE_PROVENANCE.md','paper/orf/cover-letter.tex','paper/orf/title-page.tex','paper/orf/sn-jnl.cls','paper/orf/sn-basic.bst',
+           'paper/orf/TEMPLATE_PROVENANCE.md','paper/orf/REVISION_NOTES.md','paper/orf/cover-letter.tex','paper/orf/title-page.tex','paper/orf/sn-jnl.cls','paper/orf/sn-basic.bst',
            'paper/submission/orf/README.md','paper/submission/orf/SUBMISSION_CHECKLIST.md',
            'scripts/research/orf_config.py','scripts/research/build_orf.py',
            'scripts/research/package_orf.py','scripts/research/validate_orf.py','scripts/research/freeze_orf.py']
@@ -91,19 +99,24 @@ def main():
             if p.is_file() and p.suffix in ('.tex','.pdf'):revision[p.relative_to(ROOT).as_posix()]=p
     revision_zip=OUT/'orf-revision-sources.zip';archive(revision_zip,revision)
     snapshot={'version':VERSION,'date':DATE,'target':'Operations Research Forum','title':TITLE,
-        'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':0,
+        'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':720,
+        'prospective_primary_MIP_calls':360,'logging_confirmation_MIP_calls':360,
+        'new_exact_LP_attempts':96,'prospective_archive_sha256':sha(followup_zip),
+        'prospective_validation_sha256':sha(FOLLOWUP/'VALIDATION.json'),
         'scientific_parent':PARENT,'scientific_archive_sha256':sha(parent_archive),
         'scientific_parent_validation_sha256':sha(PARENT_DIR/'VALIDATION.json'),
         'current_sources_sha256':sha(source_zip),'canonical_revision_sha256':sha(revision_zip),
         'scientific_source_unchanged':True,
         'editorial_changes':['accuracy workflow first','practical framing and implications',
             'Springer template and numbered bibliography','Online Resource names and reproduction instructions',
-            'new cover letter and ORF declarations/portal preparation'],
+            'new cover letter and ORF declarations/portal preparation',
+            'prospective 24-scenario validation, 360 primary MIP calls, 360 logging confirmations and rational references',
+            'finite-export error bound, concise discussion, workflow figure and uncluttered author line'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
     captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
         'exact arithmetic checks, numerical limitations and reproduction instructions.\n\n'
-        'Online Resource 2: Current ORF sources and the unchanged audited scientific code/data '
+        'Online Resource 2: Current ORF sources, prospective scenario evidence and the unchanged audited scientific code/data '
         'archive, including generators, scaling software, model exports, native logs, saved '
         'solutions, rational witnesses and independent replay programs. Inheritance and '
         'file checksums identify the exact versions.\n')
@@ -120,7 +133,10 @@ ESM_1.pdf is Online Resource 1. ESM_2.zip is the complete Online Resource 2.
 The latter contains the exact {PARENT} scientific-evidence ZIP and its validation
 record, current editable ORF sources, canonical editorial sources and SNAPSHOT.json.
 Historical OMS filenames identify provenance. The current article, letter and
-resource captions are addressed to ORF. No new optimizer experiments were added.
+resource captions are addressed to ORF. A separately identified prospective study
+adds 24 new within-family scenarios, 360 primary MIP calls, a registered 360-call
+logging confirmation and 96 exact LP attempts. The first campaign is retained
+with its suppressed native traces; the confirmation supplies complete logs.
 
 ## Reproduce the evidence
 
@@ -147,6 +163,26 @@ residuals, paired work and complete-process time. Analysis regenerates 42 tables
 and three figures. The scientific archive's paper build preserves its historical
 OMS presentation; compile the ORF source bundle for the current documents.
 
+## Replay the prospective study
+
+Extract {FOLLOWUP_ARCHIVE} over the extracted scientific repository, preserving
+its exploration/ path. Its CONTENTS.sha256 lists the additional files. From that
+repository root run:
+
+```sh
+python3 exploration/orf-confirmatory-20261018/check.py
+python3 exploration/orf-confirmatory-20261018/check.py --logging-confirmation
+python3 exploration/orf-confirmatory-20261018/check_export_bound.py
+```
+
+These commands check both sets of 360 saved MIP outcomes, complete confirmation
+logs, endpoint/point replication, factor interventions, rational
+reference certificates and the elementary finite-export bound without commercial
+solver calls. The fixed protocol retains known parent data, new scenario
+perturbations and three horizon sizes. This is prospective within-family evidence;
+it is not a new independent application. The 96 rational LP acquisition attempts
+are separately costed and do not certify every returned floating-point candidate.
+
 ## Build the current documents
 
 Extract orf-editable-sources.zip separately, verify CONTENTS.sha256 and run `make`.
@@ -172,6 +208,7 @@ own notices. Manuscript text and PDFs are outside the code/data licenses.
 '''
     esm=OUT/'ESM_2.zip'
     archive(esm,{'README.md':guide,'SNAPSHOT.json':OUT/'SNAPSHOT.json',
+        FOLLOWUP_ARCHIVE:followup_zip,
         SCIENCE:parent_archive,'SCIENTIFIC_PARENT_VALIDATION.json':PARENT_DIR/'VALIDATION.json',
         'orf-editable-sources.zip':source_zip,'orf-revision-sources.zip':revision_zip,
         'ONLINE_RESOURCE_CAPTIONS.txt':captions,'CITATION.cff':ROOT/'CITATION.cff',

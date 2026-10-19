@@ -1,6 +1,6 @@
 # Operations Research Forum manuscript
 
-Current editorial version: **v1.4.0-orf-submission**.
+Current editorial version: **v1.4.1-orf-submission**.
 
 **Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational
 and Software Study** — Mathias Rodríguez Castro.
@@ -14,9 +14,9 @@ The ORF adaptation leads with accuracy-aware model generation and verification,
 followed by computational evaluation and mechanism attribution. It adds practical
 interpretation of original-unit budgets, returned-point checks and preparation
 overhead. Mathematical statements, proofs, experimental records and numerical
-tables are preserved. No additional optimizer experiments are introduced.
+tables are preserved. A separate prospective within-family study adds 24 new parameter scenarios, 360 primary MIP calls plus 360 logging confirmations and 96 rational LP attempts; known parent data and plant structure are retained. See `exploration/orf-confirmatory-20261018/RESULTADOS.md` for all outcomes and qualifications.
 
-`editorial/` contains the canonical ORF abstract, opening, practical implications,
+`editorial/` contains the canonical ORF abstract, opening, workflow figure, concise discussion, prospective results, export-error accounting, practical implications,
 availability and reproduction instructions. `scripts/research/build_orf.py` applies
 them to the preserved scientific body in `paper/main.tex`, generates
 `main_orf.tex` and `ESM_1.tex`, and copies shared inputs. Edit those editorial
@@ -32,3 +32,7 @@ format. The frozen OMS delivery remains unchanged.
 See [submission preparation](../submission/orf/README.md). The current local
 snapshot has no separately assigned Zenodo DOI; the historical baseline DOI does
 not identify the later experiments. No journal submission has been performed.
+
+The 19 October logging amendment retains the first campaign and adds a complete
+360-call native-trace confirmation. These are repeated assignments, with no new
+models or seeds. Both sets of points are independently checked.

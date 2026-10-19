@@ -1,0 +1,113 @@
+\section{Prospective scenario validation}
+\label{sec:orf-prospective-supplement}
+This local protocol was frozen before optimization. It fixes Budget-L2 at
+0.01 MW and 100 m\textsuperscript{3}, with exactly the previous kernel,
+coefficient window, integer allowance and activation export reserve. No budget
+or solver parameter is tuned on these outcomes. Eight scenarios per horizon
+(24,72,168 hours) use contiguous windows of the six known clean inputs, in
+round-robin order, and a fixed PRNG. Inflow receives independent hourly factors
+in $[0.9,1.1]$; the two demand series receive the same hourly factor, preserving
+local demand below total demand. The original generator and plant parameters
+are unchanged. The 24 new exports retain $4H$ binary variables, $17H$ columns
+and $28H$ rows. This tests prospective parameter transfer conditional on known
+parent structure, not external validation or an observational holdout.
+
+The 360 assignments use seeds 101,137,173 and five policies in a frozen shuffled
+order, sequential fresh processes on a shared host. Common settings are Gurobi
+13.0.2, four threads, 120 s, 1\% requested gap, automatic presolve,
+FeasibilityTol=$10^{-6}$, IntFeasTol=$10^{-9}$, ScaleFlag=$-1$ and default
+IntegralityFocus/NumericFocus. Base-tight changes only FeasibilityTol to
+$10^{-9}$; L2-NF3 changes only NumericFocus to 3. No starts are supplied.
+Every candidate and status is retained. All policies return points and native
+completion in 72/72 assignments; native completion is not a certificate.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Prospective scenarios. Budgets include raw and integer-rounded points;
+B/G are detected bound/1\%-completion contradictions against exact feasible
+witnesses of the actual native export. No missing witness contrasts occur.}
+\label{tab:orf-prospective-accuracy}
+\begin{tabular}{lrrr}\toprule
+Policy & Budgets & B/G & Export hypothesis\\\midrule
+Base & 72/72 & 0/0 & 70/72\\
+Base-tight & 72/72 & 0/0 & 72/72\\
+L2 & 72/72 & 7/6 & 72/72\\
+L2-NF3 & 72/72 & 0/0 & 72/72\\
+Budget-L2 & 72/72 & 1/0 & 72/72\\
+\bottomrule\end{tabular}\end{table}
+All original-unit checks use exact rational expressions in the supplied
+binary64 data and points. The nominal exported tolerance is distinguished from
+the observed residual: two Base points exceed the $10^{-6}$ physical-row
+hypothesis slightly but still satisfy their original budgets. No policy gains
+additional primal recoveries here. The contract changes 8,448 factors over the
+24 models, always activation rows (14.286\% of each model's rows). The largest
+Budget/L2 factor ratio per model ranges from 8.242 to 10.694. There are no
+incompatible requirements. These measurements locate the changed representation,
+without identifying a proprietary solver operation as its cause.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Paired geometric means for Budget-L2/control. Each horizon has eight
+scenarios and three seeds; all rows include adverse outcomes. Time covers the
+complete fresh process, including generation, selection, export, import,
+verification and persistence. Certificate acquisition is separate.}
+\label{tab:orf-prospective-performance}
+\begin{tabular}{lrrrr}\toprule
+Horizon & $W/ W_{\rm Base}$ & $W/W_{\rm L2}$ & $T/T_{\rm Base}$ & $T/T_{\rm L2}$\\\midrule
+24 & 0.517 & 0.944 & 0.945 & 1.038\\
+72 & 0.416 & 1.053 & 0.874 & 1.017\\
+168 & 0.349 & 0.811 & 0.613 & 0.936\\
+All & 0.422 & 0.931 & 0.797 & 0.996\\
+\bottomrule\end{tabular}\end{table}
+Across all 72 pairs, Budget-L2/Base-tight work and time ratios are 0.170 and
+0.643; Budget-L2/NF3 ratios are 0.476 and 1.031. There are only 24 scenarios,
+not 72 independent models. Removing pairs with a contradiction in either arm
+leaves 71 Base comparisons (work/time 0.419/0.796), 71 Base-tight
+(0.168/0.641), 64 L2 (0.971/1.023), and 71 NF3 (0.472/1.028).
+This descriptive screen does not certify the retained gaps. Candidate cost
+deterioration reaches 1.020\% against Base/Base-tight and 0.778\% against L2.
+Thus the six-known-model claim of deterioration below 0.1\% does not extend to
+this prospective sample. Lower work against Base is replicated, but a broad
+incremental speed advantage over L2 is not.
+
+For new-h072-08, seed 101, Budget-L2 reports a lower bound of
+$-531914.2655652602$. An exactly feasible point of that actual export has cost
+$-534369.9691107974$, contradicting the bound by 2455.7035455372 units.
+It does not trigger the separate 1\%-completion flag. This is an adverse outcome
+under the frozen policy, not a reason to retune it.
+
+The reference campaign attempts one unfixed global rational LP per original
+model and one integer-pattern repair per representation (Base,L2,Budget-L2),
+each at 30 s. For each representation the lowest-cost saved candidate selects
+the pattern, with a lexical tie break; no alternative patterns are tried.
+All 96 LP calls are recorded. Independent reconstruction checks 72 feasible
+integer witnesses, one per native representation/model, and 17 global LP dual
+lower bounds. Twelve Base references have certified relative interval width
+at most 1\%; none has $L=U$. Seven SoPlex global-LP attempts terminate unknown
+without usable certificates, rather than necessarily exhausting the time limit.
+The complete reference campaign costs 50.90 s additional to the MIP comparisons.
+These repaired references do not certify every returned floating-point point.
+
+The archive also reports a descriptive checked-completion PAR10: use complete
+time for a completed, budget-passing point with a known witness and no detected
+contradiction; otherwise assign 1200 s. This additional score was not an original
+prespecified endpoint. The means for Base, Base-tight, L2, NF3 and Budget-L2
+are 1.860,2.431,117.623,1.095 and 17.696 s. The raw observations and exclusions
+remain available. No one score replaces the separate accuracy, quality and
+effort comparisons.
+
+\paragraph{Native logging confirmation}
+The packaging audit detected that the first campaign inherited OutputFlag=0,
+which suppressed native traces; its API outcomes, saved points and header logs
+remain intact. A registered amendment repeats all 360 assignments with
+OutputFlag=1, changing no optimization parameter, model or policy. Both campaigns
+are supplied: 720 MIP calls on the same 24 scenarios and three seeds, not an
+enlarged independent sample. All confirmation traces contain complete optimizer
+output and are checked against the saved endpoints.
+The confirmation reproduces 360/360 saved points,
+360/360 work values and 360/360 endpoint sets exactly.
+Every repeated point is checked rationally; the unchanged exports permit reuse
+of the same witnesses without new LP acquisition. Work comparisons and adverse
+bound outcomes remain available for both campaigns. Complete-process time is
+reported separately for this technical replication on the shared host.
+Budget-L2 time ratios are 0.787 against Base, 0.637 against Base-tight, 0.986 against L2, 1.008 against L2-NF3.

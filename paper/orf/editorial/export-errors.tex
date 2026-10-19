@@ -1,0 +1,32 @@
+\section{Finite-export residual accounting}
+\label{sec:orf-export-errors}
+An admissible factor need not give exactly proportional binary64 products.
+The following elementary bound makes the required reserve explicit without
+changing the policy used in the experiments. Let
+$\widetilde a=\alpha a+e_a$ and $\widetilde b=\alpha b+e_b$ be the actual
+written row, with $\alpha>0$. If its observed violation is at most $\epsilon$,
+then
+\begin{equation}\label{eq:orf-export-transfer}
+ (a^Tx-b)_+\le
+ \frac{\epsilon+|e_a^Tx|+|e_b|}{\alpha}.
+\end{equation}
+Indeed, $\alpha(a^Tx-b)=\widetilde a^Tx-\widetilde b-e_a^Tx+e_b$;
+taking positive parts and using the triangle inequality proves the bound.
+The same argument with absolute values covers equality rows.
+
+If known finite bounds give $|x_j|\le X_j$ wherever $e_{a,j}\ne0$, set
+$B(\alpha)=\sum_j|e_{a,j}|X_j+|e_b|$. With the original-unit integer-rounding
+allowance $E=\sum_{j\in J}|a_j|\eta_j$, a sufficient condition is
+\begin{equation}\label{eq:orf-export-contract}
+ \epsilon+B(\alpha)+\alpha E\le\alpha\delta.
+\end{equation}
+This accounts for the products and decimal serialization actually imported by
+the solver, rather than only for a nominal floating-point multiplication.
+Errors can be computed as exact rational differences of the input and written
+binary64 data. Because $B$ depends on the selected factor, this is a candidate
+check, not a claim that arbitrary-factor feasibility is the same closed
+interval as in the main text's real-factor characterization. Exact dyadic export has $B=0$ and recovers
+the previous contract. Without suitable finite bounds, the pointwise form
+\eqref{eq:orf-export-transfer} remains available after solving; no uniform
+reserve is asserted. Neither form validates a dual bound or replaces the
+original-point audit.

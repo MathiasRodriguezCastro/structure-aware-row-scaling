@@ -18,8 +18,9 @@ Unmodified files retained from that ZIP:
 Publisher copyright and LPPL notices are retained. The manuscript selects
 `pdflatex,sn-basic,Numbered`. Text and bibliography dimensions follow the class.
 No publisher files were edited. The generated manuscript uses the underlying
-publisher table float for boxed table inputs, and a linked ORCID text label in
-place of the logo image absent from the template ZIP.
+publisher table float for boxed table inputs. The main author line omits the
+manual ORCID text marker; the complete identifier is supplied on the separate
+title page and in the submission metadata. No missing logo image is required.
 
 Journal instructions and scope consulted on the same date:
 https://link.springer.com/journal/43069/submission-guidelines

@@ -1,0 +1,89 @@
+
+Gurobi 13.0.2 (linux64) logging started Mon Oct 19 00:30:46 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/orf-confirmatory-20261018/logging-confirmation/runs/new-h072-01-s137-Budget-L2/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter Presolve to value -1
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-09
+Set parameter ScaleFlag to value -1
+Set parameter IntegralityFocus to value 0
+Set parameter NumericFocus to value 0
+Set parameter Seed to value 137
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  137
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 2016 rows, 1224 columns and 4535 nonzeros (Min)
+Model fingerprint: 0x8ada0d56
+Model has 145 linear objective coefficients
+Variable types: 936 continuous, 288 integer (288 binary)
+Coefficient statistics:
+  Matrix range     [1e-08, 3e+01]
+  Objective range  [1e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [3e+00, 4e+05]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 8.915195e+07
+Presolve removed 389 rows and 154 columns
+Presolve time: 0.02s
+Presolved: 1627 rows, 1070 columns, 4038 nonzeros
+Variable types: 816 continuous, 254 integer (254 binary)
+
+Root relaxation: objective -2.079453e+05, 900 iterations, 0.01 seconds (0.01 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -207945.34    0  163 8.9152e+07 -207945.34   100%     -    0s
+H    0     0                    -184759.9271 -207945.34  12.5%     -    0s
+H    0     0                    -184798.9913 -207945.34  12.5%     -    0s
+     0     0 -207552.01    0  202 -184798.99 -207552.01  12.3%     -    0s
+     0     0 -207387.41    0  189 -184798.99 -207387.41  12.2%     -    0s
+     0     0 -207173.02    0  189 -184798.99 -207173.02  12.1%     -    0s
+     0     0 -207150.96    0  190 -184798.99 -207150.96  12.1%     -    0s
+     0     0 -206621.57    0  112 -184798.99 -206621.57  11.8%     -    0s
+     0     0 -206590.42    0  119 -184798.99 -206590.42  11.8%     -    0s
+     0     0 -206443.04    0  136 -184798.99 -206443.04  11.7%     -    0s
+     0     0 -206422.09    0  136 -184798.99 -206422.09  11.7%     -    0s
+     0     0 -206405.35    0  132 -184798.99 -206405.35  11.7%     -    0s
+     0     0 -206396.89    0  132 -184798.99 -206396.89  11.7%     -    0s
+     0     0 -206396.89    0  130 -184798.99 -206396.89  11.7%     -    0s
+     0     0 -206396.89    0  115 -184798.99 -206396.89  11.7%     -    0s
+H    0     0                    -190814.3865 -206396.89  8.17%     -    0s
+     0     0 -206396.89    0   98 -190814.39 -206396.89  8.17%     -    0s
+     0     0 -206396.89    0   95 -190814.39 -206396.89  8.17%     -    0s
+     0     0 -206396.89    0   95 -190814.39 -206396.89  8.17%     -    0s
+     0     0 -206369.30    0   42 -190814.39 -206369.30  8.15%     -    0s
+     0     0 -206288.77    0   39 -190814.39 -206288.77  8.11%     -    0s
+H    0     0                    -206108.1589 -206288.77  0.09%     -    0s
+
+Cutting planes:
+  Gomory: 60
+  Implied bound: 6
+  MIR: 8
+  Flow cover: 5
+  Relax-and-lift: 3
+
+Explored 1 nodes (3077 simplex iterations) in 0.35 seconds (0.26 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 6: -206108 -206108 -190814 ... 8.9152e+07
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -2.061081588625e+05, best bound -2.062887683841e+05, gap 0.0876%

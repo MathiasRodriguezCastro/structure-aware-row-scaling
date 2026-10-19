@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h072-08",
+    "seed": 137,
+    "policy": "L2-NF3",
+    "id": "new-h072-08-s137-L2-NF3"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 3,
+    "Seed": 137
+  },
+  "representation": "L2",
+  "base_sha256": "2ba626550912c3a9bfad80ff2073c36c334154307ab48fe965fec67abcccd06a",
+  "export_sha256": "dc5a99d54c63dbf0e67109ab4b7f178be9e0fd8e7c23b4b85c084994a5b9cf02",
+  "native_import": {
+    "rows": 2016,
+    "columns": 1224,
+    "nonzeros": 4535,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 7,
+    "work": 0.359640979070613,
+    "nodes": 73.0,
+    "runtime": 0.19626712799072266,
+    "objective": -537394.8117727282,
+    "bound": -537456.4849160983
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 288,
+        "raw_max": 1.0685259197553775e-13,
+        "rounded_max": 1.0685259197553775e-13,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(17)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 72,
+        "raw_max": 1.0591527654923993e-13,
+        "rounded_max": 1.0591527654923993e-13,
+        "rounded_limiting_row": "a1_g4h_def(20)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 288,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 72,
+        "raw_max": 1.2079544831067324e-07,
+        "rounded_max": 1.2079544831067324e-07,
+        "rounded_limiting_row": "a1_balance(1)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 144,
+        "raw_max": 5.684341886080802e-14,
+        "rounded_max": 5.684341886080802e-14,
+        "rounded_limiting_row": "gh_total(5)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-41578909649855667359226606260065/77371252455336267181195264"
+  },
+  "stages_seconds": {
+    "generation": 0.016248585998255294,
+    "parse": 0.023419950004608836,
+    "metadata": 0.0074004959969897754,
+    "selection": 0.0669879939960083,
+    "export": 0.01026795700454386,
+    "export_metadata": 0.007171395998739172,
+    "native_import": 0.005407476994150784,
+    "import_check": 0.017008006005198695,
+    "solve": 0.196378642001946,
+    "verification": 0.04036928699497366
+  },
+  "global_optimality_independently_verified": false
+}

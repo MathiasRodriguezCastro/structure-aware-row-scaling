@@ -1,0 +1,90 @@
+
+Gurobi 13.0.2 (linux64) logging started Mon Oct 19 00:23:29 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/orf-confirmatory-20261018/logging-confirmation/runs/new-h168-02-s173-Budget-L2/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 120
+Set parameter MIPGap to value 0.01
+Set parameter Presolve to value -1
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-09
+Set parameter ScaleFlag to value -1
+Set parameter IntegralityFocus to value 0
+Set parameter NumericFocus to value 0
+Set parameter Seed to value 173
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  120
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  173
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 4704 rows, 2856 columns and 10583 nonzeros (Min)
+Model fingerprint: 0x1d076604
+Model has 337 linear objective coefficients
+Variable types: 2184 continuous, 672 integer (672 binary)
+Coefficient statistics:
+  Matrix range     [1e-08, 6e+01]
+  Objective range  [3e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [4e+01, 4e+05]
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 1.360834e+08
+Presolve removed 796 rows and 315 columns
+Presolve time: 0.08s
+Presolved: 3908 rows, 2541 columns, 9361 nonzeros
+Variable types: 1903 continuous, 638 integer (638 binary)
+
+Root relaxation: objective -8.639324e+05, 2852 iterations, 0.11 seconds (0.10 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -863932.43    0  324 1.3608e+08 -863932.43   101%     -    0s
+H    0     0                    -804821.8905 -863932.43  7.34%     -    0s
+     0     0 -862820.02    0  342 -804821.89 -862820.02  7.21%     -    0s
+     0     0 -862256.62    0  334 -804821.89 -862256.62  7.14%     -    0s
+     0     0 -861915.54    0  335 -804821.89 -861915.54  7.09%     -    0s
+     0     0 -861829.64    0  335 -804821.89 -861829.64  7.08%     -    0s
+     0     0 -858705.17    0  216 -804821.89 -858705.17  6.70%     -    0s
+H    0     0                    -831188.8653 -858654.87  3.30%     -    0s
+     0     0 -858654.87    0  217 -831188.87 -858654.87  3.30%     -    0s
+     0     0 -858654.87    0  217 -831188.87 -858654.87  3.30%     -    0s
+     0     0 -858651.86    0  223 -831188.87 -858651.86  3.30%     -    0s
+     0     0 -858631.00    0  223 -831188.87 -858631.00  3.30%     -    0s
+     0     0 -858631.00    0  223 -831188.87 -858631.00  3.30%     -    0s
+     0     0 -858631.00    0  226 -831188.87 -858631.00  3.30%     -    0s
+     0     0 -858620.12    0  226 -831188.87 -858620.12  3.30%     -    0s
+     0     0 -858618.95    0  226 -831188.87 -858618.95  3.30%     -    0s
+     0     0 -858618.95    0  226 -831188.87 -858618.95  3.30%     -    0s
+     0     0 -858618.95    0  226 -831188.87 -858618.95  3.30%     -    1s
+     0     2 -858618.95    0  226 -831188.87 -858618.95  3.30%     -    1s
+H  118    53                    -833207.3266 -857272.96  2.89%   8.0    1s
+*  524   231             113    -852720.9369 -857272.96  0.53%   4.7    1s
+*  565   231             114    -853271.4676 -857272.96  0.47%   4.6    1s
+
+Cutting planes:
+  Gomory: 120
+  Implied bound: 150
+  MIR: 5
+  Flow cover: 103
+  RLT: 66
+  Relax-and-lift: 1
+
+Explored 568 nodes (7448 simplex iterations) in 1.40 seconds (0.91 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 7: -853271 -853271 -852721 ... 1.36083e+08
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -8.532714676466e+05, best bound -8.572729631379e+05, gap 0.4690%

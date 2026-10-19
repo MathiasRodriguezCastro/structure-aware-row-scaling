@@ -1,10 +1,24 @@
 \section{Reproduction and artifact layout}
 Online Resource~2 is the complete code/data package for
-\path{v1.4.0-orf-submission}. It contains the unchanged scientific-evidence archive
+\path{v1.4.1-orf-submission}. It contains the unchanged scientific-evidence archive
 \path{v1.3.17-oms-submission}, its validation record, the current ORF editable
 sources and a checksum-based inheritance record. The older editorial files inside
 the scientific archive identify its provenance; the current article and this
 supplement are supplied in the ORF source bundle.
+
+The separate \texttt{prospective-scenarios-orf-20261018.zip} adds 24 new parameter
+scenarios, 360 primary MIP calls plus a 360-call logging confirmation, rational reference acquisition and their independent
+checks. After extracting the inherited scientific archive, extract this ZIP
+over the same root and run, without a commercial solver license:
+\begin{lstlisting}
+python3 exploration/orf-confirmatory-20261018/check.py
+python3 exploration/orf-confirmatory-20261018/check.py --logging-confirmation
+python3 exploration/orf-confirmatory-20261018/check_export_bound.py
+\end{lstlisting}
+Its protocol distinguishes new generated scenarios from known parent data and
+from an independent application. Native solver logs and every saved point are
+retained. The rational certificates are reference points and lower bounds,
+rather than certificates of every returned floating-point candidate.
 
 Extract \texttt{scientific-evidence-oms-v1.3.17.zip} into an empty directory.
 From its root, verify \texttt{CONTENTS.sha256}, install the dependencies in
@@ -55,5 +69,5 @@ the historical scientific archive preserves the preceding OMS build recipe.
 
 Optional fresh experiments are documented in the scientific archive's README and
 write to separate output directories. Commercial-solver arms require the
-corresponding licenses. The current adaptation adds no optimization runs and
-has no separate Zenodo version DOI.
+corresponding licenses. The prospective study records its additional calls
+separately. The current snapshot has no separate Zenodo version DOI.

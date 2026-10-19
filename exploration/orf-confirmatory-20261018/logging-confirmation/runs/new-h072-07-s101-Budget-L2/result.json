@@ -1,0 +1,98 @@
+{
+  "job": {
+    "instance": "new-h072-07",
+    "seed": 101,
+    "policy": "Budget-L2",
+    "id": "new-h072-07-s101-Budget-L2"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 120.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "IntegralityFocus": 0,
+    "NumericFocus": 0,
+    "Seed": 101
+  },
+  "representation": "Budget-L2",
+  "base_sha256": "cb13447cf9dab050778faab1d1dc481776f7b02c8566db9dbca90ab4fa3a997c",
+  "export_sha256": "257c27f70a0b57488b5ed93435ea16cf42d1d785c7453e9317518dcc9b2ac197",
+  "native_import": {
+    "rows": 2016,
+    "columns": 1224,
+    "nonzeros": 4535,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "outcome": {
+    "status": 2,
+    "solutions": 7,
+    "work": 0.2860527102450793,
+    "nodes": 1.0,
+    "runtime": 0.40632104873657227,
+    "objective": -218380.35789112415,
+    "bound": -218791.35117301592
+  },
+  "checks": {
+    "physical": [
+      {
+        "group": "Production envelopes",
+        "unit": "MW",
+        "rows": 288,
+        "raw_max": 1.0570211689368256e-13,
+        "rounded_max": 1.0570211689368256e-13,
+        "rounded_limiting_row": "a1_salto_grande_tangente_2(56)"
+      },
+      {
+        "group": "Plant generation definitions",
+        "unit": "MW",
+        "rows": 72,
+        "raw_max": 2.3447910280083306e-13,
+        "rounded_max": 2.3447910280083306e-13,
+        "rounded_limiting_row": "a1_g4h_def(6)"
+      },
+      {
+        "group": "Volume-dependent activation",
+        "unit": "m3",
+        "rows": 288,
+        "raw_max": 0.0,
+        "rounded_max": 0.0,
+        "rounded_limiting_row": ""
+      },
+      {
+        "group": "Water balances",
+        "unit": "m3",
+        "rows": 72,
+        "raw_max": 2.766901161521673e-07,
+        "rounded_max": 2.766901161521673e-07,
+        "rounded_limiting_row": "a1_balance(2)"
+      },
+      {
+        "group": "Power identities and demand cap",
+        "unit": "MW",
+        "rows": 144,
+        "raw_max": 2.842170943040401e-14,
+        "rounded_max": 2.842170943040401e-14,
+        "rounded_limiting_row": "gh_total(14)"
+      }
+    ],
+    "max_integer_violation": 0.0,
+    "point_objective_exact": "-33792723603361703212460338884477/154742504910672534362390528"
+  },
+  "stages_seconds": {
+    "generation": 0.016453714000817854,
+    "parse": 0.02306170900556026,
+    "metadata": 0.006722866004565731,
+    "selection": 0.09415980199992191,
+    "export": 0.010345447997679003,
+    "export_metadata": 0.006999452001764439,
+    "native_import": 0.0051679020034498535,
+    "import_check": 0.016752889001509175,
+    "solve": 0.40645154700177955,
+    "verification": 0.06630659499933245
+  },
+  "global_optimality_independently_verified": false
+}

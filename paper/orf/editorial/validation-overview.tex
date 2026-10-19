@@ -1,0 +1,22 @@
+\paragraph{Computational validation.}
+The evaluation separates conditioning, solver effort, factor admissibility and
+verified accuracy (\cref{sec:experiments,sec:results}). It combines 306 dispatch
+models, kernel-matched and Ruiz controls, enumerated stress tests on three
+solvers, and batch-scheduling transfer. The initial physical audit leaves factors
+unchanged; an activation follow-up changes them and supplies exact feasible
+witnesses and strong numerical controls. Directed comparisons then test the
+favorable budget settings against the unscaled model and account for complete
+preparation cost. These are within-family results, not equally certified MILP
+gaps. Exact global LP bounds and integer witnesses provide separate reference
+intervals, including a certified dispatch optimum (Online Resource~1, Table~S19).
+The directed and prospective accuracy comparisons use demand-inversion-free
+inputs. Defective historical scenarios are identified and retained as numerical
+MIPs, with limited operational interpretation.
+
+Residual transfer and accuracy-based scaling are established practice
+\cite{gurobiExternalScaling,pritchett2017scaling}. The software contribution
+connects budget declaration, admissible selection or explicit abstention, checked
+export and returned-point verification. Its Python selector and isolated C++
+integration give identical factors and exports. The tests retain failures,
+contradicted bounds and preparation overhead: checked precision and computational
+benefit are distinct outcomes.

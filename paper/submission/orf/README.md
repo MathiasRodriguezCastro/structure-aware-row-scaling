@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.4.0-orf-submission**, 18 October 2026.
+Local version: **v1.4.1-orf-submission**, 19 October 2026.
 Proposed type: Original Research Article.
 
 | File | Role |
@@ -39,7 +39,7 @@ archive. No original generator or stored experiment is modified by this adaptati
 The ORF audit checks unchanged mathematical statements, proofs, displayed
 formulae and numerical tables against the scientific source. It also verifies
 the identity of the inherited archive and regenerates the final 42 tables and
-three analysis figures from its saved data. No new research MILPs are solved.
+three analysis figures from its saved data. Replay solves no research MILPs. The separate prospective archive records 360 new MIP calls and 96 exact LP attempts on 24 new parameter scenarios, and is checked by an additional license-free rational replay.
 
 The generated portal fields and separate upload roles are preparation material;
 exact portal categories and limits are confirmed at upload. The author must enter

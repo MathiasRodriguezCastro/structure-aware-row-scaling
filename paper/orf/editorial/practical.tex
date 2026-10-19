@@ -1,22 +1,14 @@
 \subsection{Implications for model developers}
 \label{subsec:orf-practical}
-For a model generator, the contract is useful when row residuals have an application
-meaning that coefficient magnitudes alone do not express. Developers should retain
-the original rows and unit conversions, declare the budgets, and record whether
-selection changes a proposed factor or finds incompatible requirements. Unchanged
-factors still provide an explicit interpretation of accuracy; they do not demonstrate
-a computational benefit from the budget.
-
-Returned-point verification remains necessary. The exported-residual hypotheses of
-the contract must be checked on the actual written representation, together with
-integer rounding, bounds and original-unit residuals. A passing primal audit and the
-absence of a detected bound contradiction answer narrower questions than a global
-mixed-integer optimality certificate.
+Retain original rows and unit conversions, declare application-unit budgets, and
+record changed factors and incompatible requirements. Check the returned point
+against the actual written rows and then against original rows, integer domains
+and bounds. Primal accuracy and the absence of detected bound contradictions
+remain distinct from a global mixed-integer optimality certificate.
 
 Deployment also requires a complete-process comparison with no external scaling and
 with strong numerical controls. At the tested 100\,m\textsuperscript{3} setting,
 Table~\ref{tab:base-controls-time} shows that preparation is recovered on models
 001, 027 and 046, but increases total time on 005, 022 and 031. This suggests measuring
 preparation and solve costs on representative workloads before enabling a policy.
-It does not supply a predictive timing threshold for unseen models. Conditioning
-diagnostics and the lower solver work observed here cannot replace that measurement.
+It does not supply a predictive timing threshold for unseen models.
