@@ -1,0 +1,64 @@
+{
+  "parent_id": "sgtm-v1_sgtm_000415",
+  "family": "sgtm",
+  "role": "confirmation",
+  "horizon": 360,
+  "parent_sha256": "ec9970dbb937141f6d31cd5f18d02facc7d38ec6e075ffe4ce09592c707dedae",
+  "input_sha256": "b0fc18f8e6cfec8b40aa321bf7ae6aa4f0a93ccd280c6de6c380f7728b1393a2",
+  "base_sha256": "0dcff13041d6d1ff60a717f365c8f1686b13165df0ff082143303268222dcb05",
+  "rows": 10080,
+  "columns": 6120,
+  "integer_columns": 1440,
+  "physical_rows": 4320,
+  "physical_groups": {
+    "Production envelopes": 1440,
+    "Plant generation definitions": 360,
+    "Volume-dependent activation": 1440,
+    "Water balances": 360,
+    "Power identities and demand cap": 720
+  },
+  "temporal": {
+    "series": 3,
+    "demand_coherent": true,
+    "same_initial_state": true,
+    "window_start": 0,
+    "temporal_interpolation": false,
+    "terminal_function": "fixed original continuation function across horizons"
+  },
+  "policies": {
+    "L2": {
+      "incompatible": [],
+      "incompatible_count": 0,
+      "projected_rows": 1440,
+      "max_integer_rounding_reserve_m3": 0.0,
+      "changed_from_L2": 0,
+      "export_sha256": "bfe72323cc99cd529183b7fcd530eca87832bc626b49d696529745c1098e9487",
+      "equivalence": {
+        "positive_row_factors": true,
+        "ideal_whole_row_equivalence": true,
+        "actual_binary64_products_checked": 32759,
+        "max_relative_product_error": 1.1032726669845591e-16,
+        "exact_proportionality_asserted": false,
+        "objective_bounds_integer_domains_byte_identical": true
+      }
+    },
+    "Budget-L2": {
+      "incompatible": [],
+      "incompatible_count": 0,
+      "projected_rows": 1440,
+      "max_integer_rounding_reserve_m3": 13.9877639359664,
+      "changed_from_L2": 1440,
+      "export_sha256": "be3ea3660ffc5396538ebced36078d240c2ec0005ef348d7dfcb010f86865643",
+      "equivalence": {
+        "positive_row_factors": true,
+        "ideal_whole_row_equivalence": true,
+        "actual_binary64_products_checked": 32759,
+        "max_relative_product_error": 1.1032726669845591e-16,
+        "exact_proportionality_asserted": false,
+        "objective_bounds_integer_domains_byte_identical": true
+      }
+    }
+  },
+  "preparation_seconds": 1.9394956609999099,
+  "no_optimization_calls": true
+}
