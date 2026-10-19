@@ -1,5 +1,5 @@
 {
-  "pilot_plan_sha256": "245287ac06b0b1d73105a720af388dea805652a6488efb0fc359f8b0092cecd7",
+  "pilot_plan_sha256": "df04cc0c4cfcbf5aa0a2977f0b48f00a1810a433c15ddf4cc1d77d27c58ae7b5",
   "remote_repository": "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
   "jobs": {
     "deployment": {
@@ -11,25 +11,29 @@
       "job_id": "6068545",
       "submitted_utc": "2026-10-19T12:39:42.008896+00:00"
     },
-    "recheck": {
-      "job_id": "6068576",
-      "submitted_utc": "2026-10-19T12:44:59.029752+00:00"
-    },
     "references": {
       "job_id": "6068580",
       "submitted_utc": "2026-10-19T12:45:48.913724+00:00"
     },
+    "license_recheck": {
+      "job_id": "6068576",
+      "submitted_utc": "2026-10-19T12:44:59.029752+00:00"
+    },
+    "recheck": {
+      "job_id": "6069320",
+      "submitted_utc": "2026-10-19T19:35:41.340678+00:00"
+    },
     "pilot": {
-      "job_id": "6068582",
-      "submitted_utc": "2026-10-19T12:45:50.039384+00:00"
+      "job_id": "6069328",
+      "submitted_utc": "2026-10-19T19:44:40.622734+00:00"
     },
     "collection": {
-      "job_id": "6068583",
-      "submitted_utc": "2026-10-19T12:45:51.063759+00:00"
+      "job_id": "6069330",
+      "submitted_utc": "2026-10-19T19:44:43.025268+00:00"
     },
     "replay": {
-      "job_id": "6068584",
-      "submitted_utc": "2026-10-19T12:45:51.985535+00:00"
+      "job_id": "6069331",
+      "submitted_utc": "2026-10-19T19:44:43.935857+00:00"
     }
   },
   "confirmation_assignments_submitted": 0,
@@ -148,11 +152,53 @@
       "--dependency=afterok:6068583",
       "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/replay.slurm",
       "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository"
+    ],
+    [
+      "sbatch",
+      "--parsable",
+      "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+      "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/recheck-%A_%a.out",
+      "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/recheck-%A_%a.err",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/recheck.slurm",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository"
+    ],
+    [
+      "sbatch",
+      "--parsable",
+      "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+      "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/pilot-%A_%a.out",
+      "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/pilot-%A_%a.err",
+      "--array=0-31%1",
+      "--dependency=afterok:6068580:6069315",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/pilot.slurm",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+      "pilot"
+    ],
+    [
+      "sbatch",
+      "--parsable",
+      "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+      "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/collection-%A_%a.out",
+      "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/collection-%A_%a.err",
+      "--dependency=afterany:6069328",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/collect.slurm",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository"
+    ],
+    [
+      "sbatch",
+      "--parsable",
+      "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+      "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/replay-%A_%a.out",
+      "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/replay-%A_%a.err",
+      "--dependency=afterok:6069330",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/replay.slurm",
+      "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository"
     ]
   ],
   "pre_execution_amendments": [
     "PRIOR_EXPOSURE_AMENDMENT.json",
-    "LICENSE_ENVIRONMENT_AMENDMENT.json"
+    "LICENSE_ENVIRONMENT_AMENDMENT.json",
+    "BLAS_RUNTIME_AMENDMENT.json"
   ],
   "status": "resource_pilot_submitted",
   "reference_MIP_assignments": 32,
@@ -182,8 +228,39 @@
       },
       "comparative_assignments_started": 0,
       "raw_archive": "infrastructure-attempts/limited-license-6068550"
+    },
+    {
+      "reason": "CPU-dependent OpenBLAS L2 norm changed scaled-export bytes; 20 workers stopped before solving",
+      "jobs": {
+        "pilot": {
+          "job_id": "6068582",
+          "submitted_utc": "2026-10-19T12:45:50.039384+00:00"
+        },
+        "collection": {
+          "job_id": "6068583",
+          "submitted_utc": "2026-10-19T12:45:51.063759+00:00"
+        },
+        "replay": {
+          "job_id": "6068584",
+          "submitted_utc": "2026-10-19T12:45:51.985535+00:00"
+        }
+      },
+      "resource_workers_recorded": 118,
+      "native_solves_recorded": 98,
+      "export_guard_failures": 20,
+      "unattempted_assignments": 138,
+      "raw_archive": "infrastructure-attempts/blas-runtime-6068582",
+      "policies_ranked": false
     }
   ],
   "license_probe_job": "6068574",
-  "infrastructure_archive_job": "6068575"
+  "infrastructure_archive_job": "6068575",
+  "factor_probe_jobs": [
+    "6069299",
+    "6069302",
+    "6069303"
+  ],
+  "blas_archive_job": "6069313",
+  "reference_recovery_job": "6069315",
+  "all_export_gate_job": "6069319"
 }

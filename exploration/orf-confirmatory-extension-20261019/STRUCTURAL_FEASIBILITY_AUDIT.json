@@ -1,0 +1,87 @@
+{
+  "status": "completed_exact_certificates",
+  "models_checked": 192,
+  "optimizer_calls": 0,
+  "certified_infeasible_models": 2,
+  "certified_infeasible_instances": [
+    "completo-v1_completo_000106-h168",
+    "simple-v1_simple_000127-h168"
+  ],
+  "certified_by_role": {
+    "confirmation": 1,
+    "pilot": 1
+  },
+  "certificates": [
+    {
+      "instance": "completo-v1_completo_000106-h168",
+      "family": "completo",
+      "role": "confirmation",
+      "horizon": 168,
+      "base_sha256": "00a9de612d95036a10281ccd5bff81cf6829c1370a50dae035a9d16a54776940",
+      "row_multipliers": {
+        "a1_restriccion_varphi1_2(1)": "1",
+        "a1_v1h_din(1)": "1"
+      },
+      "bound_multipliers": [
+        {
+          "variable": "a1_varphi12(1)",
+          "bound": "lower",
+          "positive_multiplier": "420443321060553/2097152",
+          "value": "0"
+        },
+        {
+          "variable": "a1_x1h(1)",
+          "bound": "lower",
+          "positive_multiplier": "3600",
+          "value": "0"
+        },
+        {
+          "variable": "a1_y1h(1)",
+          "bound": "lower",
+          "positive_multiplier": "3600",
+          "value": "0"
+        }
+      ],
+      "contradiction_rhs_exact": "-26209098399747/2097152",
+      "contradiction_gap_float": 12497472.00000143,
+      "integrality_not_required": true
+    },
+    {
+      "instance": "simple-v1_simple_000127-h168",
+      "family": "simple",
+      "role": "pilot",
+      "horizon": 168,
+      "base_sha256": "fbb314512fd61361874e511183a1417cd0be122b6c44a427e61616fa33ebd288",
+      "row_multipliers": {
+        "a1_restriccion_varphi1_2(1)": "1",
+        "a1_v1h_din(1)": "1"
+      },
+      "bound_multipliers": [
+        {
+          "variable": "a1_varphi12(1)",
+          "bound": "lower",
+          "positive_multiplier": "105110841439603/524288",
+          "value": "0"
+        },
+        {
+          "variable": "a1_x1h(1)",
+          "bound": "lower",
+          "positive_multiplier": "3600",
+          "value": "0"
+        },
+        {
+          "variable": "a1_y1h(1)",
+          "bound": "lower",
+          "positive_multiplier": "3600",
+          "value": "0"
+        }
+      ],
+      "contradiction_rhs_exact": "-26209098399747/2097152",
+      "contradiction_gap_float": 12497472.00000143,
+      "integrality_not_required": true
+    }
+  ],
+  "other_models_status": "Not classified by this sufficient two-row test; absence of a certificate does not prove feasibility.",
+  "selection_or_model_data_changed": false,
+  "scope": "Exact Farkas combinations of original binary64 rows and bounds; infeasibility already holds for the LP relaxation."
+}

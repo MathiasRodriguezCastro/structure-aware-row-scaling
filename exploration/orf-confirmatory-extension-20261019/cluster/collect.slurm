@@ -12,6 +12,7 @@ set -euo pipefail
 TASK_ROOT=${1:?isolated repository root required}
 ENV_ROOT="$HOME/row-scaling-orf-extension-20261019"
 export SINGULARITYENV_OPENBLAS_NUM_THREADS=1
+export SINGULARITYENV_PYTHONINTMAXSTRDIGITS=0
 export SINGULARITYENV_PYTHONPATH="$ENV_ROOT/python-deps-v1:$ENV_ROOT/python-deps-v1/cplex-22.1.2.0.data/purelib"
 singularity exec --cleanenv -B "$HOME:$HOME" "$HOME/containers/gcc13.sif" \
  python3 "$TASK_ROOT/exploration/orf-confirmatory-extension-20261019/collect_pilot.py"

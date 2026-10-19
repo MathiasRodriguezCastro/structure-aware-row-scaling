@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-19",
+  "stage": "before_reference_recovery_calls",
+  "triggers": [
+    "Two common Gurobi-pattern LP repairs ended unknown in SoPlex",
+    "One Base acquisition returned INF_OR_UNBD without incumbent",
+    "One saved rational vector exceeded Python integer-string conversion limit"
+  ],
+  "procedures": [
+    "Recheck an existing rational vector directly, with Python integer-string limit disabled",
+    "Retry each existing fixed-pattern exact LP once with SoPlex simplifier disabled, preserving objective and all constraints",
+    "If no incumbent and no fixed LP exists, attempt Base CPLEX with the same acquisition seed 389, gap 0.001, tolerances, four threads and 120-second cap; then use the same fixed-pattern LP procedure"
+  ],
+  "maximum_additional_MIP_calls": 1,
+  "maximum_additional_LP_calls": 3,
+  "max_exact_LP_seconds": 120,
+  "independent_original_row_bound_integrality_and_cost_checks_required": true,
+  "original_acquisition_outputs_retained": true,
+  "comparative_policy_outcomes_used": false,
+  "script_sha256": "f4cf99bcd63352ef584caea9af6fac46e6175650edfc2ec5b093657b0b8ccb3a",
+  "global_concurrent_MIP_solves": 1,
+  "unknowns_not_replaced_by_easier_parents": true
+}

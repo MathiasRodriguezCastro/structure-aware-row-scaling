@@ -17,6 +17,8 @@ def main():
     assert load(HERE/'DATA_GATE.json')['status']=='passed_for_generated_population'
     assert load(HERE/'HELD_OUT_AUDIT.json')['status']=='passed'
     assert load(HERE/'PRIOR_POLICY_EXPOSURE.json')['selection_unchanged']
+    portability=load(HERE/'FACTOR_PORTABILITY-Haswell.json')
+    assert portability['status']=='passed' and portability['byte_identical_exports']==64
     names=sorted(n for n,m in data['models'].items() if m['role']=='pilot')
     assert len(names)==32
     blocks=[];rng=random.Random(2026101917)
@@ -34,6 +36,9 @@ def main():
     for p in [HERE/'runner.py',HERE/'references.py',HERE/'PROTOCOL.md',HERE/'MODEL_PREPARATION.json',
         HERE/'SOURCE_AUDIT.json',HERE/'HELD_OUT_AUDIT.json',HERE/'PRIOR_POLICY_EXPOSURE.json',
         HERE/'cluster/pilot.slurm',HERE/'PREFLIGHT-license-fixed.json',
+        HERE/'FACTOR_PORTABILITY-Haswell.json',HERE/'cluster/collect.slurm',
+        HERE/'cluster/replay.slurm',HERE/'replay_pilot.py',HERE/'collect_pilot.py',
+        HERE/'REFERENCE_RECOVERY_PLAN.json',HERE/'recover_references.py',
         ROOT/'code/build-audit/SistemaElectrico',
         ROOT/'exploration/oms-followup-20261014/exact_dispatch_witness.py',
         ROOT/'exploration/oms-followup-20261014/tools/soplex-build/bin/soplex',
@@ -47,6 +52,9 @@ def main():
         threads=4,concurrency=1,solver_limit_seconds=60,reference_limit_seconds=120,
         requested_memory='site default: 2048 MiB per CPU; measure actual RSS in pilot',
         cluster_environment_sha256=sha(HERE/'PREFLIGHT-license-fixed.json'),dependencies=dependencies,
+        floating_point_runtime=dict(OPENBLAS_CORETYPE='Haswell',OPENBLAS_NUM_THREADS=1,
+            PYTHONINTMAXSTRDIGITS=0,initial_pilot_exports_reproduced_byte_identically=64),
+        reference_recovery_plan_sha256=sha(HERE/'REFERENCE_RECOVERY_PLAN.json'),
         quality_unknown_if_reference_unavailable=True,
         pilot_used_for_policy_selection=False,pilot_used_as_confirmatory_evidence=False,
         confirmatory_assignments_if_all_later_gates_pass=3840,

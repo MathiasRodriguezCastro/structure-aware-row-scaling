@@ -61,7 +61,9 @@ def main():
             assert load(HERE/'DEPLOYMENT_RECHECK.json')['pilot_plan_sha256']==plan_hash
             assert load(HERE/'DEPLOYMENT_RECHECK.json')['status']=='passed'
         refs=submit('references','pilot.slurm',['--array=0-31%1'],['references'])
-        pilot=submit('pilot','pilot.slurm',['--array=0-31%1','--dependency=afterok:'+refs],['pilot'])
+        dependencies=refs
+        if record.get('reference_recovery_job'):dependencies+=':'+record['reference_recovery_job']
+        pilot=submit('pilot','pilot.slurm',['--array=0-31%1','--dependency=afterok:'+dependencies],['pilot'])
         collection=submit('collection','collect.slurm',['--dependency=afterany:'+pilot],[])
         submit('replay','replay.slurm',['--dependency=afterok:'+collection],[])
         record.update(status='resource_pilot_submitted',reference_MIP_assignments=32,

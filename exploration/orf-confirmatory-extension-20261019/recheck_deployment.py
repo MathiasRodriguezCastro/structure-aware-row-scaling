@@ -10,6 +10,8 @@ def main():
     assert load(HERE/'PRIOR_POLICY_EXPOSURE.json')['selection_unchanged']
     assert load(HERE/'PREFLIGHT-license-fixed.json')['status']=='passed'
     assert load(HERE/'infrastructure-attempts/limited-license-6068550/ARCHIVE.json')['comparative_assignments_started']==0
+    assert load(HERE/'infrastructure-attempts/blas-runtime-6068582/ARCHIVE.json')['recorded_assignments']==118
+    assert load(HERE/'FACTOR_PORTABILITY-Haswell.json')['byte_identical_exports']==64
     count=0
     for line in (HERE/'TRANSFER_CONTENTS.sha256').read_text().splitlines():
         expected,name=line.split('  ',1);assert sha(ROOT/name)==expected,name;count+=1

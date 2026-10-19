@@ -55,6 +55,17 @@ sensibilidad de dimensión, no un nuevo pronóstico operativo recalibrado.
   numéricos; se repetirán en el entorno de ejecución como puerta de despliegue.
   No son observaciones del piloto ni evidencia de rendimiento.
 
+El primer piloto de recursos terminó incompleto: 98 workers llegaron al solver,
+20 se detuvieron por diferencias de hashes antes de resolver y 138 quedaron sin
+intentar. Todos se conservan en el archivo de infraestructura del trabajo
+6068582. El núcleo automático de OpenBLAS producía una diferencia de un bit en
+la norma y de dos ULP en un factor L2. Fijar `OPENBLAS_CORETYPE=Haswell` reproduce
+64/64 exports originales, sin modificar políticas ni datos. El piloto se repite
+íntegro con ese entorno fijado; no se usan sus resultados para elegir políticas.
+Python también requiere `PYTHONINTMAXSTRDIGITS=0` para verificar algunos
+testigos racionales largos. La recuperación de referencias usa exclusivamente
+la adquisición Base y procedimientos registrados por separado.
+
 ## Secuencia de cómputo
 
 `PILOT_PLAN.json` fija 256 asignaciones: ocho padres, cuatro horizontes, dos

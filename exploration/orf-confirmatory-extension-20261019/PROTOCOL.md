@@ -150,3 +150,32 @@ the retry. Repeat the same 32-reference schedule under the corrected environment
 retain and cost all initial attempts separately. There is no replacement of
 parents, outcomes or policies. The 256 comparative assignments and their ordering
 remain unchanged. `LICENSE_ENVIRONMENT_AMENDMENT.json` records this intervention.
+
+## Floating-point runtime correction after the first resource pilot
+
+The first resource pilot recorded 118 workers: 98 reached a native solve and
+20 stopped at the scaled-export identity assertion; 138 were not attempted
+after their block's first failure. None is used for policy ranking. Preserve
+all outputs, the original plan and reports under
+`infrastructure-attempts/blas-runtime-6068582/` before repeating the pilot.
+An isolated stage-by-stage test identified OpenBLAS's CPU-dependent dot-product
+kernel as the cause of the L2 norm difference. `OPENBLAS_CORETYPE=Haswell`, with
+one BLAS thread, restores all 64 originally frozen pilot exports byte for byte.
+The policy sources, formulas, input data, tolerances, scaled representations and
+randomized assignment order are unchanged. Repeat all 256 assignments under
+that fixed runtime so each complete model block shares one compute allocation.
+
+Disable Python's decimal integer-string length limit for trusted saved rational
+solver vectors (`PYTHONINTMAXSTRDIGITS=0`); this changes no residual criterion.
+The new limit setting also applies to the independent replay. One existing
+reference was recovered locally by checking its saved vector without another
+optimization call. The separately recorded `REFERENCE_RECOVERY_PLAN.json`
+permits at most one additional common Base CPLEX acquisition and three exact-LP
+attempts, with original outputs preserved. These use no comparative policy
+outcomes and precede the corrected pilot. Unrecovered references stay unknown.
+Reference recovery is separately costed, not charged as a scaling-policy solve.
+
+Before any confirmation, also reproduce all 192 Base models and 384 scaled
+exports under the fixed runtime, without optimizing. Success of an export gate
+is reproducibility evidence, not a numerical-performance result or a statement
+of MILP optimality.
