@@ -5,14 +5,64 @@ at 24, 72 and 168 hourly periods, using fixed random windows and 10\% perturbati
 of inflow and demand from the six known clean inputs. These are new parameter
 scenarios within one family, not independent operational data. Five policies and
 three new seeds give 360 interleaved calls with the previous solver settings.
-All 72 Budget-L2 points meet the primal budgets; so do all controls. Paired
-geometric-mean work ratios are 0.422 against Base and 0.931 against L2, with
-complete-process ratios 0.797 and 0.996. After excluding pairs with detected
-contradictions, the L2 comparison is 0.971 for work and 1.023 for time (64 pairs).
-Exact witnesses detect seven L2 bound contradictions and one Budget-L2
-contradiction; L2-NF3 has none and a Budget-L2/NF3 time ratio of 1.031.
-Candidate deterioration reaches 1.020\% against Base. Thus lower work transfers
-against unscaled controls, while an additional computational advantage over L2
-and equally certified solution quality remain unestablished. Online Resource~1
-reports every stratum, intervention, rational reference and the registered
-360-call logging confirmation.
+Table~\ref{tab:orf-prospective-main} brings the precision and effort outcomes
+together. All five policies meet the budgets in 72/72 assignments, so the
+contract provides no additional primal feasibility recovery in this sample.
+Exact witnesses detect seven L2 bound contradictions, one Budget-L2 contradiction
+and none for L2-NF3. Satisfied primal budgets do not certify solver bounds.
+
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Prospective validation on 24 scenarios with three seeds each. Budgets
+count passing runs; B/G count detected bound/1\%-completion contradictions.
+Work and complete-process time are paired geometric means for Budget-L2 divided
+by the row policy, with marginal 95\% scenario-cluster bootstrap intervals below.
+Wins are scenarios favoring Budget-L2 after aggregating their three seeds,
+for work/time respectively, out of 24. All adverse outcomes are included.}
+\label{tab:orf-prospective-main}
+\begin{tabular}{lccccc}\toprule
+Policy & Budgets & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
+Base & 72/72 & 0/0 & \shortstack{0.422\\{[0.288, 0.604]}} & \shortstack{0.797\\{[0.646, 0.961]}} & 21/16\\[4pt]
+Base-tight & 72/72 & 0/0 & \shortstack{0.170\\{[0.136, 0.213]}} & \shortstack{0.643\\{[0.524, 0.772]}} & 24/21\\[4pt]
+L2 & 72/72 & 7/6 & \shortstack{0.931\\{[0.702, 1.133]}} & \shortstack{0.996\\{[0.832, 1.119]}} & 10/6\\[4pt]
+L2-NF3 & 72/72 & 0/0 & \shortstack{0.476\\{[0.377, 0.582]}} & \shortstack{1.031\\{[0.935, 1.129]}} & 24/8\\[4pt]
+Budget-L2 & 72/72 & 1/0 & --- & --- & ---\\[4pt]
+\bottomrule\end{tabular}\end{table}
+
+The uncertainty analysis was added after the experimental outcomes were known;
+it was not part of the frozen optimization protocol. Following the cluster
+bootstrap principle of retaining within-group observations~\citep{FieldWelsh2007},
+we resample 24 scenarios with replacement 100,000 times, keeping all three seeds
+and paired policies together. We average log ratios within each scenario and
+then across scenarios; the balanced design gives the same point estimate as
+the 72-pair geometric mean. Percentile intervals are conditional on this
+generated sample and its six known parents. They do not assess generalization
+to other applications or account for selecting different parent structures.
+
+Against L2, Budget-L2 lowers work in 24/72 seed pairs and 10/24 scenario
+aggregates; it lowers complete-process time in 6/24 scenarios. The work ratio
+is 0.931 with interval [0.702,1.133], and the time ratio is 0.996 with interval
+[0.832,1.119]. Both intervals include one. Horizon-specific work ratios are
+0.944, 1.053 and 0.811 for 24, 72 and 168 hours. Eight scenarios per horizon
+cannot establish a structural selection rule. A geometric mean below one
+can coexist with a minority of wins because improvement magnitudes vary.
+After excluding pairs with contradictions in either policy, the L2 comparison
+is 0.971 for work and 1.023 for time (64 pairs); this secondary screen does not
+certify the retained bounds.
+
+The incremental comparison is narrower than against Base: L2 already changes
+the representation using the same Euclidean kernel, whereas the contract
+modifies only factors required by the precision specification (8,448 activation
+rows across these models). This identifies the intervention without proving
+its internal solver mechanism. The evidence supports explicit specification,
+admissible selection and verification of accuracy, with conditional numerical
+benefits; it does not establish general efficiency gains over L2.
+
+Budget-L2's maximum candidate cost deterioration against Base is 1.020\%,
+exceeding the earlier six-model maximum below 0.1\%. This is the paired quantity
+$100(C_{\rm Budget}-C_{\rm Base})/|C_{\rm Base}|$, not a difference between
+certified MILP optima. The requested 1\% solver gap neither bounds this
+cross-policy candidate difference nor establishes equally certified gaps,
+especially when an independent witness contradicts a reported bound.
+Online Resource~1 reports every stratum, intervention and rational-reference
+outcome, together with the registered 360-call logging confirmation.

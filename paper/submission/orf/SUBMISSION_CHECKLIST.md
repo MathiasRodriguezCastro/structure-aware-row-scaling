@@ -11,6 +11,7 @@
 - [x] Complete Online Resource 2 supplied, with the unchanged parent archive, current sources and separately identified prospective evidence.
 - [x] Frozen-policy study: all 24 new parameter scenarios, 360 primary MIP calls plus 360 logging confirmations, 96 LP attempts and adverse outcomes retained.
 - [x] License-free rational replay covers the new factors, points, references and finite-export bound.
+- [x] Main-text prospective outcome table includes all adverse cases, candidate-cost qualification and post hoc scenario-cluster intervals; all 32 intervals independently replayed without new optimizer calls.
 - [x] Manual ORCID marker removed; full identifier retained on the separate title page and in portal metadata.
 - [x] Clean-extraction replay, table/figure regeneration and document builds verified before freezing.
 - [x] Portal text prepared from the current sources, rather than the historical manuscript.

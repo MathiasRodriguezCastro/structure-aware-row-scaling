@@ -1,0 +1,386 @@
+{
+  "analysis": "post_hoc_scenario_cluster_bootstrap",
+  "scenarios": 24,
+  "seeds_per_scenario": 3,
+  "primary_MIP_calls": 360,
+  "additional_optimizer_calls": 0,
+  "filtered_pairs": 0,
+  "resamples": 100000,
+  "PRNG": "NumPy PCG64",
+  "random_seed": 2026101902,
+  "quantiles": [
+    0.025,
+    0.975
+  ],
+  "quantile_method": "linear_on_log_scale",
+  "tie_log_tolerance": 1e-12,
+  "clusters_sampled_with_replacement": true,
+  "seeds_resampled": false,
+  "logging_replication_used_as_new_observations": false,
+  "scope": "Conditional descriptive uncertainty within the six known parents; not external validation.",
+  "input_sha256": {
+    "CLUSTER_ANALYSIS_PLAN.md": "ac84addf16e2d42c6c103f19138a9108516d948c45820d160a15264f24683f3e",
+    "verified-pairs.csv": "02034b658812f44ff31dfa9f1df5eaac596328b4fd5c12f96212f4415610f9d0",
+    "design.json": "37f77039b76149cbcc494184c15a78b4c1fb0bbc44977a6c1eb2cd98e6713b86"
+  },
+  "selection_sha256": {
+    "None": "7a21864c75602de23c9b0c6e911617dfd60b8d47855a38201a002262fa851eb3",
+    "24": "8c5959a3e3fc16d5753f08f1c1935980895560bc6b8bbedc13b656710963d8b9",
+    "72": "c7ee9ea85fe2b7474303b3b81b8c1ad5066d68ea96bbd79bc0bbfa659ee11c6c",
+    "168": "42b26575c2f2d67de03715a5cd42d171540bde197427fd32c2fdeffff4b2cdfe"
+  },
+  "comparisons": [
+    {
+      "horizon": null,
+      "control": "Base",
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "work": {
+        "ratio": 0.421717151626235,
+        "lower95": 0.2881377360945862,
+        "upper95": 0.6042139602389957,
+        "scenarios_favor_budget": 21,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 3
+      },
+      "time": {
+        "ratio": 0.796961690781959,
+        "lower95": 0.6457700998408706,
+        "upper95": 0.9606529128002907,
+        "scenarios_favor_budget": 16,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 8
+      }
+    },
+    {
+      "horizon": null,
+      "control": "Base-tight",
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "work": {
+        "ratio": 0.17036003674551028,
+        "lower95": 0.1357621639186951,
+        "upper95": 0.21279320601453997,
+        "scenarios_favor_budget": 24,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 0.6434433330688293,
+        "lower95": 0.5241029226324374,
+        "upper95": 0.7723316902106838,
+        "scenarios_favor_budget": 21,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 3
+      }
+    },
+    {
+      "horizon": null,
+      "control": "L2",
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "work": {
+        "ratio": 0.930538435811093,
+        "lower95": 0.7021989970801665,
+        "upper95": 1.13261815049914,
+        "scenarios_favor_budget": 10,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 14
+      },
+      "time": {
+        "ratio": 0.9958872980484599,
+        "lower95": 0.8318680738464601,
+        "upper95": 1.1191976160880597,
+        "scenarios_favor_budget": 6,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 18
+      }
+    },
+    {
+      "horizon": null,
+      "control": "L2-NF3",
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "work": {
+        "ratio": 0.4757698308957642,
+        "lower95": 0.3768981690525063,
+        "upper95": 0.5816187178709735,
+        "scenarios_favor_budget": 24,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 1.0306463278630333,
+        "lower95": 0.9352982607514932,
+        "upper95": 1.1285432390802785,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 16
+      }
+    },
+    {
+      "horizon": 24,
+      "control": "Base",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.517023132886119,
+        "lower95": 0.23912165183228654,
+        "upper95": 0.9224310403111339,
+        "scenarios_favor_budget": 7,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 1
+      },
+      "time": {
+        "ratio": 0.9446053140420325,
+        "lower95": 0.8380977699325901,
+        "upper95": 1.0619539715367967,
+        "scenarios_favor_budget": 5,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 3
+      }
+    },
+    {
+      "horizon": 24,
+      "control": "Base-tight",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.14346373462083964,
+        "lower95": 0.10943939069251234,
+        "upper95": 0.18980788355817532,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 0.8919630978408308,
+        "lower95": 0.8109398569466355,
+        "upper95": 0.9850632745922204,
+        "scenarios_favor_budget": 7,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 1
+      }
+    },
+    {
+      "horizon": 24,
+      "control": "L2",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.9440854095500686,
+        "lower95": 0.8176926159670291,
+        "upper95": 1.0587618941422137,
+        "scenarios_favor_budget": 4,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 4
+      },
+      "time": {
+        "ratio": 1.0382174368713422,
+        "lower95": 0.9795972747868915,
+        "upper95": 1.0969777040256115,
+        "scenarios_favor_budget": 2,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 6
+      }
+    },
+    {
+      "horizon": 24,
+      "control": "L2-NF3",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.363403048682055,
+        "lower95": 0.2099116353278337,
+        "upper95": 0.5650369849603539,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 0.9969849761834239,
+        "lower95": 0.8983490101241723,
+        "upper95": 1.0936260469305752,
+        "scenarios_favor_budget": 3,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 5
+      }
+    },
+    {
+      "horizon": 72,
+      "control": "Base",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.4157948699458859,
+        "lower95": 0.22557232509357275,
+        "upper95": 0.718869594389194,
+        "scenarios_favor_budget": 7,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 1
+      },
+      "time": {
+        "ratio": 0.8735686946133554,
+        "lower95": 0.6733843369089587,
+        "upper95": 1.1091271756068941,
+        "scenarios_favor_budget": 5,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 3
+      }
+    },
+    {
+      "horizon": 72,
+      "control": "Base-tight",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.19218023795266725,
+        "lower95": 0.11786498861183572,
+        "upper95": 0.30323477657061115,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 0.6718343264146577,
+        "lower95": 0.5528360012434086,
+        "upper95": 0.8149897052503896,
+        "scenarios_favor_budget": 7,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 1
+      }
+    },
+    {
+      "horizon": 72,
+      "control": "L2",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 1.0525003649344404,
+        "lower95": 0.8387551556032435,
+        "upper95": 1.3689971869921036,
+        "scenarios_favor_budget": 4,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 4
+      },
+      "time": {
+        "ratio": 1.0169246163377748,
+        "lower95": 0.9207422489763678,
+        "upper95": 1.1152911157938732,
+        "scenarios_favor_budget": 3,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 5
+      }
+    },
+    {
+      "horizon": 72,
+      "control": "L2-NF3",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.5117111497709848,
+        "lower95": 0.400610012204443,
+        "upper95": 0.6461413645989792,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 1.0529171978681107,
+        "lower95": 0.9591864738232379,
+        "upper95": 1.1511671919155813,
+        "scenarios_favor_budget": 3,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 5
+      }
+    },
+    {
+      "horizon": 168,
+      "control": "Base",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.34887889002366407,
+        "lower95": 0.18052810289412594,
+        "upper95": 0.6595485470752335,
+        "scenarios_favor_budget": 7,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 1
+      },
+      "time": {
+        "ratio": 0.6134298293402052,
+        "lower95": 0.3800148524275034,
+        "upper95": 0.9743542766182374,
+        "scenarios_favor_budget": 6,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 2
+      }
+    },
+    {
+      "horizon": 168,
+      "control": "Base-tight",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.1793297389695819,
+        "lower95": 0.12120039704680526,
+        "upper95": 0.2503231911299394,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 0.4445512535289983,
+        "lower95": 0.2922701335422325,
+        "upper95": 0.6695767309389166,
+        "scenarios_favor_budget": 7,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 1
+      }
+    },
+    {
+      "horizon": 168,
+      "control": "L2",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.8109039353415746,
+        "lower95": 0.38217314553951137,
+        "upper95": 1.2407259057066264,
+        "scenarios_favor_budget": 2,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 6
+      },
+      "time": {
+        "ratio": 0.9355209141220069,
+        "lower95": 0.5622337161358637,
+        "upper95": 1.2617461588288024,
+        "scenarios_favor_budget": 1,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 7
+      }
+    },
+    {
+      "horizon": 168,
+      "control": "L2-NF3",
+      "scenarios": 8,
+      "seed_pairs": 24,
+      "work": {
+        "ratio": 0.5791315858513154,
+        "lower95": 0.4335285151525655,
+        "upper95": 0.734846768112528,
+        "scenarios_favor_budget": 8,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 0
+      },
+      "time": {
+        "ratio": 1.0429083569232305,
+        "lower95": 0.8072946425863589,
+        "upper95": 1.3128932341179675,
+        "scenarios_favor_budget": 2,
+        "scenario_ties": 0,
+        "scenarios_favor_control": 6
+      }
+    }
+  ]
+}

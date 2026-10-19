@@ -14,6 +14,10 @@ def main():
     f=list(csv.DictReader((HERE/'verified-factors.csv').open()))
     points=list(csv.DictReader((HERE/'verified-runs.csv').open()))
     pairs=list(csv.DictReader((HERE/'verified-pairs.csv').open()))
+    cluster=json.loads((HERE/'CLUSTER_ANALYSIS.json').read_text())
+    cluster_check=json.loads((HERE/'CLUSTER_VALIDATION.json').read_text())
+    assert cluster_check['status']=='passed'
+    uncertainty={r['control']:r for r in cluster['comparisons'] if r['horizon'] is None}
     model_rows=[]
     for factors in f:
         name=factors['instance'];budget=[r for r in points if r['instance']==name and r['policy']=='Budget-L2']
@@ -101,7 +105,8 @@ def main():
         'para el contraste. No se presenta como métrica prefijada en el protocolo.',
         'Las medias en segundos son: '+', '.join(f"{p}: {r['checked_completion_PAR10_seconds']:.3f}" for p,r in policies.items())+'.','',
         '## Incorporación al artículo','',
-        'Se añade una subsección breve y los controles por horizonte al suplemento.',
+        'La tabla principal reúne precisión, contradicciones, trabajo y tiempo con',
+        'intervalos agrupados por escenario; el suplemento conserva todos los controles.',
         'El resumen conserva el resultado previo de seis modelos y añade el límite',
         'prospectivo. No se presenta superioridad general frente a L2 o NF3.',
         'La cota elemental de errores de exportación se documenta aparte y se prueba',
@@ -111,6 +116,7 @@ def main():
         'Desde esa raíz:', '', '```sh',
         'python3 exploration/orf-confirmatory-20261018/check.py',
         'python3 exploration/orf-confirmatory-20261018/check_export_bound.py',
+        'python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py',
         '```','',
         '`verified-runs.csv` conserva cada salida; `verified-pairs.csv`, cada comparación;',
         '`verified-factors.csv`, la intervención; `verified-certificates.csv` y',
@@ -123,16 +129,74 @@ at 24, 72 and 168 hourly periods, using fixed random windows and 10\% perturbati
 of inflow and demand from the six known clean inputs. These are new parameter
 scenarios within one family, not independent operational data. Five policies and
 three new seeds give 360 interleaved calls with the previous solver settings.
-All 72 Budget-L2 points meet the primal budgets; so do all controls. Paired
-geometric-mean work ratios are 0.422 against Base and 0.931 against L2, with
-complete-process ratios 0.797 and 0.996. After excluding pairs with detected
-contradictions, the L2 comparison is 0.971 for work and 1.023 for time (64 pairs).
-Exact witnesses detect seven L2 bound contradictions and one Budget-L2
-contradiction; L2-NF3 has none and a Budget-L2/NF3 time ratio of 1.031.
-Candidate deterioration reaches 1.020\% against Base. Thus lower work transfers
-against unscaled controls, while an additional computational advantage over L2
-and equally certified solution quality remain unestablished. Online Resource~1
-reports every stratum, intervention and rational-reference outcome.
+Table~\ref{tab:orf-prospective-main} brings the precision and effort outcomes
+together. All five policies meet the budgets in 72/72 assignments, so the
+contract provides no additional primal feasibility recovery in this sample.
+Exact witnesses detect seven L2 bound contradictions, one Budget-L2 contradiction
+and none for L2-NF3. Satisfied primal budgets do not certify solver bounds.
+
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Prospective validation on 24 scenarios with three seeds each. Budgets
+count passing runs; B/G count detected bound/1\%-completion contradictions.
+Work and complete-process time are paired geometric means for Budget-L2 divided
+by the row policy, with marginal 95\% scenario-cluster bootstrap intervals below.
+Wins are scenarios favoring Budget-L2 after aggregating their three seeds,
+for work/time respectively, out of 24. All adverse outcomes are included.}
+\label{tab:orf-prospective-main}
+\begin{tabular}{lccccc}\toprule
+Policy & Budgets & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
+'''
+    for p in ['Base','Base-tight','L2','L2-NF3','Budget-L2']:
+        r=policies[p]
+        if p in uncertainty:
+            c=uncertainty[p]
+            def cell(metric):
+                v=c[metric]
+                return r'\shortstack{'+f"{v['ratio']:.3f}"+r'\\{'+f"[{v['lower95']:.3f}, {v['upper95']:.3f}]"+'}}'
+            work,time=cell('work'),cell('time')
+            wins=f"{c['work']['scenarios_favor_budget']}/{c['time']['scenarios_favor_budget']}"
+        else:work=time=wins='---'
+        maintext+=f"{p} & {r['budgets_passed']}/72 & {r['bound_flags']}/{r['completion_flags']} & {work} & {time} & {wins}\\\\[4pt]\n"
+    maintext+=r'''\bottomrule\end{tabular}\end{table}
+
+The uncertainty analysis was added after the experimental outcomes were known;
+it was not part of the frozen optimization protocol. Following the cluster
+bootstrap principle of retaining within-group observations~\citep{FieldWelsh2007},
+we resample 24 scenarios with replacement 100,000 times, keeping all three seeds
+and paired policies together. We average log ratios within each scenario and
+then across scenarios; the balanced design gives the same point estimate as
+the 72-pair geometric mean. Percentile intervals are conditional on this
+generated sample and its six known parents. They do not assess generalization
+to other applications or account for selecting different parent structures.
+
+Against L2, Budget-L2 lowers work in 24/72 seed pairs and 10/24 scenario
+aggregates; it lowers complete-process time in 6/24 scenarios. The work ratio
+is 0.931 with interval [0.702,1.133], and the time ratio is 0.996 with interval
+[0.832,1.119]. Both intervals include one. Horizon-specific work ratios are
+0.944, 1.053 and 0.811 for 24, 72 and 168 hours. Eight scenarios per horizon
+cannot establish a structural selection rule. A geometric mean below one
+can coexist with a minority of wins because improvement magnitudes vary.
+After excluding pairs with contradictions in either policy, the L2 comparison
+is 0.971 for work and 1.023 for time (64 pairs); this secondary screen does not
+certify the retained bounds.
+
+The incremental comparison is narrower than against Base: L2 already changes
+the representation using the same Euclidean kernel, whereas the contract
+modifies only factors required by the precision specification (8,448 activation
+rows across these models). This identifies the intervention without proving
+its internal solver mechanism. The evidence supports explicit specification,
+admissible selection and verification of accuracy, with conditional numerical
+benefits; it does not establish general efficiency gains over L2.
+
+Budget-L2's maximum candidate cost deterioration against Base is 1.020\%,
+exceeding the earlier six-model maximum below 0.1\%. This is the paired quantity
+$100(C_{\rm Budget}-C_{\rm Base})/|C_{\rm Base}|$, not a difference between
+certified MILP optima. The requested 1\% solver gap neither bounds this
+cross-policy candidate difference nor establishes equally certified gaps,
+especially when an independent witness contradicts a reported bound.
+Online Resource~1 reports every stratum, intervention and rational-reference
+outcome, together with the registered 360-call logging confirmation.
 '''
     si=r'''\section{Prospective scenario validation}
 \label{sec:orf-prospective-supplement}
@@ -230,6 +294,80 @@ are 1.860,2.431,117.623,1.095 and 17.696 s. The raw observations and exclusions
 remain available. No one score replaces the separate accuracy, quality and
 effort comparisons.
 '''
+    si+=r'''
+\paragraph{Post hoc scenario-cluster uncertainty}
+The original optimization protocol did not prespecify uncertainty intervals.
+The subsequent analysis plan, supplied as \texttt{CLUSTER\_ANALYSIS\_PLAN.md},
+fixes all four controls, both work and complete-process time, and includes every
+primary pair without filtering. For each scenario and control, take the mean
+of its three paired log ratios. Resample 24 complete scenarios with replacement
+100,000 times; use the same sampled scenario indices for all controls and both
+metrics. The 2.5th and 97.5th percentiles of the resampled mean log ratios,
+with linear interpolation followed by exponentiation, give marginal 95\%
+intervals. The PRNG is NumPy PCG64, seed 2026101902, with scenarios sorted by
+name. No individual seed or logging repetition is an independent cluster.
+These are descriptive, conditional intervals, not simultaneous intervals,
+tests of superiority, or optimality certificates. Exchangeability is an
+assumption of this empirical scenario mixture; sharing six known parents is
+not an independently validated source of generalization. With only 24 groups,
+nominal coverage is approximate and uncertainty about other parents is excluded.
+
+The main text gives all four aggregate comparisons. The same PRNG stream
+continues through horizons 24, 72 and 168, resampling eight scenarios within
+each horizon. Table~\ref{tab:orf-prospective-clusters} displays the L2 comparison;
+the archive gives all controls and 96 scenario/control aggregates. A scenario
+win means its three-seed mean log ratio is below $-10^{-12}$; absolute values
+at most $10^{-12}$ are numerical ties. No such ties occur here.
+
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Budget-L2/L2 by horizon: geometric means and marginal 95\% percentile
+intervals from resampling eight complete scenarios. Wins count scenarios out
+of eight after aggregating three seeds. All work intervals include one.}
+\label{tab:orf-prospective-clusters}
+\begin{tabular}{lcccc}\toprule
+Hours & Work ratio [95\% interval] & Time ratio [95\% interval] & Wins $W$ & Wins $T$\\\midrule
+'''
+    for h in [24,72,168]:
+        c=next(r for r in cluster['comparisons'] if r['horizon']==h and r['control']=='L2')
+        def ci(metric):
+            v=c[metric];return f"{v['ratio']:.3f} [{v['lower95']:.3f}, {v['upper95']:.3f}]"
+        si+=f"{h} & {ci('work')} & {ci('time')} & {c['work']['scenarios_favor_budget']} & {c['time']['scenarios_favor_budget']}\\\\\n"
+    si+=r'''\bottomrule\end{tabular}\end{table}
+Budget-L2 uses less work in 10/24 scenarios and less complete time in 6/24
+against L2. The corresponding counts against Base are 21/24 and 16/24;
+against Base-tight, 24/24 and 21/24; against NF3, 24/24 and 8/24.
+The 168-hour work mean of 0.811 includes only two scenario wins out of eight:
+unequal improvement magnitudes explain why the geometric mean alone does not
+establish consistent benefit. No horizon-specific rule is inferred.
+Independent replay reconstructs all 32 intervals from native API work and
+outer process timings using cluster multiplicities rather than the producer's
+indexed averaging. It checks every scenario aggregation and resampling hash,
+without calls to an optimizer.
+'''
+    summary=['','## Incertidumbre agrupada por escenario (análisis posterior)','',
+        '100000 remuestras de los 24 escenarios completos; las tres semillas se',
+        'mantienen juntas. No se descartan contradicciones ni se cuentan las',
+        'repeticiones técnicas como observaciones nuevas. Intervalos percentiles',
+        'marginales del 95%, condicionados a la muestra y sus seis padres conocidos.',
+        'No se prespecificaron en el protocolo experimental original.','',
+        '| Control | Trabajo [IC 95%] | Tiempo completo [IC 95%] | Escenarios favorables W/T (de 24) |',
+        '|---|---:|---:|---:|']
+    for p,c in uncertainty.items():
+        def display(metric):
+            v=c[metric];return f"{v['ratio']:.3f} [{v['lower95']:.3f}, {v['upper95']:.3f}]"
+        summary.append(f"| {p} | {display('work')} | {display('time')} | {c['work']['scenarios_favor_budget']}/{c['time']['scenarios_favor_budget']} |")
+    summary+=['','Frente a L2, ambos intervalos incluyen 1: no se establece una ventaja.',
+        'Budget-L2 gana en trabajo en 10/24 escenarios y en tiempo en 6/24.',
+        'Por horizonte, las victorias en trabajo frente a L2 son 4/8, 4/8 y 2/8.',
+        'Incluso la razón de trabajo 0,811 de 168 horas tiene intervalo',
+        '[0,382, 1,241]: no justifica una regla según el horizonte.',
+        'La calidad candidata puede empeorar 1,020% frente a Base. El gap nominal',
+        'solicitado de 1% no limita la diferencia entre candidatos de políticas',
+        'distintas ni equivale a comparar óptimos MILP certificados.',
+        'CLUSTER_ANALYSIS.json, cluster-scenarios.csv y CLUSTER_VALIDATION.json',
+        'conservan resultados, las 96 agregaciones y su comprobación independiente.','']
+    at=lines.index('## Intervención y referencias racionales');lines[at:at]=summary
     logging_path=HERE/'logging-confirmation/VALIDATION.json'
     if logging_path.exists():
         logging=json.loads(logging_path.read_text());assert logging['complete_native_logs']==360

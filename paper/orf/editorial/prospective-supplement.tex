@@ -96,6 +96,53 @@ are 1.860,2.431,117.623,1.095 and 17.696 s. The raw observations and exclusions
 remain available. No one score replaces the separate accuracy, quality and
 effort comparisons.
 
+\paragraph{Post hoc scenario-cluster uncertainty}
+The original optimization protocol did not prespecify uncertainty intervals.
+The subsequent analysis plan, supplied as \texttt{CLUSTER\_ANALYSIS\_PLAN.md},
+fixes all four controls, both work and complete-process time, and includes every
+primary pair without filtering. For each scenario and control, take the mean
+of its three paired log ratios. Resample 24 complete scenarios with replacement
+100,000 times; use the same sampled scenario indices for all controls and both
+metrics. The 2.5th and 97.5th percentiles of the resampled mean log ratios,
+with linear interpolation followed by exponentiation, give marginal 95\%
+intervals. The PRNG is NumPy PCG64, seed 2026101902, with scenarios sorted by
+name. No individual seed or logging repetition is an independent cluster.
+These are descriptive, conditional intervals, not simultaneous intervals,
+tests of superiority, or optimality certificates. Exchangeability is an
+assumption of this empirical scenario mixture; sharing six known parents is
+not an independently validated source of generalization. With only 24 groups,
+nominal coverage is approximate and uncertainty about other parents is excluded.
+
+The main text gives all four aggregate comparisons. The same PRNG stream
+continues through horizons 24, 72 and 168, resampling eight scenarios within
+each horizon. Table~\ref{tab:orf-prospective-clusters} displays the L2 comparison;
+the archive gives all controls and 96 scenario/control aggregates. A scenario
+win means its three-seed mean log ratio is below $-10^{-12}$; absolute values
+at most $10^{-12}$ are numerical ties. No such ties occur here.
+
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Budget-L2/L2 by horizon: geometric means and marginal 95\% percentile
+intervals from resampling eight complete scenarios. Wins count scenarios out
+of eight after aggregating three seeds. All work intervals include one.}
+\label{tab:orf-prospective-clusters}
+\begin{tabular}{lcccc}\toprule
+Hours & Work ratio [95\% interval] & Time ratio [95\% interval] & Wins $W$ & Wins $T$\\\midrule
+24 & 0.944 [0.818, 1.059] & 1.038 [0.980, 1.097] & 4 & 2\\
+72 & 1.053 [0.839, 1.369] & 1.017 [0.921, 1.115] & 4 & 3\\
+168 & 0.811 [0.382, 1.241] & 0.936 [0.562, 1.262] & 2 & 1\\
+\bottomrule\end{tabular}\end{table}
+Budget-L2 uses less work in 10/24 scenarios and less complete time in 6/24
+against L2. The corresponding counts against Base are 21/24 and 16/24;
+against Base-tight, 24/24 and 21/24; against NF3, 24/24 and 8/24.
+The 168-hour work mean of 0.811 includes only two scenario wins out of eight:
+unequal improvement magnitudes explain why the geometric mean alone does not
+establish consistent benefit. No horizon-specific rule is inferred.
+Independent replay reconstructs all 32 intervals from native API work and
+outer process timings using cluster multiplicities rather than the producer's
+indexed averaging. It checks every scenario aggregation and resampling hash,
+without calls to an optimizer.
+
 \paragraph{Native logging confirmation}
 The packaging audit detected that the first campaign inherited OutputFlag=0,
 which suppressed native traces; its API outcomes, saved points and header logs

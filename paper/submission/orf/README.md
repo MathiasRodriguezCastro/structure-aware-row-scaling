@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.4.1-orf-submission**, 19 October 2026.
+Local version: **v1.4.2-orf-submission**, 19 October 2026.
 Proposed type: Original Research Article.
 
 | File | Role |
@@ -52,3 +52,11 @@ Zenodo versions. Nothing here asserts acceptance or editorial submission.
 
 See [checklist](SUBMISSION_CHECKLIST.md) and
 [publisher-template provenance](../../orf/TEMPLATE_PROVENANCE.md).
+
+The prospective outcome table in the main text reports all accuracy and bound
+checks alongside work and complete-process ratios. A separately identified post
+hoc analysis resamples 24 whole scenarios, retaining all three seeds together.
+Against L2, the work ratio is 0.931 (95% interval 0.702–1.133), with 10/24 scenario
+wins; the time ratio is 0.996 (0.832–1.119), with 6/24 wins. These conditional
+intervals do not establish a general incremental advantage or external validity.
+Replay: `python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py`.

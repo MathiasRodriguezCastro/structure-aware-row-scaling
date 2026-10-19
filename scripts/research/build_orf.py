@@ -123,7 +123,8 @@ Accuracy contracts, Computational optimization, Reproducibility}
                 dest.write_text(relabel(path.read_text()))
             else:
                 shutil.copyfile(path,dest)
-    shutil.copyfile(PAPER/'research-references.bib',ORF/'research-references.bib')
+    (ORF/'research-references.bib').write_text((PAPER/'research-references.bib').read_text()+
+        '\n'+(ORF/'editorial/additional-references.bib').read_text())
     print('Generated ORF manuscript and Online Resource 1:',VERSION)
     print('Abstract source tokens:',len(abstract.split()))
 

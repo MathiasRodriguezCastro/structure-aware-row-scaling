@@ -55,6 +55,33 @@ Budget-L2 en el ciclo completo. El peor costo candidato de Budget-L2 empeora
 1,020% frente a Base/Base-tight; no se puede repetir para esta muestra la
 afirmación de deterioro inferior a 0,1% del experimento dirigido anterior.
 
+
+## Incertidumbre agrupada por escenario (análisis posterior)
+
+100000 remuestras de los 24 escenarios completos; las tres semillas se
+mantienen juntas. No se descartan contradicciones ni se cuentan las
+repeticiones técnicas como observaciones nuevas. Intervalos percentiles
+marginales del 95%, condicionados a la muestra y sus seis padres conocidos.
+No se prespecificaron en el protocolo experimental original.
+
+| Control | Trabajo [IC 95%] | Tiempo completo [IC 95%] | Escenarios favorables W/T (de 24) |
+|---|---:|---:|---:|
+| Base | 0.422 [0.288, 0.604] | 0.797 [0.646, 0.961] | 21/16 |
+| Base-tight | 0.170 [0.136, 0.213] | 0.643 [0.524, 0.772] | 24/21 |
+| L2 | 0.931 [0.702, 1.133] | 0.996 [0.832, 1.119] | 10/6 |
+| L2-NF3 | 0.476 [0.377, 0.582] | 1.031 [0.935, 1.129] | 24/8 |
+
+Frente a L2, ambos intervalos incluyen 1: no se establece una ventaja.
+Budget-L2 gana en trabajo en 10/24 escenarios y en tiempo en 6/24.
+Por horizonte, las victorias en trabajo frente a L2 son 4/8, 4/8 y 2/8.
+Incluso la razón de trabajo 0,811 de 168 horas tiene intervalo
+[0,382, 1,241]: no justifica una regla según el horizonte.
+La calidad candidata puede empeorar 1,020% frente a Base. El gap nominal
+solicitado de 1% no limita la diferencia entre candidatos de políticas
+distintas ni equivale a comparar óptimos MILP certificados.
+CLUSTER_ANALYSIS.json, cluster-scenarios.csv y CLUSTER_VALIDATION.json
+conservan resultados, las 96 agregaciones y su comprobación independiente.
+
 ## Intervención y referencias racionales
 
 El contrato cambia 8,448 factores en las 24 instancias, siempre en activación.
@@ -106,7 +133,8 @@ residuos, contradicciones y preparación adicional de la campaña principal.
 
 ## Incorporación al artículo
 
-Se añade una subsección breve y los controles por horizonte al suplemento.
+La tabla principal reúne precisión, contradicciones, trabajo y tiempo con
+intervalos agrupados por escenario; el suplemento conserva todos los controles.
 El resumen conserva el resultado previo de seis modelos y añade el límite
 prospectivo. No se presenta superioridad general frente a L2 o NF3.
 La cota elemental de errores de exportación se documenta aparte y se prueba
@@ -121,6 +149,7 @@ Desde esa raíz:
 python3 exploration/orf-confirmatory-20261018/check.py
 python3 exploration/orf-confirmatory-20261018/check.py --logging-confirmation
 python3 exploration/orf-confirmatory-20261018/check_export_bound.py
+python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py
 ```
 
 `verified-runs.csv` conserva cada salida; `verified-pairs.csv`, cada comparación;

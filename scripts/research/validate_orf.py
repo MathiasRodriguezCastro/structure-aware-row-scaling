@@ -85,8 +85,10 @@ def scientific_preservation(science,sources):
     old_math=re.findall(theorem,old+'\n'+old_si,re.S)
     new_math=re.findall(theorem,new+'\n'+new_si,re.S)
     assert len(old_math)>0 and [(a,normalized(b)) for a,b in old_math]==[(a,normalized(b)) for a,b in new_math]
-    old_display=re.findall(r'\\\[(.*?)\\\]',old+'\n'+old_si,re.S)
-    new_display=re.findall(r'\\\[(.*?)\\\]',new+'\n'+new_si,re.S)
+    # A tabular row break followed by [4pt] is not a display-math opener.
+    display=r'(?<!\\)\\\[(.*?)(?<!\\)\\\]'
+    old_display=re.findall(display,old+'\n'+old_si,re.S)
+    new_display=re.findall(display,new+'\n'+new_si,re.S)
     assert [normalized(x) for x in old_display]==[normalized(x) for x in new_display]
     tables=list((sources/'tables').glob('*.tex'))
     assert len(tables)==42
@@ -204,6 +206,12 @@ def main():
         run(['python3',str(followup/'check_export_bound.py')],science)
         result['prospective_replay']=followup_validation
         result['finite_export_bound_checks']=json.loads((followup/'EXPORT_BOUND_VALIDATION.json').read_text())
+        run(['python3',str(followup/'check_cluster_analysis.py')],science)
+        cluster_validation=json.loads((followup/'CLUSTER_VALIDATION.json').read_text())
+        assert cluster_validation['status']=='passed' and cluster_validation['scenario_clusters']==24
+        assert cluster_validation['analysis_sha256']==snapshot['cluster_analysis_sha256']
+        assert cluster_validation['confidence_intervals_reconstructed_from_native_work_and_outer_timings']==32
+        result['scenario_cluster_uncertainty']=cluster_validation
         for name,value in before.items():
             assert (science/'paper/tables'/name).read_bytes()==value==(sources/'tables'/name).read_bytes(),name
         assert render_hashes(science)==figures
@@ -215,6 +223,14 @@ def main():
         # Current canonical editorial sources must rebuild the exact submitted TeX.
         revision=workspace/'canonical-revision'
         extract(esm/'orf-revision-sources.zip',revision)
+        # Regenerate the new tables from the extracted audited results, then compare
+        # with the canonical fragments shipped in the editorial source archive.
+        editorial=revision/'paper/orf/editorial'
+        fragments={n:(editorial/n).read_bytes() for n in ['prospective-main.tex','prospective-supplement.tex']}
+        run(['python3',str(followup/'write_report.py')],science)
+        for n, original in fragments.items():
+            assert (science/'paper/orf/editorial'/n).read_bytes()==original,n
+        result['prospective_tables_regenerated_from_audited_data']=True
         run(['python3','scripts/research/build_orf.py'],revision)
         assert (revision/'paper/orf/main_orf.tex').read_bytes()==(sources/'main_orf.tex').read_bytes()
         assert (revision/'paper/orf/ESM_1.tex').read_bytes()==(sources/'ESM_1.tex').read_bytes()

@@ -15,6 +15,8 @@ def main():
     assert validation['logging_confirmation']['replication']['assignments']==360
     assert validation['delivery']['sha256']==sha(OUT/'orf-delivery.zip')
     assert validation['canonical_editorial_regeneration_identical']
+    assert validation['scenario_cluster_uncertainty']['status']=='passed'
+    assert validation['prospective_tables_regenerated_from_audited_data']
     assert all(v['passed'] for v in validation['replay']['four_standard_commands'].values())
     files={p.name:p for p in (OUT/'uploads').iterdir() if p.is_file() and p.name!='SHA256SUMS'}
     files.update({'orf-delivery.zip':OUT/'orf-delivery.zip','VALIDATION.json':OUT/'VALIDATION.json',

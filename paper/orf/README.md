@@ -1,6 +1,6 @@
 # Operations Research Forum manuscript
 
-Current editorial version: **v1.4.1-orf-submission**.
+Current editorial version: **v1.4.2-orf-submission**.
 
 **Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational
 and Software Study** — Mathias Rodríguez Castro.
@@ -36,3 +36,11 @@ not identify the later experiments. No journal submission has been performed.
 The 19 October logging amendment retains the first campaign and adds a complete
 360-call native-trace confirmation. These are repeated assignments, with no new
 models or seeds. Both sets of points are independently checked.
+
+The prospective outcome table in the main text reports all accuracy and bound
+checks alongside work and complete-process ratios. A separately identified post
+hoc analysis resamples 24 whole scenarios, retaining all three seeds together.
+Against L2, the work ratio is 0.931 (95% interval 0.702–1.133), with 10/24 scenario
+wins; the time ratio is 0.996 (0.832–1.119), with 6/24 wins. These conditional
+intervals do not establish a general incremental advantage or external validity.
+Replay: `python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py`.

@@ -81,6 +81,9 @@ def main():
     logging_validation=json.loads((FOLLOWUP/'logging-confirmation/VALIDATION.json').read_text())
     assert logging_validation['status']=='passed' and logging_validation['MIP_calls']==360
     assert logging_validation['complete_native_logs']==360
+    cluster_validation=json.loads((FOLLOWUP/'CLUSTER_VALIDATION.json').read_text())
+    assert cluster_validation['status']=='passed'
+    assert cluster_validation['analysis_sha256']==sha(FOLLOWUP/'CLUSTER_ANALYSIS.json')
     followup_entries={p.relative_to(ROOT).as_posix():p for p in FOLLOWUP.rglob('*')
         if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.zip')}
     followup_zip=OUT/FOLLOWUP_ARCHIVE;archive(followup_zip,followup_entries)
@@ -96,13 +99,15 @@ def main():
     for name in roots:revision[name]=ROOT/name
     for folder in ('paper/orf/editorial','paper/sections','paper/tables','paper/figs/research'):
         for p in (ROOT/folder).rglob('*'):
-            if p.is_file() and p.suffix in ('.tex','.pdf'):revision[p.relative_to(ROOT).as_posix()]=p
+            if p.is_file() and p.suffix in ('.tex','.pdf','.bib'):revision[p.relative_to(ROOT).as_posix()]=p
     revision_zip=OUT/'orf-revision-sources.zip';archive(revision_zip,revision)
     snapshot={'version':VERSION,'date':DATE,'target':'Operations Research Forum','title':TITLE,
         'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':720,
         'prospective_primary_MIP_calls':360,'logging_confirmation_MIP_calls':360,
         'new_exact_LP_attempts':96,'prospective_archive_sha256':sha(followup_zip),
         'prospective_validation_sha256':sha(FOLLOWUP/'VALIDATION.json'),
+        'cluster_analysis_sha256':sha(FOLLOWUP/'CLUSTER_ANALYSIS.json'),
+        'cluster_analysis_is_post_hoc':True,'cluster_resamples':100000,'scenario_clusters':24,
         'scientific_parent':PARENT,'scientific_archive_sha256':sha(parent_archive),
         'scientific_parent_validation_sha256':sha(PARENT_DIR/'VALIDATION.json'),
         'current_sources_sha256':sha(source_zip),'canonical_revision_sha256':sha(revision_zip),
@@ -111,7 +116,8 @@ def main():
             'Springer template and numbered bibliography','Online Resource names and reproduction instructions',
             'new cover letter and ORF declarations/portal preparation',
             'prospective 24-scenario validation, 360 primary MIP calls, 360 logging confirmations and rational references',
-            'finite-export error bound, concise discussion, workflow figure and uncluttered author line'],
+            'finite-export error bound, concise discussion, workflow figure and uncluttered author line',
+            'main-text prospective outcome table, candidate-cost qualification and post hoc scenario-cluster uncertainty'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
     captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
@@ -173,6 +179,7 @@ repository root run:
 python3 exploration/orf-confirmatory-20261018/check.py
 python3 exploration/orf-confirmatory-20261018/check.py --logging-confirmation
 python3 exploration/orf-confirmatory-20261018/check_export_bound.py
+python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py
 ```
 
 These commands check both sets of 360 saved MIP outcomes, complete confirmation

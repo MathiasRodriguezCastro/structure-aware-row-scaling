@@ -1,6 +1,6 @@
 # Cierre editorial y validación prospectiva — 19 de octubre de 2026
 
-Versión v1.4.1-orf-submission. Se conserva sin cambios el archivo científico
+Versión v1.4.2-orf-submission. Se conserva sin cambios el archivo científico
 OMS v1.3.17 y se añade un ZIP identificado para el seguimiento prospectivo.
 
 ## Los dos mensajes de revisión
@@ -10,7 +10,7 @@ OMS v1.3.17 y se añade un ZIP identificado para el seguimiento prospectivo.
 | Suplemento voluminoso y DOI | Archivo completo conservado; depósito local con manifiesto de tamaños y SHA-256, metadatos, licencias e instrucciones. El autor tramita el borrador/DOI al final, como acordó. No se declara un DOI inexistente ni se retiran datos sin acceso persistente. |
 | IA en metodología | Referencia breve explícita en el diseño computacional y declaración completa al final. La referencia ya existía en v1.4.0; se simplifica sin ocultar el alcance del uso. |
 | ORCID de portada | Se retira el marcador manual del nombre; el identificador completo permanece en la portada separada y los metadatos editoriales. |
-| Concisión | Se acortan introducción, contribuciones y discusión, se simplifica el resumen y se añade una figura conceptual. El resumen tiene 209 palabras. Los nuevos resultados se presentan brevemente en el cuerpo y se desarrollan en el suplemento. |
+| Concisión | Se acortan introducción, contribuciones y discusión, se simplifica el resumen y se añade una figura conceptual. El resumen conserva su extensión breve. La validación prospectiva tiene ahora una tabla integrada y una explicación explícita en el cuerpo; el suplemento desarrolla los estratos y la incertidumbre. |
 | Nuevas instancias | Política y protocolo fijados antes de 360 MIP principales sobre 24 escenarios nuevos, tres horizontes y tres semillas. Una enmienda posterior repite las 360 asignaciones para activar las trazas nativas, silenciadas por error inicialmente; ambas campañas se conservan. Son perturbaciones de seis padres conocidos: no se presentan como una aplicación independiente ni como datos operativos reservados. |
 | Budget-L2 frente a L2 | Mismo núcleo y límites; solo cambia el contrato. Se comprueban 8.448 factores modificados y todos los residuos. La ventaja temporal incremental sobre L2 no se confirma y se declara. |
 | Calidad y cotas independientes | 96 intentos LP; 72 testigos enteros de las representaciones resueltas y 17 cotas LP globales verificadas. Doce referencias Base quedan certificadas al 1%; siete intentos globales son desconocidos y no se ocultan. Ningún nuevo óptimo MILP exacto se demuestra. |
@@ -34,3 +34,25 @@ reparadas, no certificados de cada candidato flotante entregado por el solver.
 
 Pendientes externos: DOI/deposición persistente y carga efectiva en el portal.
 No se ha publicado ni enviado el manuscrito mediante estos scripts.
+
+## Última revisión: límites e incertidumbre agrupada
+
+- A/B. Se evita atribuir al contrato una mejora general de eficiencia o recuperación
+  primal en esta muestra. Todas las políticas cumplen 72/72 presupuestos. Budget-L2
+  reduce trabajo en 24/72 pares semilla, pero en solo 10/24 escenarios al agregar
+  las tres semillas. Las razones por horizonte se publican sin inferir una regla.
+- C. Se destaca en la sección principal el deterioro candidato máximo de 1,020%
+  frente a Base y se define su denominador. El gap solicitado del 1% no limita
+  diferencias entre candidatos de políticas distintas ni certifica sus óptimos.
+- D. Una nueva tabla principal reúne cumplimiento, contradicciones, razones de
+  trabajo/tiempo e intervalos con victorias por escenario. Incluye todos los casos.
+- E. Análisis posterior identificado como tal: 100000 remuestras de los 24
+  escenarios con las tres semillas juntas, cuatro controles, trabajo y tiempo.
+  Frente a L2: trabajo 0,931 [0,702, 1,133], tiempo 0,996 [0,832, 1,119].
+  No se establece una ventaja; ambos intervalos incluyen 1. Se conservan 96
+  agregaciones y 32 intervalos, todos reconstruidos desde trabajo API y tiempos
+  externos por un verificador independiente. No hubo nuevas llamadas al solver.
+
+Los intervalos son marginales, descriptivos y condicionados a los seis padres
+conocidos; no incorporan incertidumbre sobre otras familias ni certifican
+optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.

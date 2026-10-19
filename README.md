@@ -10,7 +10,7 @@ residual-budget contracts in original application units, explicit factor-selecti
 finite-precision export and independent verification. The C++ dispatch exporter and Python
 budget selector are separate components. The archived numerical baseline is retained, with
 a controlled row-only Ruiz comparison, final-policy stage ablation, and three application
-precision scenarios on the same 30 operational models added for OMS. The current ORF adaptation is `v1.4.1-orf-submission`, with a separate prospective check on 24 generated dispatch scenarios (360 primary MIP calls plus 360 logging confirmations and 96 exact LP attempts). These use known parent data; they are new parameter scenarios, not an independent application. It reuses the exact audited `v1.3.17-oms-submission` scientific archive. Neither local snapshot has a separate Zenodo version DOI.
+precision scenarios on the same 30 operational models added for OMS. The current ORF adaptation is `v1.4.2-orf-submission`, with a separate prospective check on 24 generated dispatch scenarios (360 primary MIP calls plus 360 logging confirmations and 96 exact LP attempts). These use known parent data; they are new parameter scenarios, not an independent application. It reuses the exact audited `v1.3.17-oms-submission` scientific archive. Neither local snapshot has a separate Zenodo version DOI.
 
 The OMS activation follow-up adds 114 nonpilot solver calls, 20 exact feasible witnesses, and matched numerical controls on six archived scenarios without the documented demand inversion. [Findings and limits](exploration/oms-followup-20261014/RESULTADOS.md) distinguish original-unit precision from MILP-bound validity; `make research-oms-check` verifies the supplied data without optimizing.
 
@@ -223,3 +223,11 @@ primal-budget checks, NF3 meets 23. The 18 implementation pairs preserve every
 point, solver endpoint and Work, with paired full-time ratio 0.824 on this host.
 The favorable dispatch zero-flag regime does not persist across both tolerances.
 `make research-oms-check` replays these results without solving.
+
+The prospective outcome table in the main text reports all accuracy and bound
+checks alongside work and complete-process ratios. A separately identified post
+hoc analysis resamples 24 whole scenarios, retaining all three seeds together.
+Against L2, the work ratio is 0.931 (95% interval 0.702–1.133), with 10/24 scenario
+wins; the time ratio is 0.996 (0.832–1.119), with 6/24 wins. These conditional
+intervals do not establish a general incremental advantage or external validity.
+Replay: `python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py`.
