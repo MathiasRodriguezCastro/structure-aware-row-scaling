@@ -1,6 +1,6 @@
 # Operations Research Forum manuscript
 
-Current editorial version: **v1.4.2-orf-submission**.
+Current editorial version: **v1.5.0-orf-submission**.
 
 **Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational
 and Software Study** — Mathias Rodríguez Castro.
@@ -44,3 +44,13 @@ Against L2, the work ratio is 0.931 (95% interval 0.702–1.133), with 10/24 sce
 wins; the time ratio is 0.996 (0.832–1.119), with 6/24 wins. These conditional
 intervals do not establish a general incremental advantage or external validity.
 Replay: `python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py`.
+
+
+The v1.5.0 update selectively incorporates the frozen candidate/precision/robustness
+follow-up: 630 assigned MIP runs plus one identified technical repeat, on the same
+24 known scenarios with three new seeds. Section 5.3 adds finite-candidate selection
+with actual-export error reserves. A short main-text summary reports verified-target
+successes and PAR2 without claiming a general time advantage over L2. Detailed
+CPLEX, ScaleFlag, margin and selector checks are in Online Resource 1. The exact
+frozen follow-up ZIP and its prior validation are included in Online Resource 2.
+All five new tables regenerate from the independently replayed machine results.

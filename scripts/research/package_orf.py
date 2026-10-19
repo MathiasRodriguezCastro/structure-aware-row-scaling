@@ -7,7 +7,7 @@ import re
 import shutil
 import unicodedata
 import zipfile
-from orf_config import ROOT, PAPER, ORF, OUT, VERSION, DATE, TITLE, PARENT, PARENT_DIR, FOLLOWUP, FOLLOWUP_ARCHIVE, sha
+from orf_config import ROOT, PAPER, ORF, OUT, VERSION, DATE, TITLE, PARENT, PARENT_DIR, FOLLOWUP, FOLLOWUP_ARCHIVE, VERIFIED, VERIFIED_ARCHIVE, sha
 
 FILES = ('main_orf.pdf','orf-editable-sources.zip','cover-letter.pdf','title-page.pdf','ESM_1.pdf','ESM_2.zip')
 EXTRAS = ('REPRODUCE.md','UPLOAD_INSTRUCTIONS.md','ONLINE_RESOURCE_CAPTIONS.txt',
@@ -87,6 +87,13 @@ def main():
     followup_entries={p.relative_to(ROOT).as_posix():p for p in FOLLOWUP.rglob('*')
         if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.zip')}
     followup_zip=OUT/FOLLOWUP_ARCHIVE;archive(followup_zip,followup_entries)
+    verified_zip=VERIFIED/'research-evidence.zip'
+    verified_validation=json.loads((VERIFIED/'PACKAGE_VALIDATION.json').read_text())
+    assert verified_validation['status']=='passed' and verified_validation['clean_extraction']
+    assert sha(verified_zip)==verified_validation['research_evidence_sha256']
+    assert verified_validation['new_optimization_assignments']==630
+    assert verified_validation['additional_technical_repetitions']==1
+    assert all(r['passed'] for r in verified_validation['commands'])
     # Canonical editorial inputs and build tools, distinct from the scientific archive.
     revision={}
     roots=['README.md','CITATION.cff','.zenodo.json','LICENSE','DATA_LICENSE.md','Makefile',
@@ -95,15 +102,20 @@ def main():
            'paper/orf/TEMPLATE_PROVENANCE.md','paper/orf/REVISION_NOTES.md','paper/orf/cover-letter.tex','paper/orf/title-page.tex','paper/orf/sn-jnl.cls','paper/orf/sn-basic.bst',
            'paper/submission/orf/README.md','paper/submission/orf/SUBMISSION_CHECKLIST.md',
            'scripts/research/orf_config.py','scripts/research/build_orf.py',
-           'scripts/research/package_orf.py','scripts/research/validate_orf.py','scripts/research/freeze_orf.py']
+           'scripts/research/package_orf.py','scripts/research/validate_orf.py','scripts/research/freeze_orf.py',
+           'scripts/research/orf_followup_tables.py']
     for name in roots:revision[name]=ROOT/name
     for folder in ('paper/orf/editorial','paper/sections','paper/tables','paper/figs/research'):
         for p in (ROOT/folder).rglob('*'):
             if p.is_file() and p.suffix in ('.tex','.pdf','.bib'):revision[p.relative_to(ROOT).as_posix()]=p
     revision_zip=OUT/'orf-revision-sources.zip';archive(revision_zip,revision)
     snapshot={'version':VERSION,'date':DATE,'target':'Operations Research Forum','title':TITLE,
-        'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':720,
+        'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':1351,
         'prospective_primary_MIP_calls':360,'logging_confirmation_MIP_calls':360,
+        'verified_followup_MIP_assignments':630,'verified_followup_technical_MIP_repetitions':1,
+        'verified_followup_new_independent_scenarios':0,
+        'verified_followup_archive_sha256':sha(verified_zip),
+        'verified_followup_prior_validation_sha256':sha(VERIFIED/'PACKAGE_VALIDATION.json'),
         'new_exact_LP_attempts':96,'prospective_archive_sha256':sha(followup_zip),
         'prospective_validation_sha256':sha(FOLLOWUP/'VALIDATION.json'),
         'cluster_analysis_sha256':sha(FOLLOWUP/'CLUSTER_ANALYSIS.json'),
@@ -117,12 +129,13 @@ def main():
             'new cover letter and ORF declarations/portal preparation',
             'prospective 24-scenario validation, 360 primary MIP calls, 360 logging confirmations and rational references',
             'finite-export error bound, concise discussion, workflow figure and uncluttered author line',
-            'main-text prospective outcome table, candidate-cost qualification and post hoc scenario-cluster uncertainty'],
+            'main-text prospective outcome table, candidate-cost qualification and post hoc scenario-cluster uncertainty',
+            'selective verified-candidate summary and constructive export-aware selector; controls in Online Resource 1'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
     captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
         'exact arithmetic checks, numerical limitations and reproduction instructions.\n\n'
-        'Online Resource 2: Current ORF sources, prospective scenario evidence and the unchanged audited scientific code/data '
+        'Online Resource 2: Current ORF sources, prospective and verified-candidate evidence, and the unchanged audited scientific code/data '
         'archive, including generators, scaling software, model exports, native logs, saved '
         'solutions, rational witnesses and independent replay programs. Inheritance and '
         'file checksums identify the exact versions.\n')
@@ -143,6 +156,11 @@ resource captions are addressed to ORF. A separately identified prospective stud
 adds 24 new within-family scenarios, 360 primary MIP calls, a registered 360-call
 logging confirmation and 96 exact LP attempts. The first campaign is retained
 with its suppressed native traces; the confirmation supplies complete logs.
+A further frozen follow-up supplies 630 MIP assignments and one technical
+repeat, with new seeds on those same 24 known scenarios. It contains candidate
+traces, physical-margin tests, CPLEX/ScaleFlag controls and export-aware selection.
+It supplies no new independent scenarios. The total since the inherited OMS
+archive is 1,351 MIP calls, including both kinds of technical repetition.
 
 ## Reproduce the evidence
 
@@ -190,6 +208,31 @@ perturbations and three horizon sizes. This is prospective within-family evidenc
 it is not a new independent application. The 96 rational LP acquisition attempts
 are separately costed and do not certify every returned floating-point candidate.
 
+## Replay the verified-candidate and export-selector follow-up
+
+Extract {VERIFIED_ARCHIVE} over that same repository root and verify
+`sha256sum --quiet -c FOLLOWUP_CONTENTS.sha256` before running these commands:
+
+```sh
+python3 exploration/orf-v15-verified-20261019/check.py
+python3 exploration/orf-v15-verified-20261019/check_selector.py
+python3 exploration/orf-v15-verified-20261019/precision.py
+python3 exploration/orf-v15-verified-20261019/analyze.py
+python3 exploration/orf-v15-verified-20261019/check_statistics.py
+python3 exploration/orf-v15-verified-20261019/projection_sensitivity.py
+```
+
+These six license-free saved-result replays retain target misses, tiny bound
+violations, the failed pre-optimizer worker and the identified technical repeat.
+They check all 630 assignments, 6,725 primary candidate events, the exact finite
+export/rounding reserves and 44 scenario-cluster intervals. The ZIP is inherited
+byte-for-byte from its clean-extraction research audit, whose record is supplied
+as VERIFIED_PACKAGE_VALIDATION.json. That record refers to the pre-integration
+v1.4.2 manuscript; the current SNAPSHOT.json and validation identify this version.
+The research note's original decision to keep the study separate is historical;
+the current ORF sources incorporate the selected findings only. Neither saved
+replay nor a paper rebuild reruns commercial optimization or recreates timings.
+
 ## Build the current documents
 
 Extract orf-editable-sources.zip separately, verify CONTENTS.sha256 and run `make`.
@@ -201,7 +244,12 @@ To reconstruct the complete package from those canonical revision sources,
 create paper/submission/oms/releases/{PARENT}/ beneath the extracted revision
 root. Copy {SCIENCE} there as reproducibility-artifact.zip and copy
 SCIENTIFIC_PARENT_VALIDATION.json there as VALIDATION.json. Then run
-`make paper` and `python3 scripts/research/package_orf.py`. All these inputs
+`make paper` and `python3 scripts/research/package_orf.py`. For packaging, also
+extract both follow-up archives over the revision root, copy {VERIFIED_ARCHIVE}
+to exploration/orf-v15-verified-20261019/research-evidence.zip and copy
+VERIFIED_PACKAGE_VALIDATION.json there as PACKAGE_VALIDATION.json. Run
+`python3 scripts/research/orf_followup_tables.py` to regenerate the five selected
+follow-up tables. All these inputs
 are supplied here; the parent ZIP does not need a separate public download.
 
 Rebuilding all 1,530 historical bases additionally requires the separate baseline
@@ -216,6 +264,7 @@ own notices. Manuscript text and PDFs are outside the code/data licenses.
     esm=OUT/'ESM_2.zip'
     archive(esm,{'README.md':guide,'SNAPSHOT.json':OUT/'SNAPSHOT.json',
         FOLLOWUP_ARCHIVE:followup_zip,
+        VERIFIED_ARCHIVE:verified_zip,'VERIFIED_PACKAGE_VALIDATION.json':VERIFIED/'PACKAGE_VALIDATION.json',
         SCIENCE:parent_archive,'SCIENTIFIC_PARENT_VALIDATION.json':PARENT_DIR/'VALIDATION.json',
         'orf-editable-sources.zip':source_zip,'orf-revision-sources.zip':revision_zip,
         'ONLINE_RESOURCE_CAPTIONS.txt':captions,'CITATION.cff':ROOT/'CITATION.cff',

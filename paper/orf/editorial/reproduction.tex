@@ -1,6 +1,6 @@
 \section{Reproduction and artifact layout}
 Online Resource~2 is the complete code/data package for
-\path{v1.4.2-orf-submission}. It contains the unchanged scientific-evidence archive
+\path{v1.5.0-orf-submission}. It contains the unchanged scientific-evidence archive
 \path{v1.3.17-oms-submission}, its validation record, the current ORF editable
 sources and a checksum-based inheritance record. The older editorial files inside
 the scientific archive identify its provenance; the current article and this
@@ -20,6 +20,23 @@ Its protocol distinguishes new generated scenarios from known parent data and
 from an independent application. Native solver logs and every saved point are
 retained. The rational certificates are reference points and lower bounds,
 rather than certificates of every returned floating-point candidate.
+
+Next extract \path{verified-candidates-orf-20261019.zip} over that same root.
+Its \path{FOLLOWUP_CONTENTS.sha256} identifies the frozen follow-up files.
+Run these six license-free commands from the extracted repository root:
+\begin{lstlisting}
+python3 exploration/orf-v15-verified-20261019/check.py
+python3 exploration/orf-v15-verified-20261019/check_selector.py
+python3 exploration/orf-v15-verified-20261019/precision.py
+python3 exploration/orf-v15-verified-20261019/analyze.py
+python3 exploration/orf-v15-verified-20261019/check_statistics.py
+python3 exploration/orf-v15-verified-20261019/projection_sensitivity.py
+\end{lstlisting}
+These replay saved candidate vectors, exact export reserves, target attainment,
+grouped uncertainty and the identified post hoc projection sensitivity. They
+make no new commercial-solver calls. The separate package-validation record
+identifies the exact inherited follow-up ZIP; canonical ORF sources supply the
+table generator for the selected manuscript summaries.
 
 Extract \texttt{scientific-evidence-oms-v1.3.17.zip} into an empty directory.
 From its root, verify \texttt{CONTENTS.sha256}, install the dependencies in

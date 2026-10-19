@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.4.2-orf-submission**, 19 October 2026.
+Local version: **v1.5.0-orf-submission**, 19 October 2026.
 Proposed type: Original Research Article.
 
 | File | Role |
@@ -28,8 +28,11 @@ distribution files are outside Git and are supplied inside Online Resource 2.
 To rebuild the full package after extracting the canonical revision sources,
 copy `scientific-evidence-oms-v1.3.17.zip` from Online Resource 2 to that frozen
 directory as `reproducibility-artifact.zip`, and copy
-`SCIENTIFIC_PARENT_VALIDATION.json` there as `VALIDATION.json`. Then run the
-commands above. The directory is created locally if absent; no download of an
+`SCIENTIFIC_PARENT_VALIDATION.json` there as `VALIDATION.json`. Extract both follow-up ZIPs over the same revision root. Copy
+`verified-candidates-orf-20261019.zip` into
+`exploration/orf-v15-verified-20261019/research-evidence.zip`, and its supplied
+`VERIFIED_PACKAGE_VALIDATION.json` into that directory as `PACKAGE_VALIDATION.json`.
+Then run the commands above. The directory is created locally if absent; no download of an
 unpublished parent release is required.
 The canonical code, experiments and current editorial fragments remain in Git.
 The editable LaTeX source bundle can be compiled independently of the code/data
@@ -60,3 +63,13 @@ Against L2, the work ratio is 0.931 (95% interval 0.702–1.133), with 10/24 sce
 wins; the time ratio is 0.996 (0.832–1.119), with 6/24 wins. These conditional
 intervals do not establish a general incremental advantage or external validity.
 Replay: `python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py`.
+
+
+The v1.5.0 update selectively incorporates the frozen candidate/precision/robustness
+follow-up: 630 assigned MIP runs plus one identified technical repeat, on the same
+24 known scenarios with three new seeds. Section 5.3 adds finite-candidate selection
+with actual-export error reserves. A short main-text summary reports verified-target
+successes and PAR2 without claiming a general time advantage over L2. Detailed
+CPLEX, ScaleFlag, margin and selector checks are in Online Resource 1. The exact
+frozen follow-up ZIP and its prior validation are included in Online Resource 2.
+All five new tables regenerate from the independently replayed machine results.

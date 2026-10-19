@@ -15,6 +15,8 @@
 - [x] Manual ORCID marker removed; full identifier retained on the separate title page and in portal metadata.
 - [x] Clean-extraction replay, table/figure regeneration and document builds verified before freezing.
 - [x] Portal text prepared from the current sources, rather than the historical manuscript.
+- [x] Selective v1.5 follow-up: exact-export selector, brief verified-target summary and supplementary robustness/margin controls.
+- [x] Frozen follow-up archive, all six license-free replays and five regenerated tables included in the complete package.
 - [ ] Confirm exact article type, upload categories and size limits in the ORF portal.
 - [ ] Enter author contributions, competing interests and other required declarations in the interface.
 - [ ] Deposit the exact final version in Zenodo, supply its reserved DOI and update availability.

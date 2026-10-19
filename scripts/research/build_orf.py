@@ -5,6 +5,12 @@ import shutil
 from orf_config import ROOT, PAPER, ORF, TITLE, VERSION
 
 
+def fragment(name):
+    text = (ORF/'editorial'/name).read_text()
+    return re.sub(r'\\input\{editorial/([^}]+)\}',
+                  lambda m: fragment(m[1]+'.tex'), text)
+
+
 def relabel(text):
     # Retain internal scientific labels and data paths; change published SI names.
     text = re.sub(r'Supplementary\s+Material\s*~?\s*([12])', r'Online Resource~\1', text)
@@ -36,7 +42,7 @@ def main():
     end = source.index(r'\input{sections/related_work}', start)
     source = source[:start]+(ORF/'editorial/validation-overview.tex').read_text()+'\n'+source[end:]
     source = source.replace(r'\section{Discussion and conclusions}',
-        (ORF/'editorial/prospective-main.tex').read_text()+'\n'+r'\section{Discussion and conclusions}',1)
+        fragment('prospective-main.tex')+'\n'+fragment('verified-main.tex')+'\n'+r'\section{Discussion and conclusions}',1)
     start = source.index(r'\subsection{Implications for scaling software}')
     end = source.index(r'\subsection{Scope and limitations}', start)
     source = source[:start]+(ORF/'editorial/discussion.tex').read_text()+'\n'+source[end:]
@@ -104,7 +110,7 @@ Accuracy contracts, Computational optimization, Reproducibility}
     supplement = supplement.replace('Prepared for Optimization Methods and Software','Prepared for Operations Research Forum')
     supplement = supplement.replace('v1.3.17-oms-submission', VERSION)
     reproduction = supplement.index(r'\section{Reproduction and artifact layout}')
-    supplement = supplement[:reproduction]+(ORF/'editorial/prospective-supplement.tex').read_text()+'\n'+(ORF/'editorial/export-errors.tex').read_text()+'\n'+(ORF/'editorial/reproduction.tex').read_text()+'\n'+r'\end{document}'+'\n'
+    supplement = supplement[:reproduction]+fragment('prospective-supplement.tex')+'\n'+fragment('export-errors.tex')+'\n'+fragment('verified-supplement.tex')+'\n'+fragment('reproduction.tex')+'\n'+r'\end{document}'+'\n'
     supplement = relabel(supplement)
     # The original SI reproduction recipe refers to the unchanged scientific archive.
     marker = 'This supplement specifies the computational evidence and its limitations.'
@@ -120,7 +126,12 @@ Accuracy contracts, Computational optimization, Reproducibility}
             dest = ORF/folder/path.name
             dest.parent.mkdir(parents=True,exist_ok=True)
             if folder=='sections':
-                dest.write_text(relabel(path.read_text()))
+                section = relabel(path.read_text())
+                if path.name=='residual_contract.tex':
+                    anchor = r'\paragraph{Verification after solving}'
+                    assert section.count(anchor)==1
+                    section = section.replace(anchor,fragment('export-selector-main.tex')+'\n'+anchor)
+                dest.write_text(section)
             else:
                 shutil.copyfile(path,dest)
     (ORF/'research-references.bib').write_text((PAPER/'research-references.bib').read_text()+

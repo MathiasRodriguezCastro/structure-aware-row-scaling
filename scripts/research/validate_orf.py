@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 import unicodedata
 import zipfile
-from orf_config import ROOT, PAPER, ORF, OUT, VERSION, PARENT, TITLE, FOLLOWUP_ARCHIVE, sha
+from orf_config import ROOT, PAPER, ORF, OUT, VERSION, PARENT, TITLE, FOLLOWUP_ARCHIVE, VERIFIED_ARCHIVE, sha
 from package_orf import FILES, EXTRAS, SCIENCE, build_delivery, write_json
 from build_orf import relabel
 
@@ -21,12 +21,12 @@ def run(command,cwd):
     return r.stdout
 
 
-def extract(path,destination):
+def extract(path,destination,manifest='CONTENTS.sha256'):
     destination.mkdir(parents=True,exist_ok=True)
     with zipfile.ZipFile(path) as z:
         assert all((destination/n).resolve().is_relative_to(destination.resolve()) for n in z.namelist())
         z.extractall(destination)
-    run(['sha256sum','--quiet','-c','CONTENTS.sha256'],destination)
+    run(['sha256sum','--quiet','-c',manifest],destination)
 
 
 def compile_documents(folder):
@@ -64,6 +64,10 @@ def scientific_preservation(science,sources):
     assert addition in new_core
     new_core=new_core.split(addition,1)[0]
     new_core=re.sub(r'\\paragraph\{Research-tool documentation\}.*?\n\n','',new_core,flags=re.S)
+    extension=r'% BEGIN ORF EXPORT SELECTOR EXTENSION.*?% END ORF EXPORT SELECTOR EXTENSION'
+    assert len(re.findall(extension,new_core,re.S))==1
+    assert r'\label{eq:orf-selected-export-contract}' in new_core
+    new_core=re.sub(extension,'',new_core,flags=re.S)
     assert normalized(old_core)==normalized(new_core),'Scientific sections changed'
     for start,finish in [(r'\subsection{Scope and limitations}',r'\section*{Data and software availability}')]:
         assert normalized(old.split(start,1)[1].split(finish,1)[0])==normalized(new.split(start,1)[1].split(finish,1)[0])
@@ -98,7 +102,8 @@ def scientific_preservation(science,sources):
         'theorem_definition_example_and_proof_environments':len(old_math),
         'displayed_math_blocks_preserved':len(old_display),'numerical_table_files_identical':len(tables),
         'additional_elementary_export_bound_documented':True,
-        'new_optimization_experiments':720,'new_exact_LP_attempts':96}
+        'constructive_export_selector_added_without_changing_inherited_statements':True,
+        'new_optimization_experiments':1351,'new_exact_LP_attempts':96}
 
 
 def abstract_normalized(text):
@@ -122,7 +127,7 @@ def main():
         help='Reuse an earlier full replay only for a byte-identical parent evidence archive; current sources and prospective evidence are still checked.')
     args=parser.parse_args()
     result={'version':VERSION,'title':TITLE,'target':'Operations Research Forum',
-            'new_optimization_experiments':720,'new_exact_LP_attempts':96,
+            'new_optimization_experiments':1351,'new_exact_LP_attempts':96,
             'submitted':False,'published':False,'version_doi':None}
     uploads=OUT/'uploads'
     with tempfile.TemporaryDirectory(prefix='orf-complete-audit-') as tmp:
@@ -212,6 +217,36 @@ def main():
         assert cluster_validation['analysis_sha256']==snapshot['cluster_analysis_sha256']
         assert cluster_validation['confidence_intervals_reconstructed_from_native_work_and_outer_timings']==32
         result['scenario_cluster_uncertainty']=cluster_validation
+        # Replay the byte-identical frozen follow-up from the complete delivery.
+        assert sha(esm/VERIFIED_ARCHIVE)==snapshot['verified_followup_archive_sha256']
+        assert sha(esm/'VERIFIED_PACKAGE_VALIDATION.json')==snapshot['verified_followup_prior_validation_sha256']
+        previous_verified=json.loads((esm/'VERIFIED_PACKAGE_VALIDATION.json').read_text())
+        assert previous_verified['research_evidence_sha256']==sha(esm/VERIFIED_ARCHIVE)
+        extract(esm/VERIFIED_ARCHIVE,science,manifest='FOLLOWUP_CONTENTS.sha256')
+        verified=science/'exploration/orf-v15-verified-20261019'
+        frozen_names=['VALIDATION.json','SELECTOR_VALIDATION.json','PRECISION_RESULTS.json',
+                      'COMPUTATIONAL_RESULTS.json','STATISTICS_VALIDATION.json','PROJECTION_SENSITIVITY.json']
+        frozen_results={n:(verified/n).read_bytes() for n in frozen_names}
+        replay={}
+        for command in ['check.py','check_selector.py','precision.py','analyze.py',
+                        'check_statistics.py','projection_sensitivity.py']:
+            print('Frozen verified-candidate follow-up: '+command,flush=True)
+            output=run(['python3',str(verified/command)],science)
+            replay[command]={'passed':True,'output_sha256':hashlib.sha256(output.encode()).hexdigest()}
+        for n,original in frozen_results.items():
+            assert (verified/n).read_bytes()==original,'Follow-up replay drift: '+n
+        checked=json.loads((verified/'VALIDATION.json').read_text())
+        assert checked['status']=='passed' and checked['research_MIP_assignments']==630
+        assert checked['additional_technical_MIP_calls']==1 and checked['technical_repeat_independently_compared']
+        assert checked['candidate_events']==6725 and checked['full_rational_candidate_audits']==1943
+        statistics=json.loads((verified/'STATISTICS_VALIDATION.json').read_text())
+        assert statistics['status']=='passed'
+        result['verified_followup_replay']={'status':'passed','archive_sha256':sha(esm/VERIFIED_ARCHIVE),
+            'six_commands':replay,'replayed_results_identical':True,
+            'MIP_assignments':630,'technical_repetitions':1,'new_independent_scenarios':0,
+            'candidate_events':6725,'full_rational_candidate_audits':1943,
+            'statistics_validation':statistics,
+            'selector_validation':json.loads((verified/'SELECTOR_VALIDATION.json').read_text())}
         for name,value in before.items():
             assert (science/'paper/tables'/name).read_bytes()==value==(sources/'tables'/name).read_bytes(),name
         assert render_hashes(science)==figures
@@ -231,6 +266,15 @@ def main():
         for n, original in fragments.items():
             assert (science/'paper/orf/editorial'/n).read_bytes()==original,n
         result['prospective_tables_regenerated_from_audited_data']=True
+        # Render every added table from the cleanly replayed machine results.
+        (revision/'exploration').mkdir(exist_ok=True)
+        (revision/'exploration/orf-v15-verified-20261019').symlink_to(verified,target_is_directory=True)
+        added_tables=[p for p in editorial.glob('verified-*-table.tex')]
+        assert len(added_tables)==5
+        originals={p.name:p.read_bytes() for p in added_tables}
+        run(['python3','scripts/research/orf_followup_tables.py'],revision)
+        assert all((editorial/n).read_bytes()==value for n,value in originals.items())
+        result['verified_followup_tables_regenerated_identically']=len(originals)
         run(['python3','scripts/research/build_orf.py'],revision)
         assert (revision/'paper/orf/main_orf.tex').read_bytes()==(sources/'main_orf.tex').read_bytes()
         assert (revision/'paper/orf/ESM_1.tex').read_bytes()==(sources/'ESM_1.tex').read_bytes()

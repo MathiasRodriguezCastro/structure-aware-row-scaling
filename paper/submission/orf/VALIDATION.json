@@ -1,21 +1,21 @@
 {
-  "version": "v1.4.2-orf-submission",
+  "version": "v1.5.0-orf-submission",
   "title": "Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational and Software Study",
   "target": "Operations Research Forum",
-  "new_optimization_experiments": 720,
+  "new_optimization_experiments": 1351,
   "new_exact_LP_attempts": 96,
   "submitted": false,
   "published": false,
   "version_doi": null,
   "source_builds": {
     "main_orf": {
-      "pages": 41,
+      "pages": 43,
       "rebuilt_from_extracted_sources": true,
       "overfull_boxes": 0,
       "undefined_references": 0
     },
     "ESM_1": {
-      "pages": 34,
+      "pages": 38,
       "rebuilt_from_extracted_sources": true,
       "overfull_boxes": 0,
       "undefined_references": 0
@@ -34,7 +34,7 @@
     }
   },
   "forms": {
-    "abstract_words": 209,
+    "abstract_words": 203,
     "abstract_matches_current_pdf": true,
     "keywords": 6,
     "declarations": 5,
@@ -48,11 +48,12 @@
     "displayed_math_blocks_preserved": 16,
     "numerical_table_files_identical": 42,
     "additional_elementary_export_bound_documented": true,
-    "new_optimization_experiments": 720,
+    "constructive_export_selector_added_without_changing_inherited_statements": true,
+    "new_optimization_experiments": 1351,
     "new_exact_LP_attempts": 96
   },
   "parent_replay_reuse": {
-    "validation_record_sha256": "626e2ee3f5caa33d478d44cd7ed29aa41b3e9ae5cbd252b31d3874dbd103d300",
+    "validation_record_sha256": "99b7ba176c5a94387667fa6debe095fdd1911462c214154bd1e658f57d51a97f",
     "parent_archive_sha256": "6898ad91aae3d4d9a0a35f05c518d749fdff26d91b654ee4223e37a577a8125c",
     "reason": "Editorial revalidation; identical parent evidence was fully replayed in the supplied earlier audit."
   },
@@ -668,6 +669,98 @@
     "scenario_aggregates_sha256": "a1b9d970e19eff42abda0bc0c5a2d3420521ef31ceff84b8d75b0948b848aace",
     "plan_sha256": "ac84addf16e2d42c6c103f19138a9108516d948c45820d160a15264f24683f3e"
   },
+  "verified_followup_replay": {
+    "status": "passed",
+    "archive_sha256": "8b9dde877014036ea272672a54341ec90a02567c3e59f58b74a3d5c6a4d711a2",
+    "six_commands": {
+      "check.py": {
+        "passed": true,
+        "output_sha256": "27d1a01e17c5c6566ac80a07d555bb592752a1292fea78d247bb540191d7d113"
+      },
+      "check_selector.py": {
+        "passed": true,
+        "output_sha256": "ee6f414b4435a7db507a83df430e5bdffa8cecb5d4687145d732dd1f8bde328f"
+      },
+      "precision.py": {
+        "passed": true,
+        "output_sha256": "70c670cc6617827651daa5b5862e3a40384c630d3b5c67a3f068423e8c307917"
+      },
+      "analyze.py": {
+        "passed": true,
+        "output_sha256": "52d926a9880c9ac75e4641cd6396d6b993c1d59bdbf204ea53ee167f9f943447"
+      },
+      "check_statistics.py": {
+        "passed": true,
+        "output_sha256": "1fef94db3ed5f3fa1ee17debca73478cf4892142c61049c07bc6b1a89ac595dd"
+      },
+      "projection_sensitivity.py": {
+        "passed": true,
+        "output_sha256": "a8e84d0cc7fa0d3219dd06ed24adffd85d84c5f8d3440a9a66f260f35ac739db"
+      }
+    },
+    "replayed_results_identical": true,
+    "MIP_assignments": 630,
+    "technical_repetitions": 1,
+    "new_independent_scenarios": 0,
+    "candidate_events": 6725,
+    "full_rational_candidate_audits": 1943,
+    "statistics_validation": {
+      "status": "passed",
+      "grouped_intervals_independently_recomputed": 44,
+      "scenario_scopes": 5,
+      "all_three_seeds_retained": true,
+      "additional_optimizer_calls": 0,
+      "results_sha256": "af08e72d7706ace3f2542ebe07ad268a1b0070f985a2ab99938b00d1754ab560"
+    },
+    "selector_validation": {
+      "status": "passed",
+      "boundary_transfer_checks": 2000,
+      "certified_rows": 80,
+      "rows_with_nonzero_coefficient_export_errors": 80,
+      "ideal_projection_counterexample": {
+        "ideal_factor": 0.3333333333333333,
+        "ideal_sufficient_violation": "360288619226746997153664171315473/216345702438951139179171674062848",
+        "budget": 0.01,
+        "selected": {
+          "factor": 0.33333333333333326,
+          "certified": true,
+          "status": "finite_candidate_certificate",
+          "candidates_tested": 173,
+          "certified_candidates": 92,
+          "rejections": {
+            "export_contract_not_met": 81
+          },
+          "log_distance_to_L2": 2.220446049250313e-16,
+          "B_exact": "300239975158033/162259276829213363391578010288128",
+          "E_exact": "0",
+          "delta_exact": "5764607523034235/576460752303423488",
+          "sufficient_violation_exact": "162259276829513596024197393/54086425609737775787593663774720",
+          "changed_coefficient_products": 0,
+          "rhs_product_error_exact": "-300239975158033/162259276829213363391578010288128"
+        }
+      },
+      "unbounded_column_example": {
+        "factor": 0.13130643285972254,
+        "certified": true,
+        "status": "finite_candidate_certificate",
+        "candidates_tested": 172,
+        "certified_candidates": 66,
+        "rejections": {
+          "missing_finite_bound": 106
+        },
+        "log_distance_to_L2": 0.0,
+        "B_exact": "101229331213429/324518553658426726783156020576256",
+        "E_exact": "0",
+        "delta_exact": "5764607523034235/576460752303423488",
+        "sufficient_violation_exact": "324518553658527941429292149/42611373677684476708312410226688",
+        "changed_coefficient_products": 0,
+        "rhs_product_error_exact": "101229331213429/324518553658426726783156020576256"
+      },
+      "incompatibility_is_of_sufficient_condition_only": true,
+      "additional_optimizer_calls": 0,
+      "selector_sha256": "66cac9dad4252573ea8a81d37b1b2ae4a869ef63a0d95a984e615ff95dfbb4bc"
+    }
+  },
   "replay": {
     "four_standard_commands": {
       "research-oms-check": {
@@ -946,31 +1039,32 @@
     }
   },
   "prospective_tables_regenerated_from_audited_data": true,
+  "verified_followup_tables_regenerated_identically": 5,
   "canonical_editorial_regeneration_identical": true,
   "archives": {
     "main_orf.pdf": {
-      "sha256": "db1acc787d2dd275ea4113ee848dbbefcc292eed0d0ae67415a4d08158e7e413",
-      "bytes": 858889
+      "sha256": "3c4a775f314a58deff7346eba5ad76f67c2360c346b2506ef45863d3abfd63a2",
+      "bytes": 869179
     },
     "orf-editable-sources.zip": {
-      "sha256": "327f8e7bf07e789875a4b860743184521064967efe4f0dc8be0432e043677468",
-      "bytes": 1679830
+      "sha256": "b3e1b47f269c1b858a15468554ed274efdd645e4703b664e65306c3d820f77a3",
+      "bytes": 1718170
     },
     "cover-letter.pdf": {
-      "sha256": "9458a312aa48057e884d76a1a002bd973c272343584eec1be07bac559a0b9ee6",
-      "bytes": 54071
+      "sha256": "8f1961ad4f0c9e1b849f27020d58666889844771ebdb3b82e91451d02c9ebe8e",
+      "bytes": 54338
     },
     "title-page.pdf": {
       "sha256": "8b38226aa8f5cae67722ee1a958cf7fcefa903e5310765e46a5466e18ad6c277",
       "bytes": 91178
     },
     "ESM_1.pdf": {
-      "sha256": "05828591601f109e4f33a4679ff0e42b570f465320bea82d556f59078d30b08a",
-      "bytes": 517678
+      "sha256": "134aff6de409250191de00c4d97940b5cb0d14a6cfae63bd98bcf6ee805e2336",
+      "bytes": 538950
     },
     "ESM_2.zip": {
-      "sha256": "125a1f794ed39b167458b2c91cd261388840cd091107304440918db96ed1b2ed",
-      "bytes": 291052301
+      "sha256": "0cc913c5778915d76bf3ef60dc76ed7119d97a72640fbbfd2b7a328b35c9addf",
+      "bytes": 317255774
     }
   },
   "scientific_parent": {
@@ -980,7 +1074,7 @@
     "byte_identical_to_audited_parent": true
   },
   "delivery": {
-    "sha256": "7e2f795692c54b79ab4430b96092fd4820643ccbb0d6075e38910341a1346f5f",
+    "sha256": "fd977e812e11e126b7bcb72fbf5b1dc588b403f9e3691675d727e5a156090948",
     "checksums_verified": true,
     "files": [
       "ESM_1.pdf",
@@ -996,6 +1090,6 @@
       "orf-editable-sources.zip",
       "title-page.pdf"
     ],
-    "bytes": 293738810
+    "bytes": 320013249
   }
 }

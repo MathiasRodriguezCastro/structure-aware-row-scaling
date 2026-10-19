@@ -1,0 +1,20 @@
+\paragraph{A common verified-candidate target}
+A follow-up on the same 24 scenarios, with three new seeds, tests physical
+budgets and candidate quality jointly (\cref{tab:orf-verified-candidates}).
+The primary target requires cost at most
+$U_{\rm ref}+0.001\max\{1,|U_{\rm ref}|\}$, using an independently checked
+feasible reference, not a certified optimum. The audit also checks exact
+rounded-point bounds, integer distances and remaining-row backward errors.
+Callbacks save candidates; rational verification runs after solving.
+Thus verified availability includes waiting for solver termination and auditing
+the candidate prefix, rather than measuring an online stopping rule.
+\input{editorial/verified-summary-table}
+Budget-L2 attains more targets than L2, but its paired geometric PAR2 ratio
+does not establish a time advantage. Unattained targets receive 60 seconds
+plus preparation; this penalized score is not observed completion time.
+The 1\% native stopping gap can itself prevent attainment of the 0.1\% target.
+Online Resource~1 reports the protocol, scenario-grouped uncertainty, CPLEX and
+\texttt{ScaleFlag} controls, and physical-margin tests. All tested policies
+satisfy the final physical budgets in these controls; they demonstrate neither
+additional primal recovery nor a general computational advantage for the
+export-aware selector.

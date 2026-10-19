@@ -1,0 +1,178 @@
+\section{Verified candidates, physical margins and robustness}
+\label{sec:orf-verified-followup}
+This separately registered follow-up uses the same 24 within-family scenarios,
+not new independent instances. Seeds 211, 257 and 293 replace the earlier seeds.
+The 630 assigned MIP runs comprise 288 candidate-target runs, 126 additional
+precision runs and 216 robustness runs. Reused controls are identified below.
+One additional technical repeat standardizes the first Base run's verification
+timing after an implementation amendment; its 54 candidate vectors, solver work,
+endpoints and first-target indices reproduce exactly. Both traces, the amendment
+and a worker failure before optimizer creation are retained. The repeat adds no
+independent observation. The frozen research note describes the pre-integration
+editorial assessment; the present manuscript incorporates only selected findings.
+
+\subsection{Targets, verification and timing}
+Gurobi 13.0.2 uses four threads, a 30-second limit, a requested 1\% MIP gap,
+automatic presolve, \texttt{FeasibilityTol=1e-6},
+\texttt{IntFeasTol=1e-9}, \texttt{NumericFocus=0} and automatic scaling, except
+for the explicitly named controls. L2-NF3 changes only \texttt{NumericFocus} to 3.
+Runs use fresh sequential processes on the declared local machine.
+The reference physical requirements are 100\,m$^3$ for activation and water
+balance, and 0.01\,MW for power.
+All callback candidate events and the final postsolve point are saved;
+callback events need not improve the incumbent. There are 6,725 primary
+candidate events, with 1,943 full rational candidate audits. Exact rounded costs
+reject the remaining candidates when neither fixed quality threshold is possible;
+their full vectors remain available for replay.
+
+For each scenario, $U_{\rm ref}$ is the exact cost of a rational feasible Base
+witness acquired before these runs. A target uses
+$C(\bar x)\le U_{\rm ref}+\tau\max\{1,|U_{\rm ref}|\}$, with primary
+$\tau=0.001$ and secondary $\tau=0.01$. Neither reference is assumed optimal.
+Qualification requires physical budgets at both raw and integer-rounded points,
+raw integer distances at most $10^{-9}$, and exact variable bounds at the rounded
+point. For rows without a declared physical budget, the rounded-point backward
+error is at most $10^{-6}$, with denominator
+$\max\{1,|b|,\sum_j|a_j\bar x_j|\}$.
+This is a budget-verified approximate candidate, not exact feasibility of every
+row or a MILP optimality certificate. The solver's requested 1\% stopping gap
+can terminate before the primary 0.1\% target, without any numerical failure.
+
+\emph{Discovery} is the elapsed fresh-process time to the first candidate later
+found to qualify. \emph{Verified availability} is the actual elapsed time when
+the postsolve rational audit reaches it, including solver completion, point
+storage, parsing and earlier candidate checks. Neither is an online verified
+stopping experiment. PAR2 retains every paired assignment: a hit contributes
+its measured time, while a miss contributes 60 seconds plus measured process
+preparation. A PAR2 improvement can therefore reflect more target hits rather
+than faster common successes. Common-success ratios describe a selected subset
+and are reported alongside all-assignment scores.
+
+The uncertainty calculation uses 100,000 whole-scenario bootstrap samples,
+retaining all three paired seeds within each sampled scenario. Marginal 95\%
+percentile intervals are computed on log ratios; the primary analysis seed is
+2026101906. The 24-, 12- and six-scenario analyses are conditional on known
+parent structures, rather than uncertainty estimates for unrelated MIP families.
+An independent implementation reconstructs all 44 reported intervals.
+\input{editorial/verified-target-table}
+\input{editorial/verified-comparison-table}
+All four policies satisfy physical budgets in 72/72 final points. Exact final
+domain checks pass in 69/72 Base runs and all 72 runs of the other policies.
+Remaining-row backward errors pass in every run. Budget-L2 still has one
+independently refuted bound, versus seven for L2 and none for L2-NF3; primal
+qualification does not remove this distinction. Bound contradictions use feasible
+witnesses of the actual imported representation. An undetected contradiction is
+not a certificate for every reported bound.
+
+\subsection{Physical requirements and margins}
+Six scenarios (indices 01 and 08 at each horizon) and three seeds test three
+uniform water budgets of 10, 100 and 1,000\,m$^3$, with power budget 0.01\,MW.
+A heterogeneous specification uses activation 10\,m$^3$, water-balance
+0.001\,m$^3$ and power 0.001\,MW. These are numerical study requirements, not
+operator standards; the one-liter balance is a numerical conservation goal,
+not a measurement-accuracy assertion. Each row's physical-to-algebraic unit
+conversion is applied before selection and reconstructed independently.
+Budget-L2 at 100\,m$^3$ and L2 reuse candidate-study runs. The other three
+Budget-L2 specifications add 54 runs; Export-Budget-L2 adds 72, for 126 new calls.
+\input{editorial/verified-precision-table}
+Every policy passes all 18 final physical-budget checks in every specification.
+No row has normalized residual $q$ near the limit (the recorded near-limit range
+is $0.5\le q\le1$). Rechecking the reused 100\,m$^3$ Budget-L2 points under all
+four requirements also passes. Thus this sample supplies margins and contract
+interventions, without additional primal recovery over L2.
+
+The independent uniform-reserve audit performs 95,040 row/configuration checks.
+At the 100\,m$^3$ reference budget, 16,896 of 25,344 L2 physical rows satisfy the
+full export-and-rounding sufficient condition; Budget-L2 satisfies it on all
+25,344 rows across the 24 scenarios. The new selector certifies all 25,344
+row--budget cases on six scenarios and four specifications. These are repeated
+row/specification checks, not independent experimental units. In this sample,
+the old Budget-L2 factors already satisfy the actual-export condition: the new
+selector integrates the check into selection rather than recovering missing
+conditional coverage. A compiled numerical-envelope control reproduces every
+old factor exactly. Once the factors coincide, labels alone do not change the
+solver's imported model.
+
+A precheck at a 1\,m$^3$ activation budget finds 8,256 rows in 22/24 scenarios
+with $E\ge\delta$ at integer distance $10^{-9}$. Because $\epsilon>0$ and
+$B\ge0$, no factor can satisfy the stated sufficient contract for those rows.
+This is neither dispatch infeasibility nor proof that an actual point cannot
+meet 1\,m$^3$. No MIP is solved for this precheck, and the two other scenarios
+are not thereby certified compatible in all respects.
+
+\subsection{CPLEX and internal scaling}
+CPLEX 22.1.2 tests 12 scenarios (indices 01, 03, 05 and 07 at each horizon),
+three seeds and Base/L2/Budget-L2, adding 108 runs. This prespecified subset
+contains three of the known parents. All policies use traditional MIP search
+to expose incumbent callbacks, four threads, 30 seconds, requested gap 1\%,
+primal tolerance $10^{-6}$, integer tolerance $10^{-9}$ and default scaling.
+The full native library is identified by checksum; the default Community API's
+size limit is documented by separate preflight probes. Imported matrices, RHS,
+objectives, bounds and domains are checked against the intended exports.
+Solver work units are compared only within the same solver.
+
+Gurobi tests \texttt{ScaleFlag=0} and 2 on the six precision-study scenarios,
+three seeds and the same three policies, adding 108 runs. Automatic-scaling
+controls reuse 54 candidate-study runs. All final physical budgets pass, even
+where the strict candidate criterion or independently checked dual bounds fail.
+\input{editorial/verified-robustness-table}
+CPLEX's strict exact-bound rule rejects tiny final continuous-bound deviations
+between approximately $1.3\times10^{-13}$ and $4.2\times10^{-11}$; these should
+not be interpreted as substantial physical inaccuracies. A clearly post hoc
+sensitivity rounds integers, projects onto exact variable bounds and rechecks
+the transformed point's physical rows, backward errors and exact cost for every
+policy. CPLEX then attains the primary target in 24/36 Base, 30/36 L2 and 30/36
+Budget-L2 runs; all three attain the secondary target in 36/36. The largest
+CPLEX candidate projection is approximately $2.2\times10^{-9}$.
+The primary results and definition remain unchanged. No online availability
+times are claimed for these projected points, and projection does not validate
+the contradicted dual bounds. Thus CPLEX supplies a transfer/control result,
+without an incremental Budget-L2 benefit over L2. The wide six-scenario
+\texttt{ScaleFlag} intervals likewise establish no general advantage.
+
+\subsection{Constructive selector and independent checks}
+The export-aware policy uses \eqref{eq:orf-export-contract} during selection.
+For every candidate it forms the products, writes 17 significant decimal
+digits, parses binary64, and computes exact rational differences from $\alpha a$
+and $\alpha b$. It rejects overflow, underflow of a nonzero coefficient, actual
+written magnitudes outside $[10^{-9},10^9]$, a nonzero coefficient error without
+a finite absolute variable bound, or a failed sufficient contract. Zero error
+needs no variable bound. RHS products must also remain finite.
+
+For $\delta>E$, the implementation first forms inward-rounded binary64
+endpoints of the ideal search interval
+$[\max\{\epsilon/(\delta-E),\ell/m\},U/M]$.
+Its finite candidate list contains the constrained L2 target and endpoints,
+32 adjacent representable neighbors in each direction from that target,
+65 logarithmically spaced trial values, and every representable power of two
+inside the interval. Duplicates are removed. Candidates are ordered by the
+computed binary64 key
+$(|\log\alpha-\log\alpha_{L2}|,-\alpha)$, so ties prefer the larger factor.
+The ranked implementation returns the first exact certificate; an exhaustive
+implementation checks the same list and returns its first successful key.
+Consequently both implementations select the same factor under this numerical
+ranking. This is not exact real-logarithm ordering or global optimization over
+all binary64 factors. Restricting the ideal search interval may miss factors
+whose written coefficients happen to satisfy the limits after rounding.
+
+If $E\ge\delta$, the sufficient condition is empty for every positive factor.
+Other empty-search or failed-list outcomes are explicit abstentions, not a
+complete nonexistence proof for actual-export factors. For a returned factor,
+the guarantee still requires the raw variable bounds, actual written residual
+and integer distances used in its certificate. Nominal solver parameters do not
+prove these hypotheses; direct original-point verification remains necessary.
+
+Independent tests check 2,000 rational points on exported-tolerance boundaries
+on 80 rows with nonzero coefficient export errors, compare ranked and exhaustive
+selection, and exercise missing-bound and rounding-incompatibility cases.
+A controlled example uses $a=(3)$, $b=0.1$, $X=10^{16}$ and $\delta=0.01$:
+the ideal binary64 factor 0.3333333333333333 fails the uniform export reserve,
+whereas the neighboring selected factor 0.33333333333333326 passes. This is a
+software test, not evidence of an applied speedup or a second-family benefit.
+The ranked implementation reproduces all 24 complete experimental LP exports
+by SHA-256. A later selection-only benchmark measures medians of 0.630 seconds
+for the ranked procedure and 8.175 seconds for the exhaustive prototype.
+It compares implementations of the same selector, not Budget-L2 against L2;
+it neither replaces recorded MIP process times nor establishes an end-to-end
+acceleration. Inputs, all outcomes, failed attempts and reproducible checks are
+supplied in Online Resource~2.

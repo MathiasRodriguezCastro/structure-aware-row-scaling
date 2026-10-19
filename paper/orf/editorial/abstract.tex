@@ -1,22 +1,21 @@
 Row scaling preserves a mixed-integer programming model in exact arithmetic but
 changes the application-unit meaning of absolute feasibility tolerances. We
-develop a software workflow using original-unit residual budgets during model
-generation. It selects admissible row factors under coefficient limits,
-reports incompatible requirements, accounts for integer rounding and binary64
-export, and independently checks returned points.
+develop a model-generation workflow using original-unit residual budgets. It
+selects row factors under coefficient limits, reports incompatible requirements,
+accounts for integer rounding, checks binary64 export errors during selection,
+and independently checks returned points.
 Evaluation combines 306 hydrothermal dispatch models, kernel-matched and Ruiz
-controls, enumerated stress tests on three solvers, and independent
-batch-scheduling models. In a directed comparison on six known dispatch models
-and three seeds, the budget-aware Euclidean policy reduces solver work by
-68.3\% relative to no external scaling, measured by a paired geometric mean.
-This result uses a 100\,m\textsuperscript{3} volume budget, automatic presolve and
-integer feasibility tolerance $10^{-9}$ in Gurobi. In that comparison, primal budgets
-are satisfied without detected bound contradictions, with candidate cost deterioration
-below 0.1\%; these checks do not establish equally certified optimality gaps.
-Preparation overhead makes the three inexpensive models slower.
-A prospective check on 24 perturbed scenarios from known parents retains lower
-work against unscaled controls without clear advantage over conventional Euclidean
-scaling, with one budget-aware bound contradiction.
-Batch scheduling verifies budget delivery without an additional primal benefit
-over conventional Euclidean scaling. Performance benefits remain conditional on
-the instance and numerical configuration.
+controls, enumerated stress tests on three solvers, and independent batch scheduling.
+In a directed comparison on six known dispatch models and three seeds,
+budget-aware Euclidean scaling reduces solver work by 68.3\% relative to no
+external scaling, measured by a paired geometric mean. This uses a
+100\,m\textsuperscript{3} volume budget, automatic presolve and integer feasibility
+tolerance $10^{-9}$ in Gurobi. Primal budgets are satisfied without detected bound
+contradictions, with candidate cost deterioration below 0.1\%; these checks do not
+establish equally certified optimality gaps. Preparation overhead slows the three
+inexpensive models. A prospective check on 24 perturbed scenarios from known
+parents retains lower work against unscaled controls, with one budget-aware
+bound contradiction. Common verified-candidate targets show no clear time
+advantage over conventional Euclidean scaling. Batch scheduling verifies budget
+delivery without an additional primal benefit. Performance benefits remain
+conditional on the instance and numerical configuration.

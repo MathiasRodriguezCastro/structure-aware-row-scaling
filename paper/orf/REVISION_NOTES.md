@@ -1,7 +1,8 @@
 # Cierre editorial y validación prospectiva — 19 de octubre de 2026
 
-Versión v1.4.2-orf-submission. Se conserva sin cambios el archivo científico
-OMS v1.3.17 y se añade un ZIP identificado para el seguimiento prospectivo.
+Versión v1.5.0-orf-submission. Se conserva sin cambios el archivo científico
+OMS v1.3.17 y se añaden los ZIP identificados del seguimiento prospectivo y de la exploración
+de candidatos, precisión y robustez.
 
 ## Los dos mensajes de revisión
 
@@ -56,3 +57,23 @@ No se ha publicado ni enviado el manuscrito mediante estos scripts.
 Los intervalos son marginales, descriptivos y condicionados a los seis padres
 conocidos; no incorporan incertidumbre sobre otras familias ni certifican
 optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.
+
+
+## Incorporación selectiva de v1.5.0
+
+- Sección 5.3: selector constructivo con reserva de exportación efectiva, lista
+  finita, aritmética racional para certificar y abstención explícita. No se altera
+  ninguna política experimental anterior ni se amplían los teoremas heredados.
+- Seguimiento breve en la sección prospectiva: 54/72 objetivos primarios Budget-L2
+  frente a 51/72 L2; PAR2 de disponibilidad 0,876 [0,441, 1,722]; 44 éxitos comunes
+  con razón 0,980. No se establece ventaja temporal general. Los candidatos se
+  verifican después del solver, sin presentar el descubrimiento como parada en línea.
+- Controles CPLEX/ScaleFlag, márgenes heterogéneos y verificación del selector en
+  Online Resource 1. Se conserva el contexto de pequeñas violaciones exactas de
+  cotas y la sensibilidad posterior de proyección; no se anuncian nuevas ganancias.
+- Online Resource 2 incorpora, sin recomprimir sus contenidos, el ZIP científico
+  congelado de la exploración y su auditoría anterior. Esa nota refleja la decisión
+  previa a esta incorporación; los documentos actuales identifican la selección.
+- Los 630 MIP más una repetición técnica no agregan escenarios independientes.
+  El total ORF desde el padre OMS es 1.351 llamadas, incluidas las 360 confirmaciones
+  previas. Se reproducen los seis verificadores sin nuevas optimizaciones comerciales.

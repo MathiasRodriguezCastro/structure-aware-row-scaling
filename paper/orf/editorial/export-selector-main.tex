@@ -1,0 +1,23 @@
+% BEGIN ORF EXPORT SELECTOR EXTENSION
+\subsection{Selection with finite-export errors}
+The same workflow can check the products actually written before accepting a
+factor. Write $\widetilde a=\alpha a+e_a$ and
+$\widetilde b=\alpha b+e_b$. If finite bounds give $|x_j|\le X_j$ wherever
+$e_{a,j}\ne0$, define $B(\alpha)=\sum_j|e_{a,j}|X_j+|e_b|$.
+A sufficient contract for the integer-rounded point is
+\begin{equation}\label{eq:orf-selected-export-contract}
+ \epsilon+B(\alpha)+\alpha E\le\alpha\delta.
+\end{equation}
+It requires the raw point to satisfy those bounds, the actual written-row
+residual to be at most $\epsilon$, and the rounding distances used in $E$.
+Online Resource~1 derives the bound and specifies a constructive selector:
+rank a finite list of representable factors near the constrained L2 target,
+including exact dyadic candidates, and return the first passing coefficient
+limits and \eqref{eq:orf-selected-export-contract}. The implementation certifies
+these inequalities with rational arithmetic on the input and serialized
+binary64 data; its logarithmic ranking is floating point. It abstains if no
+listed candidate passes. Since $B$ depends on $\alpha$, this finite search does
+not characterize all admissible factors. Missing bounds with nonzero export
+errors prevent a uniform certificate. The extension leaves the earlier
+experimental policies unchanged and does not certify solver dual bounds.
+% END ORF EXPORT SELECTOR EXTENSION
