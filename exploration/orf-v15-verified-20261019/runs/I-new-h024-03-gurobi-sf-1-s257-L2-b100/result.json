@@ -1,0 +1,159 @@
+{
+  "job": {
+    "id": "I-new-h024-03-gurobi-sf-1-s257-L2-b100",
+    "instance": "new-h024-03",
+    "policy": "L2",
+    "solver": "gurobi",
+    "scale": -1,
+    "seed": 257,
+    "contract": "b100",
+    "experiment": "I"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 30.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "NumericFocus": 0,
+    "IntegralityFocus": 0,
+    "Seed": 257
+  },
+  "native_import": {
+    "rows": 672,
+    "columns": 408,
+    "nonzeros": 1511,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "export_sha256": "e588ebea331df1decd40ae7191cbca0e7ae066bbe45cf7578d6ef067f1b358ae",
+  "outcome": {
+    "status": 2,
+    "completed": true,
+    "solutions": 2,
+    "work": 0.0091023055396403,
+    "objective": -212432.28884535527,
+    "bound": -213562.550961878,
+    "runtime": 0.011144161224365234,
+    "nodes": 1.0,
+    "solver_version": [
+      13,
+      0,
+      2
+    ]
+  },
+  "callback_seconds": 0.00014316500164568424,
+  "events": [
+    {
+      "kind": "MIPSOL",
+      "process_discovery": 0.24951783500000602,
+      "solver_discovery": 0.0003590583801269531,
+      "work": 0.000242809,
+      "objective": 29857799.72319632,
+      "nodes": 0.0,
+      "audit": {
+        "objective_exact": "4620270720288583611636332280162905/154742504910672534362390528",
+        "quality_rejected_before_residual_checks": true
+      }
+    },
+    {
+      "kind": "MIPSOL",
+      "process_discovery": 0.25957416299934266,
+      "solver_discovery": 0.010413169860839844,
+      "work": 0.009041509539640299,
+      "objective": -212432.28884535527,
+      "nodes": 0.0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": false,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "185/1125899906842624",
+          "water": "29433/137438953472",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "1/35184372088832",
+        "max_other_backward_error": "69/738853022566120064",
+        "objective_exact": "-65744608999675588466534792177225/309485009821345068724781056"
+      }
+    },
+    {
+      "kind": "MIPSOL",
+      "process_discovery": 0.2599896120009362,
+      "solver_discovery": 0.010827064514160156,
+      "work": 0.0091023055396403,
+      "objective": -212432.28884535527,
+      "nodes": 1.0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": true,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "185/1125899906842624",
+          "water": "29433/137438953472",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "0",
+        "max_other_backward_error": "69/738853022566120064",
+        "objective_exact": "-65744608999675585827706885514825/309485009821345068724781056"
+      }
+    },
+    {
+      "kind": "final",
+      "process_discovery": 0.26065140499849804,
+      "solver_discovery": 0.011144161224365234,
+      "work": 0.0091023055396403,
+      "objective": -212432.28884535527,
+      "nodes": 1.0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": true,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "185/1125899906842624",
+          "water": "29433/137438953472",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "0",
+        "max_other_backward_error": "69/738853022566120064",
+        "objective_exact": "-65744608999675585827706885514825/309485009821345068724781056"
+      }
+    }
+  ],
+  "first_qualified": {
+    "0.001": null,
+    "0.01": {
+      "index": 2,
+      "kind": "MIPSOL",
+      "solver_discovery": 0.010827064514160156,
+      "process_discovery": 0.2599896120009362,
+      "work": 0.0091023055396403,
+      "offline_verified_available": 0.3127762160002021,
+      "objective_exact": "-65744608999675585827706885514825/309485009821345068724781056"
+    }
+  },
+  "reference_exact": "-612987692604854082182336702949922581351791957424924945470869023440061661784175567948072051305128700125229110551392923960557510005128877165/2872548099330895877857282684393466257818195131714763334232458438675173208355173020232144526141850876943810100649970291954850046410752",
+  "reference_is_global_optimum": false,
+  "known_native_export_witness": true,
+  "bound_contradiction": false,
+  "solve_started_process_seconds": 0.24904653999692528,
+  "solver_finished_process_seconds": 0.2648032789948047,
+  "stages_seconds": {
+    "generation": 0.010422972998640034,
+    "original_parse": 0.005420909001259133,
+    "original_metadata": 0.0024130990059347823,
+    "selection": 0.021925246001046617,
+    "export": 0.0034315770026296377,
+    "export_metadata": 0.002414490998489782,
+    "import_check": 0.012673983997956384,
+    "solve": 0.011282986000878736,
+    "rational_model": 0.011503542002174072,
+    "verification": 0.05375591300253291
+  },
+  "worker_seconds": 0.3308978979985113
+}

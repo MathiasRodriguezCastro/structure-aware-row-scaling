@@ -1,0 +1,167 @@
+{
+  "job": {
+    "id": "II-new-h168-01-gurobi-sf-1-s293-Export-Budget-L2-heterogeneous",
+    "instance": "new-h168-01",
+    "policy": "Export-Budget-L2",
+    "solver": "gurobi",
+    "scale": -1,
+    "seed": 293,
+    "contract": "heterogeneous",
+    "experiment": "II"
+  },
+  "abstained": false,
+  "parameters": {
+    "Threads": 4,
+    "TimeLimit": 30.0,
+    "MIPGap": 0.01,
+    "Presolve": -1,
+    "FeasibilityTol": 1e-06,
+    "IntFeasTol": 1e-09,
+    "ScaleFlag": -1,
+    "NumericFocus": 0,
+    "IntegralityFocus": 0,
+    "Seed": 293
+  },
+  "native_import": {
+    "rows": 4704,
+    "columns": 2856,
+    "nonzeros": 10583,
+    "matrix_rhs_objective_bounds_integer_domains_equal": true
+  },
+  "export_sha256": "44557ae85897be2930564af386759c83ca5e1437d3ef6ea511f4255530f1614b",
+  "outcome": {
+    "status": 2,
+    "completed": true,
+    "solutions": 2,
+    "work": 0.08113109272901405,
+    "objective": -1511326.2352079186,
+    "bound": -1511501.806080493,
+    "runtime": 0.06285405158996582,
+    "nodes": 1.0,
+    "solver_version": [
+      13,
+      0,
+      2
+    ]
+  },
+  "callback_seconds": 0.000815715997305233,
+  "events": [
+    {
+      "kind": "MIPSOL",
+      "process_discovery": 18.78372405799746,
+      "solver_discovery": 0.0007212162017822266,
+      "work": 0.000323982,
+      "objective": 191228227.97870237,
+      "nodes": 0.0,
+      "audit": {
+        "objective_exact": "462361484485211840213751495013129/2417851639229258349412352",
+        "quality_rejected_before_residual_checks": true
+      }
+    },
+    {
+      "kind": "MIPSOL",
+      "process_discovery": 18.843840752997494,
+      "solver_discovery": 0.060836076736450195,
+      "work": 0.08041304772901404,
+      "objective": -1511326.2352079186,
+      "nodes": 0.0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": false,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "77/281474976710656",
+          "water": "97801/137438953472",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "1/17592186044416",
+        "max_other_backward_error": "173/1010971605570895488",
+        "objective_exact": "-14616650460830598236447244207743/9671406556917033397649408"
+      }
+    },
+    {
+      "kind": "MIPSOL",
+      "process_discovery": 18.84527037299995,
+      "solver_discovery": 0.06226301193237305,
+      "work": 0.08113109272901405,
+      "objective": -1511326.2352079186,
+      "nodes": 1.0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": true,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "77/281474976710656",
+          "water": "97801/137438953472",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "0",
+        "max_other_backward_error": "173/1010971605570895488",
+        "objective_exact": "-14616650460830598181471662818943/9671406556917033397649408"
+      }
+    },
+    {
+      "kind": "final",
+      "process_discovery": 18.848032773996238,
+      "solver_discovery": 0.06285405158996582,
+      "work": 0.08113109272901405,
+      "objective": -1511326.2352079186,
+      "nodes": 1.0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": true,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "77/281474976710656",
+          "water": "97801/137438953472",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "0",
+        "max_other_backward_error": "173/1010971605570895488",
+        "objective_exact": "-14616650460830598181471662818943/9671406556917033397649408"
+      }
+    }
+  ],
+  "first_qualified": {
+    "0.001": {
+      "index": 2,
+      "kind": "MIPSOL",
+      "solver_discovery": 0.06226301193237305,
+      "process_discovery": 18.84527037299995,
+      "work": 0.08113109272901405,
+      "offline_verified_available": 19.19029691799369,
+      "objective_exact": "-14616650460830598181471662818943/9671406556917033397649408"
+    },
+    "0.01": {
+      "index": 2,
+      "kind": "MIPSOL",
+      "solver_discovery": 0.06226301193237305,
+      "process_discovery": 18.84527037299995,
+      "work": 0.08113109272901405,
+      "offline_verified_available": 19.190313214996422,
+      "objective_exact": "-14616650460830598181471662818943/9671406556917033397649408"
+    }
+  },
+  "reference_exact": "-20816038417566384619725801555469239900522114401956523580441772302268289317629584245077878271686416042854926481/13773358744548386766735978713718401992719979421423387963902591252554521627024948321023379802502450905088",
+  "reference_is_global_optimum": false,
+  "known_native_export_witness": false,
+  "bound_contradiction": null,
+  "solve_started_process_seconds": 18.78287516499404,
+  "solver_finished_process_seconds": 18.858597067999654,
+  "stages_seconds": {
+    "generation": 0.03256441899429774,
+    "original_parse": 0.0430715640031849,
+    "original_metadata": 0.01533598900277866,
+    "selection": 18.375317354999424,
+    "export": 0.022620484000071883,
+    "export_metadata": 0.015353019000031054,
+    "import_check": 0.0371247389994096,
+    "solve": 0.06302260399388615,
+    "rational_model": 0.08168787499744212,
+    "verification": 0.38167029400210595
+  },
+  "worker_seconds": 19.325569378997898
+}

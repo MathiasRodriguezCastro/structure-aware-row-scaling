@@ -1,0 +1,92 @@
+
+Gurobi 13.0.2 (linux64) logging started Mon Oct 19 03:15:39 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/orf-v15-verified-20261019/runs/I-new-h024-07-gurobi-sf-1-s293-Base-b100/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 30
+Set parameter MIPGap to value 0.01
+Set parameter Presolve to value -1
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-09
+Set parameter ScaleFlag to value -1
+Set parameter NumericFocus to value 0
+Set parameter IntegralityFocus to value 0
+Set parameter Seed to value 293
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  30
+IntFeasTol  1e-09
+MIPGap  0.01
+LogToConsole  0
+Seed  293
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 672 rows, 408 columns and 1511 nonzeros (Min)
+Model fingerprint: 0x3c9b5888
+Model has 49 linear objective coefficients
+Variable types: 312 continuous, 96 integer (96 binary)
+Coefficient statistics:
+  Matrix range     [7e-04, 1e+09]
+  Objective range  [9e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [4e+01, 3e+09]
+Warning: Model contains large matrix coefficient range
+Warning: Model contains large rhs
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 5.103335e+07
+Presolve removed 190 rows and 90 columns
+Presolve time: 0.00s
+Presolved: 482 rows, 318 columns, 1188 nonzeros
+Variable types: 255 continuous, 63 integer (63 binary)
+
+Root relaxation: objective -2.095216e+06, 353 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -2095216.0    0   59 5.1033e+07 -2095216.0   104%     -    0s
+H    0     0                    1.133850e+07 -2095216.0   118%     -    0s
+     0     0 -2093614.1    0   58 1.1338e+07 -2093614.1   118%     -    0s
+H    0     0                    1.131747e+07 -2092797.1   118%     -    0s
+H    0     0                    1.061749e+07 -2092797.1   120%     -    0s
+     0     0 -2092709.8    0   58 1.0617e+07 -2092709.8   120%     -    0s
+H    0     0                    1.039536e+07 -2092709.8   120%     -    0s
+     0     0 -2091959.1    0   56 1.0395e+07 -2091959.1   120%     -    0s
+H    0     0                    9344179.3059 -2091959.1   122%     -    0s
+     0     0 -2091959.1    0   56 9344179.31 -2091959.1   122%     -    0s
+     0     0 -2090331.5    0   56 9344179.31 -2090331.5   122%     -    0s
+     0     0 -2090331.5    0   56 9344179.31 -2090331.5   122%     -    0s
+H    0     0                    9224837.3375 -2090331.5   123%     -    0s
+     0     2 -2090331.5    0   56 9224837.34 -2090331.5   123%     -    0s
+*   37    32              11    8485805.0818 -2090331.5   125%  27.5    0s
+*   77    56              21    7985912.0593 -2088167.0   126%  27.2    0s
+*  100    62              11    7390234.5477 -2087088.5   128%  23.9    0s
+*  106    62              19    6117089.6380 -2087088.5   134%  22.8    0s
+H  109    70                    -262439.4551 -2087088.5   695%  22.4    0s
+*  169   132              38    -2083535.469 -2084127.5  0.03%  19.2    0s
+
+Cutting planes:
+  Gomory: 18
+  Implied bound: 6
+  MIR: 5
+  Flow cover: 11
+  RLT: 18
+  Relax-and-lift: 12
+
+Explored 197 nodes (3883 simplex iterations) in 0.11 seconds (0.11 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 10: -2.08354e+06 -262439 6.11709e+06 ... 1.06175e+07
+
+Optimal solution found (tolerance 1.00e-02)
+Best objective -2.083535469439e+06, best bound -2.084127465233e+06, gap 0.0284%
+
+User-callback calls 1022, time in user-callback 0.00 sec

@@ -1,0 +1,123 @@
+{
+  "job": {
+    "id": "III-cplex-new-h072-05-cplex-sf-1-s211-L2-b100",
+    "instance": "new-h072-05",
+    "policy": "L2",
+    "solver": "cplex",
+    "scale": -1,
+    "seed": 211,
+    "contract": "b100",
+    "experiment": "III-cplex"
+  },
+  "abstained": false,
+  "parameters": {
+    "threads": 4,
+    "timelimit": 30.0,
+    "mipgap": 0.01,
+    "epRHS": 1e-06,
+    "epInt": 1e-09,
+    "search": "traditional",
+    "scaling": "default",
+    "seed": 211
+  },
+  "native_import": {
+    "matrix_rhs_objective_bounds_integer_domains_equal": true,
+    "rows": 2016,
+    "columns": 1224
+  },
+  "export_sha256": "ec11cc30f2304c1339d384cd3b4087844980185576c3fa78a89222d9d245bf6c",
+  "outcome": {
+    "status": 102,
+    "completed": true,
+    "solutions": 1,
+    "work": 359.3894348144531,
+    "objective": -1909241.6007643875,
+    "bound": -1911146.0081942272,
+    "runtime": 0.17921924800612032,
+    "nodes": 1,
+    "solver_version": "22.1.2.0"
+  },
+  "callback_seconds": 6.417200347641483e-05,
+  "events": [
+    {
+      "kind": "CPLEX-incumbent",
+      "process_discovery": 0.4472346819966333,
+      "solver_discovery": 0.09670090675354004,
+      "work": 183.2454071044922,
+      "objective": 29253131.124610648,
+      "nodes": 0,
+      "audit": {
+        "objective_exact": "141459462084456031862580305540677/4835703278458516698824704",
+        "quality_rejected_before_residual_checks": true
+      }
+    },
+    {
+      "kind": "CPLEX-incumbent",
+      "process_discovery": 0.4667388239977299,
+      "solver_discovery": 0.11620187759399414,
+      "work": 235.6483974456787,
+      "objective": -1909241.6007643933,
+      "nodes": 0,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": false,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "3/8796093022208",
+          "water": "4075/17179869184",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "813641576201861/19342813113834066795298816",
+        "max_other_backward_error": "5/17592186044416",
+        "objective_exact": "-36930103472742940830493388715833/19342813113834066795298816"
+      }
+    },
+    {
+      "kind": "final",
+      "process_discovery": 0.5299923049969948,
+      "solver_discovery": 0.17921924800612032,
+      "work": 359.3894348144531,
+      "objective": -1909241.6007643875,
+      "nodes": 1,
+      "audit": {
+        "physical_pass": true,
+        "domain_pass": false,
+        "other_rows_pass": true,
+        "maximum_physical_violation": {
+          "power": "3/8796093022208",
+          "water": "4075/17179869184",
+          "activation": "0"
+        },
+        "max_integrality": "0",
+        "max_bound_violation": "813641576201861/19342813113834066795298816",
+        "max_other_backward_error": "5/17592186044416",
+        "objective_exact": "-36930103472742940830493388715833/19342813113834066795298816"
+      }
+    }
+  ],
+  "first_qualified": {
+    "0.001": null,
+    "0.01": null
+  },
+  "reference_exact": "-7404528053421568228364997332887595071555940700428264562146819423609148185225813838150219805332437224521551314180170802134194605166570551996688033154276581589055427827858208510634762841/3877121649706305548321945554847711202369855259009448484542858353631092551161578924801033413556556265434788133225331372351293424639694083011756750203345254417181959019347117604864",
+  "reference_is_global_optimum": false,
+  "known_native_export_witness": true,
+  "bound_contradiction": false,
+  "solve_started_process_seconds": 0.3505465779962833,
+  "solver_finished_process_seconds": 0.5302452359974268,
+  "stages_seconds": {
+    "generation": 0.015997051996237133,
+    "original_parse": 0.01595340900530573,
+    "original_metadata": 0.006659115002548788,
+    "selection": 0.06544725200365065,
+    "export": 0.010278260997438338,
+    "export_metadata": 0.007912310997198801,
+    "native_read": 0.003624967997893691,
+    "import_check": 0.017491341997811105,
+    "solve": 0.17914810199727071,
+    "rational_model": 0.03373093499976676,
+    "verification": 0.10705856899585342
+  },
+  "worker_seconds": 0.6727396299975226
+}

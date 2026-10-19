@@ -1,0 +1,95 @@
+
+Gurobi 13.0.2 (linux64) logging started Mon Oct 19 03:38:07 2026
+
+Set parameter LogFile to value "/home/mathiasr/Escritorio/generator-aware-row-scaling/exploration/orf-v15-verified-20261019/runs/III-scale-new-h168-08-gurobi-sf0-s293-Base-b100/solver.log"
+Set parameter Threads to value 4
+Set parameter TimeLimit to value 30
+Set parameter MIPGap to value 0.01
+Set parameter Presolve to value -1
+Set parameter FeasibilityTol to value 1e-06
+Set parameter IntFeasTol to value 1e-09
+Set parameter ScaleFlag to value 0
+Set parameter NumericFocus to value 0
+Set parameter IntegralityFocus to value 0
+Set parameter Seed to value 293
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (linux64 - "Ubuntu 22.04.5 LTS")
+
+CPU model: 13th Gen Intel(R) Core(TM) i7-13620H, instruction set [SSE2|AVX|AVX2]
+Thread count: 16 physical cores, 16 logical processors, using up to 4 threads
+
+Non-default parameters:
+TimeLimit  30
+IntFeasTol  1e-09
+MIPGap  0.01
+ScaleFlag  0
+LogToConsole  0
+Seed  293
+Threads  4
+
+Academic license 2849920 - for non-commercial use only - registered to ma___@fing.edu.uy
+Optimize a model with 4704 rows, 2856 columns and 10583 nonzeros (Min)
+Model fingerprint: 0x13f03e31
+Model has 337 linear objective coefficients
+Variable types: 2184 continuous, 672 integer (672 binary)
+Coefficient statistics:
+  Matrix range     [6e-04, 6e+09]
+  Objective range  [3e-04, 1e+02]
+  Bounds range     [1e+00, 4e+09]
+  RHS range        [4e+01, 4e+09]
+Warning: Model contains large matrix coefficient range
+Warning: Model contains large rhs
+Warning: Model contains large bounds
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+
+Found heuristic solution: objective 1.723734e+08
+Presolve removed 755 rows and 285 columns
+Presolve time: 0.04s
+Presolved: 3949 rows, 2571 columns, 9511 nonzeros
+Variable types: 1932 continuous, 639 integer (639 binary)
+
+Root relaxation: objective -7.777052e+05, 3836 iterations, 0.17 seconds (0.41 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0 -777705.19    0  508 1.7237e+08 -777705.19   100%     -    0s
+H    0     0                    1.683354e+07 -777705.19   105%     -    0s
+H    0     0                    1.577568e+07 -776817.09   105%     -    0s
+H    0     0                    1.577403e+07 -776817.09   105%     -    0s
+     0     0 -776461.62    0  506 1.5774e+07 -776461.62   105%     -    0s
+     0     0 -776419.84    0  509 1.5774e+07 -776419.84   105%     -    0s
+     0     0 -776404.22    0  509 1.5774e+07 -776404.22   105%     -    0s
+     0     0 -776312.64    0  509 1.5774e+07 -776312.64   105%     -    0s
+     0     0 -776312.64    0  509 1.5774e+07 -776312.64   105%     -    0s
+H    0     0                    783066.10774 -776307.60   199%     -    2s
+     0     0 -775865.14    0  504 783066.108 -775865.14   199%     -    5s
+     0     0 -774104.72    0  505 783066.108 -774104.72   199%     -    5s
+     0     0 -774104.72    0  506 783066.108 -774104.72   199%     -    5s
+     0     0 -774104.72    0  501 783066.108 -774104.72   199%     -    5s
+     0     0 -774104.72    0  501 783066.108 -774104.72   199%     -    5s
+     0     2 -774104.72    0  501 783066.108 -774104.72   199%     -    5s
+    14    10 -686193.89    6  494 783066.108 -686193.89   188%  3210   10s
+    40     3 infeasible   11      783066.108 -686193.89   188%  2025   15s
+    53     2 infeasible   15      783066.108 -686193.89   188%  2298   20s
+H   58     5                    781620.73428 -686193.89   188%  2354   23s
+    68     2 -686193.89   23  472 781620.734 -686193.89   188%  2487   25s
+    76     2 infeasible   28      781620.734 -686193.89   188%  2517   30s
+H   77     2                    765797.43303 -686193.89   190%  2485   30s
+
+Cutting planes:
+  Implied bound: 110
+  MIR: 53
+  Flow cover: 82
+  RLT: 149
+  Relax-and-lift: 13
+
+Explored 79 nodes (222054 simplex iterations) in 30.00 seconds (83.14 work units)
+Thread count was 4 (of 16 available processors)
+
+Solution count 8: 765797 765797 781621 ... 1.72373e+08
+
+Time limit reached
+Best objective 7.657974330321e+05, best bound -6.861938912823e+05, gap 189.6051%
+
+User-callback calls 2477, time in user-callback 0.01 sec

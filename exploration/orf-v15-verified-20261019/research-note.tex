@@ -1,0 +1,241 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,booktabs,longtable,geometry,hyperref,adjustbox}
+\geometry{margin=2.3cm}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}\emergencystretch=2em
+\begin{document}
+\begin{center}\Large\bfseries Seguimiento para una posible v1.5: resultados completos\end{center}
+
+La versión de envío v1.4.2 permanece congelada. Este informe evalúa los
+cuatro trabajos propuestos; no constituye una nueva versión enviada ni
+una promesa de aceptación editorial.
+
+\section*{Resultado principal y decisión}
+
+No se establece una ventaja temporal general frente a L2 al exigir el objetivo común de precisión y calidad.
+Budget-L2 alcanza 54/72 objetivos primarios, frente a 51/72 de L2.
+La razón del indicador de disponibilidad verificada PAR2 es 0.876 [0.441, 1.722].
+Entre los 44 éxitos comunes, la razón de disponibilidad real es 0.980.
+PAR2 asigna 60 segundos de resolución más preparación a un objetivo no
+alcanzado; su razón no es una reducción del tiempo observado de las soluciones.
+En las cuatro especificaciones del experimento de precisión, L2 satisface todos los presupuestos finales comprobados. No se demuestra recuperación primal adicional frente a L2 en esa muestra.
+
+El avance tangible del software es un selector que incorpora la exportación
+efectiva a la decisión y un auditor independiente de sus reservas. Es una
+extensión condicional del procedimiento existente, no una prueba de un
+nuevo escalador universalmente competitivo. La información física conserva
+su valor de especificación; las etiquetas no afectan al solver una vez
+compilado el mismo vector de factores.
+
+\section*{Diseño y significado de los tiempos}
+
+630 asignaciones registradas: 288 para candidatos, 126 para precisión y
+216 para robustez. Una repetición técnica predeterminada corrige la
+implementación de tiempos de verificación del primer caso Base; no añade
+un escenario ni una semilla. Se conservan un fallo previo al optimizador,
+el programa original, la enmienda y todos los resultados iniciales.
+La repetición solo sustituye tiempos comparativos si vectores, trabajo,
+endpoints y primer objetivo se reproducen exactamente.
+
+24 escenarios conocidos de 24, 72 y 168 horas; semillas nuevas 211, 257,
+293; cuatro hilos, límite común de 30 segundos, gap nativo solicitado del 1\%.
+CPLEX utiliza doce escenarios seleccionados por índice y búsqueda
+tradicional común para instrumentar sus incumbentes. El control de
+ScaleFlag usa seis escenarios: automático, 0 y 2. Son escenarios de la
+misma familia y padres conocidos, no una muestra externa nueva.
+
+El objetivo primario permite un costo hasta U\_ref + 0,001 max(1,|U\_ref|);
+el secundario usa 0,01. U\_ref es un testigo factible racional adquirido
+antes de estas ejecuciones, no un óptimo certificado. El gap de parada
+del 1\% puede terminar una búsqueda sin llegar al objetivo primario del
+0,1\%, incluso sin error numérico. Un objetivo no alcanzado no equivale
+automáticamente a una cota incorrecta.
+
+Se verifican presupuestos físicos crudos y tras redondear enteros,
+distancia entera <=1e-9 y cotas exactas del punto redondeado. Las filas
+sin unidad declarada usan error hacia atrás <=1e-6. Esta definición
+no certifica factibilidad exacta de todas las filas ni optimalidad.
+Las eventuales violaciones diminutas de cotas se conservan como tales.
+El callback guarda todos los candidatos y el punto final; el verificador
+corre después del solver. El tiempo de descubrimiento es retrospectivo;
+la disponibilidad real incluye la espera hasta fin del solver y el
+costo de comprobar el prefijo de candidatos. No se presenta como un
+verificador en línea ni como un nuevo criterio de parada.
+
+\section*{I. Objetivos comprobados y calidad}
+
+\begin{center}\small\adjustbox{max width=\linewidth}{\begin{tabular}{llllll}\toprule
+Política & Objetivo 0,1\% & Objetivo 1\% & Presupuestos finales & Dominios finales & Contradicciones B\\\midrule
+Base & 53/72 & 68/72 & 72/72 & 69/72 & 2\\
+Budget-L2 & 54/72 & 72/72 & 72/72 & 72/72 & 1\\
+L2 & 51/72 & 66/72 & 72/72 & 72/72 & 7\\
+L2-NF3 & 54/72 & 72/72 & 72/72 & 72/72 & 0\\
+\bottomrule\end{tabular}}\end{center}
+
+Las contradicciones usan testigos exactos de la representación efectivamente
+importada; ausencia de contradicción no significa certificación de todas
+las cotas. Un candidato que pasa el control primal puede coexistir con
+una cota refutada.
+
+\begin{center}\small\adjustbox{max width=\linewidth}{\begin{tabular}{lllll}\toprule
+Control & Pares con éxito común & PAR2 descubrimiento [95\%] & PAR2 disponibilidad [95\%] & Disponibilidad en éxitos comunes\\\midrule
+Base & 45 & 0.772 [0.375, 1.596] & 0.802 [0.405, 1.595] & 0.742\\
+L2 & 44 & 0.875 [0.422, 1.807] & 0.876 [0.441, 1.722] & 0.980\\
+L2-NF3 & 46 & 0.953 [0.497, 1.834] & 0.943 [0.509, 1.746] & 0.994\\
+\bottomrule\end{tabular}}\end{center}
+
+Los intervalos remuestrean 24 escenarios, conservando juntas las tres semillas:
+100000 remuestras, percentiles marginales 95\%. Son condicionales a los
+padres conocidos. Los éxitos comunes son un subconjunto seleccionado,
+por eso se publican junto al análisis penalizado de todos los casos.
+Al objetivo secundario, Budget-L2 alcanza 72/72 y L2 66/72;
+su PAR2 de disponibilidad es 0.753 [0.454, 1.085].
+Entre éxitos comunes la razón es 1.041.
+El indicador penalizado puede mejorar por mayor cumplimiento del objetivo,
+aunque los éxitos comunes no lleguen antes. No se confunden ambos efectos.
+
+\section*{II. Precisión y necesidad del contrato}
+
+Requisitos numéricos experimentales, sin atribuirles autoridad operativa:
+
+\noindent\textbullet\ b10: potencia 0,01 MW; balance y activación 10 m3.\par
+\noindent\textbullet\ b100: potencia 0,01 MW; balance y activación 100 m3.\par
+\noindent\textbullet\ b1000: potencia 0,01 MW; balance y activación 1000 m3.\par
+\noindent\textbullet\ heterogeneous: potencia 0,001 MW; balance 0,001 m3; activación 10 m3.\par
+
+El balance a un litro es una meta de conservación numérica del estudio,
+no una tolerancia de medición del operador. Las conversiones a unidades
+algebraicas se reconstruyen desde cada fila. Cada celda tiene seis modelos
+y tres semillas; los controles reutilizados no cuentan como nuevas llamadas.
+
+\begin{center}\small\adjustbox{max width=\linewidth}{\begin{tabular}{lllll}\toprule
+Contrato & Política & Presupuestos finales & Máximo q=v/delta & Filas que incumplen\\\midrule
+b10 & Budget-L2 & 18/18 & 6.44e-08 & 0\\
+b10 & Export-Budget-L2 & 18/18 & 7e-08 & 0\\
+b10 & L2 & 18/18 & 6.44e-08 & 0\\
+b100 & Budget-L2 & 18/18 & 6.77e-09 & 0\\
+b100 & Export-Budget-L2 & 18/18 & 7e-09 & 0\\
+b100 & L2 & 18/18 & 6.44e-09 & 0\\
+b1000 & Budget-L2 & 18/18 & 6.44e-10 & 0\\
+b1000 & Export-Budget-L2 & 18/18 & 6.34e-10 & 0\\
+b1000 & L2 & 18/18 & 6.44e-10 & 0\\
+heterogeneous & Budget-L2 & 18/18 & 0.000681 & 0\\
+heterogeneous & Export-Budget-L2 & 18/18 & 0.000712 & 0\\
+heterogeneous & L2 & 18/18 & 0.000644 & 0\\
+\bottomrule\end{tabular}}\end{center}
+
+Con activación de 1 m3, 22/24 modelos contienen 8256 filas
+cuyo E=gamma sum |a\_entero| agota el presupuesto. Esto certifica incompatibilidad
+de la condición suficiente, no infactibilidad del despacho ni imposibilidad
+de que un punto concreto cumpla un metro cúbico. No se lanzan MIP en ese caso.
+El control numérico compilado reproduce los factores antiguos sin diferencias (0 discrepancias).
+Por tanto, no se atribuye un efecto causal a las etiquetas físicas. Los
+márgenes por familia, percentiles de q, intervenciones y reservas R/delta
+están íntegros en los CSV, incluyendo la aplicación de nuevos requisitos
+a las soluciones antiguas Budget100.
+
+\section*{III. CPLEX e interacción con el escalado interno}
+
+\begin{center}\small\adjustbox{max width=\linewidth}{\begin{tabular}{llllll}\toprule
+Configuración & Escenarios & Objetivo Budget & Objetivo L2 & PAR2 disponibilidad B/L2 [95\%] & B Budget/L2\\\midrule
+CPLEX & 12 & 15/36 & 15/36 & 1.021 [1.005, 1.040] & 5/6\\
+Gurobi ScaleFlag=-1 & 6 & 14/18 & 14/18 & 0.934 [0.128, 4.635] & 0/3\\
+Gurobi ScaleFlag=0 & 6 & 15/18 & 13/18 & 0.689 [0.098, 3.571] & 0/4\\
+Gurobi ScaleFlag=2 & 6 & 15/18 & 14/18 & 0.782 [0.109, 4.010] & 0/4\\
+\bottomrule\end{tabular}}\end{center}
+
+El criterio primario de dominios exige cotas exactas. En los puntos finales
+de CPLEX, algunas desviaciones de cota están entre 1,3e-13 y 4,2e-11:
+no se deben interpretar como una falta importante de precisión física.
+Para comprobar su influencia se añadió una sensibilidad posterior: redondear
+enteros, proyectar sobre las cotas exactas y volver a verificar el punto
+completo, aplicando la misma regla a todas las políticas. No altera la
+definición primaria ni mide una disponibilidad en línea del punto reparado.
+
+\begin{center}\small\adjustbox{max width=\linewidth}{\begin{tabular}{llll}\toprule
+Ámbito con proyección posterior & Política & Objetivo 0,1\% & Objetivo 1\%\\\midrule
+I & Base & 53/72 & 71/72\\
+I & Budget-L2 & 54/72 & 72/72\\
+I & L2 & 51/72 & 66/72\\
+I & L2-NF3 & 54/72 & 72/72\\
+CPLEX & Budget-L2 & 30/36 & 36/36\\
+CPLEX & Base & 24/36 & 36/36\\
+CPLEX & L2 & 30/36 & 36/36\\
+\bottomrule\end{tabular}}\end{center}
+
+La proyección permite separar el efecto de cotas diminutamente excedidas
+de la precisión de las filas y de la calidad del costo. No elimina las
+contradicciones independientes de cotas duales ya detectadas. Las tablas
+de tiempo primarias conservan su criterio registrado y no se reinterpretan
+como tiempos medidos del posprocesamiento añadido.
+
+Estas comparaciones usan las mismas representaciones y ajustes dentro de
+cada solver. CPLEX se ejecutó con la biblioteca completa 22.1.2; la API
+Community instalada por defecto no admite los tamaños mayores. No se
+comparan sus ticks con las unidades de trabajo de Gurobi. Cambiar ScaleFlag
+aísla una opción del solver, no reconstruye todas sus operaciones internas.
+Los intervalos de seis o doce escenarios tienen incertidumbre limitada por
+ese tamaño y no prueban generalidad entre familias.
+
+\section*{Selector con exportación efectiva}
+
+La auditoría independiente certifica 25344 casos fila-presupuesto del nuevo selector
+(seis modelos y cuatro contratos; no son observaciones independientes)
+con epsilon+B(alpha)+alpha E <= alpha delta, usando los coeficientes/RHS
+realmente escritos. Si falta una cota finita y el producto tiene error
+no nulo, ese candidato se rechaza. Un producto exacto no necesita esa cota.
+Se elige entre candidatos finitos; abstenerse no prueba inexistencia global.
+El orden logarítmico se calcula en binario64; las desigualdades residuales
+se certifican con racionales exactos.
+
+En la configuración de referencia, los factores del Budget-L2 anterior
+también satisfacen la condición completa de exportación en todas las filas
+físicas auditadas. Aquí el nuevo selector no recupera una garantía que
+esos factores hubieran perdido; incorpora su comprobación a la elección.
+Esta diferencia limita cuánto puede afirmarse de su utilidad adicional.
+
+Se comprueban 2000 puntos racionales en la frontera de la tolerancia exportada.
+Hay un ejemplo donde la proyección ideal no cumple la reserva uniforme
+de exportación y un factor vecino sí la cumple. Es una prueba controlada
+del algoritmo, no evidencia de una ventaja en una segunda aplicación.
+La variante ordenada reproduce los 24 archivos completos del experimento II por SHA-256.
+Medianas de selección: exhaustiva 8.175 s; ordenada 0.630 s.
+Razón geométrica de tiempos de selección: 0.082.
+Es un benchmark de compilación posterior; no reemplaza los tiempos de
+proceso de los MIP ya registrados ni demuestra una aceleración completa.
+La garantía sigue condicionada al residuo escrito, las cotas y la
+distancia entera efectivamente satisfechos. No certifica optimalidad.
+
+\section*{Qué incorporar al artículo}
+
+La campaña responde las cuatro líneas solicitadas. La decisión editorial
+debe basarse en cumplimiento y generalidad, no en escoger el cociente más
+favorable. Este informe conserva todos los resultados y no modifica v1.4.2.
+El selector ofrece una mejora concreta de implementación y certificación;
+los resultados de candidatos y robustez delimitan su ventaja computacional.
+Sin una recuperación relevante frente a L2 o una reducción temporal estable,
+no se justifica anunciar una v1.5 sustancialmente superior ni agrandar el
+manuscrito principal con toda esta campaña.
+
+\section*{Reproducción}
+
+Extraer la evidencia científica heredada de Online Resource 2 v1.4.2,
+superponer sus escenarios prospectivos y luego este seguimiento. Desde
+esa raíz ejecutar, sin Gurobi ni CPLEX:
+
+\begin{verbatim}
+python3 exploration/orf-v15-verified-20261019/check.py
+python3 exploration/orf-v15-verified-20261019/check_selector.py
+python3 exploration/orf-v15-verified-20261019/precision.py
+python3 exploration/orf-v15-verified-20261019/analyze.py
+python3 exploration/orf-v15-verified-20261019/check_statistics.py
+python3 exploration/orf-v15-verified-20261019/projection_sensitivity.py
+\end{verbatim}
+
+Se retienen 6725 eventos de candidatos, sus vectores y todas las trazas.
+VALIDATION.json, STATISTICS\_VALIDATION.json, SELECTOR\_VALIDATION.json y
+PRECISION\_RESULTS.json documentan comprobaciones independientes y límites.
+El DOI de la versión de envío permanece reservado para el final por
+decisión del autor; este trabajo no publica ni envía un manuscrito.
+\end{document}

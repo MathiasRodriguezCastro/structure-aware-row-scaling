@@ -1,0 +1,884 @@
+{
+  "experiment_I": {
+    "scope": "I: Gurobi automatic scaling, reference budgets",
+    "scenarios": 24,
+    "seeds_per_scenario": 3,
+    "policy_results": [
+      {
+        "policy": "Base",
+        "runs": 72,
+        "candidate_events": 1517,
+        "targets": {
+          "0.001": 53,
+          "0.01": 68
+        },
+        "final_physical_pass": 72,
+        "final_domain_pass": 69,
+        "final_other_rows_pass": 72,
+        "detected_bound_contradictions": 2,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 72,
+        "median_callback_seconds": 0.0008547635006834753,
+        "median_verification_seconds": 0.1670090714978869
+      },
+      {
+        "policy": "Budget-L2",
+        "runs": 72,
+        "candidate_events": 459,
+        "targets": {
+          "0.001": 54,
+          "0.01": 72
+        },
+        "final_physical_pass": 72,
+        "final_domain_pass": 72,
+        "final_other_rows_pass": 72,
+        "detected_bound_contradictions": 1,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 72,
+        "median_callback_seconds": 0.00047490699580521323,
+        "median_verification_seconds": 0.15782748550191172
+      },
+      {
+        "policy": "L2",
+        "runs": 72,
+        "candidate_events": 571,
+        "targets": {
+          "0.001": 51,
+          "0.01": 66
+        },
+        "final_physical_pass": 72,
+        "final_domain_pass": 72,
+        "final_other_rows_pass": 72,
+        "detected_bound_contradictions": 7,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 72,
+        "median_callback_seconds": 0.0006128865024948027,
+        "median_verification_seconds": 0.15835074499773327
+      },
+      {
+        "policy": "L2-NF3",
+        "runs": 72,
+        "candidate_events": 568,
+        "targets": {
+          "0.001": 54,
+          "0.01": 72
+        },
+        "final_physical_pass": 72,
+        "final_domain_pass": 72,
+        "final_other_rows_pass": 72,
+        "detected_bound_contradictions": 0,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 72,
+        "median_callback_seconds": 0.0007536959965364076,
+        "median_verification_seconds": 0.1828677775010874
+      }
+    ],
+    "comparisons": [
+      {
+        "control": "Base",
+        "tau": 0.001,
+        "scenarios": 24,
+        "seed_pairs": 72,
+        "common_success_pairs": 45,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 0.7721935216247956,
+          "lower95": 0.37529309041702913,
+          "upper95": 1.5959145746329093,
+          "scenarios_favor_budget": 13,
+          "common_success_geometric_ratio": 0.7188098498347629
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 0.8016775631798383,
+          "lower95": 0.4050571622883486,
+          "upper95": 1.595411707856063,
+          "scenarios_favor_budget": 13,
+          "common_success_geometric_ratio": 0.7420830177374388
+        },
+        "common_success_work_ratio": 0.31414089065712986
+      },
+      {
+        "control": "Base",
+        "tau": 0.01,
+        "scenarios": 24,
+        "seed_pairs": 72,
+        "common_success_pairs": 68,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 0.6131406427850188,
+          "lower95": 0.37380216214086914,
+          "upper95": 0.8931850619483224,
+          "scenarios_favor_budget": 14,
+          "common_success_geometric_ratio": 0.7932091988105564
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 0.6377988577949292,
+          "lower95": 0.40075316021886337,
+          "upper95": 0.9013660557662305,
+          "scenarios_favor_budget": 14,
+          "common_success_geometric_ratio": 0.8155955085046405
+        },
+        "common_success_work_ratio": 0.3941219345464648
+      },
+      {
+        "control": "L2",
+        "tau": 0.001,
+        "scenarios": 24,
+        "seed_pairs": 72,
+        "common_success_pairs": 44,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 0.8751635568730265,
+          "lower95": 0.4223812110633504,
+          "upper95": 1.8071144496279181,
+          "scenarios_favor_budget": 8,
+          "common_success_geometric_ratio": 0.9814091576205393
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 0.8760081119107062,
+          "lower95": 0.4410398406639908,
+          "upper95": 1.7222952231397017,
+          "scenarios_favor_budget": 8,
+          "common_success_geometric_ratio": 0.9800324252137176
+        },
+        "common_success_work_ratio": 0.8606717876360296
+      },
+      {
+        "control": "L2",
+        "tau": 0.01,
+        "scenarios": 24,
+        "seed_pairs": 72,
+        "common_success_pairs": 66,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 0.7587662965250017,
+          "lower95": 0.4433088499112483,
+          "upper95": 1.1237548598886653,
+          "scenarios_favor_budget": 6,
+          "common_success_geometric_ratio": 1.0701533669519134
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 0.7528300496391936,
+          "lower95": 0.45409058967478766,
+          "upper95": 1.0845561392870302,
+          "scenarios_favor_budget": 8,
+          "common_success_geometric_ratio": 1.0408676735439006
+        },
+        "common_success_work_ratio": 0.9941540866919735
+      },
+      {
+        "control": "L2-NF3",
+        "tau": 0.001,
+        "scenarios": 24,
+        "seed_pairs": 72,
+        "common_success_pairs": 46,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 0.9527049908962891,
+          "lower95": 0.4965259864089397,
+          "upper95": 1.8335646968629922,
+          "scenarios_favor_budget": 10,
+          "common_success_geometric_ratio": 0.9994857058856739
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 0.9432578282859735,
+          "lower95": 0.5085029590604266,
+          "upper95": 1.746052583124273,
+          "scenarios_favor_budget": 10,
+          "common_success_geometric_ratio": 0.9943759095303857
+        },
+        "common_success_work_ratio": 0.5093359006454515
+      },
+      {
+        "control": "L2-NF3",
+        "tau": 0.01,
+        "scenarios": 24,
+        "seed_pairs": 72,
+        "common_success_pairs": 72,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 1.0137605351326704,
+          "lower95": 0.9407350435286099,
+          "upper95": 1.0929981494030943,
+          "scenarios_favor_budget": 11,
+          "common_success_geometric_ratio": 1.0137605351326704
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 1.0104668689805718,
+          "lower95": 0.9504149894975636,
+          "upper95": 1.08191349743423,
+          "scenarios_favor_budget": 11,
+          "common_success_geometric_ratio": 1.0104668689805718
+        },
+        "common_success_work_ratio": 0.5082916876254946
+      }
+    ],
+    "bootstrap": {
+      "resamples": 100000,
+      "seed": 2026101906,
+      "unit": "scenario; all three paired seeds retained",
+      "intervals": "marginal percentile 95%, log scale",
+      "conditional_on_known_parent_structure": true
+    },
+    "failed_target_penalty": "60 seconds plus process preparation; score, not observed completion time",
+    "point_quality_reference_is_not_global_optimum": true
+  },
+  "technical_repeat": {
+    "status": "passed",
+    "additional_MIP_calls": 1,
+    "job_id": "I-new-h168-04-gurobi-sf-1-s211-Base-b100",
+    "same_candidate_vectors": true,
+    "same_non_timing_endpoints": true,
+    "same_first_target_indices": true,
+    "standardized_timing_replacement_permitted": true,
+    "original_retained": true,
+    "independent_observations_added": 0,
+    "total_seconds": 7.356182349998562
+  },
+  "CPLEX": {
+    "scope": "III: CPLEX default scaling, traditional search",
+    "scenarios": 12,
+    "seeds_per_scenario": 3,
+    "policy_results": [
+      {
+        "policy": "Base",
+        "runs": 36,
+        "candidate_events": 512,
+        "targets": {
+          "0.001": 15,
+          "0.01": 17
+        },
+        "final_physical_pass": 36,
+        "final_domain_pass": 17,
+        "final_other_rows_pass": 36,
+        "detected_bound_contradictions": 0,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 36,
+        "median_callback_seconds": 4.643149804905988e-05,
+        "median_verification_seconds": 0.1114031109973439
+      },
+      {
+        "policy": "Budget-L2",
+        "runs": 36,
+        "candidate_events": 529,
+        "targets": {
+          "0.001": 15,
+          "0.01": 15
+        },
+        "final_physical_pass": 36,
+        "final_domain_pass": 15,
+        "final_other_rows_pass": 36,
+        "detected_bound_contradictions": 5,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 36,
+        "median_callback_seconds": 4.9887497880263254e-05,
+        "median_verification_seconds": 0.10937931249645771
+      },
+      {
+        "policy": "L2",
+        "runs": 36,
+        "candidate_events": 582,
+        "targets": {
+          "0.001": 15,
+          "0.01": 15
+        },
+        "final_physical_pass": 36,
+        "final_domain_pass": 15,
+        "final_other_rows_pass": 36,
+        "detected_bound_contradictions": 6,
+        "unknown_native_bound_contrasts": 0,
+        "native_completed": 36,
+        "median_callback_seconds": 5.094399966765195e-05,
+        "median_verification_seconds": 0.11237007799718413
+      }
+    ],
+    "comparisons": [
+      {
+        "control": "Base",
+        "tau": 0.001,
+        "scenarios": 12,
+        "seed_pairs": 36,
+        "common_success_pairs": 15,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 1.1282094379985423,
+          "lower95": 1.0364038537402236,
+          "upper95": 1.2445922410989736,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.331720748832469
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 1.097581201482575,
+          "lower95": 1.0310305888200768,
+          "upper95": 1.1794697478472278,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.2465962105092525
+        },
+        "common_success_work_ratio": 0.9607729070812219
+      },
+      {
+        "control": "Base",
+        "tau": 0.01,
+        "scenarios": 12,
+        "seed_pairs": 36,
+        "common_success_pairs": 15,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 1.3845741451575257,
+          "lower95": 1.0644869412802254,
+          "upper95": 2.1173377610924797,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.331720748832469
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 1.329255025210334,
+          "lower95": 1.0518808399269488,
+          "upper95": 1.9714946998844085,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.2465859992501414
+        },
+        "common_success_work_ratio": 0.9607729070812219
+      },
+      {
+        "control": "L2",
+        "tau": 0.001,
+        "scenarios": 12,
+        "seed_pairs": 36,
+        "common_success_pairs": 15,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 1.0264221012785268,
+          "lower95": 1.0048928081521327,
+          "upper95": 1.0521472956468156,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.0635333774466857
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 1.0209585367640013,
+          "lower95": 1.00519999783801,
+          "upper95": 1.0400331549276347,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.049997314128152
+        },
+        "common_success_work_ratio": 0.9952715190810717
+      },
+      {
+        "control": "L2",
+        "tau": 0.01,
+        "scenarios": 12,
+        "seed_pairs": 36,
+        "common_success_pairs": 15,
+        "all_pairs_retained_in_penalized_scores": true,
+        "process_discovery": {
+          "PAR2_paired_geometric_ratio": 1.0264221012785268,
+          "lower95": 1.0048928081521327,
+          "upper95": 1.0521472956468156,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.0635333774466857
+        },
+        "offline_verified_available": {
+          "PAR2_paired_geometric_ratio": 1.0209582295185575,
+          "lower95": 1.005199820117781,
+          "upper95": 1.0400327345816651,
+          "scenarios_favor_budget": 0,
+          "common_success_geometric_ratio": 1.04999655576594
+        },
+        "common_success_work_ratio": 0.9952715190810717
+      }
+    ],
+    "bootstrap": {
+      "resamples": 100000,
+      "seed": 2026101908,
+      "unit": "scenario; all three paired seeds retained",
+      "intervals": "marginal percentile 95%, log scale",
+      "conditional_on_known_parent_structure": true
+    },
+    "failed_target_penalty": "60 seconds plus process preparation; score, not observed completion time",
+    "point_quality_reference_is_not_global_optimum": true
+  },
+  "Gurobi_internal_scaling": {
+    "-1": {
+      "scope": "III: Gurobi ScaleFlag=-1",
+      "scenarios": 6,
+      "seeds_per_scenario": 3,
+      "policy_results": [
+        {
+          "policy": "Base",
+          "runs": 18,
+          "candidate_events": 451,
+          "targets": {
+            "0.001": 16,
+            "0.01": 17
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 1,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0011737745080608875,
+          "median_verification_seconds": 0.16795482699671993
+        },
+        {
+          "policy": "Budget-L2",
+          "runs": 18,
+          "candidate_events": 97,
+          "targets": {
+            "0.001": 14,
+            "0.01": 18
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 0,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0006716099960613064,
+          "median_verification_seconds": 0.15849197050192743
+        },
+        {
+          "policy": "L2",
+          "runs": 18,
+          "candidate_events": 127,
+          "targets": {
+            "0.001": 14,
+            "0.01": 15
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 3,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0008116749959299341,
+          "median_verification_seconds": 0.12259709100180771
+        }
+      ],
+      "comparisons": [
+        {
+          "control": "Base",
+          "tau": 0.001,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 13,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 1.1644506282094464,
+            "lower95": 0.4255463219129953,
+            "upper95": 4.2066494438624105,
+            "scenarios_favor_budget": 4,
+            "common_success_geometric_ratio": 0.795676024797584
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 1.1466561034820624,
+            "lower95": 0.4225634872937417,
+            "upper95": 4.033888099110109,
+            "scenarios_favor_budget": 4,
+            "common_success_geometric_ratio": 0.7898048454861992
+          },
+          "common_success_work_ratio": 0.27485260930726324
+        },
+        {
+          "control": "Base",
+          "tau": 0.01,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 17,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.6580743563333606,
+            "lower95": 0.40679615467500524,
+            "upper95": 1.0598190872689746,
+            "scenarios_favor_budget": 4,
+            "common_success_geometric_ratio": 0.8366518917062022
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.6658260407215983,
+            "lower95": 0.429740213716423,
+            "upper95": 1.014051820722245,
+            "scenarios_favor_budget": 4,
+            "common_success_geometric_ratio": 0.8370160609213252
+          },
+          "common_success_work_ratio": 0.30667989923018824
+        },
+        {
+          "control": "L2",
+          "tau": 0.001,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 11,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.9342901077617012,
+            "lower95": 0.1149973632014567,
+            "upper95": 5.038626429629161,
+            "scenarios_favor_budget": 1,
+            "common_success_geometric_ratio": 1.0705419957462532
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.9337152938689554,
+            "lower95": 0.12841654214983503,
+            "upper95": 4.635351955079344,
+            "scenarios_favor_budget": 1,
+            "common_success_geometric_ratio": 1.0499116625637601
+          },
+          "common_success_work_ratio": 1.0534242459843446
+        },
+        {
+          "control": "L2",
+          "tau": 0.01,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 15,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.4967893753120716,
+            "lower95": 0.09609667603073466,
+            "upper95": 1.1731875321276177,
+            "scenarios_favor_budget": 1,
+            "common_success_geometric_ratio": 1.1245914875031295
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.5098130769122378,
+            "lower95": 0.10822948227248526,
+            "upper95": 1.1423850787748209,
+            "scenarios_favor_budget": 1,
+            "common_success_geometric_ratio": 1.101374462509778
+          },
+          "common_success_work_ratio": 1.0065509975602693
+        }
+      ],
+      "bootstrap": {
+        "resamples": 100000,
+        "seed": 2026101909,
+        "unit": "scenario; all three paired seeds retained",
+        "intervals": "marginal percentile 95%, log scale",
+        "conditional_on_known_parent_structure": true
+      },
+      "failed_target_penalty": "60 seconds plus process preparation; score, not observed completion time",
+      "point_quality_reference_is_not_global_optimum": true
+    },
+    "0": {
+      "scope": "III: Gurobi ScaleFlag=0",
+      "scenarios": 6,
+      "seeds_per_scenario": 3,
+      "policy_results": [
+        {
+          "policy": "Base",
+          "runs": 18,
+          "candidate_events": 334,
+          "targets": {
+            "0.001": 7,
+            "0.01": 9
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 15,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 8,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 15,
+          "median_callback_seconds": 0.0016847224978846498,
+          "median_verification_seconds": 0.0769882204986061
+        },
+        {
+          "policy": "Budget-L2",
+          "runs": 18,
+          "candidate_events": 108,
+          "targets": {
+            "0.001": 15,
+            "0.01": 18
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 0,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0006884140020702034,
+          "median_verification_seconds": 0.1569139305029239
+        },
+        {
+          "policy": "L2",
+          "runs": 18,
+          "candidate_events": 136,
+          "targets": {
+            "0.001": 13,
+            "0.01": 14
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 4,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0007940525065350812,
+          "median_verification_seconds": 0.07653561699771672
+        }
+      ],
+      "comparisons": [
+        {
+          "control": "Base",
+          "tau": 0.001,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 7,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.11150510783896012,
+            "lower95": 0.0328659443289778,
+            "upper95": 0.3973154452056581,
+            "scenarios_favor_budget": 5,
+            "common_success_geometric_ratio": 0.45254407759298976
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.1248806081794491,
+            "lower95": 0.038902914095247,
+            "upper95": 0.41995202614564875,
+            "scenarios_favor_budget": 5,
+            "common_success_geometric_ratio": 0.4875952668385113
+          },
+          "common_success_work_ratio": 0.04227070019886034
+        },
+        {
+          "control": "Base",
+          "tau": 0.01,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 9,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.08534072876816606,
+            "lower95": 0.025068441917760587,
+            "upper95": 0.28816665266504055,
+            "scenarios_favor_budget": 6,
+            "common_success_geometric_ratio": 0.4650619258985333
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.09768612958811586,
+            "lower95": 0.03014039842071946,
+            "upper95": 0.31572001106489855,
+            "scenarios_favor_budget": 6,
+            "common_success_geometric_ratio": 0.5077950038319046
+          },
+          "common_success_work_ratio": 0.049898231566933376
+        },
+        {
+          "control": "L2",
+          "tau": 0.001,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 11,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.6763264375813062,
+            "lower95": 0.08655884148242074,
+            "upper95": 3.808218872880644,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 1.1568186865999301
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.6892882158755858,
+            "lower95": 0.09783339862780481,
+            "upper95": 3.5711654757935367,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 1.1444299999082828
+          },
+          "common_success_work_ratio": 1.0927178838788179
+        },
+        {
+          "control": "L2",
+          "tau": 0.01,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 14,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.3882768728158072,
+            "lower95": 0.0756486468497223,
+            "upper95": 1.199176679854838,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 1.1336975788588755
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.40605203443290155,
+            "lower95": 0.08649363376800083,
+            "upper95": 1.1834232789484225,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 1.1219071711927875
+          },
+          "common_success_work_ratio": 1.0483024939561996
+        }
+      ],
+      "bootstrap": {
+        "resamples": 100000,
+        "seed": 2026101910,
+        "unit": "scenario; all three paired seeds retained",
+        "intervals": "marginal percentile 95%, log scale",
+        "conditional_on_known_parent_structure": true
+      },
+      "failed_target_penalty": "60 seconds plus process preparation; score, not observed completion time",
+      "point_quality_reference_is_not_global_optimum": true
+    },
+    "2": {
+      "scope": "III: Gurobi ScaleFlag=2",
+      "scenarios": 6,
+      "seeds_per_scenario": 3,
+      "policy_results": [
+        {
+          "policy": "Base",
+          "runs": 18,
+          "candidate_events": 412,
+          "targets": {
+            "0.001": 17,
+            "0.01": 18
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 0,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0014764134903089143,
+          "median_verification_seconds": 0.16877504649892217
+        },
+        {
+          "policy": "Budget-L2",
+          "runs": 18,
+          "candidate_events": 103,
+          "targets": {
+            "0.001": 15,
+            "0.01": 18
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 0,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0006481300042651128,
+          "median_verification_seconds": 0.158130390002043
+        },
+        {
+          "policy": "L2",
+          "runs": 18,
+          "candidate_events": 123,
+          "targets": {
+            "0.001": 14,
+            "0.01": 14
+          },
+          "final_physical_pass": 18,
+          "final_domain_pass": 18,
+          "final_other_rows_pass": 18,
+          "detected_bound_contradictions": 4,
+          "unknown_native_bound_contrasts": 0,
+          "native_completed": 18,
+          "median_callback_seconds": 0.0007938804992591031,
+          "median_verification_seconds": 0.07077133549682912
+        }
+      ],
+      "comparisons": [
+        {
+          "control": "Base",
+          "tau": 0.001,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 14,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 1.4430002659119754,
+            "lower95": 0.40224456041378115,
+            "upper95": 8.323687356556936,
+            "scenarios_favor_budget": 3,
+            "common_success_geometric_ratio": 0.9248827343767171
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 1.3808471846566366,
+            "lower95": 0.41297926458410317,
+            "upper95": 7.388041066010898,
+            "scenarios_favor_budget": 3,
+            "common_success_geometric_ratio": 0.9067028148454903
+          },
+          "common_success_work_ratio": 0.43425168966789884
+        },
+        {
+          "control": "Base",
+          "tau": 0.01,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 18,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.9521970930813467,
+            "lower95": 0.7188123324900174,
+            "upper95": 1.227541996361876,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 0.9521970930813467
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.9290167617451205,
+            "lower95": 0.7244233698053131,
+            "upper95": 1.1418341005042145,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 0.9290167617451205
+          },
+          "common_success_work_ratio": 0.494297426962875
+        },
+        {
+          "control": "L2",
+          "tau": 0.001,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 12,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.7764532794456386,
+            "lower95": 0.09737443072999873,
+            "upper95": 4.280379454891444,
+            "scenarios_favor_budget": 1,
+            "common_success_geometric_ratio": 1.1060783354808459
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.7815832883268816,
+            "lower95": 0.1092116129236331,
+            "upper95": 4.009753486038628,
+            "scenarios_favor_budget": 1,
+            "common_success_geometric_ratio": 1.0783598204410896
+          },
+          "common_success_work_ratio": 1.0789724281862083
+        },
+        {
+          "control": "L2",
+          "tau": 0.01,
+          "scenarios": 6,
+          "seed_pairs": 18,
+          "common_success_pairs": 14,
+          "all_pairs_retained_in_penalized_scores": true,
+          "process_discovery": {
+            "PAR2_paired_geometric_ratio": 0.376944176580715,
+            "lower95": 0.0748784325797879,
+            "upper95": 1.1263878777516405,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 1.0801393664536527
+          },
+          "offline_verified_available": {
+            "PAR2_paired_geometric_ratio": 0.39185628513936116,
+            "lower95": 0.08528130319705139,
+            "upper95": 1.0990027288450097,
+            "scenarios_favor_budget": 2,
+            "common_success_geometric_ratio": 1.0613922662744515
+          },
+          "common_success_work_ratio": 1.0391431397749882
+        }
+      ],
+      "bootstrap": {
+        "resamples": 100000,
+        "seed": 2026101912,
+        "unit": "scenario; all three paired seeds retained",
+        "intervals": "marginal percentile 95%, log scale",
+        "conditional_on_known_parent_structure": true
+      },
+      "failed_target_penalty": "60 seconds plus process preparation; score, not observed completion time",
+      "point_quality_reference_is_not_global_optimum": true
+    }
+  }
+}

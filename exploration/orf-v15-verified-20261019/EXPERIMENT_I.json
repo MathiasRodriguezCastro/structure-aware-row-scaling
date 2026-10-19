@@ -1,0 +1,224 @@
+{
+  "scope": "I: Gurobi automatic scaling, reference budgets",
+  "scenarios": 24,
+  "seeds_per_scenario": 3,
+  "policy_results": [
+    {
+      "policy": "Base",
+      "runs": 72,
+      "candidate_events": 1517,
+      "targets": {
+        "0.001": 53,
+        "0.01": 68
+      },
+      "final_physical_pass": 72,
+      "final_domain_pass": 69,
+      "final_other_rows_pass": 72,
+      "detected_bound_contradictions": 2,
+      "unknown_native_bound_contrasts": 0,
+      "native_completed": 72,
+      "median_callback_seconds": 0.0008547635006834753,
+      "median_verification_seconds": 0.1670090714978869
+    },
+    {
+      "policy": "Budget-L2",
+      "runs": 72,
+      "candidate_events": 459,
+      "targets": {
+        "0.001": 54,
+        "0.01": 72
+      },
+      "final_physical_pass": 72,
+      "final_domain_pass": 72,
+      "final_other_rows_pass": 72,
+      "detected_bound_contradictions": 1,
+      "unknown_native_bound_contrasts": 0,
+      "native_completed": 72,
+      "median_callback_seconds": 0.00047490699580521323,
+      "median_verification_seconds": 0.15782748550191172
+    },
+    {
+      "policy": "L2",
+      "runs": 72,
+      "candidate_events": 571,
+      "targets": {
+        "0.001": 51,
+        "0.01": 66
+      },
+      "final_physical_pass": 72,
+      "final_domain_pass": 72,
+      "final_other_rows_pass": 72,
+      "detected_bound_contradictions": 7,
+      "unknown_native_bound_contrasts": 0,
+      "native_completed": 72,
+      "median_callback_seconds": 0.0006128865024948027,
+      "median_verification_seconds": 0.15835074499773327
+    },
+    {
+      "policy": "L2-NF3",
+      "runs": 72,
+      "candidate_events": 568,
+      "targets": {
+        "0.001": 54,
+        "0.01": 72
+      },
+      "final_physical_pass": 72,
+      "final_domain_pass": 72,
+      "final_other_rows_pass": 72,
+      "detected_bound_contradictions": 0,
+      "unknown_native_bound_contrasts": 0,
+      "native_completed": 72,
+      "median_callback_seconds": 0.0007536959965364076,
+      "median_verification_seconds": 0.1828677775010874
+    }
+  ],
+  "comparisons": [
+    {
+      "control": "Base",
+      "tau": 0.001,
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "common_success_pairs": 45,
+      "all_pairs_retained_in_penalized_scores": true,
+      "process_discovery": {
+        "PAR2_paired_geometric_ratio": 0.7721935216247956,
+        "lower95": 0.37529309041702913,
+        "upper95": 1.5959145746329093,
+        "scenarios_favor_budget": 13,
+        "common_success_geometric_ratio": 0.7188098498347629
+      },
+      "offline_verified_available": {
+        "PAR2_paired_geometric_ratio": 0.8016775631798383,
+        "lower95": 0.4050571622883486,
+        "upper95": 1.595411707856063,
+        "scenarios_favor_budget": 13,
+        "common_success_geometric_ratio": 0.7420830177374388
+      },
+      "common_success_work_ratio": 0.31414089065712986
+    },
+    {
+      "control": "Base",
+      "tau": 0.01,
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "common_success_pairs": 68,
+      "all_pairs_retained_in_penalized_scores": true,
+      "process_discovery": {
+        "PAR2_paired_geometric_ratio": 0.6131406427850188,
+        "lower95": 0.37380216214086914,
+        "upper95": 0.8931850619483224,
+        "scenarios_favor_budget": 14,
+        "common_success_geometric_ratio": 0.7932091988105564
+      },
+      "offline_verified_available": {
+        "PAR2_paired_geometric_ratio": 0.6377988577949292,
+        "lower95": 0.40075316021886337,
+        "upper95": 0.9013660557662305,
+        "scenarios_favor_budget": 14,
+        "common_success_geometric_ratio": 0.8155955085046405
+      },
+      "common_success_work_ratio": 0.3941219345464648
+    },
+    {
+      "control": "L2",
+      "tau": 0.001,
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "common_success_pairs": 44,
+      "all_pairs_retained_in_penalized_scores": true,
+      "process_discovery": {
+        "PAR2_paired_geometric_ratio": 0.8751635568730265,
+        "lower95": 0.4223812110633504,
+        "upper95": 1.8071144496279181,
+        "scenarios_favor_budget": 8,
+        "common_success_geometric_ratio": 0.9814091576205393
+      },
+      "offline_verified_available": {
+        "PAR2_paired_geometric_ratio": 0.8760081119107062,
+        "lower95": 0.4410398406639908,
+        "upper95": 1.7222952231397017,
+        "scenarios_favor_budget": 8,
+        "common_success_geometric_ratio": 0.9800324252137176
+      },
+      "common_success_work_ratio": 0.8606717876360296
+    },
+    {
+      "control": "L2",
+      "tau": 0.01,
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "common_success_pairs": 66,
+      "all_pairs_retained_in_penalized_scores": true,
+      "process_discovery": {
+        "PAR2_paired_geometric_ratio": 0.7587662965250017,
+        "lower95": 0.4433088499112483,
+        "upper95": 1.1237548598886653,
+        "scenarios_favor_budget": 6,
+        "common_success_geometric_ratio": 1.0701533669519134
+      },
+      "offline_verified_available": {
+        "PAR2_paired_geometric_ratio": 0.7528300496391936,
+        "lower95": 0.45409058967478766,
+        "upper95": 1.0845561392870302,
+        "scenarios_favor_budget": 8,
+        "common_success_geometric_ratio": 1.0408676735439006
+      },
+      "common_success_work_ratio": 0.9941540866919735
+    },
+    {
+      "control": "L2-NF3",
+      "tau": 0.001,
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "common_success_pairs": 46,
+      "all_pairs_retained_in_penalized_scores": true,
+      "process_discovery": {
+        "PAR2_paired_geometric_ratio": 0.9527049908962891,
+        "lower95": 0.4965259864089397,
+        "upper95": 1.8335646968629922,
+        "scenarios_favor_budget": 10,
+        "common_success_geometric_ratio": 0.9994857058856739
+      },
+      "offline_verified_available": {
+        "PAR2_paired_geometric_ratio": 0.9432578282859735,
+        "lower95": 0.5085029590604266,
+        "upper95": 1.746052583124273,
+        "scenarios_favor_budget": 10,
+        "common_success_geometric_ratio": 0.9943759095303857
+      },
+      "common_success_work_ratio": 0.5093359006454515
+    },
+    {
+      "control": "L2-NF3",
+      "tau": 0.01,
+      "scenarios": 24,
+      "seed_pairs": 72,
+      "common_success_pairs": 72,
+      "all_pairs_retained_in_penalized_scores": true,
+      "process_discovery": {
+        "PAR2_paired_geometric_ratio": 1.0137605351326704,
+        "lower95": 0.9407350435286099,
+        "upper95": 1.0929981494030943,
+        "scenarios_favor_budget": 11,
+        "common_success_geometric_ratio": 1.0137605351326704
+      },
+      "offline_verified_available": {
+        "PAR2_paired_geometric_ratio": 1.0104668689805718,
+        "lower95": 0.9504149894975636,
+        "upper95": 1.08191349743423,
+        "scenarios_favor_budget": 11,
+        "common_success_geometric_ratio": 1.0104668689805718
+      },
+      "common_success_work_ratio": 0.5082916876254946
+    }
+  ],
+  "bootstrap": {
+    "resamples": 100000,
+    "seed": 2026101906,
+    "unit": "scenario; all three paired seeds retained",
+    "intervals": "marginal percentile 95%, log scale",
+    "conditional_on_known_parent_structure": true
+  },
+  "failed_target_penalty": "60 seconds plus process preparation; score, not observed completion time",
+  "point_quality_reference_is_not_global_optimum": true
+}
