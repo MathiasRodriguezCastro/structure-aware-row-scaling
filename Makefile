@@ -22,18 +22,20 @@ APP_BUDGET_INSTANCE := data/entradas/entrada-modelo-simple/caso46e.txt
         research-robustness-analysis oms-package oms-validate
 
 help:
-	@echo "OMS manuscript and reproducibility (no optimizer license required):"
+	@echo "ORF manuscript and scientific replay (no optimizer license required):"
 	@echo "  make research-check-python  - mathematical tests, saved binary audit, LP hashes"
 	@echo "  make research-check         - also build and test the C++ LP serializer"
 	@echo "  make research-analysis      - regenerate current tables, figures and summaries"
 	@echo "  make research-application-budgets - declared-budget table and its delta sweep"
 	@echo "  make research-application-export  - re-export that model and compare byte by byte"
-	@echo "  make research-online-resources    - audit the two Online Resources before submitting"
+	@echo "  make research-online-resources    - audit the preserved scientific-source supplements"
 	@echo "  make research-claims              - independently verify stored numerical claims"
 	@echo "  make research-bridge              - what a solver-style scaling leaves of the audit"
 	@echo "  make research-certificate-audit   - solver claims contradicted by a verified point"
 	@echo "  make research-stage-ablation      - historical local/coupling stage ablation"
 	@echo "  make paper                  - build main and supplement PDFs with pdfLaTeX"
+	@echo "  make orf-package            - prepare the complete ORF upload files"
+	@echo "  make orf-validate           - verify ORF builds, unchanged science and full replay"
 	@echo "  make oms-package            - prepare separate OMS upload files and archives"
 	@echo "  make oms-validate           - verify extracted packages, builds and stored claims"
 	@echo "  make audit-build            - isolated solver-free C++ build in code/build-audit"
@@ -54,6 +56,13 @@ oms-package: paper
 
 oms-validate:
 	$(PYTHON) scripts/research/validate_oms.py
+
+.PHONY: orf-package orf-validate
+orf-package: paper
+	$(PYTHON) scripts/research/package_orf.py
+
+orf-validate:
+	$(PYTHON) scripts/research/validate_orf.py
 
 research-rounding-check:
 	OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 $(PYTHON) -m pytest -q tests/test_joint_rounding_certificate.py tests/test_finite_safety_geometry.py tests/test_single_row_safety.py tests/test_certified_guards.py

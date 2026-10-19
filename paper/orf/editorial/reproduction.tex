@@ -1,0 +1,59 @@
+\section{Reproduction and artifact layout}
+Online Resource~2 is the complete code/data package for
+\path{v1.4.0-orf-submission}. It contains the unchanged scientific-evidence archive
+\path{v1.3.17-oms-submission}, its validation record, the current ORF editable
+sources and a checksum-based inheritance record. The older editorial files inside
+the scientific archive identify its provenance; the current article and this
+supplement are supplied in the ORF source bundle.
+
+Extract \texttt{scientific-evidence-oms-v1.3.17.zip} into an empty directory.
+From its root, verify \texttt{CONTENTS.sha256}, install the dependencies in
+\path{environment/research-requirements.txt}, and run:
+\begin{lstlisting}
+make research-oms-check
+make research-check-python
+make research-check
+make research-analysis
+\end{lstlisting}
+These four commands are self-contained in the supplied archive. They check saved
+results, exact witnesses, original-unit residuals, the native C++ exporter, named
+bases and paired summaries, and regenerate all final tables and analysis figures.
+No commercial optimizer license is required. The archive's
+\path{paper/submission/oms/OMS_DATA_MANIFEST.json} inventories the additional
+scientific inputs; \texttt{SNAPSHOT.json} identifies its version and campaigns.
+The stopped-campaign screening tables use the supplied \texttt{runs.csv} and
+\texttt{contradictions.csv}; they remain floating-point screening evidence.
+
+The full native export check needs GNU Make and a C++17 compiler. Mathematical
+tests include small SciPy reference linear programs. The figures are generated
+with matplotlib from supplied data or explicit mathematical expressions.
+SoPlex is only needed to generate fresh rational witnesses, rather than to check
+those supplied. Recorded runtime is specific to the declared hardware and solver
+versions; arithmetic replay does not recreate wall-clock measurements.
+
+Reconstructing all 1,530 historical bases additionally requires
+\texttt{fixed-basis-exports.tar.zst}, available with
+\path{v1.2-coap-submission} at \url{https://doi.org/10.5281/zenodo.23145294}.
+The separate archive contains 337 MB compressed and 5.18 GB uncompressed in
+11,585 files. Its manifest and checksums are under
+\path{paper/submission/data-deposit/} in the scientific archive. That bulk
+reconstruction is not part of the four-command self-contained replay.
+
+Extract the current \texttt{orf-editable-sources.zip} separately to rebuild the
+submission documents:
+\begin{lstlisting}
+pdflatex main_orf
+bibtex main_orf
+pdflatex main_orf
+pdflatex main_orf
+pdflatex ESM_1
+pdflatex ESM_1
+\end{lstlisting}
+The source bundle includes the publisher's class and bibliography style, all
+figures, shared proofs and numerical tables. It builds the current ORF documents;
+the historical scientific archive preserves the preceding OMS build recipe.
+
+Optional fresh experiments are documented in the scientific archive's README and
+write to separate output directories. Commercial-solver arms require the
+corresponding licenses. The current adaptation adds no optimization runs and
+has no separate Zenodo version DOI.

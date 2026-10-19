@@ -1,10 +1,13 @@
-# Current OMS manuscript and supplementary information; COAP files are historical.
+# ORF is the current editorial target; OMS and COAP remain preserved.
 MAIN = main
 SI = supporting-information
 OMS = oms/main_oms
 PYTHON ?= python3
-.PHONY: all si oms coap clean
-all: $(MAIN).pdf si oms
+.PHONY: all orf si oms coap clean
+all: orf
+orf:
+	cd .. && $(PYTHON) scripts/research/build_orf.py
+	$(MAKE) -C orf
 $(MAIN).pdf: $(MAIN).tex research-references.bib $(wildcard sections/*.tex tables/*.tex figs/research/*.pdf)
 	pdflatex -halt-on-error -interaction=nonstopmode $(MAIN)
 	bibtex $(MAIN)
@@ -16,6 +19,7 @@ $(SI).pdf: $(SI).tex $(wildcard sections/*.tex tables/*.tex)
 	pdflatex -halt-on-error -interaction=nonstopmode $(SI)
 
 clean:
+	$(MAKE) -C orf clean
 	rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).blg $(MAIN).log $(MAIN).out $(MAIN).pdf $(SI).aux $(SI).log $(SI).out $(SI).pdf
 	rm -f $(OMS).aux $(OMS).bbl $(OMS).blg $(OMS).log $(OMS).out $(OMS).pdf
 

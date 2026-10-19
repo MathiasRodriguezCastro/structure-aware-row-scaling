@@ -1,0 +1,18 @@
+Mixed-integer programming models used for operational decisions are often produced
+by software generators. Their developers must connect numerical feasibility to the
+accuracy needed in the application: a small residual in an exported row need not
+be small in megawatts, water volume or material mass. Multiplying a constraint and
+its right-hand side (RHS) by a positive number preserves the model in exact
+arithmetic, but changes both the coefficients presented to the optimizer and the
+original-unit meaning of an absolute residual tolerance. Solvers scale internally;
+a generator can also use row roles, variable ownership and application units before
+export \cite{gurobiExternalScaling,idaesScaling}.
+
+The practical task is to make those accuracy requirements part of model generation
+and verification. Coefficient centering alone does not resolve it: scaling a row
+down enlarges the original-unit residual admitted by a fixed exported-row tolerance.
+Conversely, a factor chosen only for residual accuracy may conflict with coefficient
+limits. We connect four steps: declare an original-unit residual budget, select an
+admissible factor or report incompatibility, check the written model, and independently
+verify the returned point. The application budgets in this study are stated numerical
+precision goals, rather than operator standards.

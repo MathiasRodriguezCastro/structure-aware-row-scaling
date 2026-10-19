@@ -1,7 +1,7 @@
-# Pre-Export Row Scaling for Generated Mixed-Integer Programs: Accuracy Contracts and Software Evaluation
+# Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational and Software Study
 
-Manuscript and reproducibility artifact prepared for **Optimization Methods and
-Software (OMS)**. Author: Mathias Rodríguez Castro, Facultad de Ingeniería,
+Manuscript and reproducibility artifact prepared for **Operations Research
+Forum (ORF)**. Author: Mathias Rodríguez Castro, Facultad de Ingeniería,
 Universidad de la República, Montevideo, Uruguay; mathiasr@fing.edu.uy;
 ORCID [0009-0002-7235-7677](https://orcid.org/0009-0002-7235-7677).
 
@@ -10,8 +10,7 @@ residual-budget contracts in original application units, explicit factor-selecti
 finite-precision export and independent verification. The C++ dispatch exporter and Python
 budget selector are separate components. The archived numerical baseline is retained, with
 a controlled row-only Ruiz comparison, final-policy stage ablation, and three application
-precision scenarios on the same 30 operational models added for OMS. The locally frozen `v1.3.17-oms-submission` snapshot includes those additions. It has not
-been submitted or published as a separate Zenodo release and has no version DOI.
+precision scenarios on the same 30 operational models added for OMS. The current ORF adaptation is `v1.4.0-orf-submission`, with no additional optimization experiments. It reuses the exact audited `v1.3.17-oms-submission` scientific archive. Neither local snapshot has a separate Zenodo version DOI.
 
 The OMS activation follow-up adds 114 nonpilot solver calls, 20 exact feasible witnesses, and matched numerical controls on six archived scenarios without the documented demand inversion. [Findings and limits](exploration/oms-followup-20261014/RESULTADOS.md) distinguish original-unit precision from MILP-bound validity; `make research-oms-check` verifies the supplied data without optimizing.
 
@@ -44,46 +43,34 @@ selection rule for unseen instances.
 
 ## Manuscript and supplements
 
+Run `make paper` for the current ORF documents. The adaptation leads with
+accuracy-aware model generation and verification, followed by computational
+assessment and practical implications. Mathematical statements, experiments and
+numerical results are preserved from the audited OMS v1.3.17.
+
 | File | Purpose |
 |---|---|
-| `paper/oms/main_oms.pdf` | Manuscript for OMS in the publisher's Interact layout |
-| `paper/submission/oms/oms-submission.zip` | Editable LaTeX sources, class/style files, figures and bibliography |
-| `paper/oms/cover-letter.pdf` | Cover letter for OMS |
-| `paper/supporting-information.pdf` | Supplementary Material 1: proofs, protocols and reproduction instructions |
-| `paper/submission/oms/reproducibility-artifact.zip` | Supplementary Material 2: code, stored data, analysis and verification scripts |
-| `paper/submission/oms/oms-delivery.zip` | Local package with separate files and upload instructions |
+| `paper/orf/main_orf.pdf` | ORF manuscript in the Springer Nature template |
+| `paper/orf/ESM_1.pdf` | Online Resource 1: proofs, controls and reproduction instructions |
+| `paper/orf/cover-letter.pdf` | New letter addressed to ORF |
+| `paper/submission/orf/ESM_2.zip` | Online Resource 2: current sources and the complete unchanged scientific archive |
+| `paper/submission/orf/orf-delivery.zip` | Complete local delivery, source ZIP, both resources, form fields and checksums |
 
-Supplementary Material 2 includes `paper/supporting-information.pdf`, byte-identical to
-Supplementary Material 1. The complete delivery also includes `REPRODUCE.md` and
-`REPRODUCTION-VALIDATION.json`, identifying the exact inner archives checked from
-clean extractions. See the [OMS submission checklist](paper/submission/oms/SUBMISSION_CHECKLIST.md)
-and [adaptation notes](paper/oms/OMS_NOTES.md). File roles must be selected in the journal's
-submission portal; its detailed current author instructions could not be retrieved.
+[ORF preparation](paper/submission/orf/README.md) and the
+[checklist](paper/submission/orf/SUBMISSION_CHECKLIST.md) describe the package.
+`paper/orf/editorial/` and `scripts/research/build_orf.py` generate the current
+manuscript from the preserved scientific source in `paper/main.tex`.
+Generated mirrors, local delivery ZIPs and compiler intermediates stay outside Git.
+Canonical text, source code, experiment records and verifiers remain versioned.
 
-The frozen experimental baseline is
-[`v1.2-coap-submission`](https://github.com/MathiasRodriguezCastro/structure-aware-row-scaling/releases/tag/v1.2-coap-submission).
-This version is archived at Zenodo DOI [10.5281/zenodo.23145294](https://doi.org/10.5281/zenodo.23145294).
-The repository uses the Zenodo concept DOI
-[10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949).
-[CITATION.cff](CITATION.cff) and `.zenodo.json` describe the local OMS snapshot
-`v1.3.17-oms-submission`, frozen 2026-10-18. The former root metadata for the published
-baseline are preserved in `artifacts/baseline-metadata/`; the baseline DOI belongs to
-`v1.2-coap-submission`, not to the new OMS experiments. The version metadata and new-data
-inventory are in `paper/submission/oms/SNAPSHOT.json` and `OMS_DATA_MANIFEST.json`.
-After package validation, `python3 scripts/research/freeze_oms.py` creates the immutable
-local copy under `paper/submission/oms/releases/v1.3.17-oms-submission/`, with hashes and both
-supplements. It does not publish to Zenodo or create a remote Git tag. The prior locally frozen `v1.3-oms-submission` copy is retained; this revision clarifies
-two main contributions supported by computational evidence. Earlier editorial
-files remain in `paper/coap/`; `make paper` builds OMS.
-
-Git retains the canonical manuscript, experiment inputs, saved results, protocols
-and independent verification programs. Generated OMS source mirrors, compiler
-intermediates, duplicate study bundles and local upload/deposit preparation are
-excluded from version control. The two recorded native-selector executables are
-retained because their exact hashes belong to the timing evidence. Superseded
-editorial previews and packaging logs are kept in a separate local archive.
-The [baseline repository validation](paper/validation/oms-repository-validation.json)
-records replay and compilation from the preceding committed sources.
+The immutable local OMS v1.3.17 delivery is retained. Online Resource 2 contains
+its exact scientific-evidence ZIP, parent validation record and current ORF
+sources, with an explicit inheritance record. The current CFF and Zenodo metadata
+identify the ORF adaptation. The published historical baseline is
+[v1.2-coap-submission](https://doi.org/10.5281/zenodo.23145294), with concept DOI
+[10.5281/zenodo.20648949](https://doi.org/10.5281/zenodo.20648949). These DOIs
+identify the earlier baseline, rather than the later experiments or current ORF
+snapshot. The new deposit/DOI remains deferred. No journal submission has been made.
 
 ## Reproduce and verify
 

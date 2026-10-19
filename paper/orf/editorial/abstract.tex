@@ -1,0 +1,23 @@
+Generated mixed-integer programming models support operational decisions, but mathematically
+equivalent exports can behave differently in finite precision. Row scaling also changes
+the original-unit meaning of absolute feasibility tolerances.
+We develop an accuracy-aware pre-export workflow that accepts row-level residual budgets,
+selects admissible factors under coefficient limits, accounts for integer rounding and
+binary64 export, and independently checks returned solutions.
+The evaluation combines 306 hydrothermal dispatch models, kernel-matched and Ruiz scaling
+controls, enumerated finite-precision stress tests on three solvers, and independent
+batch-scheduling models.
+In a directed comparison on six known dispatch models and three seeds, with a
+100\,m\textsuperscript{3} volume budget, Gurobi, automatic presolve and integer feasibility
+tolerance $10^{-9}$, the budget-aware Euclidean policy has paired geometric-mean
+work ratios of 0.317 against no external scaling and 0.264 against that baseline
+with a stricter feasibility tolerance. An interleaved replication gives a paired
+geometric-mean complete-process time ratio of 0.621 against the baseline on a shared
+host; preparation overhead makes the three inexpensive models slower.
+All three policies satisfy the tested primal budgets without detected bound or completion
+contradictions; the budget-aware policy's candidate costs worsen by less than 0.1\%.
+These checks do not
+establish equally certified mixed-integer optimality gaps. Batch scheduling verifies
+budget delivery without an added primal benefit over conventional Euclidean scaling.
+The workflow makes application-unit precision explicit and testable; performance
+benefits remain instance- and configuration-dependent.
