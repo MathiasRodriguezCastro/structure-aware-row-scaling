@@ -115,9 +115,12 @@ def main(freeze):
         policy_outcomes_used=False, optimality_certified=False,
         unknown_quality_is_not_scored_as_target_failure=True,
         standard_library_replay_passed=True, explicit_written_finite_bounds_checked=True,
+        physical_budget_scope='Frozen physically mapped rows only; other rows retain the separate relative backward-error check.',
+        original_Rio_Negro_activation_rows_not_relabelled_as_physically_budgeted=True,
         hashes={n: digest(n) for n in ['PENDING_VALIDATION_PLAN.json','BASE_CALIBRATION_REPORT.json',
             'CONFIRMATION_REFERENCE_REPORT.json','CONFIRMATION_REFERENCE_REPLAY.json',
-            'STDLIB_REFERENCE_REPLAY.json','STDLIB_READER_CHECK.json']+recovery_hashes})
+            'STDLIB_REFERENCE_REPLAY.json','STDLIB_READER_CHECK.json',
+            'CONTRACT_SCOPE_AUDIT.json','CONTRACT_SCOPE_NOTE.md']+recovery_hashes})
     if freeze:
         path = HERE / 'CONFIRMATION_PREREQUISITES_FROZEN.json'
         if path.exists():
@@ -136,6 +139,11 @@ def main(freeze):
         'Un segundo verificador lee el formato LP del generador usando solo Python estándar. '
         'Conserva y comprueba las cotas finitas escritas, incluso las que el lector nativo '
         'interpreta como infinitas, y reproduce el certificado de inviabilidad del caso diagnóstico.', '',
+        'Los contratos físicos conservan su mapa original de filas y unidades. No cubren '
+        'todas las filas: las restantes mantienen el control separado de error relativo hacia atrás. '
+        'En particular, no se atribuye el presupuesto de 100 m³ a las activaciones Río Negro '
+        'sin unidad asignada en ese mapa. La verificación de referencias sí comprueba '
+        'exactamente todas las filas y dominios.', '',
         f"Adquisición: {references['actual_MIP_calls']} intentos MIP y "
         f"{references['actual_exact_LP_calls']} LP racionales. Calibración separada: "
         f"{calibration['actual_MIP_calls']} MIP Base.", '',
