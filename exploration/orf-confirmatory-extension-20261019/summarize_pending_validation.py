@@ -26,6 +26,7 @@ def main(freeze):
     calibration = load('BASE_CALIBRATION_REPORT.json')
     references = load('CONFIRMATION_REFERENCE_REPORT.json')
     replay = load('CONFIRMATION_REFERENCE_REPLAY.json')
+    stdlib = load('STDLIB_REFERENCE_REPLAY.json')
     assert calibration['plan_sha256'] == references['plan_sha256'] == replay['plan_sha256'] == digest('PENDING_VALIDATION_PLAN.json')
     assert calibration['status'] == 'completed' and references['status'] == 'completed'
     assert replay['status'] == 'passed' and replay['optimizer_calls'] == 0
@@ -42,6 +43,11 @@ def main(freeze):
     unknowns = sorted(n for n, status in statuses.items() if status == 'unknown')
     assert diagnostics == plan['certified_infeasible_confirmation_models']
     assert len(admitted) == replay['verified_feasible']
+    assert stdlib['status'] == 'passed' and stdlib['models_classified'] == 160
+    assert stdlib['optimizer_calls'] == stdlib['third_party_packages'] == 0
+    assert stdlib['verified_feasible'] == len(admitted) and stdlib['unknown'] == len(unknowns)
+    assert stdlib['certified_infeasible'] == len(diagnostics)
+    assert stdlib['verifier_sha256'] == digest('verify_reference_witnesses_stdlib.py')
     caps = []
     assessment = load('BASE_RESOURCE_ASSESSMENT.json')
     for stratum in assessment['strata']:
@@ -73,8 +79,10 @@ def main(freeze):
         caps_and_reference_mask_frozen=freeze, confirmation_comparative_assignments_submitted=0,
         policy_outcomes_used=False, optimality_certified=False,
         unknown_quality_is_not_scored_as_target_failure=True,
+        standard_library_replay_passed=True, explicit_written_finite_bounds_checked=True,
         hashes={n: digest(n) for n in ['PENDING_VALIDATION_PLAN.json','BASE_CALIBRATION_REPORT.json',
-            'CONFIRMATION_REFERENCE_REPORT.json','CONFIRMATION_REFERENCE_REPLAY.json']})
+            'CONFIRMATION_REFERENCE_REPORT.json','CONFIRMATION_REFERENCE_REPLAY.json',
+            'STDLIB_REFERENCE_REPLAY.json','STDLIB_READER_CHECK.json']})
     if freeze:
         path = HERE / 'CONFIRMATION_PREREQUISITES_FROZEN.json'
         if path.exists():
@@ -90,6 +98,9 @@ def main(freeze):
         'La referencia común no es un óptimo MILP certificado. Todos los intentos Base y sus '
         'costos permanecen separados de las políticas. La reproducción independiente revisó '
         'filas, cotas, integralidad, objetivos y hashes sin llamar a optimizadores.', '',
+        'Un segundo verificador lee el formato LP del generador usando solo Python estándar. '
+        'Conserva y comprueba las cotas finitas escritas, incluso las que el lector nativo '
+        'interpreta como infinitas, y reproduce el certificado de inviabilidad del caso diagnóstico.', '',
         f"Adquisición: {references['actual_MIP_calls']} intentos MIP y "
         f"{references['actual_exact_LP_calls']} LP racionales. Calibración separada: "
         f"{calibration['actual_MIP_calls']} MIP Base.", '',

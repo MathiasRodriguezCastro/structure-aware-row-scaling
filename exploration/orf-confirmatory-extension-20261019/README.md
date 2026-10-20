@@ -7,9 +7,11 @@ y su ZIP de envío no se modifican. Esta investigación está en una rama separa
 
 El 20 de octubre se registró `PENDING_VALIDATION_PLAN.json` para completar los
 pendientes del piloto cerrado. La admisión `6070373` pasó con los 160 Base
-originales. La calibración `6070374` repite los siete casos Base a 120 s y, solo
-en los estratos todavía pendientes, a 300 s como techo explícito. No usa
-resultados de políticas para decidir recursos.
+originales. La calibración `6070374` terminó nueve resoluciones Base: siete a
+120 s y dos a 300 s. Propone 120 s para Full/360/CPLEX y SG-Ter-Mer/360/Gurobi,
+y el techo de 300 s para Full/360/Gurobi. En este último estrato el criterio
+operativo sigue incumplido (1/2 casos), con censura explícita. Los demás estratos
+conservan 60 s. No se usan resultados de políticas para decidir recursos.
 
 El array `6070375`, serial y dependiente de esa calibración, intenta referencias
 comunes para los 159 modelos sin certificado de inviabilidad. Conserva además
