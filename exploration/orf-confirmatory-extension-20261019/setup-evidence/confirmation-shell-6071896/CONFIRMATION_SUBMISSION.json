@@ -1,0 +1,110 @@
+{
+  "confirmation_plan_sha256": "779f7ba35884eddad37d8eaa30bccee5c11b2778eb91846e16a634e5082d78a6",
+  "jobs": {
+    "gate": {
+      "job_id": "6071896",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--time=00:30:00",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-gate-%A_%a.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-gate-%A_%a.err",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/confirmation.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "gate"
+      ],
+      "submitted_utc": "2026-10-20T21:45:44.375172+00:00"
+    },
+    "first_block": {
+      "job_id": "6071897",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--time=02:00:00",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-first_block-%A_%a.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-first_block-%A_%a.err",
+        "--dependency=afterok:6071896",
+        "--array=0-0%1",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/confirmation.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "run"
+      ],
+      "submitted_utc": "2026-10-20T21:45:45.550919+00:00"
+    },
+    "array": {
+      "job_id": "6071898",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--time=02:00:00",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-array-%A_%a.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-array-%A_%a.err",
+        "--dependency=afterok:6071897",
+        "--array=1-479%1",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/confirmation.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "run"
+      ],
+      "submitted_utc": "2026-10-20T21:45:46.650343+00:00"
+    },
+    "collection": {
+      "job_id": "6071899",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--time=00:30:00",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-collection-%A_%a.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-collection-%A_%a.err",
+        "--dependency=afterany:6071898",
+        "--cpus-per-task=1",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/confirmation.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "collect"
+      ],
+      "submitted_utc": "2026-10-20T21:45:47.605034+00:00"
+    },
+    "analysis": {
+      "job_id": "6071900",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--time=01:00:00",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-analysis-%A_%a.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-analysis-%A_%a.err",
+        "--dependency=afterok:6071899",
+        "--cpus-per-task=1",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/confirmation.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "analyze"
+      ],
+      "submitted_utc": "2026-10-20T21:45:48.847769+00:00"
+    },
+    "seal": {
+      "job_id": "6071901",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--time=01:00:00",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-seal-%A_%a.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/confirmation-seal-%A_%a.err",
+        "--dependency=afterany:6071900",
+        "--cpus-per-task=1",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/confirmation.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "seal"
+      ],
+      "submitted_utc": "2026-10-20T21:45:49.795476+00:00"
+    }
+  },
+  "registered_assignments": 3840,
+  "simultaneous_MIP_processes": 1,
+  "remote_repository": "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+  "scientific_parent_modified": false,
+  "comparative_assignments_submitted": 3840
+}

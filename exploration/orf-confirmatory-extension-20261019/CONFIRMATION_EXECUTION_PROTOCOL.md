@@ -106,3 +106,9 @@ The gate first repeats saved-candidate arithmetic checks, the complete reference
 closure and two 2,501-variable continuous license probes (two technical LP calls,
 zero extra MIPs, excluded from benchmark observations). No scientific conclusion
 is incorporated into the manuscript automatically.
+
+The first admission attempt (6071896) stopped in the shell before Python, with
+zero solver calls. Preserve its complete plan, receipt and logs. Its unstarted
+dependents were cancelled. `CONFIRMATION_EXECUTION_AMENDMENT.json` records only
+the nonempty-shell-argv correction; all assignments, order, caps, analysis and
+scientific sources remain identical before the resubmission.

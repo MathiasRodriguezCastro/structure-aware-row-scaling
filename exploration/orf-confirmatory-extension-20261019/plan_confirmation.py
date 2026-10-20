@@ -51,6 +51,16 @@ def main():
     for name in sources:
         path = HERE / name
         dependencies[path.relative_to(ROOT).as_posix()] = sha(path)
+    amendment_path = HERE / 'CONFIRMATION_EXECUTION_AMENDMENT.json'
+    if amendment_path.exists():
+        amendment = load(amendment_path)
+        assert amendment['assignment_order_caps_policies_analysis_unchanged']
+        assert amendment['corrected_wrapper_sha256'] == sha(HERE / 'cluster/confirmation.slurm')
+        for name, expected in amendment['archived_evidence_sha256'].items():
+            path = HERE / name
+            assert sha(path) == expected
+            dependencies[path.relative_to(ROOT).as_posix()] = expected
+        dependencies[amendment_path.relative_to(ROOT).as_posix()] = sha(amendment_path)
     for name in names:
         path = HERE / 'models' / name / 'input.txt'
         dependencies[path.relative_to(ROOT).as_posix()] = sha(path)
@@ -65,6 +75,12 @@ def main():
             bootstrap_resamples=100000, bootstrap_seed=2026102021, marginal_confidence=.95),
         technical_gate_LP_calls=2, technical_gate_MIP_calls=0,
         original_generator_modified=False, submission_modified=False, new_reference_acquisitions_allowed=False)
+    if amendment_path.exists():
+        import hashlib
+        import json
+        design = {k: result[k] for k in ['blocks','cap_rules','analysis','threads','memory_GiB','runtime','simultaneous_MIP_processes']}
+        assert hashlib.sha256(json.dumps(design,sort_keys=True).encode()).hexdigest() == amendment['scientific_design_sha256']
+        result['execution_amendment_sha256'] = sha(amendment_path)
     destination = HERE / 'CONFIRMATION_PLAN.json'
     if destination.exists():
         assert load(destination) == result, 'Immutable confirmation plan differs; retain it and register an amendment.'
