@@ -24,6 +24,15 @@ Los identificadores y dependencias se guardan en
 `PENDING_VALIDATION_SUBMISSION.json`; el protocolo y fuentes quedan congelados
 por hash. Se mantienen una sola resolución simultánea, cuatro hilos y 8 GiB.
 
+Los casos sin testigo racional tras ambos Base no se declaran inviables ni se
+sustituyen. `REFERENCE_FEASIBILITY_RECOVERY_PROTOCOL.md` y su registro de reglas
+prevén una recuperación posterior, únicamente con los LP y patrones guardados:
+objetivo de factibilidad, techo de costo explícito y hasta dos LP por caso,
+sin MILP nuevos. Conserva intactos los informes y el sellado iniciales y verifica
+cada punto contra todas las filas, cotas escritas e integralidad originales.
+La máscara común definitiva incorpora por separado esa procedencia antes de
+cualquier comparación de políticas.
+
 ## Estado del piloto cerrado
 
 El array corregido `6069328` completó **256/256 asignaciones**, sin fallos de
