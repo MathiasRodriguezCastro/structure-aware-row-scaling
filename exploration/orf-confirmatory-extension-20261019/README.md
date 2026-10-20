@@ -3,6 +3,50 @@
 Se preserva `v1.5.0-orf-submission` (`2fbb5f14`) y también v1.4.2. El artículo
 y su ZIP de envío no se modifican. Esta investigación está en una rama separada.
 
+## Campaña confirmatoria enviada
+
+Se enviaron las **3.840 asignaciones** del `CONFIRMATION_PLAN.json`: 480 bloques
+de modelo/semilla, ocho ejecuciones por bloque y una sola resolución simultánea.
+Los 3.816 objetivos de calidad usan las referencias comunes; las 24 ejecuciones
+del modelo infactible permanecen diagnósticas. El protocolo de ejecución y
+análisis está en `CONFIRMATION_EXECUTION_PROTOCOL.md`; todas sus dependencias
+quedaron identificadas por hash antes del primer resultado comparativo.
+
+El intento de admisión `6071896` se detuvo en Bash antes de Python o cualquier
+solver. Se preservaron su plan, recepción, registros y cancelación de trabajos
+pendientes. La enmienda de portabilidad conserva exactamente las asignaciones,
+su orden, los límites y el análisis. El envío corregido consta de admisión
+`6071904`, primer bloque `6071905`, array restante `6071906`, consolidación
+`6071907`, análisis `6071908` y sellado `6071909`.
+
+La admisión comprueba referencias, hashes, aritmética sobre candidatos guardados
+y ambas licencias completas. El primer bloque integra las 3.840 ejecuciones;
+su reproducción habilita los otros 479. No se evalúa qué política gana para
+autorizar esa continuidad. Cada bloque guarda los vectores y ejecuta su propia
+verificación independiente. El análisis final exige la campaña completa y
+remuestrea padres enteros; no se publican comparaciones parciales de políticas.
+
+La admisión corregida pasó. El primer bloque terminó sus ocho ejecuciones sin
+fallos y habilitó el array restante. Se descargaron sus artefactos completos y
+se reprodujo localmente el informe con bytes idénticos a los del clúster:
+28 vectores, 22 auditorías completas y una referencia exacta comprobada.
+`CONFIRMATION_INITIAL_LOCAL_REPLAY.json` conserva ese control, que no constituye
+un resultado comparativo de eficiencia ni certifica toda la campaña pendiente.
+
+`CONFIRMATION_SUBMISSION.json` contiene los recibos y dependencias Slurm.
+`CONFIRMATION_PROGRESS.json` es una captura operacional fechada, no el estado en
+tiempo real. Para actualizarla sin resolver ni modificar el plan:
+
+```sh
+python3 exploration/orf-confirmatory-extension-20261019/monitor_confirmation.py --copy --snapshot
+```
+
+La consolidación, el análisis y el sellado están programados al terminar el
+array. Los registros voluminosos quedan fuera de Git y se conservan en el
+directorio aislado del clúster. El artículo no recibe cambios automáticamente.
+Las referencias a las asignaciones «sin lanzar» en los informes de preparación
+describen sus cierres históricos, anteriores a esta autorización y envío.
+
 ## Continuación de recursos y referencias
 
 El 20 de octubre se registró `PENDING_VALIDATION_PLAN.json` para completar los
