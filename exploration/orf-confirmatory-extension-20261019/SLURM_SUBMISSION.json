@@ -40,6 +40,22 @@
       "submitted_utc": "2026-10-19T20:07:50.087360+00:00",
       "dependency": "afterok:6069331",
       "optimizer_calls": 0
+    },
+    "artifact_seal": {
+      "job_id": "6069623",
+      "command": [
+        "sbatch",
+        "--parsable",
+        "--dependency=afterok:6069331",
+        "--chdir=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository",
+        "--output=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/pilot-seal-%j.out",
+        "--error=/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/logs/pilot-seal-%j.err",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository/exploration/orf-confirmatory-extension-20261019/cluster/seal_pilot.slurm",
+        "/clusteruy/home/mathiasr/row-scaling-orf-extension-20261019/repository"
+      ],
+      "submitted_utc": "2026-10-19T23:07:48.914053+00:00",
+      "optimizer_calls": 0,
+      "confirmation_launched": false
     }
   },
   "confirmation_assignments_submitted": 0,
@@ -206,7 +222,7 @@
     "LICENSE_ENVIRONMENT_AMENDMENT.json",
     "BLAS_RUNTIME_AMENDMENT.json"
   ],
-  "status": "resource_pilot_submitted",
+  "status": "resource_pilot_closed",
   "reference_MIP_assignments": 32,
   "exact_reference_LP_attempts_at_most": 32,
   "pilot_MIP_assignments": 256,
@@ -268,5 +284,16 @@
   ],
   "blas_archive_job": "6069313",
   "reference_recovery_job": "6069315",
-  "all_export_gate_job": "6069319"
+  "all_export_gate_job": "6069319",
+  "closure_evidence": {
+    "resource_pilot_closed": true,
+    "pilot_assignments_processed": 256,
+    "failed_or_missing_assignments": 0,
+    "cluster_and_local_independent_replay": "passed",
+    "raw_manifest": "PILOT_RAW_MANIFEST.json",
+    "resource_proposal": "INFORME_PILOTO.md",
+    "confirmation_resources_frozen": false,
+    "additional_Base_calibration_jobs_submitted": 0,
+    "optimizer_calls_during_closure": 0
+  }
 }

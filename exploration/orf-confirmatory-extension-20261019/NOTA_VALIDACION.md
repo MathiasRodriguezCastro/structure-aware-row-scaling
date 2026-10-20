@@ -3,6 +3,11 @@
 19 de octubre de 2026. Investigación separada de `v1.5.0-orf-submission`.
 No se modifican el artículo, sus resultados ni el generador original.
 
+**Actualización de cierre:** el piloto repetido ya terminó sus 256 asignaciones
+y pasó la reproducción independiente en el clúster y localmente. El detalle
+vigente está en [INFORME_PILOTO.md](INFORME_PILOTO.md). Las menciones siguientes
+a repetir o terminar el piloto documentan el estado anterior al cierre.
+
 ## Exportación reproducible
 
 El primer piloto terminó con 118 workers registrados: 98 llegaron al solver,

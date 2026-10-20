@@ -3,6 +3,27 @@
 Se preserva `v1.5.0-orf-submission` (`2fbb5f14`) y también v1.4.2. El artículo
 y su ZIP de envío no se modifican. Esta investigación está en una rama separada.
 
+## Estado del piloto cerrado
+
+El array corregido `6069328` completó **256/256 asignaciones**, sin fallos de
+infraestructura ni resultados faltantes. La reproducción independiente pasó en
+el clúster y en la copia local: 1.821 vectores, 692 auditorías completas y 31
+referencias exactas. Las ocho ejecuciones del modelo Simple certificado como
+inviable permanecen como diagnóstico; no son timeouts ni comparaciones de calidad.
+
+El [informe del piloto](INFORME_PILOTO.md) explica estados, memoria, tiempos y
+la propuesta de recursos. `PILOT_ASSIGNMENTS.csv` contiene las 256 asignaciones;
+`PILOT_RAW_MANIFEST.json` identifica todos sus artefactos, incluidos vectores,
+exports y referencias. `close_resource_pilot.py` verifica los hashes y reproduce
+el cierre sin optimizadores. No se usó el piloto para elegir políticas ganadoras.
+
+Las siete calibraciones Base a 120 s propuestas para tres estratos de 360 h
+**no se lanzaron**: el cierre solicitado conserva las 256 asignaciones.
+Los recursos confirmatorios aún no están congelados y las 3.840 ejecuciones
+principales siguen sin enviar. El resto del documento conserva la historia de
+preparación; las frases sobre tareas pendientes del piloto corresponden a ese
+estado previo, no reemplazan el informe de cierre.
+
 ## Procedencia que efectivamente se comprobó
 
 ClusterUY contiene 100.000 y 10.000 entradas Simple, además de 500 Simple,
