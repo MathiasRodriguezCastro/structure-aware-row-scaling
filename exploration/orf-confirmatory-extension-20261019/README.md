@@ -3,6 +3,25 @@
 Se preserva `v1.5.0-orf-submission` (`2fbb5f14`) y también v1.4.2. El artículo
 y su ZIP de envío no se modifican. Esta investigación está en una rama separada.
 
+## Continuación de recursos y referencias
+
+El 20 de octubre se registró `PENDING_VALIDATION_PLAN.json` para completar los
+pendientes del piloto cerrado. La admisión `6070373` pasó con los 160 Base
+originales. La calibración `6070374` repite los siete casos Base a 120 s y, solo
+en los estratos todavía pendientes, a 300 s como techo explícito. No usa
+resultados de políticas para decidir recursos.
+
+El array `6070375`, serial y dependiente de esa calibración, intenta referencias
+comunes para los 159 modelos sin certificado de inviabilidad. Conserva además
+el caso inviable como diagnóstico. La adquisición Base, reparación LP racional
+sin simplificador y verificación independiente están fijadas antes de cualquier
+comparación. Los trabajos `6070376` y `6070377` consolidan y reproducen los
+resultados. No se lanzan las 3.840 comparaciones desde esta continuación.
+
+Los identificadores y dependencias se guardan en
+`PENDING_VALIDATION_SUBMISSION.json`; el protocolo y fuentes quedan congelados
+por hash. Se mantienen una sola resolución simultánea, cuatro hilos y 8 GiB.
+
 ## Estado del piloto cerrado
 
 El array corregido `6069328` completó **256/256 asignaciones**, sin fallos de
@@ -18,7 +37,8 @@ exports y referencias. `close_resource_pilot.py` verifica los hashes y reproduce
 el cierre sin optimizadores. No se usó el piloto para elegir políticas ganadoras.
 
 Las siete calibraciones Base a 120 s propuestas para tres estratos de 360 h
-**no se lanzaron**: el cierre solicitado conserva las 256 asignaciones.
+**no se lanzaron dentro del cierre**: aquel informe conserva las 256 asignaciones.
+Su continuación posterior se registra por separado en la sección anterior.
 Los recursos confirmatorios aún no están congelados y las 3.840 ejecuciones
 principales siguen sin enviar. El resto del documento conserva la historia de
 preparación; las frases sobre tareas pendientes del piloto corresponden a ese
