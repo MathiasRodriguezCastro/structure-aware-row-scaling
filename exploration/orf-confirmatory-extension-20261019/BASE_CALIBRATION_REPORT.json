@@ -1,0 +1,64 @@
+{
+  "status": "completed",
+  "records": [
+    {
+      "stratum": "completo-h360-cplex",
+      "cap_seconds": 120,
+      "cases": 2,
+      "native_gap_stops": 2,
+      "native_gap_stop_fraction": 1.0,
+      "operational_target_met": true,
+      "cases_repeated_in_full": true
+    },
+    {
+      "stratum": "completo-h360-gurobi",
+      "cap_seconds": 120,
+      "cases": 2,
+      "native_gap_stops": 1,
+      "native_gap_stop_fraction": 0.5,
+      "operational_target_met": false,
+      "cases_repeated_in_full": true
+    },
+    {
+      "stratum": "sgtm-h360-gurobi",
+      "cap_seconds": 120,
+      "cases": 3,
+      "native_gap_stops": 3,
+      "native_gap_stop_fraction": 1.0,
+      "operational_target_met": true,
+      "cases_repeated_in_full": true
+    },
+    {
+      "stratum": "completo-h360-gurobi",
+      "cap_seconds": 300,
+      "cases": 2,
+      "native_gap_stops": 1,
+      "native_gap_stop_fraction": 0.5,
+      "operational_target_met": false,
+      "cases_repeated_in_full": true
+    }
+  ],
+  "recommended_caps": {
+    "completo-h360-cplex": {
+      "cap_seconds": 120,
+      "operational_target_met": true,
+      "right_censoring_retained": false
+    },
+    "sgtm-h360-gurobi": {
+      "cap_seconds": 120,
+      "operational_target_met": true,
+      "right_censoring_retained": false
+    },
+    "completo-h360-gurobi": {
+      "cap_seconds": 300,
+      "operational_target_met": false,
+      "right_censoring_retained": true
+    }
+  },
+  "pending_strata": [],
+  "actual_MIP_calls": 9,
+  "plan_sha256": "11c5da375e7bd7e05d45a81c48f47a24947b2b976aa0ff826d415e59dd442c27",
+  "policy_ranking_used": false,
+  "confirmation_launched": false,
+  "ceiling_rule": "Stop at 300 seconds even if the 80% native-gap target is unmet; retain censoring explicitly."
+}

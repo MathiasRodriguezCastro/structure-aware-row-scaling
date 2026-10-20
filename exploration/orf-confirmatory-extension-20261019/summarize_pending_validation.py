@@ -54,10 +54,11 @@ def main(freeze):
             all_four_policies_share_cap=True, right_censoring_retained=True))
     assert len(caps) == 24
     proof_records = {r['instance']: r for r in replay['records'] if r['status'] == 'verified_feasible'}
-    readiness = not unknowns and len(admitted) == 159 and len(diagnostics) == 1
+    readiness = (len(admitted) + len(unknowns) == 159 and len(diagnostics) == 1)
+    assert readiness, 'All 160 models must be classified before freezing.'
     if freeze:
-        assert readiness, 'Resolve or explicitly re-register unknown reference eligibility before freezing.'
-    result = dict(status='prerequisites_complete' if readiness else 'unknown_references_retained',
+        assert references['recorded_models'] == 160 and not references['missing_models']
+    result = dict(status='prerequisites_complete' if not unknowns else 'prerequisites_processed_with_unknown_references',
         counts=counts, eligibility=dict(verified_feasible=admitted, diagnostic=diagnostics, unknown=unknowns),
         caps=caps, threads=4, memory_GiB=8, simultaneous_MIP_processes=1,
         requested_gap=.001, quality_relative_target=.001, confirmation_solver_seeds=[401,457,503],
@@ -71,6 +72,7 @@ def main(freeze):
         actual_reference_exact_LP_calls=references['actual_exact_LP_calls'],
         caps_and_reference_mask_frozen=freeze, confirmation_comparative_assignments_submitted=0,
         policy_outcomes_used=False, optimality_certified=False,
+        unknown_quality_is_not_scored_as_target_failure=True,
         hashes={n: digest(n) for n in ['PENDING_VALIDATION_PLAN.json','BASE_CALIBRATION_REPORT.json',
             'CONFIRMATION_REFERENCE_REPORT.json','CONFIRMATION_REFERENCE_REPLAY.json']})
     if freeze:
