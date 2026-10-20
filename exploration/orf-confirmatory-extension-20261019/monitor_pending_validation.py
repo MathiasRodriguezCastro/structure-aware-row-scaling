@@ -3,6 +3,7 @@
 import argparse
 from collections import Counter
 import json
+import os
 from pathlib import Path
 import re
 import shlex
@@ -12,12 +13,14 @@ HERE = Path(__file__).resolve().parent
 
 
 def main(copy_results, snapshot):
+    control_environment = dict(os.environ, LC_ALL='C')
     receipt = json.loads((HERE / 'PENDING_VALIDATION_SUBMISSION.json').read_text())
     identifiers = ','.join(r['job_id'] for r in receipt['jobs'].values())
     command = ['sacct', '-j', identifiers,
         '--format=JobID,State,ExitCode,Elapsed,AllocCPUS,MaxRSS,NodeList', '-n', '-P']
     process = subprocess.run(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=15',
-        'mathiasr@login.cluster.uy', shlex.join(command)], text=True, capture_output=True, check=True)
+        'mathiasr@login.cluster.uy', shlex.join(command)], text=True, capture_output=True, check=True,
+        env=control_environment)
     rows = [line.split('|') for line in process.stdout.splitlines() if line.strip()]
     status = {}
     for stage, item in receipt['jobs'].items():
@@ -42,7 +45,8 @@ def main(copy_results, snapshot):
         destination.mkdir(exist_ok=True)
         subprocess.run(['rsync','-rlt','--include=*/','--include=result.json','--exclude=*',
             '-e','ssh -p 10022 -o BatchMode=yes -o ConnectTimeout=15',
-            'mathiasr@cluster.uy:'+remote+'confirmation-reference-acquisition/',str(destination)+'/'], check=True)
+            'mathiasr@cluster.uy:'+remote+'confirmation-reference-acquisition/',str(destination)+'/'],
+            check=True, env=control_environment)
     results = [json.loads(p.read_text()) for p in (HERE / 'confirmation-reference-acquisition').glob('*/result.json')]
     status['downloaded_reference_outcomes'] = dict(Counter(r['status'] for r in results))
     status['downloaded_unknown_models'] = [r['instance'] for r in results if r['status'] == 'unknown']
