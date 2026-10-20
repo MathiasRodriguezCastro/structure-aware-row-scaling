@@ -77,7 +77,11 @@ def main(freeze):
         recovery_calls=recovery['additional_LP_calls']
         recovery_hashes=['REFERENCE_FEASIBILITY_RECOVERY_RULES.json',
             'REFERENCE_FEASIBILITY_RECOVERY_PLAN.json','REFERENCE_FEASIBILITY_RECOVERY_REPORT.json',
-            'REFERENCE_FEASIBILITY_RECOVERY_REPLAY.json']
+            'REFERENCE_FEASIBILITY_RECOVERY_REPLAY.json','REFERENCE_RECOVERY_RAW_MANIFEST.json']
+        recovery_seal = load('REFERENCE_RECOVERY_RAW_MANIFEST.json')
+        assert recovery_seal['status'] == 'sealed'
+        assert recovery_seal['initial_raw_manifest_sha256'] == digest('PENDING_RAW_MANIFEST.json')
+        assert recovery_seal['recovery_plan_sha256'] == digest('REFERENCE_FEASIBILITY_RECOVERY_PLAN.json')
         admitted=sorted(n for n,status in statuses.items() if status=='verified_feasible')
         unknowns=sorted(n for n,status in statuses.items() if status=='unknown')
         counts=dict(Counter(statuses.values()))
@@ -96,6 +100,11 @@ def main(freeze):
     assert readiness, 'All 160 models must be classified before freezing.'
     if freeze:
         assert references['recorded_models'] == 160 and not references['missing_models']
+        from seal_pending_validation import main as check_initial_seal
+        check_initial_seal(True)
+        if recovery_hashes:
+            from seal_reference_recovery import main as check_recovery_seal
+            check_recovery_seal(True)
     result = dict(status='prerequisites_complete' if not unknowns else 'prerequisites_processed_with_unknown_references',
         counts=counts, initial_reference_counts=initial_counts, recovered_references=recovered_count,
         eligibility=dict(verified_feasible=admitted, diagnostic=diagnostics, unknown=unknowns),
@@ -117,7 +126,10 @@ def main(freeze):
         standard_library_replay_passed=True, explicit_written_finite_bounds_checked=True,
         physical_budget_scope='Frozen physically mapped rows only; other rows retain the separate relative backward-error check.',
         original_Rio_Negro_activation_rows_not_relabelled_as_physically_budgeted=True,
-        hashes={n: digest(n) for n in ['PENDING_VALIDATION_PLAN.json','BASE_CALIBRATION_REPORT.json',
+        raw_evidence_verified_locally_before_freezing=freeze,
+        hashes={n: digest(n) for n in ['PENDING_VALIDATION_PLAN.json','PENDING_RAW_MANIFEST.json',
+            'PROTOCOL.md','summarize_pending_validation.py','seal_pending_validation.py',
+            'seal_reference_recovery.py','BASE_CALIBRATION_REPORT.json',
             'CONFIRMATION_REFERENCE_REPORT.json','CONFIRMATION_REFERENCE_REPLAY.json',
             'STDLIB_REFERENCE_REPLAY.json','STDLIB_READER_CHECK.json',
             'CONTRACT_SCOPE_AUDIT.json','CONTRACT_SCOPE_NOTE.md']+recovery_hashes})
@@ -151,7 +163,9 @@ def main(freeze):
         f"{recovered_count} referencias recuperadas. El informe inicial permanece intacto. "
         'Los subproblemas de recuperación reutilizan los patrones guardados, conservan las '
         'filas originales y añaden un techo de costo explícito; los puntos se verifican '
-        'contra el modelo original completo, incluidas las cotas escritas.', '',
+        'contra el modelo original completo, incluidas las cotas escritas. '
+        'Se descargaron los registros completos y se comprobaron localmente los hashes '
+        'de ambos sellados, sin sobrescribir el archivo inicial.', '',
         '## Límites de resolución', '',
         '| Familia | Horizonte | Solver | Límite (s) | Criterio operativo Base alcanzado |',
         '| --- | ---: | --- | ---: | --- |']

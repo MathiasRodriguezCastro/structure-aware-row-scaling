@@ -1,4 +1,4 @@
-# Ampliación confirmatoria: preparación y piloto
+# Ampliación confirmatoria: preparación, piloto y referencias
 
 Se preserva `v1.5.0-orf-submission` (`2fbb5f14`) y también v1.4.2. El artículo
 y su ZIP de envío no se modifican. Esta investigación está en una rama separada.
@@ -13,25 +13,46 @@ y el techo de 300 s para Full/360/Gurobi. En este último estrato el criterio
 operativo sigue incumplido (1/2 casos), con censura explícita. Los demás estratos
 conservan 60 s. No se usan resultados de políticas para decidir recursos.
 
-El array `6070375`, serial y dependiente de esa calibración, intenta referencias
-comunes para los 159 modelos sin certificado de inviabilidad. Conserva además
-el caso inviable como diagnóstico. La adquisición Base, reparación LP racional
-sin simplificador y verificación independiente están fijadas antes de cualquier
-comparación. Los trabajos `6070376` y `6070377` consolidan y reproducen los
-resultados. No se lanzan las 3.840 comparaciones desde esta continuación.
+El array `6070375` completó los 160 modelos: 149 referencias factibles exactas,
+diez casos desconocidos y el caso certificado como inviable. Usó 171 MIP Base y
+171 LP racionales, separados de los nueve MIP de calibración. Los trabajos
+`6070376` y `6070377` consolidaron y reprodujeron sus resultados. El verificador
+independiente de biblioteca estándar (`6070447`) comprobó todas las filas,
+cotas finitas escritas e integralidad, sin paquetes externos ni optimizadores.
 
 Los identificadores y dependencias se guardan en
 `PENDING_VALIDATION_SUBMISSION.json`; el protocolo y fuentes quedan congelados
 por hash. Se mantienen una sola resolución simultánea, cuatro hilos y 8 GiB.
 
-Los casos sin testigo racional tras ambos Base no se declaran inviables ni se
-sustituyen. `REFERENCE_FEASIBILITY_RECOVERY_PROTOCOL.md` y su registro de reglas
-prevén una recuperación posterior, únicamente con los LP y patrones guardados:
-objetivo de factibilidad, techo de costo explícito y hasta dos LP por caso,
-sin MILP nuevos. Conserva intactos los informes y el sellado iniciales y verifica
-cada punto contra todas las filas, cotas escritas e integralidad originales.
-La máscara común definitiva incorpora por separado esa procedencia antes de
-cualquier comparación de políticas.
+La recuperación registrada en `REFERENCE_FEASIBILITY_RECOVERY_PROTOCOL.md`
+terminó en el array `6071776`: **diez referencias recuperadas con diez LP y cero
+MIP nuevos**. Reutilizó los patrones guardados, con objetivo de factibilidad y
+techo de costo explícito. La reproducción `6071778` pasó y se repitió localmente
+con resultado idéntico. Los informes y el sellado iniciales se conservan intactos.
+
+El [informe de referencias y recursos](INFORME_REFERENCIAS_Y_RECURSOS.md)
+documenta el cierre: **159 referencias factibles verificadas, un diagnóstico
+inviable y cero desconocidos**. Los registros completos se descargaron y sus
+hashes se comprobaron localmente. `CONFIRMATION_PREREQUISITES_FROZEN.json`
+congela límites y máscara común antes de comparar políticas: 3.816 asignaciones
+con calidad evaluable y 24 diagnósticas. **Las 3.840 asignaciones siguen sin
+lanzar.** Las referencias no son óptimos MILP certificados y esta etapa no
+demuestra una ventaja de Budget-L2.
+
+Con los archivos completos presentes, el cierre se reproduce sin optimizadores:
+
+```sh
+python3 exploration/orf-confirmatory-extension-20261019/seal_pending_validation.py --check
+python3 exploration/orf-confirmatory-extension-20261019/verify_reference_witnesses_stdlib.py
+python3 exploration/orf-confirmatory-extension-20261019/verify_recovered_references_stdlib.py
+python3 exploration/orf-confirmatory-extension-20261019/seal_reference_recovery.py --check
+python3 exploration/orf-confirmatory-extension-20261019/summarize_pending_validation.py --freeze
+```
+
+El checkout contiene fuentes, entradas, informes y manifiestos. Los LP, vectores,
+registros y testigos voluminosos permanecen fuera de Git, identificados en ambos
+sellados y conservados en la copia local y el directorio aislado del clúster.
+El checkout solo no constituye un archivo íntegro de resultados.
 
 ## Estado del piloto cerrado
 
@@ -50,8 +71,8 @@ el cierre sin optimizadores. No se usó el piloto para elegir políticas ganador
 Las siete calibraciones Base a 120 s propuestas para tres estratos de 360 h
 **no se lanzaron dentro del cierre**: aquel informe conserva las 256 asignaciones.
 Su continuación posterior se registra por separado en la sección anterior.
-Los recursos confirmatorios aún no están congelados y las 3.840 ejecuciones
-principales siguen sin enviar. El resto del documento conserva la historia de
+Los recursos confirmatorios se fijaron en la continuación descrita arriba y las
+3.840 ejecuciones principales siguen sin enviar. El resto conserva la historia de
 preparación; las frases sobre tareas pendientes del piloto corresponden a ese
 estado previo, no reemplazan el informe de cierre.
 
