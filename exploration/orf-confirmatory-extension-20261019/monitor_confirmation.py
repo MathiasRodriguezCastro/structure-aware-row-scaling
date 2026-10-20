@@ -44,9 +44,18 @@ def main(copy, snapshot):
             'ssh -p 10022 -o BatchMode=yes -o ConnectTimeout=15', 'mathiasr@cluster.uy:' + remote, str(HERE) + '/'],
             check=True, env=env)
     replays = [json.loads(p.read_text()) for p in (HERE / 'confirmation-replay').glob('*.json')]
-    report['local_block_replays'] = dict(Counter(r['status'] for r in replays))
-    report['locally_replayed_assignments'] = sum(len(r['rows']) for r in replays)
-    report['retained_execution_failures'] = sum(len(r['failed_jobs']) for r in replays)
+    report['downloaded_block_replay_reports'] = dict(Counter(r['status'] for r in replays))
+    report['cluster_verified_assignments'] = sum(len(r['rows']) for r in replays if r['status'] == 'passed')
+    report['execution_failures_in_downloaded_reports'] = sum(len(r['failed_jobs']) for r in replays)
+    report['local_independent_audit'] = None
+    for name in ['CONFIRMATION_LOCAL_AUDIT.json', 'CONFIRMATION_INITIAL_LOCAL_REPLAY.json']:
+        path = HERE / name
+        if not path.exists():
+            continue
+        audit = json.loads(path.read_text())
+        if audit['status'] == 'passed' and audit['confirmation_plan_sha256'] == receipt['confirmation_plan_sha256']:
+            report['local_independent_audit'] = dict(assignments=audit['assignments'], source=name)
+            break
     report['partial_policy_rankings_reported'] = False
     if snapshot:
         folder = HERE / 'setup-evidence/confirmation'

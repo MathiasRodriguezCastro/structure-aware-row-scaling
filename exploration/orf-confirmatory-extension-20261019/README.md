@@ -41,6 +41,29 @@ tiempo real. Para actualizarla sin resolver ni modificar el plan:
 python3 exploration/orf-confirmatory-extension-20261019/monitor_confirmation.py --copy --snapshot
 ```
 
+El monitor distingue los informes verificados en el clúster y descargados de
+las auditorías realmente reproducidas con los vectores en la copia local.
+Para descargar y revisar localmente todos los bloques terminados disponibles:
+
+```sh
+python3 exploration/orf-confirmatory-extension-20261019/audit_completed_confirmation.py --download
+```
+
+El auditor fija primero una instantánea de los bloques completos disponibles;
+descarga sus artefactos y cronómetros por el puerto 10022, reproduce los informes
+sin optimizadores y exige que coincidan byte a byte. Comprueba además parámetros,
+versiones, importaciones de matrices y el nodo común de cada bloque. Conserva
+un manifiesto SHA-256 de los archivos usados en `setup-evidence/confirmation-local/`
+y resume el último control en `CONFIRMATION_LOCAL_AUDIT.json`. Este control
+adicional no modifica fuentes congeladas, políticas, límites ni resultados.
+
+El primer control ampliado pasó en 136 ejecuciones de 17 bloques y 16 modelos
+distintos: 1.330 vectores, 524 auditorías completas y 17 comprobaciones de
+referencias. Cubre las tres familias y nueve combinaciones de familia/horizonte.
+Los 1.309 archivos usados quedaron identificados por SHA-256 (227.843.301 bytes).
+La coincidencia de informes verifica su reproducción, no implica que todos los
+candidatos satisfagan los objetivos de precisión/calidad ni anticipa eficiencia.
+
 La consolidación, el análisis y el sellado están programados al terminar el
 array. Los registros voluminosos quedan fuera de Git y se conservan en el
 directorio aislado del clúster. El artículo no recibe cambios automáticamente.
@@ -79,9 +102,9 @@ documenta el cierre: **159 referencias factibles verificadas, un diagnóstico
 inviable y cero desconocidos**. Los registros completos se descargaron y sus
 hashes se comprobaron localmente. `CONFIRMATION_PREREQUISITES_FROZEN.json`
 congela límites y máscara común antes de comparar políticas: 3.816 asignaciones
-con calidad evaluable y 24 diagnósticas. **Las 3.840 asignaciones siguen sin
-lanzar.** Las referencias no son óptimos MILP certificados y esta etapa no
-demuestra una ventaja de Budget-L2.
+con calidad evaluable y 24 diagnósticas. **En ese cierre todavía no se habían
+lanzado las 3.840 asignaciones.** Las referencias no son óptimos MILP certificados
+y esta etapa no demuestra una ventaja de Budget-L2.
 
 Con los archivos completos presentes, el cierre se reproduce sin optimizadores:
 
@@ -115,9 +138,9 @@ el cierre sin optimizadores. No se usó el piloto para elegir políticas ganador
 Las siete calibraciones Base a 120 s propuestas para tres estratos de 360 h
 **no se lanzaron dentro del cierre**: aquel informe conserva las 256 asignaciones.
 Su continuación posterior se registra por separado en la sección anterior.
-Los recursos confirmatorios se fijaron en la continuación descrita arriba y las
-3.840 ejecuciones principales siguen sin enviar. El resto conserva la historia de
-preparación; las frases sobre tareas pendientes del piloto corresponden a ese
+Los recursos confirmatorios se fijaron en la continuación descrita arriba; el
+envío posterior de las 3.840 ejecuciones está registrado al principio. El resto
+conserva la historia de preparación; las frases sobre tareas pendientes del piloto corresponden a ese
 estado previo, no reemplazan el informe de cierre.
 
 ## Procedencia que efectivamente se comprobó
