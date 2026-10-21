@@ -47,6 +47,14 @@ está en `CONFIRMATION_LOCAL_AUDIT.json`; los controles del intento anterior se
 conservan en su archivo separado. La verificación local completa de los 6.296
 archivos históricos pasó en `LOADER_ATTEMPT_LOCAL_VERIFICATION.json`.
 
+El 21 de octubre se reprodujeron localmente los bloques 45 y 64, seleccionados
+porque fallaron antes del solver en el intento anterior. Sus 16 ejecuciones
+terminaron y conservaron los hashes originales de los exports. Los dos informes
+coinciden byte a byte con los del clúster: 301 vectores, 82 auditorías completas
+y dos referencias exactas; 154 archivos inventariados. El control está en
+`LOADER_CORRECTED_LOCAL_CHECKPOINT.json`. Verifica la reparación del entorno,
+sin comparar la eficiencia de las políticas.
+
 La admisión comprueba referencias, hashes, aritmética sobre candidatos guardados
 y ambas licencias completas. El primer bloque integra las 3.840 ejecuciones;
 su reproducción habilita los otros 479. No se evalúa qué política gana para
