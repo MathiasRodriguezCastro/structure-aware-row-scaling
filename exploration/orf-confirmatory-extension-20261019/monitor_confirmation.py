@@ -3,6 +3,7 @@
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -16,15 +17,22 @@ HERE = Path(__file__).resolve().parent
 def main(copy, snapshot):
     env = dict(os.environ, LC_ALL='C')
     receipt = json.loads((HERE / 'CONFIRMATION_SUBMISSION.json').read_text())
-    ids = ','.join(r['job_id'] for r in receipt['jobs'].values())
+    expected_plan = receipt['confirmation_plan_sha256']
+    assert hashlib.sha256((HERE / 'CONFIRMATION_PLAN.json').read_bytes()).hexdigest() == expected_plan
+    jobs = dict(receipt['jobs'])
+    extra = HERE / 'CONFIRMATION_ANALYSIS_VALIDATION_SUBMISSION.json'
+    if extra.exists():
+        jobs['analysis_verification'] = json.loads(extra.read_text())
+    ids = ','.join(r['job_id'] for r in jobs.values())
     command = ['sacct', '-n', '-P', '-j', ids,
                '--format=JobID,State,ExitCode,Elapsed,AllocCPUS,MaxRSS,NodeList']
     process = subprocess.run(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=15',
         'mathiasr@login.cluster.uy', shlex.join(command)], text=True, capture_output=True,
         check=True, timeout=60, env=env)
     accounting = [r.split('|') for r in process.stdout.splitlines() if r.strip()]
-    report = dict(captured_utc=datetime.now(timezone.utc).isoformat(), stages={})
-    for stage, item in receipt['jobs'].items():
+    report = dict(captured_utc=datetime.now(timezone.utc).isoformat(),
+                  confirmation_plan_sha256=expected_plan, stages={})
+    for stage, item in jobs.items():
         job = item['job_id']
         if stage in ['array', 'first_block']:
             rows = [r for r in accounting if re.fullmatch(re.escape(job) + r'_\d+', r[0])]
@@ -38,12 +46,19 @@ def main(copy, snapshot):
         remote = receipt['remote_repository'] + '/exploration/orf-confirmatory-extension-20261019/'
         names = ['CONFIRMATION_GATE.json', 'PREFLIGHT-confirmation.json', 'CONFIRMATION_EXECUTION_REPORT.json',
                  'CONFIRMATION_ANALYSIS.json', 'CONFIRMATION_ASSIGNMENTS.csv', 'INFORME_CONFIRMACION.md',
-                 'CONFIRMATION_RAW_MANIFEST.json']
+                 'CONFIRMATION_RAW_MANIFEST.json', 'CONFIRMATION_ANALYSIS_REPLAY.json',
+                 'CONFIRMATION_ANALYSIS_VALIDATION_MANIFEST.json']
         includes = ['--include=' + n for n in names] + ['--include=confirmation-replay/', '--include=confirmation-replay/*.json']
         subprocess.run(['rsync', '-rlt', *includes, '--exclude=*', '-e',
             'ssh -p 10022 -o BatchMode=yes -o ConnectTimeout=15', 'mathiasr@cluster.uy:' + remote, str(HERE) + '/'],
             check=True, env=env)
     replays = [json.loads(p.read_text()) for p in (HERE / 'confirmation-replay').glob('*.json')]
+    assert all(r['confirmation_plan_sha256'] == expected_plan for r in replays), 'Stale block reports from another execution attempt.'
+    for name in ['CONFIRMATION_GATE.json', 'CONFIRMATION_EXECUTION_REPORT.json',
+                 'CONFIRMATION_RAW_MANIFEST.json', 'CONFIRMATION_ANALYSIS.json']:
+        path = HERE / name
+        if path.exists():
+            assert json.loads(path.read_text())['confirmation_plan_sha256'] == expected_plan, 'Stale metadata: ' + name
     report['downloaded_block_replay_reports'] = dict(Counter(r['status'] for r in replays))
     report['cluster_verified_assignments'] = sum(len(r['rows']) for r in replays if r['status'] == 'passed')
     report['execution_failures_in_downloaded_reports'] = sum(len(r['failed_jobs']) for r in replays)
@@ -57,6 +72,9 @@ def main(copy, snapshot):
             report['local_independent_audit'] = dict(assignments=audit['assignments'], source=name)
             break
     report['partial_policy_rankings_reported'] = False
+    analysis_check = HERE / 'CONFIRMATION_ANALYSIS_REPLAY.json'
+    if analysis_check.exists():
+        report['independent_analysis_verification'] = json.loads(analysis_check.read_text())['status']
     if snapshot:
         folder = HERE / 'setup-evidence/confirmation'
         folder.mkdir(parents=True, exist_ok=True)

@@ -15,9 +15,37 @@ quedaron identificadas por hash antes del primer resultado comparativo.
 El intento de admisión `6071896` se detuvo en Bash antes de Python o cualquier
 solver. Se preservaron su plan, recepción, registros y cancelación de trabajos
 pendientes. La enmienda de portabilidad conserva exactamente las asignaciones,
-su orden, los límites y el análisis. El envío corregido consta de admisión
-`6071904`, primer bloque `6071905`, array restante `6071906`, consolidación
-`6071907`, análisis `6071908` y sellado `6071909`.
+su orden, los límites y el análisis. Ese envío inicial usó la admisión
+`6071904`, primer bloque `6071905` y array `6071906`.
+
+El intento inicial se cerró tras 624 asignaciones: 612 llegaron al
+optimizador y doce fallaron antes de resolver por diferencias de uno o dos ULP
+en los exports. La prueba `6072392` aisló la causa: la precarga global de CPLEX
+cambia el último bit de `math.exp`. Usar la ruta normal de búsqueda de bibliotecas
+conserva la licencia completa y los factores originales. La puerta `6072394`
+comprobó los hashes de los 192 Base, reprodujo 384 exports escalados byte a byte y comprobó las dos
+licencias completas. No se relajó ningún hash ni tolerancia.
+
+El intento completo anterior quedó excluido del análisis primario y conservado
+en `infrastructure-attempts/loader-preload-6071906/`: 6.296 archivos y
+1.233.290.204 bytes, con fuentes, resultados, registros y manifiesto. Su resumen
+y manifiesto están en `setup-evidence/confirmation-loader-6071906/`. Los costos
+previos se conservan aparte. El protocolo es `LOADER_RECOVERY_PROTOCOL.md`.
+
+La repetición íntegra conserva exactamente el orden, modelos, políticas,
+semillas, referencias, límites, tolerancias y análisis. Su envío consta de
+admisión `6072410`, primer bloque `6072411`, array `6072412`, consolidación
+`6072413`, análisis `6072414` y sellado `6072415`. El cambio efectivo se limita
+al mecanismo de carga de la biblioteca en el wrapper; no se combinan resultados
+entre entornos. `LOADER_RESTART_REGISTRATION.json` comprueba la igualdad del
+diseño científico con el original.
+
+La admisión de la repetición y su primer bloque pasaron. Las ocho ejecuciones
+del primer bloque se reprodujeron localmente con un informe byte a byte idéntico:
+28 vectores, 22 auditorías completas y una referencia exacta. El control vigente
+está en `CONFIRMATION_LOCAL_AUDIT.json`; los controles del intento anterior se
+conservan en su archivo separado. La verificación local completa de los 6.296
+archivos históricos pasó en `LOADER_ATTEMPT_LOCAL_VERIFICATION.json`.
 
 La admisión comprueba referencias, hashes, aritmética sobre candidatos guardados
 y ambas licencias completas. El primer bloque integra las 3.840 ejecuciones;
@@ -26,11 +54,12 @@ autorizar esa continuidad. Cada bloque guarda los vectores y ejecuta su propia
 verificación independiente. El análisis final exige la campaña completa y
 remuestrea padres enteros; no se publican comparaciones parciales de políticas.
 
-La admisión corregida pasó. El primer bloque terminó sus ocho ejecuciones sin
+En el intento inicial, la admisión pasó. El primer bloque terminó sus ocho ejecuciones sin
 fallos y habilitó el array restante. Se descargaron sus artefactos completos y
 se reprodujo localmente el informe con bytes idénticos a los del clúster:
 28 vectores, 22 auditorías completas y una referencia exacta comprobada.
-`CONFIRMATION_INITIAL_LOCAL_REPLAY.json` conserva ese control, que no constituye
+`setup-evidence/confirmation-loader-6071906/CONFIRMATION_INITIAL_LOCAL_REPLAY.json`
+conserva ese control histórico, que no constituye
 un resultado comparativo de eficiencia ni certifica toda la campaña pendiente.
 
 `CONFIRMATION_SUBMISSION.json` contiene los recibos y dependencias Slurm.
@@ -57,12 +86,21 @@ un manifiesto SHA-256 de los archivos usados en `setup-evidence/confirmation-loc
 y resume el último control en `CONFIRMATION_LOCAL_AUDIT.json`. Este control
 adicional no modifica fuentes congeladas, políticas, límites ni resultados.
 
-El primer control ampliado pasó en 136 ejecuciones de 17 bloques y 16 modelos
+El primer control ampliado del intento anterior pasó en 136 ejecuciones de 17 bloques y 16 modelos
 distintos: 1.330 vectores, 524 auditorías completas y 17 comprobaciones de
 referencias. Cubre las tres familias y nueve combinaciones de familia/horizonte.
 Los 1.309 archivos usados quedaron identificados por SHA-256 (227.843.301 bytes).
 La coincidencia de informes verifica su reproducción, no implica que todos los
 candidatos satisfagan los objetivos de precisión/calidad ni anticipa eficiencia.
+
+El comprobador adicional `verify_confirmation_analysis.py` reconstruye las
+medias geométricas, recuentos e intervalos desde el CSV y los informes de cada
+bloque. Usa multiplicidades de padres y una implementación independiente del
+remuestreo. Pasó casos analíticos, padres sin éxitos comunes y controles de
+corrupción del CSV. El trabajo `6072417`, posterior al análisis y sellado, exige
+la campaña completa y todos los hashes antes de aceptar hasta 48 comparaciones
+y 80 intervalos. No añade llamadas a optimizadores ni modifica el análisis
+primario. Su registro está en `CONFIRMATION_ANALYSIS_VALIDATION_PLAN.json`.
 
 La consolidación, el análisis y el sellado están programados al terminar el
 array. Los registros voluminosos quedan fuera de Git y se conservan en el

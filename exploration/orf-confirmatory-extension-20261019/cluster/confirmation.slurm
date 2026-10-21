@@ -19,7 +19,8 @@ export SINGULARITYENV_PYTHONINTMAXSTRDIGITS=0
 export SINGULARITYENV_SLURM_JOB_ID="$SLURM_JOB_ID"
 export SINGULARITYENV_GRB_LICENSE_FILE="$HOME/.gurobi/gurobi.lic"
 export SINGULARITYENV_PYTHONPATH="$ENV_ROOT/python-deps-v1:$ENV_ROOT/python-deps-v1/cplex-22.1.2.0.data/purelib"
-export SINGULARITYENV_LD_PRELOAD="$ENV_ROOT/native-cplex-2212/libcplex2212.so"
+export SINGULARITYENV_LD_LIBRARY_PATH="$ENV_ROOT/native-cplex-2212"
+unset SINGULARITYENV_LD_PRELOAD
 SUB=exploration/orf-confirmatory-extension-20261019
 case "$STAGE" in
   gate) PROGRAM=confirmation_gate.py ;;
