@@ -101,3 +101,37 @@ optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.
   DOI permanecen diferidos por el autor. No se afirma haber enviado el trabajo.
 - La campaña posterior de 3.840 ejecuciones conserva su informe independiente;
   no se incorpora selectivamente ni cambia los totales de esta entrega.
+
+
+## Incorporación de la confirmación amplia, v1.6.0
+
+- Se incorpora el resultado primario completo de las 3.840 asignaciones,
+  conservando 3.816 evaluables y 24 diagnósticas. PAR2 Budget-L2/L2: Gurobi
+  0,995 [0,923, 1,062] y CPLEX 1,000 [0,963, 1,030]. No se infiere equivalencia
+  ni una ventaja temporal general. El tiempo completo Gurobi aumenta 7,9%.
+- El resumen conserva el resultado prospectivo favorable frente a Base y añade
+  el resultado nulo de la muestra más grande. No se combinan sus gaps nativos,
+  semillas o muestras ni se confunden padres generados con datos independientes.
+- Un párrafo y una tabla principales; cuatro tablas adicionales en el suplemento
+  conservan los seis controles globales, los catorce estratos primarios y las
+  ocho filas de precisión/dominio. Las 48 comparaciones completas y 80 intervalos
+  permanecen disponibles como datos reproducibles, sin selección por signo.
+- Se explicita el efecto del criterio de cotas exactas en CPLEX y la ausencia
+  de contrastes aplicables de cotas en las representaciones escaladas.
+- El archivo nuevo preserva todos los bytes sellados de la campaña final, piloto
+  corregido y adquisición/recuperación de referencias, con deduplicación mediante
+  enlaces duros tar. Los intentos de infraestructura excluidos conservan su
+  historia y manifiestos; sus archivos crudos separados no se agregan a la muestra.
+- El archivo se inició por sbatch; se canceló ese trabajo de archivo cuando la
+  deduplicación local comprobada permitió usar la copia local completa y su caché.
+  La compresión se ejecuta localmente con prioridad reducida. No se usa CPU
+  intensiva del login ni se resuelven nuevos MIP.
+- La versión anterior y sus PDFs/ZIP permanecen inmutables. El DOI y la carga
+  efectiva del envío continúan diferidos hasta el cierre final autorizado.
+
+- Las conclusiones se reescriben de forma más breve para reflejar la evidencia
+  nueva; se conserva el alcance heredado y se añade su límite explícito de
+  población histórica, cotas exactas y contrastes no aplicables. Los resultados
+  anteriores y sus controles adversos permanecen en el cuerpo y el suplemento.
+- La sección de reproducción identifica ahora v1.6.0 y documenta el archivo
+  nuevo; se verifica automáticamente que esa identidad coincida con el paquete.

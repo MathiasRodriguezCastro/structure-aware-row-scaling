@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """Freeze only a validated ORF delivery; prepare local portal/deposit copies."""
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
-from orf_config import ROOT, OUT, VERSION, sha
+from orf_config import ROOT, OUT, VERSION, COMPARATIVE_MIP_CALLS, sha
 
 
 def main():
     validation=json.loads((OUT/'VALIDATION.json').read_text())
     assert validation['version']==VERSION
-    assert validation['new_optimization_experiments']==1351
+    assert validation['new_optimization_experiments']==COMPARATIVE_MIP_CALLS
+    assert validation['larger_confirmation']['status']=='passed'
+    assert validation['confirmation_tables_regenerated_identically']==4
     assert validation['logging_confirmation']['complete_native_logs']==360
     assert validation['logging_confirmation']['replication']['assignments']==360
     assert validation['delivery']['sha256']==sha(OUT/'orf-delivery.zip')
@@ -33,7 +36,9 @@ def main():
         with tempfile.TemporaryDirectory(prefix='.orf-freeze-',dir=release.parent) as tmp:
             staging=Path(tmp)/VERSION;staging.mkdir()
             for n,p in files.items():
-                shutil.copyfile(p,staging/n);assert sha(staging/n)==sha(p)
+                if p.stat().st_size>20_000_000:os.link(p,staging/n)
+                else:shutil.copyfile(p,staging/n)
+                assert sha(staging/n)==sha(p)
             (staging/'SHA256SUMS').write_text(''.join(f'{sha(staging/n)}  {n}\n' for n in sorted(files)))
             staging.rename(release)
         for p in release.iterdir():p.chmod(0o444)
@@ -43,7 +48,10 @@ def main():
         shutil.copyfile(release/n,portal/n)
     deposit=OUT/'zenodo-deposit'/VERSION;deposit.mkdir(parents=True,exist_ok=True)
     for n in ('ESM_2.zip','SNAPSHOT.json','CITATION.cff','zenodo-metadata.json','REPRODUCTION-VALIDATION.json'):
-        shutil.copyfile(release/n,deposit/n)
+        target=deposit/n
+        if target.exists() or target.is_symlink():target.unlink()
+        if (release/n).stat().st_size>20_000_000:target.symlink_to(os.path.relpath(release/n,deposit))
+        else:shutil.copyfile(release/n,target)
     for n in ('LICENSE','DATA_LICENSE.md'):shutil.copyfile(ROOT/n,deposit/n)
     manifest={'version':VERSION,'remote_deposit_performed':False,'reserved_doi':None,
         'files':[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha(p)}

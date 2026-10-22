@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.5.1-orf-submission**, 22 October 2026.
+Local version: **v1.6.0-orf-submission**, 22 October 2026.
 Proposed type: Original Research Article.
 
 | File | Role |
@@ -82,5 +82,9 @@ of each known parent leaves 20 scenarios / 60 paired runs: the Base work ratio
 ranges from 0.355 to 0.504, while the L2 ratio ranges from 0.883 to 1.041.
 All four controls and both metrics replay from native work and external clocks:
 `python3 exploration/orf-confirmatory-20261018/parent_sensitivity.py --check`.
-The separate later 3,840-run campaign remains in its research report and is not
-included in this editorial snapshot or its scientific result counts.
+In v1.6.0, the closed 3,840-run campaign is incorporated as a brief main-text
+confirmation with full controls, all primary strata and domain/applicability
+diagnostics in Online Resource 1. Online Resource 2 includes its lossless raw
+archive, pilot/reference evidence and saved-result replay. No superiority
+claim is inferred from a null result; Gurobi process time is higher.
+The earlier v1.5.0/v1.5.1 releases remain unchanged.

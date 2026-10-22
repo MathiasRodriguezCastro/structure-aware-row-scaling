@@ -1,0 +1,105 @@
+\section{Larger fixed-policy confirmation}
+\label{sec:orf-large-confirmation}
+The complete execution protocol, frozen plans and provenance accompany
+\path{confirmation-evidence-20261022.tar.xz} in Online Resource~2. The study
+uses 14 Simple, 13 SG-Ter-Mer and 13 Full parent inputs, four horizons
+(24, 72, 168, 360 hours), seeds 401/457/503, Gurobi 13.0.2 and CPLEX 22.1.2.0,
+and four policies per solver. Simple, SG-Ter-Mer and Full are formulations
+within the hydrothermal application, not independent application families.
+Their inputs recombine historical components; prior exposure to scaling
+policies is documented. No operational independence or observational holdout
+is claimed. The Full continuation function remains fixed across horizons,
+so the longer horizon is a dimensional sensitivity, not a recalibrated forecast.
+
+\paragraph{Frozen execution and reference acquisition}
+The study runs one fresh MIP process at a time with four threads and 8 GiB.
+Each model/seed block keeps all eight solver/policy calls on one node, using a
+fixed shuffled order. Policies are Base, L2, Budget-L2 and L2-NF3 for Gurobi or
+L2-NumEmphasis for CPLEX; these two numerical controls are not equated. Native
+presolve/internal scaling remain automatic. Feasibility and integer tolerances
+are $10^{-6}$ and $10^{-9}$; the requested gap is 0.1\% for all four policies.
+Caps are 60 s except Full/360/CPLEX and SG-Ter-Mer/360/Gurobi (120 s), and
+Full/360/Gurobi (300 s). Base-only calibration fixed these resources before
+comparisons. The last stratum did not reach the operational Base-stop target;
+its finite-limit censoring is retained, not repaired by changing the sample.
+
+Common-reference acquisition is separate: 171 Base MIP calls and 171 rational
+LP attempts yield 149 exactly feasible references, ten unknowns and one
+independently infeasible model. Ten additional feasibility LPs, with zero new
+MIPs, recover the unknown references. Thus 159 references are exactly feasible;
+none is assumed a certified MILP optimum. Calibration, the disjoint 256-call
+resource pilot, reference acquisition, installation and queue time are excluded
+from the comparative process clocks and identified separately in the archive.
+The complete 24 assignments of the infeasible Full/106/168-hour model remain
+diagnostic. The remaining 3,816 assignments form the common eligible mask.
+
+An initial attempt stopped after 624 assignments, including twelve pre-solver
+export-hash failures. A loader diagnostic traced the one-ulp factor change to
+global CPLEX preloading. Normal library-path loading reproduced the frozen
+exports and retained the unrestricted license. The entire attempt was excluded
+from comparison and retained as infrastructure history; all 3,840 assignments
+were repeated uniformly without changing factors, seeds, order or budgets.
+An earlier shell-only admission failure and the resource pilot's BLAS-kernel
+correction are recorded separately. The archive supplies the final campaign,
+pilot and reference raw data, plus provenance and manifests for these excluded
+attempts; their separate raw infrastructure archives remain outside this bundle.
+
+\paragraph{Acceptance and the primary endpoint}
+The physical map uses 0.01 MW and 100 m\textsuperscript{3} for its mapped rows,
+before and after integer rounding. Unmapped Rio Negro activation rows acquire
+no physical contract. Acceptance also requires integer distances at most
+$10^{-9}$, exact rounded-point bounds and remaining-row relative backward error
+at most $10^{-6}$. Every explicitly written finite bound is retained, including
+values that a native reader treats as an infinity sentinel. These rules are
+fixed before results and are not relaxed for tiny violations.
+
+The cost threshold is
+$C_{\rm ref}+\operatorname{binary64}(0.001)\max\{1,|C_{\rm ref}|\}$,
+evaluated exactly from original coefficients and rounded integer coordinates.
+Callbacks retain all candidate vectors. Verification occurs after solving:
+availability includes termination and auditing the candidate prefix, rather
+than an online certified stopping rule. PAR2 uses measured verified availability
+on success and twice the declared solver cap plus measured preparation on
+failure. Complete-process time additionally includes persistence. Work is
+solver-specific, finite-limit censored and not an equal-quality certificate.
+No Gurobi work/CPLEX tick pooling is performed.
+
+The primary comparison is Budget-L2/L2 separately by solver. The registered
+100,000-resample bootstrap draws complete parents, keeping all horizons,
+seeds and the diagnostic mask together; seed 2026102021 and deterministic
+solver/stratum offsets are supplied. Parent totals and counts preserve the
+observed weights when eligible blocks have different sizes. Common-success
+intervals retain parents with no common successes in the sampling frame and
+count undefined replicas instead of imputing them. Intervals are marginal,
+conditional on this historically generated population, and not evidence of
+equivalence or external validity. The independent multiplicity-based replay
+reconstructs all 48 comparisons and 80 intervals from 480 checked block reports.
+
+\input{editorial/confirmation-controls-table}
+\input{editorial/confirmation-strata-table}
+\paragraph{Physical precision, domains and bound applicability}
+All 3,816 eligible final points meet the mapped physical budgets. Simple's L2
+and Budget-L2 exports are identical, so their timing differences cannot measure
+an effect of changing contractual factors. Across the eligible sample the
+contract supplies no additional physical-budget recovery. The global PAR2
+ratios are 0.995 for Gurobi and 1.000 for CPLEX, with both intervals containing
+one. This establishes neither general acceleration nor equivalence. Gurobi's
+complete-process ratio is 1.079 [1.032,1.133]; the slight CPLEX work decrease
+is secondary and does not establish an improvement in the primary endpoint.
+
+\input{editorial/confirmation-precision-table}
+CPLEX's exact-domain failures are all positive written-bound residues, ranging
+globally from $1.665\times10^{-16}$ to $3.815\times10^{-6}$ in the respective
+variable units. They affect 379/477 final Budget-L2 points and 378/477 L2 points,
+dominating the low combined success rates. No alternative tolerance is used
+to recalculate success. A successful target can use an earlier saved incumbent;
+final-point domain counts are therefore not target-success counts.
+
+The Base reference is not certified feasible for any scaled rounded export in
+this detector. Those zero available bound contrasts are missing applicability,
+not evidence of valid bounds. Base provides 477 applicable contrasts per
+solver, with two Gurobi and thirteen CPLEX contradictions. The acceptance checks
+and the absence of an applicable contradiction detector do not certify MILP
+optimality. All 48 control/stratum comparisons, native gaps and time-limit
+outcomes remain in the machine-readable archive; no favorable strata are used
+to redefine the primary comparison.

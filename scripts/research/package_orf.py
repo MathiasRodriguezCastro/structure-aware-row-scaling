@@ -2,12 +2,14 @@
 """Prepare an ORF delivery with the unchanged, audited scientific archive."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
 import unicodedata
 import zipfile
 from orf_config import ROOT, PAPER, ORF, OUT, VERSION, DATE, TITLE, PARENT, PARENT_DIR, FOLLOWUP, FOLLOWUP_ARCHIVE, VERIFIED, VERIFIED_ARCHIVE, sha
+from orf_config import CONFIRMATION, CONFIRMATION_ARCHIVE, CONFIRMATION_ARCHIVE_PATH, COMPARATIVE_MIP_CALLS
 
 FILES = ('main_orf.pdf','orf-editable-sources.zip','cover-letter.pdf','title-page.pdf','ESM_1.pdf','ESM_2.zip')
 EXTRAS = ('REPRODUCE.md','UPLOAD_INSTRUCTIONS.md','ONLINE_RESOURCE_CAPTIONS.txt',
@@ -20,6 +22,8 @@ def write_json(path, value):
 
 
 def archive(path, entries):
+    # A previous validated build may share storage with its immutable release.
+    if path.exists() or path.is_symlink():path.unlink()
     with zipfile.ZipFile(path,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
         hashes=[]
         for name, value in sorted(entries.items()):
@@ -50,7 +54,9 @@ def build_delivery(validation=None):
         'validation':validation})
     names=FILES+EXTRAS
     (uploads/'SHA256SUMS').write_text(''.join(f'{sha(uploads/n)}  {n}\n' for n in names if n!='SHA256SUMS'))
-    with zipfile.ZipFile(OUT/'orf-delivery.zip','w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+    delivery=OUT/'orf-delivery.zip'
+    if delivery.exists() or delivery.is_symlink():delivery.unlink()
+    with zipfile.ZipFile(delivery,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
         for name in names:z.write(uploads/name,name)
     (OUT/'SHA256SUMS').write_text(''.join(f'{sha(uploads/n)}  uploads/{n}\n' for n in FILES)+
         f'{sha(OUT/"orf-delivery.zip")}  orf-delivery.zip\n')
@@ -97,6 +103,9 @@ def main():
     assert verified_validation['new_optimization_assignments']==630
     assert verified_validation['additional_technical_repetitions']==1
     assert all(r['passed'] for r in verified_validation['commands'])
+    confirmation_validation=json.loads((CONFIRMATION/'CONFIRMATION_ARCHIVE_VALIDATION.json').read_text())
+    assert confirmation_validation['status']=='passed' and confirmation_validation['full_stream_read_and_checksums']
+    assert confirmation_validation['archive_sha256']==sha(CONFIRMATION_ARCHIVE_PATH)
     # Canonical editorial inputs and build tools, distinct from the scientific archive.
     revision={}
     roots=['README.md','CITATION.cff','.zenodo.json','LICENSE','DATA_LICENSE.md','Makefile',
@@ -106,20 +115,28 @@ def main():
            'paper/submission/orf/README.md','paper/submission/orf/SUBMISSION_CHECKLIST.md',
            'scripts/research/orf_config.py','scripts/research/build_orf.py',
            'scripts/research/package_orf.py','scripts/research/validate_orf.py','scripts/research/freeze_orf.py',
-           'scripts/research/orf_followup_tables.py']
+           'scripts/research/orf_followup_tables.py','scripts/research/orf_confirmation_tables.py',
+           'scripts/research/orf_confirmation_evidence.py']
     for name in roots:revision[name]=ROOT/name
     for folder in ('paper/orf/editorial','paper/sections','paper/tables','paper/figs/research'):
         for p in (ROOT/folder).rglob('*'):
             if p.is_file() and p.suffix in ('.tex','.pdf','.bib'):revision[p.relative_to(ROOT).as_posix()]=p
     revision_zip=OUT/'orf-revision-sources.zip';archive(revision_zip,revision)
     snapshot={'version':VERSION,'date':DATE,'target':'Operations Research Forum','title':TITLE,
-        'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':1351,
+        'published':False,'submitted':False,'version_doi':None,'new_optimization_experiments':COMPARATIVE_MIP_CALLS,
+        'comparative_MIP_count_scope':'1351 earlier comparative/logging calls plus 3840 final confirmation assignments; resource pilots, reference acquisition and excluded infrastructure attempts are separate.',
+        'larger_confirmation_assignments':3840,'larger_confirmation_quality_evaluable':3816,
+        'larger_confirmation_diagnostic':24,
         'prospective_primary_MIP_calls':360,'logging_confirmation_MIP_calls':360,
         'verified_followup_MIP_assignments':630,'verified_followup_technical_MIP_repetitions':1,
         'verified_followup_new_independent_scenarios':0,
         'verified_followup_archive_sha256':sha(verified_zip),
         'verified_followup_prior_validation_sha256':sha(VERIFIED/'PACKAGE_VALIDATION.json'),
-        'new_exact_LP_attempts':96,'prospective_archive_sha256':sha(followup_zip),
+        'confirmation_archive_sha256':sha(CONFIRMATION_ARCHIVE_PATH),
+        'confirmation_archive_validation_sha256':sha(CONFIRMATION/'CONFIRMATION_ARCHIVE_VALIDATION.json'),
+        'confirmation_analysis_sha256':sha(CONFIRMATION/'CONFIRMATION_ANALYSIS.json'),
+        'confirmation_statistical_replay_sha256':sha(CONFIRMATION/'CONFIRMATION_ANALYSIS_REPLAY.json'),
+        'earlier_prospective_exact_LP_attempts':96, 'confirmation_reference_exact_LP_attempts':181,'prospective_archive_sha256':sha(followup_zip),
         'prospective_validation_sha256':sha(FOLLOWUP/'VALIDATION.json'),
         'cluster_analysis_sha256':sha(FOLLOWUP/'CLUSTER_ANALYSIS.json'),
         'cluster_analysis_is_post_hoc':True,'cluster_resamples':100000,'scenario_clusters':24,
@@ -136,12 +153,14 @@ def main():
             'finite-export error bound, concise discussion, workflow figure and uncluttered author line',
             'main-text prospective outcome table, candidate-cost qualification and post hoc scenario-cluster uncertainty',
             'selective verified-candidate summary and constructive export-aware selector; controls in Online Resource 1',
-            'prospective-first abstract, explicit exact-domain counts, six-parent deletion sensitivity and concise cover letter'],
+            'prospective-first abstract, explicit exact-domain counts, six-parent deletion sensitivity and concise cover letter',
+            'larger fixed-policy confirmation: full primary comparison and adverse outcomes; all controls and strata retained',
+            'concise conclusions updated to the complete evidence; inherited limitations retained with explicit extension'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
     captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
         'exact arithmetic checks, numerical limitations and reproduction instructions.\n\n'
-        'Online Resource 2: Current ORF sources, prospective and verified-candidate evidence, and the unchanged audited scientific code/data '
+        'Online Resource 2: Current ORF sources, prospective and verified-candidate evidence, the larger fixed-policy confirmation, and the unchanged audited scientific code/data '
         'archive, including generators, scaling software, model exports, native logs, saved '
         'solutions, rational witnesses and independent replay programs. Inheritance and '
         'file checksums identify the exact versions.\n')
@@ -165,8 +184,16 @@ with its suppressed native traces; the confirmation supplies complete logs.
 A further frozen follow-up supplies 630 MIP assignments and one technical
 repeat, with new seeds on those same 24 known scenarios. It contains candidate
 traces, physical-margin tests, CPLEX/ScaleFlag controls and export-aware selection.
-It supplies no new independent scenarios. The total since the inherited OMS
-archive is 1,351 MIP calls, including both kinds of technical repetition.
+It supplies no new independent scenarios. These earlier ORF studies account
+for 1,351 comparative MIP calls, including both kinds of technical repetition.
+The larger frozen confirmation adds 3,840 assignments on 160 generated models
+from 40 known historical-component parents: 3,816 are quality-eligible and 24
+remain diagnostic. Its 256-call resource pilot, Base-only calibration, reference
+acquisition/recovery and excluded infrastructure attempts are accounted for
+separately; they do not enlarge the confirmatory comparison. The lossless
+{CONFIRMATION_ARCHIVE} supplies the final campaign, pilot and reference raw data,
+frozen sources, native logs, vectors, whole-parent analysis and independent replay.
+Its validated stream preserves repeated contents as ordinary tar hard links.
 
 ## Reproduce the evidence
 
@@ -240,6 +267,33 @@ The research note's original decision to keep the study separate is historical;
 the current ORF sources incorporate the selected findings only. Neither saved
 replay nor a paper rebuild reruns commercial optimization or recreates timings.
 
+## Replay the larger fixed-policy confirmation
+
+Extract {CONFIRMATION_ARCHIVE} over the same scientific repository with GNU tar
+(`tar -xJf path/to/{CONFIRMATION_ARCHIVE}`). Keep hard links when extracting:
+they preserve identical content at its original paths and reduce disk usage.
+CONFIRMATION_ARCHIVE_CONTENTS.json lists every path, size and SHA-256. From
+the repository root, run:
+
+```sh
+python3 exploration/orf-confirmatory-extension-20261019/seal_confirmation.py --check
+python3 exploration/orf-confirmatory-extension-20261019/seal_pending_validation.py --check
+python3 exploration/orf-confirmatory-extension-20261019/seal_reference_recovery.py --check
+python3 exploration/orf-confirmatory-extension-20261019/verify_confirmation_analysis.py
+```
+
+The independent statistical replay checks all 48 comparisons and 80 marginal
+whole-parent intervals against the 480 saved block reports, without commercial
+optimizer calls. All 3,840 executions already passed their independent vector
+audits; to rerun their full rational arithmetic, use replay_confirmation.py
+with each block index 0 through 479. This is substantially more costly than
+replaying the aggregate analysis. The archive preserves the exact acceptance
+rules, missing applicability of scaled bound contrasts, tiny written-bound
+violations and adverse runtime outcomes. It does not certify MILP optimality.
+Provenance and manifests identify excluded infrastructure attempts; their
+separate raw archives remain outside this bundle. Before fresh model generation,
+restore execute permission on code/build-audit/SistemaElectrico if required.
+
 ## Build the current documents
 
 Extract orf-editable-sources.zip separately, verify CONTENTS.sha256 and run `make`.
@@ -256,8 +310,11 @@ extract both follow-up archives over the revision root, copy {VERIFIED_ARCHIVE}
 to exploration/orf-v15-verified-20261019/research-evidence.zip and copy
 VERIFIED_PACKAGE_VALIDATION.json there as PACKAGE_VALIDATION.json. Run
 `python3 scripts/research/orf_followup_tables.py` to regenerate the five selected
-follow-up tables. All these inputs
-are supplied here; the parent ZIP does not need a separate public download.
+follow-up tables. Also extract {CONFIRMATION_ARCHIVE} over the revision root,
+copy the tar/xz file into exploration/orf-confirmatory-extension-20261019/ and
+copy CONFIRMATION_ARCHIVE_VALIDATION.json into that directory. Run
+`python3 scripts/research/orf_confirmation_tables.py` to regenerate the four
+confirmation tables. All these inputs are supplied here; the parent ZIP does not need a separate public download.
 
 Rebuilding all 1,530 historical bases additionally requires the separate baseline
 bulk archive at DOI 10.5281/zenodo.23145294. That DOI identifies the historical
@@ -272,6 +329,8 @@ own notices. Manuscript text and PDFs are outside the code/data licenses.
     archive(esm,{'README.md':guide,'SNAPSHOT.json':OUT/'SNAPSHOT.json',
         FOLLOWUP_ARCHIVE:followup_zip,
         VERIFIED_ARCHIVE:verified_zip,'VERIFIED_PACKAGE_VALIDATION.json':VERIFIED/'PACKAGE_VALIDATION.json',
+        CONFIRMATION_ARCHIVE:CONFIRMATION_ARCHIVE_PATH,
+        'CONFIRMATION_ARCHIVE_VALIDATION.json':CONFIRMATION/'CONFIRMATION_ARCHIVE_VALIDATION.json',
         SCIENCE:parent_archive,'SCIENTIFIC_PARENT_VALIDATION.json':PARENT_DIR/'VALIDATION.json',
         'orf-editable-sources.zip':source_zip,'orf-revision-sources.zip':revision_zip,
         'ONLINE_RESOURCE_CAPTIONS.txt':captions,'CITATION.cff':ROOT/'CITATION.cff',
@@ -280,7 +339,10 @@ own notices. Manuscript text and PDFs are outside the code/data licenses.
     for name,origin in {'main_orf.pdf':ORF/'main_orf.pdf','cover-letter.pdf':ORF/'cover-letter.pdf',
                         'title-page.pdf':ORF/'title-page.pdf',
                         'ESM_1.pdf':ORF/'ESM_1.pdf','ESM_2.zip':esm,'orf-editable-sources.zip':source_zip}.items():
-        shutil.copyfile(origin,uploads/name)
+        destination=uploads/name
+        if destination.exists() or destination.is_symlink():destination.unlink()
+        if origin.stat().st_size>20_000_000:os.link(origin,destination)
+        else:shutil.copyfile(origin,destination)
     (uploads/'REPRODUCE.md').write_text(guide)
     (uploads/'ONLINE_RESOURCE_CAPTIONS.txt').write_text(captions)
     (uploads/'UPLOAD_INSTRUCTIONS.md').write_text('''# ORF separate upload preparation

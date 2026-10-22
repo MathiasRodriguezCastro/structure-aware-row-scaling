@@ -42,12 +42,15 @@ def main():
     end = source.index(r'\input{sections/related_work}', start)
     source = source[:start]+(ORF/'editorial/validation-overview.tex').read_text()+'\n'+source[end:]
     source = source.replace(r'\section{Discussion and conclusions}',
-        fragment('prospective-main.tex')+'\n'+fragment('verified-main.tex')+'\n'+r'\section{Discussion and conclusions}',1)
+        fragment('prospective-main.tex')+'\n'+fragment('verified-main.tex')+'\n'+fragment('confirmation-main.tex')+'\n'+r'\section{Discussion and conclusions}',1)
     start = source.index(r'\subsection{Implications for scaling software}')
     end = source.index(r'\subsection{Scope and limitations}', start)
     source = source[:start]+(ORF/'editorial/discussion.tex').read_text()+'\n'+source[end:]
     source = source.replace(r'\subsection{Scope and limitations}',
         (ORF/'editorial/practical.tex').read_text()+'\n'+r'\subsection{Scope and limitations}',1)
+    start = source.index(r'\subsection{Conclusions}')
+    end = source.index(r'\section*{Data and software availability}',start)
+    source = source[:start]+fragment('scope-extension.tex')+'\n'+fragment('conclusions.tex')+'\n'+source[end:]
     start = source.index(r'\section*{Data and software availability}')
     end = source.index(r'\section*{Acknowledgements}',start)
     source = source[:start]+(ORF/'editorial/availability.tex').read_text()+'\n'+source[end:]
@@ -64,6 +67,8 @@ def main():
     source = source.replace('The accompanying source and data archive\nis Supplementary Material 2.',
                             'Online Resource~2 contains the source and data archive.')
     source = relabel(source)
+    source = source.replace('The historical campaigns used ClusterUY,',
+        'The historical and larger confirmation campaigns used ClusterUY,')
     # Fit only tables that otherwise exceed the publisher's text width.
     def fit_table(match):
         if r'\begin{table}' in (PAPER/(match[1]+'.tex')).read_text():
@@ -110,7 +115,7 @@ Accuracy contracts, Computational optimization, Reproducibility}
     supplement = supplement.replace('Prepared for Optimization Methods and Software','Prepared for Operations Research Forum')
     supplement = supplement.replace('v1.3.17-oms-submission', VERSION)
     reproduction = supplement.index(r'\section{Reproduction and artifact layout}')
-    supplement = supplement[:reproduction]+fragment('prospective-supplement.tex')+'\n'+fragment('export-errors.tex')+'\n'+fragment('verified-supplement.tex')+'\n'+fragment('reproduction.tex')+'\n'+r'\end{document}'+'\n'
+    supplement = supplement[:reproduction]+fragment('prospective-supplement.tex')+'\n'+fragment('export-errors.tex')+'\n'+fragment('verified-supplement.tex')+'\n'+fragment('confirmation-supplement.tex')+'\n'+fragment('reproduction.tex')+'\n'+r'\end{document}'+'\n'
     supplement = relabel(supplement)
     # The original SI reproduction recipe refers to the unchanged scientific archive.
     marker = 'This supplement specifies the computational evidence and its limitations.'

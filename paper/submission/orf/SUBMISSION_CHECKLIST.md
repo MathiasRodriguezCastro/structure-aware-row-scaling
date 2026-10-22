@@ -20,6 +20,8 @@
 - [x] Prospective-first abstract and separate physical-budget/domain counts, including Base-tight failures.
 - [x] Six known-parent deletions replayed from native work and external clocks, with all controls retained.
 - [x] Editable LaTeX bundle supplied separately for the source-file upload role, as required by the official instructions checked on 22 October 2026.
+- [x] Larger fixed-policy confirmation: all primary outcomes, controls, strata, domain failures and missing bound applicability retained.
+- [x] Lossless confirmation archive checked against all five original seals; four new tables reproduce the complete comparison and diagnostics.
 - [ ] Confirm exact article type, upload categories and size limits in the ORF portal.
 - [ ] Enter author contributions, competing interests and other required declarations in the interface.
 - [ ] Deposit the exact final version in Zenodo, supply its reserved DOI and update availability.

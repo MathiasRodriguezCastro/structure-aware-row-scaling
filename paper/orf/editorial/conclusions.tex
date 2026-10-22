@@ -1,0 +1,31 @@
+\subsection{Conclusions}
+Accuracy-aware model generation connects row factors to requirements in the
+application's original units. Residual-budget contracts provide admissible
+intervals, incompatibility checks and constrained selection, with separate
+allowances for integer rounding and finite export. The implementation can
+select a certified sufficient candidate or report abstention; returned-point
+verification remains necessary because nominal solver tolerances do not
+establish the actual exported-residual hypothesis.
+
+The controlled comparisons on 306 dispatch models distinguish exported
+conditioning, subsequent equilibration and solver effort. Kernel matching
+identifies a confounded metadata interpretation, while the final-policy
+ablation identifies an inactive coupling stage. These results support implementation
+audits rather than using a better condition measure as a runtime prediction.
+
+Computational benefits remain conditional. Small adversarial tests and one
+presolve-off dispatch case show primal recovery under selected settings;
+batch scheduling verifies budget transfer without an additional benefit over
+matched L2. The 24-scenario prospective study retains lower work and process
+time against Base, but supplies no clear incremental advantage over L2. The
+larger 3,840-assignment confirmation likewise establishes no primary time
+advantage over L2; Gurobi's complete-process cost is higher. All policies meet
+the mapped physical budgets in these prospective samples. Strict written-bound
+residuals limit CPLEX acceptance, and missing scaled bound contrasts limit
+what the detector can say about solver bounds. Physical-budget and domain
+checks do not certify MILP optimality.
+
+The practical contribution is therefore an explicit, reproducible precision
+workflow: retain original units, select admissible factors or report
+incompatibility, audit export and returned points, and measure candidate
+quality and complete-process cost alongside successful and failed targets.

@@ -1,0 +1,25 @@
+\paragraph{Larger fixed-policy confirmation}
+A subsequent frozen study compares four policies on 160 models: 40 historically
+generated parents, three dispatch formulations and four horizons, with three
+new seeds and two solvers. All 3,840 assignments and 480 independent block
+replays finish; 24 assignments of an independently infeasible model remain
+diagnostic. Table~\ref{tab:orf-large-confirmation} reports the primary comparison
+on the other 3,816 assignments, using a common verified feasible cost reference
+and a 0.1\% target. Native stopping gaps are also 0.1\%; caps are fixed from
+Base-only resource calibration before policy comparisons. These results are
+not pooled with the earlier study, which uses a different stopping gap.
+\input{editorial/confirmation-summary-table}
+Neither primary PAR2 interval establishes an incremental time advantage over
+L2. Gurobi complete-process time is 7.9\% higher for Budget-L2. Every eligible
+final point meets the mapped physical budgets under every policy, so the
+contract supplies no additional physical-budget recoveries in this sample.
+CPLEX's low combined success counts primarily reflect positive residuals of
+exact written bounds; the registered acceptance rule is retained, and this
+is distinct from physical-budget failure. Its numerical control attains 106
+targets versus 99 for Budget-L2; Gurobi L2-NF3 attains 454 versus 432.
+The bound detector has no applicable contrasts for the scaled exports because
+the Base reference is not certified feasible for those rounded representations;
+zero flags there cannot validate solver bounds. Online Resource~1 reports all
+controls, strata, censoring and domain diagnostics. These historically generated
+parents and their prior policy exposure support within-family checking, not
+independent operational validation.

@@ -1,6 +1,6 @@
 \section{Reproduction and artifact layout}
 Online Resource~2 is the complete code/data package for
-\path{v1.5.0-orf-submission}. It contains the unchanged scientific-evidence archive
+\path{v1.6.0-orf-submission}. It contains the unchanged scientific-evidence archive
 \path{v1.3.17-oms-submission}, its validation record, the current ORF editable
 sources and a checksum-based inheritance record. The older editorial files inside
 the scientific archive identify its provenance; the current article and this
@@ -21,6 +21,22 @@ Its protocol distinguishes new generated scenarios from known parent data and
 from an independent application. Native solver logs and every saved point are
 retained. The rational certificates are reference points and lower bounds,
 rather than certificates of every returned floating-point candidate.
+
+The larger confirmation is supplied as a lossless archive. After extracting
+its tar/xz file over the same root, run these saved-evidence checks:
+\begin{lstlisting}
+python3 exploration/orf-confirmatory-extension-20261019/seal_confirmation.py --check
+python3 exploration/orf-confirmatory-extension-20261019/seal_pending_validation.py --check
+python3 exploration/orf-confirmatory-extension-20261019/seal_reference_recovery.py --check
+python3 exploration/orf-confirmatory-extension-20261019/verify_confirmation_analysis.py
+\end{lstlisting}
+The last command reconstructs 48 comparisons and 80 whole-parent intervals
+from 480 saved block reports without optimization. The archive's per-file
+inventory preserves all final-campaign, pilot and reference data. Its hard
+links retain identical file contents at their original paths. Repeating every
+full rational candidate audit is available through
+\path{replay_confirmation.py} for block indices 0--479, with a substantially
+larger replay cost. Reference and pilot acquisition remain separately costed.
 
 Next extract \path{verified-candidates-orf-20261019.zip} over that same root.
 Its \path{FOLLOWUP_CONTENTS.sha256} identifies the frozen follow-up files.

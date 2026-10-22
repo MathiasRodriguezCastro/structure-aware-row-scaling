@@ -3,21 +3,21 @@ changes the application-unit meaning of absolute feasibility tolerances. We
 develop a model-generation workflow using original-unit residual budgets. It
 selects row factors under coefficient limits, reports incompatible requirements,
 accounts for integer rounding, checks binary64 export errors during selection,
-and independently checks returned points.
-Evaluation combines 306 hydrothermal dispatch models, kernel-matched and Ruiz
-controls, enumerated stress tests on three solvers, and independent batch scheduling.
-With a frozen 100\,m\textsuperscript{3} policy, prospective validation on 24
-perturbed scenarios from six known dispatch inputs and three new seeds gives
-paired geometric-mean work and complete-process time ratios of 0.422 and 0.797
-against no external scaling. Every policy meets the physical budgets; the
-budget-aware policy retains one independently contradicted bound and candidate
-cost deterioration reaches 1.02\%. Against conventional Euclidean scaling, the
-work ratio is 0.931, with a scenario-cluster interval containing one. Excluding
-each known parent preserves lower work against the unscaled control, but can
-reverse the comparison with Euclidean scaling. An earlier directed six-model
-comparison gives a work ratio of 0.317; preparation overhead slows inexpensive
-models. Common verified-candidate targets show no clear time advantage over
-conventional Euclidean scaling. Batch scheduling verifies budget delivery
-without an additional primal benefit. These results support explicit precision
-specification and verification, with configuration-dependent performance, rather
-than general acceleration or certified mixed-integer optimality.
+and independently checks returned points. Evaluation combines 306 hydrothermal
+dispatch models, kernel-matched and Ruiz controls, enumerated stress tests on
+three solvers, and independent batch scheduling. In prospective validation on
+24 perturbed scenarios from six known inputs, the budget-aware Euclidean policy
+has paired geometric-mean work and complete-process time ratios of 0.422 and
+0.797 against no external scaling. All policies meet the physical budgets;
+one budget-aware bound is independently contradicted, and candidate cost
+deterioration reaches 1.02\%. A larger fixed-policy study comprises 3,840 runs
+on 160 models from 40 historically generated parents and two solvers. Against
+conventional Euclidean scaling, paired ratios of penalized verified-availability
+time are 0.995 for Gurobi and 1.000 for CPLEX, with whole-parent uncertainty
+intervals containing one. Gurobi complete-process time increases by 7.9\%.
+Every eligible final point meets the mapped physical budgets under every policy;
+strict written-bound checks limit CPLEX's combined acceptance. These within-family
+results support explicit precision specification, admissible selection and
+reproducible verification. They establish neither general incremental acceleration,
+additional physical-budget recovery in the prospective samples, nor certified
+mixed-integer optimality.

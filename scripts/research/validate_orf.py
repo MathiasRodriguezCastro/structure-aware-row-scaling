@@ -7,9 +7,12 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+import os
+import tarfile
 import unicodedata
 import zipfile
 from orf_config import ROOT, PAPER, ORF, OUT, VERSION, PARENT, TITLE, FOLLOWUP_ARCHIVE, VERIFIED_ARCHIVE, sha
+from orf_config import CONFIRMATION_ARCHIVE, COMPARATIVE_MIP_CALLS
 from package_orf import FILES, EXTRAS, SCIENCE, build_delivery, write_json
 from build_orf import relabel
 
@@ -44,6 +47,44 @@ def compile_documents(folder):
     return result
 
 
+def extract_confirmation(path,destination):
+    """Unpack checked regular files/hard links; retain deduplication on disk."""
+    contents={}
+    manifest=None
+    with tarfile.open(path,'r|xz') as archive:
+        for item in archive:
+            relative=Path(item.name)
+            assert not relative.is_absolute() and '..' not in relative.parts
+            target=(destination/relative).resolve()
+            assert target.is_relative_to(destination.resolve())
+            if item.name=='CONFIRMATION_ARCHIVE_CONTENTS.json':
+                manifest=json.load(archive.extractfile(item))
+                continue
+            assert item.name not in contents
+            target.parent.mkdir(parents=True,exist_ok=True)
+            if item.islnk():
+                assert item.linkname in contents
+                source=(destination/item.linkname).resolve()
+                assert source.is_relative_to(destination.resolve())
+                if target.exists():target.unlink()
+                os.link(source,target)
+                contents[item.name]=dict(contents[item.linkname],path=item.name)
+            else:
+                assert item.isfile()
+                # Remove a prior hard link before replacing its contents.
+                if target.exists():target.unlink()
+                with target.open('wb') as stream:
+                    h=hashlib.sha256();count=0
+                    incoming=archive.extractfile(item)
+                    for block in iter(lambda:incoming.read(1048576),b''):
+                        stream.write(block);h.update(block);count+=len(block)
+                assert count==item.size
+                target.chmod(item.mode & 0o777)
+                contents[item.name]=dict(path=item.name,bytes=count,sha256=h.hexdigest())
+    assert manifest and [contents[n] for n in sorted(contents)]==manifest['files']
+    return manifest
+
+
 def expand(name,folder,stack=()):
     assert name not in stack
     source=(folder/name).read_text()
@@ -69,8 +110,13 @@ def scientific_preservation(science,sources):
     assert r'\label{eq:orf-selected-export-contract}' in new_core
     new_core=re.sub(extension,'',new_core,flags=re.S)
     assert normalized(old_core)==normalized(new_core),'Scientific sections changed'
-    for start,finish in [(r'\subsection{Scope and limitations}',r'\section*{Data and software availability}')]:
-        assert normalized(old.split(start,1)[1].split(finish,1)[0])==normalized(new.split(start,1)[1].split(finish,1)[0])
+    start=r'\subsection{Scope and limitations}';finish=r'\subsection{Conclusions}'
+    new_scope=new.split(start,1)[1].split(finish,1)[0]
+    scope_extension=r'% BEGIN ORF LARGER CONFIRMATION SCOPE.*?% END ORF LARGER CONFIRMATION SCOPE'
+    assert len(re.findall(scope_extension,new_scope,re.S))==1
+    new_scope=re.sub(scope_extension,'',new_scope,flags=re.S)
+    assert normalized(old.split(start,1)[1].split(finish,1)[0])==normalized(new_scope)
+    assert '3,840-assignment confirmation' in new.split(finish,1)[1]
     old_si=expand('supporting-information.tex',science/'paper')
     new_si=expand('ESM_1.tex',sources)
     addition=r'\section{Prospective scenario validation}'
@@ -98,12 +144,13 @@ def scientific_preservation(science,sources):
     assert len(tables)==42
     for table in tables:assert table.read_bytes()==(science/'paper/tables'/table.name).read_bytes(),table.name
     return {'scientific_sections_3_to_7_identical_after_resource_relabelling':True,
-        'scope_and_conclusions_preserved':True,'technical_supplement_preserved':True,
+        'inherited_scope_preserved_with_explicit_confirmation_extension':True,
+        'conclusions_updated_for_complete_confirmation':True,'technical_supplement_preserved':True,
         'theorem_definition_example_and_proof_environments':len(old_math),
         'displayed_math_blocks_preserved':len(old_display),'numerical_table_files_identical':len(tables),
         'additional_elementary_export_bound_documented':True,
         'constructive_export_selector_added_without_changing_inherited_statements':True,
-        'new_optimization_experiments':1351,'new_exact_LP_attempts':96}
+        'new_optimization_experiments':COMPARATIVE_MIP_CALLS,'earlier_prospective_exact_LP_attempts':96, 'confirmation_reference_exact_LP_attempts':181}
 
 
 def abstract_normalized(text):
@@ -127,7 +174,7 @@ def main():
         help='Reuse an earlier full replay only for a byte-identical parent evidence archive; current sources and prospective evidence are still checked.')
     args=parser.parse_args()
     result={'version':VERSION,'title':TITLE,'target':'Operations Research Forum',
-            'new_optimization_experiments':1351,'new_exact_LP_attempts':96,
+            'new_optimization_experiments':COMPARATIVE_MIP_CALLS,'earlier_prospective_exact_LP_attempts':96, 'confirmation_reference_exact_LP_attempts':181,
             'submitted':False,'published':False,'version_doi':None}
     uploads=OUT/'uploads'
     with tempfile.TemporaryDirectory(prefix='orf-complete-audit-') as tmp:
@@ -139,6 +186,8 @@ def main():
         result['source_builds']=compile_documents(sources)
         text=(sources/'main_orf.tex').read_text()
         assert VERSION in text and TITLE in text
+        supplement_text=(sources/'ESM_1.tex').read_text()
+        assert ('Online Resource~2 is the complete code/data package for\n'+r'\path{'+VERSION+'}') in supplement_text
         assert text.index('Accuracy-aware model generation and verification')<text.index('Computational evaluation and mechanism attribution')
         assert 'Statements and Declarations' in text and 'Research-tool documentation' in text
         assert 'Supplementary Material' not in text
@@ -258,6 +307,29 @@ def main():
             'candidate_events':6725,'full_rational_candidate_audits':1943,
             'statistics_validation':statistics,
             'selector_validation':json.loads((verified/'SELECTOR_VALIDATION.json').read_text())}
+        print('Larger confirmation: lossless extraction and independent statistics replay',flush=True)
+        assert sha(esm/CONFIRMATION_ARCHIVE)==snapshot['confirmation_archive_sha256']
+        archive_validation=json.loads((esm/'CONFIRMATION_ARCHIVE_VALIDATION.json').read_text())
+        assert sha(esm/'CONFIRMATION_ARCHIVE_VALIDATION.json')==snapshot['confirmation_archive_validation_sha256']
+        assert archive_validation['status']=='passed' and archive_validation['full_stream_read_and_checksums']
+        assert archive_validation['archive_sha256']==sha(esm/CONFIRMATION_ARCHIVE)
+        manifest=extract_confirmation(esm/CONFIRMATION_ARCHIVE,science)
+        confirmation=science/'exploration/orf-confirmatory-extension-20261019'
+        assert sha(confirmation/'CONFIRMATION_ANALYSIS.json')==snapshot['confirmation_analysis_sha256']
+        expected_replay=(confirmation/'CONFIRMATION_ANALYSIS_REPLAY.json').read_bytes()
+        for seal in ['seal_pending_validation.py','seal_reference_recovery.py']:
+            run(['python3',str(confirmation/seal),'--check'],science)
+        replay_output=run(['python3',str(confirmation/'verify_confirmation_analysis.py')],science)
+        assert (confirmation/'CONFIRMATION_ANALYSIS_REPLAY.json').read_bytes()==expected_replay
+        confirmation_replay=json.loads(expected_replay)
+        assert confirmation_replay['status']=='passed' and confirmation_replay['comparisons_reproduced']==48
+        assert confirmation_replay['bootstrap_intervals_reproduced']==80
+        assert sha(confirmation/'CONFIRMATION_ANALYSIS_REPLAY.json')==snapshot['confirmation_statistical_replay_sha256']
+        result['larger_confirmation']={'status':'passed','archive_sha256':sha(esm/CONFIRMATION_ARCHIVE),
+            'files_reconstructed_and_checksum_verified':manifest['file_count'],
+            'logical_bytes':manifest['logical_bytes'],'archive_validation':archive_validation,
+            'statistical_replay':confirmation_replay,
+            'output_sha256':hashlib.sha256(replay_output.encode()).hexdigest(),'new_optimizer_calls':0}
         for name,value in before.items():
             assert (science/'paper/tables'/name).read_bytes()==value==(sources/'tables'/name).read_bytes(),name
         assert render_hashes(science)==figures
@@ -286,6 +358,13 @@ def main():
         run(['python3','scripts/research/orf_followup_tables.py'],revision)
         assert all((editorial/n).read_bytes()==value for n,value in originals.items())
         result['verified_followup_tables_regenerated_identically']=len(originals)
+        (revision/'exploration/orf-confirmatory-extension-20261019').symlink_to(confirmation,target_is_directory=True)
+        confirmation_tables=list(editorial.glob('confirmation-*-table.tex'))
+        assert len(confirmation_tables)==4
+        originals={p.name:p.read_bytes() for p in confirmation_tables}
+        run(['python3','scripts/research/orf_confirmation_tables.py'],revision)
+        assert all((editorial/n).read_bytes()==value for n,value in originals.items())
+        result['confirmation_tables_regenerated_identically']=4
         run(['python3','scripts/research/build_orf.py'],revision)
         assert (revision/'paper/orf/main_orf.tex').read_bytes()==(sources/'main_orf.tex').read_bytes()
         assert (revision/'paper/orf/ESM_1.tex').read_bytes()==(sources/'ESM_1.tex').read_bytes()
