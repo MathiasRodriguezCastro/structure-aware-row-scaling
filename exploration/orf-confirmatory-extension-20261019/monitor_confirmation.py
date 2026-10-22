@@ -71,6 +71,14 @@ def main(copy, snapshot):
         if audit['status'] == 'passed' and audit['confirmation_plan_sha256'] == receipt['confirmation_plan_sha256']:
             report['local_independent_audit'] = dict(assignments=audit['assignments'], source=name)
             break
+    local_raw = HERE / 'CONFIRMATION_LOCAL_RAW_CHECK.json'
+    if local_raw.exists():
+        check = json.loads(local_raw.read_text())
+        assert check['raw_manifest_sha256'] == hashlib.sha256((HERE / 'CONFIRMATION_RAW_MANIFEST.json').read_bytes()).hexdigest()
+        assert check['verifier_sha256'] == hashlib.sha256((HERE / 'seal_confirmation.py').read_bytes()).hexdigest()
+        report['local_raw_archive_verification'] = dict(status=check['status'],
+            file_count=check['file_count'], total_bytes=check['total_bytes'],
+            captured_utc=check['captured_utc'], source=local_raw.name)
     report['partial_policy_rankings_reported'] = False
     analysis_check = HERE / 'CONFIRMATION_ANALYSIS_REPLAY.json'
     if analysis_check.exists():

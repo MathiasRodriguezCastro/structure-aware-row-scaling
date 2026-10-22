@@ -39,6 +39,6 @@ Si se incorpora al artículo, presentar un resumen breve de la comparación prim
 
 La verificación estadística independiente reprodujo 48 comparaciones y 80 intervalos. Las auditorías de ejecución abarcan 39,265 vectores, 13,387 auditorías completas y 477 verificaciones de referencia. El archivo sellado inventaría 37,298 archivos y 6,801,485,096 bytes.
 
-Los hashes de las fuentes, datos tabulados, 480 informes y prueba estadística se comprobaron en la copia local. La comprobación local de todos los registros voluminosos se conserva separada del control estadístico realizado en el clúster.
+Los hashes de las fuentes, datos tabulados, 480 informes y prueba estadística se comprobaron en la copia local. La copia local de todos los archivos del manifiesto también pasó el verificador completo.
 
 Fuentes: `CONFIRMATION_ANALYSIS.json`, `CONFIRMATION_EXECUTION_REPORT.json`, `CONFIRMATION_ANALYSIS_REPLAY.json`, `CONFIRMATION_RAW_MANIFEST.json` y `CONFIRMATION_FINAL_DIAGNOSTICS.json`. No se ejecutaron nuevos optimizadores.

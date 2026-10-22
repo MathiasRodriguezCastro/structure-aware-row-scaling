@@ -31,6 +31,14 @@ controla por separado mediante `CONFIRMATION_LOCAL_COPY_FOLLOWUP.json`: al termi
 la transferencia, `finalize_local_copy.py` ejecuta el verificador de todos los
 archivos del manifiesto. Su resultado queda en `CONFIRMATION_LOCAL_RAW_CHECK.json`.
 
+La transferencia local y su comprobación completa también terminaron: los
+37.298 archivos coinciden con el manifiesto sellado. El seguimiento quedó en
+estado `passed`; no se ejecutaron nuevos optimizadores. Este cierre corresponde
+a la campaña de investigación. La nueva evidencia conserva su informe separado;
+los pendientes del envío editorial están en la
+[lista de envío ORF](../../paper/submission/orf/SUBMISSION_CHECKLIST.md), incluido
+el DOI que el autor dejó para el final.
+
 Se enviaron las **3.840 asignaciones** del `CONFIRMATION_PLAN.json`: 480 bloques
 de modelo/semilla, ocho ejecuciones por bloque y una sola resolución simultánea.
 Los 3.816 objetivos de calidad usan las referencias comunes; las 24 ejecuciones
