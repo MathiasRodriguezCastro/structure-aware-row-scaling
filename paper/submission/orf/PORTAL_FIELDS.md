@@ -1,4 +1,4 @@
-# Campos de carga para ORF — v1.7.1-orf-submission
+# Campos de carga para ORF — v1.7.2-orf-submission
 
 Preparados desde las declaraciones del manuscrito congelado para su carga en
 el formulario editorial. **La carga efectiva no se ha realizado.** No se

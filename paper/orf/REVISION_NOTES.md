@@ -179,3 +179,17 @@ optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.
   descripciones de los suplementos se acortan y los campos de autoría, intereses
   y financiación quedan preparados para la interfaz, sin registrar una carga
   que no se haya realizado. El README público diferencia Git de Online Resource 2.
+
+## Cierre editorial y coherencia documental, v1.7.2
+
+- El manuscrito y la portada utilizan un único reconocimiento a ClusterUY, que
+  comprende las campañas históricas y la confirmación grande. Las fuentes
+  editables incluyen ese archivo compartido y su dependencia de compilación.
+- Se reducen advertencias repetidas en captions, resultados y conclusiones; la
+  discusión conserva las hipótesis de precisión, los límites de generalización
+  y la diferencia entre verificación primal y certificación de optimalidad.
+- No se modifican ecuaciones, pruebas, tablas numéricas, datos experimentales
+  sellados ni la carta. Las comprobaciones admiten solo los recortes editoriales
+  enumerados y siguen verificando el resto del núcleo científico.
+- El paquete completo contiene las fuentes editables y Online Resource 2. La
+  documentación pública identifica la revisión exacta y sus canales de entrega.

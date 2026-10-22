@@ -21,6 +21,38 @@ def relabel(text):
     return text
 
 
+EDITORIAL_CUTS = (
+    ('Here the contracts provide a conditional precision interpretation and an auditable\n'
+     'admissibility rule, rather than a performance improvement or an operational calibration.',
+     'Here the contracts make factor admissibility and original-unit precision auditable.'),
+    ('These results establish a useful, configuration-dependent\n'
+     'representation choice and verification workflow; admissibility does not certify MILP\n'
+     'optimality. ', ''),
+    (' Lower work or absence of\n'
+     'a detected flag does not certify bounds or optimality.', ''),
+    (' No MILP optimality certificate is implied.', ''),
+    ('Ratios below\n'
+     'one indicate a faster process on the shared host; they do not establish a\n'
+     'hardware-independent threshold for applying scaling.',
+     'Ratios below one indicate a faster process on the shared host.'),
+    ('These controls strengthen the\n'
+     'within-family effort comparison without establishing a generally superior rule.', ''),
+    (' These additional checks do not certify every native MILP result.', ''),
+    (' Budget compliance alone therefore does\nnot imply feasibility of all domains.', ''),
+    (' Satisfied primal budgets do not certify solver bounds.', ''),
+    ('; absence of a flag does not certify optimality.', '.'),
+)
+
+
+def refine_editorial(text, strict=False):
+    """Remove listed duplicate prose only; equations and numerical inputs stay intact."""
+    for original, replacement in EDITORIAL_CUTS:
+        if strict:
+            assert text.count(original)==1, 'Editorial anchor changed: '+original
+        text=text.replace(original,replacement)
+    return text
+
+
 def main():
     original = (PAPER/'main.tex').read_text()
     source = original.split(r'\section{Introduction}', 1)[1]
@@ -67,8 +99,10 @@ def main():
     source = source.replace('The accompanying source and data archive\nis Supplementary Material 2.',
                             'Online Resource~2 contains the source and data archive.')
     source = relabel(source)
-    source = source.replace('The historical campaigns used ClusterUY,',
-        'The historical and larger confirmation campaigns used ClusterUY,')
+    start = source.index(r'\section*{Acknowledgements}')
+    end = source.index(r'\section*{Statements and Declarations}',start)
+    source = source[:start]+r'\section*{Acknowledgements}'+'\n'+fragment('acknowledgements.tex')+'\n'+source[end:]
+    source = refine_editorial(source,strict=True)
     # Fit only tables that otherwise exceed the publisher's text width.
     def fit_table(match):
         if r'\begin{table}' in (PAPER/(match[1]+'.tex')).read_text():

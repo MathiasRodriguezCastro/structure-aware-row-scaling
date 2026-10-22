@@ -1,6 +1,6 @@
 # Operations Research Forum manuscript
 
-Current editorial version: **v1.7.1-orf-submission**.
+Current editorial version: **v1.7.2-orf-submission**.
 
 **Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational
 and Software Study** — Mathias Rodríguez Castro.
@@ -85,3 +85,7 @@ The v1.7.1 packaging correction restores 38 cluster source/launch/lock files in
 a small support ZIP. It changes no sealed experimental data or conclusions.
 Coverage checks retain all 3,840 job bundles and check every referenced cluster
 Python helper plus the wheel lock against the recorded installation.
+
+The v1.7.2 editorial revision uses one shared acknowledgement in the manuscript
+and title page and consolidates repeated qualifications in the discussion.
+Equations, numerical results, sealed data and the cover letter remain unchanged.

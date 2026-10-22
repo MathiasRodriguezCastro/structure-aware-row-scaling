@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.7.1-orf-submission**, 22 October 2026.
+Local version: **v1.7.2-orf-submission**, 22 October 2026.
 Proposed type: Original Research Article.
 
 The sealed scientific data from v1.7.0 remain unchanged. The v1.7.1 packaging
@@ -24,7 +24,7 @@ captions for the upload interface:
 - Online Resource 2 — Source code, experimental data and reproducibility package
 
 Upload `orf-editable-sources.zip` in the LaTeX/editable-source role alongside
-`main_orf.pdf` at initial submission. This 70-member bundle includes the main
+`main_orf.pdf` at initial submission. This source bundle includes the main
 and supplementary TeX, bibliography, figures, class/style and build instructions;
 it is supplied separately as well as inside Online Resource 2. The four PDFs
 alone are not the complete upload set. These preparation files follow the
@@ -135,3 +135,7 @@ is 395/477 for Budget-L2 and 405/477 for L2, compared with 99 and 102 at zero.
 The complete sensitivity and magnitudes remain reproducible, without additional
 optimizer calls. Table 14 now separates precision and performance in two panels.
 The large v1.6.0 scientific archive and earlier releases remain byte-identical.
+
+The v1.7.2 editorial revision uses one shared acknowledgement in the manuscript
+and title page and consolidates repeated qualifications in the discussion.
+Equations, numerical results, sealed data and the cover letter remain unchanged.

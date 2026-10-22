@@ -82,6 +82,7 @@ def main():
         for p in (ORF/folder).rglob('*'):
             if p.is_file() and p.suffix in ('.tex','.pdf'):entries[p.relative_to(ORF).as_posix()]=p
     entries['README.md']='Current ORF editable sources. Run make in this directory with pdfLaTeX and BibTeX.\n'
+    entries['editorial/acknowledgements.tex']=ORF/'editorial/acknowledgements.tex'
     source_zip=OUT/'orf-editable-sources.zip';archive(source_zip,entries)
     followup_validation=json.loads((FOLLOWUP/'VALIDATION.json').read_text())
     assert followup_validation['status']=='passed' and followup_validation['MIP_calls']==360

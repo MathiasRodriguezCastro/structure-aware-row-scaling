@@ -16,7 +16,7 @@ from orf_config import CONFIRMATION_ARCHIVE, COMPARATIVE_MIP_CALLS
 from orf_config import CONFIRMATION_SUPPORT_ARCHIVE
 from orf_resource_inventory import check_coverage
 from package_orf import FILES, EXTRAS, SCIENCE, build_delivery, write_json
-from build_orf import relabel
+from build_orf import relabel, refine_editorial
 
 
 def run(command,cwd):
@@ -111,7 +111,7 @@ def scientific_preservation(science,sources):
     assert len(re.findall(extension,new_core,re.S))==1
     assert r'\label{eq:orf-selected-export-contract}' in new_core
     new_core=re.sub(extension,'',new_core,flags=re.S)
-    assert normalized(old_core)==normalized(new_core),'Scientific sections changed'
+    assert normalized(refine_editorial(relabel(old_core)))==normalized(new_core),'Scientific sections changed beyond listed editorial cuts'
     start=r'\subsection{Scope and limitations}';finish=r'\subsection{Conclusions}'
     new_scope=new.split(start,1)[1].split(finish,1)[0]
     scope_extension=r'% BEGIN ORF LARGER CONFIRMATION SCOPE.*?% END ORF LARGER CONFIRMATION SCOPE'
@@ -145,7 +145,7 @@ def scientific_preservation(science,sources):
     tables=list((sources/'tables').glob('*.tex'))
     assert len(tables)==42
     for table in tables:assert table.read_bytes()==(science/'paper/tables'/table.name).read_bytes(),table.name
-    return {'scientific_sections_3_to_7_identical_after_resource_relabelling':True,
+    return {'scientific_sections_3_to_7_preserved_except_listed_editorial_cuts':True,
         'inherited_scope_preserved_with_explicit_confirmation_extension':True,
         'conclusions_updated_for_complete_confirmation':True,'technical_supplement_preserved':True,
         'theorem_definition_example_and_proof_environments':len(old_math),
@@ -199,6 +199,12 @@ def main():
         assert 'ORCID' not in pdf.split('\f',1)[0]
         titlepage=run(['pdftotext','title-page.pdf','-'],sources)
         assert '0009-0002-7235-7677' in titlepage
+        acknowledgements=(sources/'editorial/acknowledgements.tex').read_text().strip()
+        main_ack=text.split(r'\section*{Acknowledgements}',1)[1].split(r'\section*{Statements and Declarations}',1)[0]
+        title_ack=expand('title-page.tex',sources).split(r'\section*{Acknowledgements}',1)[1].split(r'\section*{Funding}',1)[0]
+        assert normalized(main_ack)==normalized(acknowledgements)==normalized(title_ack)
+        assert 'larger fixed-policy confirmation' in acknowledgements
+        result['shared_acknowledgements_identical']=True
         fields=json.loads((uploads/'FORM_FIELDS.json').read_text())
         abstract=pdf.split('Abstract',1)[1].split('Keywords:',1)[0]
         assert abstract_normalized(abstract)==abstract_normalized(fields['abstract'])

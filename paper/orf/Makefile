@@ -15,7 +15,7 @@ cover-letter.pdf: cover-letter.tex
 	pdflatex -halt-on-error -interaction=nonstopmode cover-letter
 	pdflatex -halt-on-error -interaction=nonstopmode cover-letter
 
-title-page.pdf: title-page.tex
+title-page.pdf: title-page.tex editorial/acknowledgements.tex
 	pdflatex -halt-on-error -interaction=nonstopmode title-page
 	pdflatex -halt-on-error -interaction=nonstopmode title-page
 

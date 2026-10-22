@@ -5,8 +5,10 @@ Forum (ORF)**. Author: Mathias Rodríguez Castro, Facultad de Ingeniería,
 Universidad de la República, Montevideo, Uruguay; mathiasr@fing.edu.uy;
 ORCID [0009-0002-7235-7677](https://orcid.org/0009-0002-7235-7677).
 
-**Current submission snapshot: `v1.7.1-orf-submission` (22 October 2026).**
-The v1.7.1 packaging correction adds 38 small cluster support/launch files and
+**Current submission snapshot: `v1.7.2-orf-submission` (22 October 2026).**
+The v1.7.2 editorial revision shares the ClusterUY acknowledgement between the
+manuscript and title page and consolidates repeated qualifications. It retains
+all scientific results and the cover letter. The v1.7.1 packaging correction adds 38 small cluster support/launch files and
 an installation wheel lock omitted by the earlier raw-tar metadata filter.
 It leaves the sealed scientific tar and all results unchanged; a clean package
 audit checks the restored helpers alongside every confirmatory job bundle.
@@ -155,7 +157,7 @@ The frozen ORF package can be checked without replacing its files:
 
 ```sh
 TMPDIR=/dev/shm python3 scripts/research/audit_orf_release.py \
-  --release /path/to/v1.7.1-orf-submission \
+  --release /path/to/v1.7.2-orf-submission \
   --output /path/to/new-audit-directory
 ```
 
