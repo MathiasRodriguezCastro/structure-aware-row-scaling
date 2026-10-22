@@ -55,6 +55,14 @@ y dos referencias exactas; 154 archivos inventariados. El control está en
 `LOADER_CORRECTED_LOCAL_CHECKPOINT.json`. Verifica la reparación del entorno,
 sin comparar la eficiencia de las políticas.
 
+El 22 de octubre se retiraron 1.498 copias temporales duplicadas de la vista
+local del intento anterior, recuperando 241.258.465 bytes. Cada archivo se
+comparó con su copia canónica y con el manifiesto sellado antes de retirarlo;
+el archivo completo y las dependencias registradas se conservan. El inventario
+está en `setup-evidence/storage-maintenance-20261022/DUPLICATE_RAW_FILES.json`.
+Los registros voluminosos de la campaña activa permanecen en el clúster, donde
+se ejecutan el sellado y la verificación completa.
+
 La admisión comprueba referencias, hashes, aritmética sobre candidatos guardados
 y ambas licencias completas. El primer bloque integra las 3.840 ejecuciones;
 su reproducción habilita los otros 479. No se evalúa qué política gana para
