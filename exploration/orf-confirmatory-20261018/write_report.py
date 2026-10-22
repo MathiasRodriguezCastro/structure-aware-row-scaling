@@ -143,75 +143,62 @@ Exact witnesses detect seven L2 bound contradictions, one Budget-L2 contradictio
 and none for L2-NF3. Satisfied primal budgets do not certify solver bounds.
 
 \begin{table}[htbp]
-\centering\small\setlength{\tabcolsep}{2pt}
-\caption{Prospective validation on 24 scenarios with three seeds each. Physical
-budgets cover mapped rows before and after integer rounding; domains require
-exact written variable bounds and integrality at the returned point.
-B/G count detected bound/1\%-completion contradictions.
-Work and complete-process time are paired geometric means for Budget-L2 divided
-by the row policy, with marginal 95\% scenario-cluster bootstrap intervals below.
-Wins are scenarios favoring Budget-L2 after aggregating their three seeds,
-for work/time respectively, out of 24. All adverse outcomes are included.}
+\centering\small\setlength{\tabcolsep}{5pt}
+\caption{Prospective validation on 24 scenarios and three seeds each.
+Panel A separates mapped physical budgets, exact written bounds with integrality,
+and detected bound/1\%-completion contradictions (B/G). Panel B gives paired
+geometric-mean Budget-L2/control ratios with marginal 95\% scenario-cluster
+intervals. Wins count scenarios favoring Budget-L2 in work/time, out of 24.}
 \label{tab:orf-prospective-main}
-\begin{tabular}{lcccccc}\toprule
-Policy & \shortstack{Physical\\budgets} & Domains & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
+\begin{tabular}{lccc}\toprule
+\multicolumn{4}{l}{\textit{A. Precision and detected contradictions}}\\[3pt]
+Policy & Physical budgets & Domains & B/G\\\midrule
 '''
     for p in ['Base','Base-tight','L2','L2-NF3','Budget-L2']:
         r=policies[p]
-        if p in uncertainty:
-            c=uncertainty[p]
-            def cell(metric):
-                v=c[metric]
-                return r'\shortstack{'+f"{v['ratio']:.3f}"+r'\\{'+f"[{v['lower95']:.3f}, {v['upper95']:.3f}]"+'}}'
-            work,time=cell('work'),cell('time')
-            wins=f"{c['work']['scenarios_favor_budget']}/{c['time']['scenarios_favor_budget']}"
-        else:work=time=wins='---'
-        maintext+=f"{p} & {r['budgets_passed']}/72 & {domains[p]['exact_domains_passed']}/72 & {r['bound_flags']}/{r['completion_flags']} & {work} & {time} & {wins}\\\\[4pt]\n"
+        maintext+=f"{p} & {r['budgets_passed']}/72 & {domains[p]['exact_domains_passed']}/72 & {r['bound_flags']}/{r['completion_flags']}\\\\\n"
+    maintext+=r'''\bottomrule\end{tabular}
+
+\medskip
+\begin{tabular}{lccc}\toprule
+\multicolumn{4}{l}{\textit{B. Work and complete-process time}}\\[3pt]
+Control & Work ratio [95\% interval] & Time ratio [95\% interval] & Wins $W/T$\\\midrule
+'''
+    for p in ['Base','Base-tight','L2','L2-NF3']:
+        c=uncertainty[p]
+        def cell(metric):
+            v=c[metric]
+            return f"{v['ratio']:.3f} [{v['lower95']:.3f}, {v['upper95']:.3f}]"
+        wins=f"{c['work']['scenarios_favor_budget']}/{c['time']['scenarios_favor_budget']}"
+        maintext+=f"{p} & {cell('work')} & {cell('time')} & {wins}\\\\\n"
     maintext+=r'''\bottomrule\end{tabular}\end{table}
 
-The uncertainty analysis was added after the experimental outcomes were known;
-it was not part of the frozen optimization protocol. Following the cluster
-bootstrap principle of retaining within-group observations~\citep{FieldWelsh2007},
-we resample 24 scenarios with replacement 100,000 times, keeping all three seeds
-and paired policies together. We average log ratios within each scenario and
-then across scenarios; the balanced design gives the same point estimate as
-the 72-pair geometric mean. These descriptive percentile intervals are
-conditional on the generated sample and its six known parents. Shared parent
-structure excludes interpreting them as uncertainty about other MILP families.
-A post hoc deletion of each parent and all four derived scenarios retains
-Budget-L2/Base work ratios of 0.355--0.504 and time ratios of 0.724--0.841.
-Against L2, the work ratios range from 0.883 to 1.041; removing parent 001
-reverses the aggregate work comparison. Online Resource~1 supplies all six
-deletions. This checks dependence within the observed family, not external
-generalization.
+The post hoc uncertainty analysis resamples complete scenarios 100,000 times,
+keeping their three seeds and paired policies together~\citep{FieldWelsh2007}.
+The balanced design preserves the 72-pair geometric mean. Intervals describe
+this generated sample, conditional on its six known parents. Deleting each
+parent and its four scenarios retains lower work and time against Base;
+removing parent 001 reverses the L2 work comparison. Online Resource~1 gives
+all deletions and the complete resampling protocol.
 
 Against L2, Budget-L2 lowers work in 24/72 seed pairs and 10/24 scenario
-aggregates; it lowers complete-process time in 6/24 scenarios. The work ratio
-is 0.931 with interval [0.702,1.133], and the time ratio is 0.996 with interval
-[0.832,1.119]. Both intervals include one. Horizon-specific work ratios are
-0.944, 1.053 and 0.811 for 24, 72 and 168 hours. Eight scenarios per horizon
-cannot establish a structural selection rule. A geometric mean below one
-can coexist with a minority of wins because improvement magnitudes vary.
-After excluding pairs with contradictions in either policy, the L2 comparison
-is 0.971 for work and 1.023 for time (64 pairs); this secondary screen does not
-certify the retained bounds.
-
-The incremental comparison is narrower than against Base: L2 already changes
-the representation using the same Euclidean kernel, whereas the contract
-modifies only factors required by the precision specification (8,448 activation
-rows across these models). This identifies the intervention without proving
-its internal solver mechanism. The evidence supports explicit specification,
-admissible selection and verification of accuracy, with conditional numerical
-benefits; it does not establish general efficiency gains over L2.
+aggregates; it lowers complete-process time in 6/24 scenarios. Both global
+intervals include one. Work ratios by horizon are 0.944, 1.053 and 0.811 for
+24, 72 and 168 hours; eight scenarios per horizon do not establish a selection
+rule. A geometric mean below one can coexist with a minority of wins because
+improvement magnitudes vary. L2 already changes the representation using the
+same Euclidean kernel; the contract additionally modifies factors on 8,448
+activation rows. This identifies the intervention without proving its internal
+solver mechanism, and explains why the incremental comparison is narrower
+than against Base.
 
 Budget-L2's maximum candidate cost deterioration against Base is 1.020\%,
-exceeding the earlier six-model maximum below 0.1\%. This is the paired quantity
-$100(C_{\rm Budget}-C_{\rm Base})/|C_{\rm Base}|$, not a difference between
+exceeding the earlier six-model maximum below 0.1\%. The paired quantity
+$100(C_{\rm Budget}-C_{\rm Base})/|C_{\rm Base}|$ compares candidates, not
 certified MILP optima. The requested 1\% solver gap neither bounds this
-cross-policy candidate difference nor establishes equally certified gaps,
-especially when an independent witness contradicts a reported bound.
-Online Resource~1 reports every stratum, intervention and rational-reference
-outcome, together with the registered 360-call logging confirmation.
+cross-policy difference nor establishes equally certified gaps. Online
+Resource~1 retains contradiction-filtered secondary comparisons, every
+stratum and rational reference, and the registered 360-call logging confirmation.
 '''
     si=r'''\section{Prospective scenario validation}
 \label{sec:orf-prospective-supplement}

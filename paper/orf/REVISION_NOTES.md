@@ -135,3 +135,30 @@ optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.
   anteriores y sus controles adversos permanecen en el cuerpo y el suplemento.
 - La sección de reproducción identifica ahora v1.6.0 y documenta el archivo
   nuevo; se verifica automáticamente que esa identidad coincida con el paquete.
+
+## Procedimiento verificable y sensibilidad de aceptación, v1.7.0
+
+- La contribución principal se centra en integrar decisiones explícitas de
+  generación, selección o abstención, exportación y verificación independiente;
+  no se atribuye novedad fundamental a la identidad de transferencia de residuos.
+- La campaña de 3.840 asignaciones tiene ahora subsección propia, diseño congelado,
+  unidades de remuestreo, comparación primaria y resultados por solver/horizonte.
+  Se preservan el mayor tiempo completo de Gurobi y los resultados adversos.
+- Un análisis posterior separado cambia solo el umbral de residuo de cotas
+  escritas en todos los candidatos elegibles. A 10^-9, CPLEX acepta 395/477
+  objetivos Budget-L2 y 405/477 L2, frente a 99 y 102 bajo cotas exactas. Las
+  medianas de los residuos positivos finales son 3,41e-13 y 4,51e-13; se muestran
+  también máximos, percentiles y todos los controles de ambos solvers.
+- El verificador reconstruye 13.387 comprobaciones de dominios desde los vectores
+  y cotas escritas. Los demás requisitos reutilizan los auditores independientes
+  sellados. Se reproducen los éxitos originales, sin ejecutar optimizadores,
+  reparar puntos, cambiar la muestra ni estimar relojes no registrados.
+- La regla de aceptación registrada y sus intervalos temporales permanecen
+  intactos. El análisis nuevo no se interpreta como ventaja adicional del contrato.
+- La Tabla 14 separa precisión y rendimiento en dos paneles. Se acortan los
+  detalles secundarios del estudio anterior y las advertencias repetidas; los
+  datos y análisis completos permanecen en el suplemento.
+- La introducción distingue la ausencia de recuperaciones físicas en las muestras
+  prospectivas de las recuperaciones observadas en configuraciones de estrés.
+  El archivo científico grande de v1.6.0 se conserva byte a byte; el nuevo análisis
+  se entrega como un pequeño conjunto separado en las fuentes canónicas.

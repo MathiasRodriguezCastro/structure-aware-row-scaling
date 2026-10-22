@@ -1,0 +1,35 @@
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Positive final-point written-bound residues in the larger confirmation.
+Quantiles are nearest ranks among positive residues only; values use the
+respective variable units. The exact rational values are in Online Resource~2.}
+\label{tab:orf-large-bound-magnitudes}
+\begin{tabular}{llrrrrr}\toprule
+Solver & Policy & Positive/$477$ & Min & Median & 95th percentile & Max\\\midrule
+CPLEX & Base & 353 & $1.67\!\times\!10^{-16}$ & $2.64\!\times\!10^{-13}$ & $1.14\!\times\!10^{-7}$ & $3.81\!\times\!10^{-6}$\\
+CPLEX & Budget-L2 & 379 & $8.88\!\times\!10^{-16}$ & $3.41\!\times\!10^{-13}$ & $1.20\!\times\!10^{-7}$ & $2.46\!\times\!10^{-6}$\\
+CPLEX & L2 & 378 & $8.88\!\times\!10^{-16}$ & $4.51\!\times\!10^{-13}$ & $3.94\!\times\!10^{-8}$ & $3.55\!\times\!10^{-6}$\\
+CPLEX & L2-NumEmphasis & 374 & $8.88\!\times\!10^{-16}$ & $4.55\!\times\!10^{-13}$ & $1.02\!\times\!10^{-8}$ & $5.36\!\times\!10^{-7}$\\
+Gurobi & Base & 39 & $1.32\!\times\!10^{-10}$ & $6.36\!\times\!10^{-9}$ & $3.09\!\times\!10^{-8}$ & $6.71\!\times\!10^{-6}$\\
+Gurobi & Budget-L2 & 17 & $3.70\!\times\!10^{-8}$ & $1.94\!\times\!10^{-7}$ & $3.92\!\times\!10^{-7}$ & $3.92\!\times\!10^{-7}$\\
+Gurobi & L2 & 17 & $3.70\!\times\!10^{-8}$ & $1.76\!\times\!10^{-7}$ & $4.17\!\times\!10^{-7}$ & $4.17\!\times\!10^{-7}$\\
+Gurobi & L2-NF3 & 8 & $9.93\!\times\!10^{-9}$ & $4.62\!\times\!10^{-8}$ & $4.74\!\times\!10^{-7}$ & $4.74\!\times\!10^{-7}$\\
+\bottomrule\end{tabular}\end{table}
+\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Complete post hoc bound-threshold sensitivity for both solvers. Each
+cell gives attained targets/final-point domain passes, out of 477 assignments.
+An earlier candidate may attain the target even when the final domains fail.
+The first column of counts reproduces the registered endpoint.}
+\label{tab:orf-large-sensitivity-full}
+\begin{tabular}{llrrrrr}\toprule
+Solver & Policy & $0$ & $10^{-12}$ & $10^{-9}$ & $10^{-6}$ & $10^{-5}$\\\midrule
+CPLEX & Base & 128/124 & 367/361 & 422/420 & 465/473 & 468/477\\
+CPLEX & Budget-L2 & 99/98 & 302/317 & 395/423 & 428/472 & 430/477\\
+CPLEX & L2 & 102/99 & 300/311 & 405/432 & 430/475 & 431/477\\
+CPLEX & L2-NumEmphasis & 106/103 & 300/307 & 415/447 & 434/477 & 434/477\\
+Gurobi & Base & 437/438 & 437/438 & 443/443 & 469/476 & 469/477\\
+Gurobi & Budget-L2 & 432/460 & 435/460 & 436/460 & 447/477 & 447/477\\
+Gurobi & L2 & 423/460 & 425/460 & 425/460 & 434/477 & 434/477\\
+Gurobi & L2-NF3 & 454/469 & 457/469 & 457/469 & 461/477 & 461/477\\
+\bottomrule\end{tabular}\end{table}

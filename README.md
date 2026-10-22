@@ -10,7 +10,7 @@ residual-budget contracts in original application units, explicit factor-selecti
 finite-precision export and independent verification. The C++ dispatch exporter and Python
 budget selector are separate components. The archived numerical baseline is retained, with
 a controlled row-only Ruiz comparison, final-policy stage ablation, and three application
-precision scenarios on the same 30 operational models added for OMS. The current ORF adaptation is `v1.6.0-orf-submission`, with a separate prospective check on 24 generated dispatch scenarios (360 primary MIP calls plus 360 logging confirmations and 96 exact LP attempts). These use known parent data; they are new parameter scenarios, not an independent application. It reuses the exact audited `v1.3.17-oms-submission` scientific archive. Neither local snapshot has a separate Zenodo version DOI. The v1.5.0 update selectively incorporates export-aware selection and verified-candidate evidence from 630 additional assignments plus one technical repeat on those same scenarios; it establishes no general time advantage over L2.
+precision scenarios on the same 30 operational models added for OMS. The current ORF adaptation is `v1.7.0-orf-submission`, with a separate prospective check on 24 generated dispatch scenarios (360 primary MIP calls plus 360 logging confirmations and 96 exact LP attempts). These use known parent data; they are new parameter scenarios, not an independent application. It reuses the exact audited `v1.3.17-oms-submission` scientific archive. Neither local snapshot has a separate Zenodo version DOI. The v1.5.0 update selectively incorporates export-aware selection and verified-candidate evidence from 630 additional assignments plus one technical repeat on those same scenarios; it establishes no general time advantage over L2.
 
 The v1.5.1 revision emphasizes prospective evidence, distinguishes physical
 budgets from exact domains and reports sensitivity to deleting each known
@@ -237,3 +237,8 @@ Against L2, the work ratio is 0.931 (95% interval 0.702–1.133), with 10/24 sce
 wins; the time ratio is 0.996 (0.832–1.119), with 6/24 wins. These conditional
 intervals do not establish a general incremental advantage or external validity.
 Replay: `python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py`.
+
+The ORF v1.7.0 revision presents the large confirmation separately and adds
+[post hoc written-bound acceptance sensitivity](exploration/orf-acceptance-sensitivity-20261022/README.md),
+independently checked from 13,387 saved candidate domains. The registered
+criterion, primary times and scientific archive remain unchanged.

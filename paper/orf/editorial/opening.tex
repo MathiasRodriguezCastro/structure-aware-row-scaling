@@ -8,8 +8,9 @@ original-unit meaning of an absolute residual tolerance. Solvers scale internall
 a generator can also use row roles, variable ownership and application units before
 export \cite{gurobiExternalScaling,idaesScaling}.
 
-The practical task is to make those accuracy requirements part of model generation
-and verification. Coefficient centering alone does not resolve it: scaling a row
+The contribution is a verifiable procedure that makes accuracy requirements
+part of model generation and verification, rather than a new residual-transfer
+identity. Coefficient centering alone does not resolve it: scaling a row
 down enlarges the original-unit residual admitted by a fixed exported-row tolerance.
 Conversely, a factor chosen only for residual accuracy may conflict with coefficient
 limits. We connect four steps: declare an original-unit residual budget, select an

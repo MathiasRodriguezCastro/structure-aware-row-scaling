@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.6.0-orf-submission**, 22 October 2026.
+Local version: **v1.7.0-orf-submission**, 22 October 2026.
 Proposed type: Original Research Article.
 
 | File | Role |
@@ -88,3 +88,14 @@ diagnostics in Online Resource 1. Online Resource 2 includes its lossless raw
 archive, pilot/reference evidence and saved-result replay. No superiority
 claim is inferred from a null result; Gurobi process time is higher.
 The earlier v1.5.0/v1.5.1 releases remain unchanged.
+
+
+The v1.7.0 revision centers the verifiable generation procedure and gives the
+3,840-run confirmation its own subsection with horizon-level time comparisons.
+A separately identified post hoc sensitivity changes only the written-bound
+threshold; all registered endpoints and times remain unchanged. Its independent
+vector/bound replay checks 13,387 candidate domains. CPLEX acceptance at 10^-9
+is 395/477 for Budget-L2 and 405/477 for L2, compared with 99 and 102 at zero.
+The complete sensitivity and magnitudes remain reproducible, without additional
+optimizer calls. Table 14 now separates precision and performance in two panels.
+The large v1.6.0 scientific archive and earlier releases remain byte-identical.

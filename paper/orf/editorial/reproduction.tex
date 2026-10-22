@@ -1,6 +1,6 @@
 \section{Reproduction and artifact layout}
 Online Resource~2 is the complete code/data package for
-\path{v1.6.0-orf-submission}. It contains the unchanged scientific-evidence archive
+\path{v1.7.0-orf-submission}. It contains the unchanged scientific-evidence archive
 \path{v1.3.17-oms-submission}, its validation record, the current ORF editable
 sources and a checksum-based inheritance record. The older editorial files inside
 the scientific archive identify its provenance; the current article and this
@@ -37,6 +37,20 @@ links retain identical file contents at their original paths. Repeating every
 full rational candidate audit is available through
 \path{replay_confirmation.py} for block indices 0--479, with a substantially
 larger replay cost. Reference and pilot acquisition remain separately costed.
+
+The post hoc written-bound sensitivity is a separate, small payload inside
+\path{orf-revision-sources.zip}. Extract those canonical sources over the same
+root, then run:
+\begin{lstlisting}
+python3 scripts/research/orf_acceptance_sensitivity.py
+python3 scripts/research/check_orf_acceptance_sensitivity.py
+python3 scripts/research/orf_confirmation_tables.py
+\end{lstlisting}
+The checker reconstructs 13,387 candidate domain tests from saved vectors and
+written bounds. Other acceptance checks reuse the sealed independent audits.
+The zero threshold reproduces registered successes; alternative thresholds
+change neither the primary endpoint nor its measured times. All seven current
+confirmation table fragments regenerate from these supplied inputs.
 
 Next extract \path{verified-candidates-orf-20261019.zip} over that same root.
 Its \path{FOLLOWUP_CONTENTS.sha256} identifies the frozen follow-up files.

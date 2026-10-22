@@ -1,23 +1,22 @@
 Row scaling preserves a mixed-integer programming model in exact arithmetic but
 changes the application-unit meaning of absolute feasibility tolerances. We
-develop a model-generation workflow using original-unit residual budgets. It
-selects row factors under coefficient limits, reports incompatible requirements,
-accounts for integer rounding, checks binary64 export errors during selection,
-and independently checks returned points. Evaluation combines 306 hydrothermal
-dispatch models, kernel-matched and Ruiz controls, enumerated stress tests on
-three solvers, and independent batch scheduling. In prospective validation on
-24 perturbed scenarios from six known inputs, the budget-aware Euclidean policy
+present a verifiable model-generation procedure integrating original-unit
+residual budgets, admissible row-factor selection or explicit abstention,
+integer-rounding allowances, finite-export error reserves and independent
+returned-point checks. The contribution connects established scaling and
+residual-transfer ideas to reproducible software decisions. Evaluation combines
+306 hydrothermal dispatch models, kernel-matched and Ruiz controls, enumerated
+stress tests on three solvers, and independent batch scheduling. On 24 prospective
+parameter scenarios from six known inputs, the budget-aware Euclidean policy
 has paired geometric-mean work and complete-process time ratios of 0.422 and
-0.797 against no external scaling. All policies meet the physical budgets;
-one budget-aware bound is independently contradicted, and candidate cost
-deterioration reaches 1.02\%. A larger fixed-policy study comprises 3,840 runs
-on 160 models from 40 historically generated parents and two solvers. Against
-conventional Euclidean scaling, paired ratios of penalized verified-availability
-time are 0.995 for Gurobi and 1.000 for CPLEX, with whole-parent uncertainty
-intervals containing one. Gurobi complete-process time increases by 7.9\%.
-Every eligible final point meets the mapped physical budgets under every policy;
-strict written-bound checks limit CPLEX's combined acceptance. These within-family
-results support explicit precision specification, admissible selection and
-reproducible verification. They establish neither general incremental acceleration,
-additional physical-budget recovery in the prospective samples, nor certified
-mixed-integer optimality.
+0.797 against no external scaling; candidate cost deterioration reaches 1.02\%
+and one reported bound is independently contradicted. A larger frozen study
+comprises 3,840 runs on 160 models from 40 historically generated parents and
+two solvers. Against conventional Euclidean scaling, paired ratios of penalized
+verified-availability time are 0.995 for Gurobi and 1.000 for CPLEX, with
+whole-parent intervals containing one; Gurobi complete-process time increases
+by 7.9\%. All policies meet the mapped physical budgets in both prospective
+samples. CPLEX acceptance is highly sensitive to tiny written-bound residues.
+The results support explicit precision specification, selection and verification,
+without establishing general acceleration or additional prospective physical
+feasibility recovery.

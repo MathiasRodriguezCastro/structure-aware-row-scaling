@@ -116,8 +116,16 @@ def main():
            'scripts/research/orf_config.py','scripts/research/build_orf.py',
            'scripts/research/package_orf.py','scripts/research/validate_orf.py','scripts/research/freeze_orf.py',
            'scripts/research/orf_followup_tables.py','scripts/research/orf_confirmation_tables.py',
-           'scripts/research/orf_confirmation_evidence.py']
+           'scripts/research/orf_confirmation_evidence.py',
+           'scripts/research/orf_acceptance_sensitivity.py',
+           'scripts/research/check_orf_acceptance_sensitivity.py']
     for name in roots:revision[name]=ROOT/name
+    sensitivity=ROOT/'exploration/orf-acceptance-sensitivity-20261022'
+    sensitivity_validation=json.loads((sensitivity/'VALIDATION.json').read_text())
+    assert sensitivity_validation['status']=='passed'
+    assert sensitivity_validation['sensitivity_sha256']==sha(sensitivity/'SENSITIVITY.json')
+    for name in ('PLAN.json','SENSITIVITY.json','VALIDATION.json','README.md'):
+        p=sensitivity/name;revision[p.relative_to(ROOT).as_posix()]=p
     for folder in ('paper/orf/editorial','paper/sections','paper/tables','paper/figs/research'):
         for p in (ROOT/folder).rglob('*'):
             if p.is_file() and p.suffix in ('.tex','.pdf','.bib'):revision[p.relative_to(ROOT).as_posix()]=p
@@ -136,6 +144,9 @@ def main():
         'confirmation_archive_validation_sha256':sha(CONFIRMATION/'CONFIRMATION_ARCHIVE_VALIDATION.json'),
         'confirmation_analysis_sha256':sha(CONFIRMATION/'CONFIRMATION_ANALYSIS.json'),
         'confirmation_statistical_replay_sha256':sha(CONFIRMATION/'CONFIRMATION_ANALYSIS_REPLAY.json'),
+        'acceptance_sensitivity_sha256':sha(sensitivity/'SENSITIVITY.json'),
+        'acceptance_sensitivity_validation_sha256':sha(sensitivity/'VALIDATION.json'),
+        'acceptance_sensitivity_is_post_hoc':True,'registered_acceptance_endpoint_unchanged':True,
         'earlier_prospective_exact_LP_attempts':96, 'confirmation_reference_exact_LP_attempts':181,'prospective_archive_sha256':sha(followup_zip),
         'prospective_validation_sha256':sha(FOLLOWUP/'VALIDATION.json'),
         'cluster_analysis_sha256':sha(FOLLOWUP/'CLUSTER_ANALYSIS.json'),
@@ -155,7 +166,9 @@ def main():
             'selective verified-candidate summary and constructive export-aware selector; controls in Online Resource 1',
             'prospective-first abstract, explicit exact-domain counts, six-parent deletion sensitivity and concise cover letter',
             'larger fixed-policy confirmation: full primary comparison and adverse outcomes; all controls and strata retained',
-            'concise conclusions updated to the complete evidence; inherited limitations retained with explicit extension'],
+            'concise conclusions updated to the complete evidence; inherited limitations retained with explicit extension',
+            'dedicated larger-confirmation subsection, horizon results and post hoc exact-domain sensitivity; registered endpoint unchanged',
+            'prospective table split into readable precision/performance panels; redundant editorial caveats condensed'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
     captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
@@ -313,8 +326,15 @@ VERIFIED_PACKAGE_VALIDATION.json there as PACKAGE_VALIDATION.json. Run
 follow-up tables. Also extract {CONFIRMATION_ARCHIVE} over the revision root,
 copy the tar/xz file into exploration/orf-confirmatory-extension-20261019/ and
 copy CONFIRMATION_ARCHIVE_VALIDATION.json into that directory. Run
-`python3 scripts/research/orf_confirmation_tables.py` to regenerate the four
-confirmation tables. All these inputs are supplied here; the parent ZIP does not need a separate public download.
+`python3 scripts/research/orf_acceptance_sensitivity.py` and
+`python3 scripts/research/check_orf_acceptance_sensitivity.py` to reconstruct
+and independently check the post hoc threshold sensitivity from all saved
+eligible vectors. It reuses sealed physical/row/cost audits, changes no registered
+endpoint, and estimates no alternative verification times. Its plan and results
+are in exploration/orf-acceptance-sensitivity-20261022 within the canonical ZIP.
+Then run `python3 scripts/research/orf_confirmation_tables.py` to regenerate the
+seven confirmation table fragments. All these inputs are supplied here; the
+parent ZIP does not need a separate public download.
 
 Rebuilding all 1,530 historical bases additionally requires the separate baseline
 bulk archive at DOI 10.5281/zenodo.23145294. That DOI identifies the historical

@@ -2,6 +2,7 @@
 """Render the complete closed confirmation without selecting favorable strata."""
 import hashlib
 import json
+from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -106,7 +107,76 @@ Solver & Stratum & Pairs & Targets B/L2 & PAR2 ratio [95\% interval] & Time rati
             strata += f"{label} & {group_label} & {r['paired_assignments']} & {r['numerator_successes']}/{r['denominator_successes']} & {ci(r,'par2_seconds')} & {ci(r,'complete_process_seconds')}\\\\\n"
     strata += '\\bottomrule\\end{tabular}\\end{table}\n'
     (OUT/'confirmation-strata-table.tex').write_text(strata)
-    print('Four confirmation tables regenerated from all 48 comparisons and final-point diagnostics.')
+    horizons = r'''\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Primary Budget-L2/L2 comparison by horizon in the larger confirmation.
+Targets give successful assignments B/L2; $n$ is the number of eligible pairs.
+Ratios are paired geometric means with marginal 95\% whole-parent intervals.
+PAR2 and complete-process time measure distinct costs.}
+\label{tab:orf-large-horizons}
+\begin{tabular}{llrccc}\toprule
+Solver & Hours & $n$ & Targets B/L2 & PAR2 ratio [95\% interval] & Time ratio [95\% interval]\\\midrule
+'''
+    for solver, label in [('gurobi', 'Gurobi'), ('cplex', 'CPLEX')]:
+        for horizon in [24,72,168,360]:
+            r = indexed[solver, f'h{horizon}', 'L2']
+            horizons += f"{label} & {horizon} & {r['paired_assignments']} & {r['numerator_successes']}/{r['denominator_successes']} & {ci(r,'par2_seconds')} & {ci(r,'complete_process_seconds')}\\\\\n"
+    horizons += '\\bottomrule\\end{tabular}\\end{table}\n'
+    (OUT/'confirmation-horizons-table.tex').write_text(horizons)
+    folder = ROOT/'exploration/orf-acceptance-sensitivity-20261022'
+    sensitivity = json.loads((folder/'SENSITIVITY.json').read_text())
+    validation = json.loads((folder/'VALIDATION.json').read_text())
+    assert validation['status'] == 'passed'
+    assert validation['sensitivity_sha256'] == hashlib.sha256((folder/'SENSITIVITY.json').read_bytes()).hexdigest()
+    table = r'''\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{6pt}
+\caption{Post hoc CPLEX acceptance sensitivity. Counts out of 477 assignments
+per policy use any saved cost-eligible candidate. Only the maximum written-bound
+residue threshold $\tau_b$ changes, in the respective variable's algebraic units;
+physical, integrality, remaining-row and cost checks are fixed. The registered
+endpoint is $\tau_b=0$; the other columns are diagnostic.}
+\label{tab:orf-large-sensitivity}
+\begin{tabular}{lrrrrr}\toprule
+Policy & $0$ & $10^{-12}$ & $10^{-9}$ & $10^{-6}$ & $10^{-5}$\\\midrule
+'''
+    for policy in ['Base','L2','Budget-L2','L2-NumEmphasis']:
+        r = next(r for r in sensitivity['summary'] if r['solver']=='cplex' and r['policy']==policy)
+        table += policy+' & '+' & '.join(map(str,r['target_successes']))+r'\\'+'\n'
+    table += '\\bottomrule\\end{tabular}\\end{table}\n'
+    (OUT/'confirmation-sensitivity-table.tex').write_text(table)
+    details = r'''\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Positive final-point written-bound residues in the larger confirmation.
+Quantiles are nearest ranks among positive residues only; values use the
+respective variable units. The exact rational values are in Online Resource~2.}
+\label{tab:orf-large-bound-magnitudes}
+\begin{tabular}{llrrrrr}\toprule
+Solver & Policy & Positive/$477$ & Min & Median & 95th percentile & Max\\\midrule
+'''
+    for r in sensitivity['summary']:
+        values = [float(Fraction(r[k])) for k in ['positive_final_min','positive_final_median','positive_final_p95','positive_final_max']]
+        def scientific(v):
+            mantissa, exponent = f'{v:.2e}'.split('e')
+            return f'${mantissa}\\!\\times\\!10^{{{int(exponent)}}}$'
+        solver_label = 'CPLEX' if r['solver']=='cplex' else 'Gurobi'
+        details += solver_label+' & '+r['policy']+f" & {r['positive_final_bounds']} & "+' & '.join(scientific(v) for v in values)+r'\\'+'\n'
+    details += '\\bottomrule\\end{tabular}\\end{table}\n'
+    details += r'''\begin{table}[htbp]
+\centering\small\setlength{\tabcolsep}{4pt}
+\caption{Complete post hoc bound-threshold sensitivity for both solvers. Each
+cell gives attained targets/final-point domain passes, out of 477 assignments.
+An earlier candidate may attain the target even when the final domains fail.
+The first column of counts reproduces the registered endpoint.}
+\label{tab:orf-large-sensitivity-full}
+\begin{tabular}{llrrrrr}\toprule
+Solver & Policy & $0$ & $10^{-12}$ & $10^{-9}$ & $10^{-6}$ & $10^{-5}$\\\midrule
+'''
+    for r in sensitivity['summary']:
+        solver_label = 'CPLEX' if r['solver']=='cplex' else 'Gurobi'
+        details += solver_label+' & '+r['policy']+' & '+' & '.join(f'{a}/{b}' for a,b in zip(r['target_successes'],r['final_domains']))+r'\\'+'\n'
+    details += '\\bottomrule\\end{tabular}\\end{table}\n'
+    (OUT/'confirmation-sensitivity-details-table.tex').write_text(details)
+    print('Seven confirmation table fragments regenerated; registered results and post hoc sensitivity kept distinct.')
 
 
 if __name__ == '__main__':

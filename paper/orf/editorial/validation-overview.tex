@@ -4,25 +4,23 @@ verified accuracy (\cref{sec:experiments,sec:results}). It combines 306 dispatch
 models, kernel-matched and Ruiz controls, enumerated stress tests on three
 solvers, and batch-scheduling transfer. The initial physical audit leaves factors
 unchanged; an activation follow-up changes them and supplies exact feasible
-witnesses and strong numerical controls. Directed comparisons then test the
-favorable budget settings against the unscaled model and account for complete
-preparation cost. These are within-family results, not equally certified MILP
-gaps. Exact global LP bounds and integer witnesses provide separate reference
-intervals, including a certified dispatch optimum (Online Resource~1, Table~S19).
-The directed and prospective accuracy comparisons use demand-inversion-free
-inputs. Defective historical scenarios are identified and retained as numerical
-MIPs, with limited operational interpretation.
+witnesses and strong controls. Directed comparisons test favorable budget
+settings against the unscaled model, accounting for preparation cost.
+The prospective studies add 24 perturbed scenarios and a larger frozen
+3,840-assignment confirmation from 40 historically generated parents
+(\cref{subsec:orf-prospective,subsec:orf-large-confirmation}). Every policy meets
+the mapped physical budgets in these samples: no additional physical-feasibility
+recovery is demonstrated there. Recovery in adversarial and presolve-off tests
+is evidence for those selected configurations, not a general operational benefit.
+The larger confirmation establishes no primary time advantage over L2.
 
 Residual transfer and accuracy-based scaling are established practice
-\cite{gurobiExternalScaling,pritchett2017scaling}. The software contribution
-connects budget declaration, admissible selection or explicit abstention, checked
-export and returned-point verification. Its Python selector and isolated C++
-integration give identical factors and exports. The tests retain failures,
-contradicted bounds and preparation overhead: checked precision and computational
-benefit are distinct outcomes.
-
-A larger frozen confirmation adds 3,840 comparative assignments across 40
-historically generated parents, four horizons and two solvers. It preserves
-all outcomes and uses complete-parent uncertainty for the primary comparison
-with L2 (\cref{tab:orf-large-confirmation}); resource and reference acquisition
-are accounted for separately in Online Resource~1.
+\cite{gurobiExternalScaling,pritchett2017scaling}. Our software connects budget
+declaration, admissible selection or explicit abstention, checked export and
+returned-point verification; its Python selector and isolated C++ integration
+produce identical factors and exports. These decisions and independent checks,
+rather than the transfer identity alone, are the methodological contribution.
+The accuracy comparisons use demand-inversion-free inputs. Defective historical
+scenarios remain identified as numerical MIPs with limited operational meaning.
+Exact LP bounds and integer witnesses supply separate reference intervals,
+including one certified dispatch optimum (Online Resource~1, Table~S19).

@@ -1,25 +1,72 @@
-\paragraph{Larger fixed-policy confirmation}
-A subsequent frozen study compares four policies on 160 models: 40 historically
-generated parents, three dispatch formulations and four horizons, with three
-new seeds and two solvers. All 3,840 assignments and 480 independent block
-replays finish; 24 assignments of an independently infeasible model remain
-diagnostic. Table~\ref{tab:orf-large-confirmation} reports the primary comparison
-on the other 3,816 assignments, using a common verified feasible cost reference
-and a 0.1\% target. Native stopping gaps are also 0.1\%; caps are fixed from
-Base-only resource calibration before policy comparisons. These results are
-not pooled with the earlier study, which uses a different stopping gap.
+\subsection{Larger fixed-policy confirmation}
+\label{subsec:orf-large-confirmation}
+\paragraph{Frozen design and independent units}
+This study compares four fixed policies on 160 models from 40 historically
+generated parents, three dispatch formulations and four horizons (24, 72, 168
+and 360 hours). Three new seeds and two solvers give 3,840 assignments,
+independently replayed in 480 blocks. The 24 assignments of one independently
+infeasible model remain diagnostic; the common eligible mask contains 3,816
+assignments. Policies, budgets, shuffled execution order and resources are fixed
+before comparison, with caps determined by Base-only calibration.
+Each model/seed block runs all eight solver/policy calls on the same node.
+The 40 parents, rather than seeds or horizons, are the resampling units;
+100,000 whole-parent bootstrap draws retain their nested observations and mask.
+The parents still share historical components and documented prior policy
+exposure. This is a larger within-family test, not independent operational data.
+
+Acceptance combines physical budgets (0.01 MW and 100\,m\textsuperscript{3}),
+integer distance at most $10^{-9}$, exact written bounds after integer rounding,
+remaining-row backward error at most $10^{-6}$, and a common cost target within
+0.1\% of an exactly verified feasible reference. Reference acquisition is
+separate; those references are not assumed optimal. Native stopping gaps are
+0.1\%, unlike the earlier 1\% study, so the studies are not pooled.
+
+\paragraph{Verified availability and complete-process cost}
+Table~\ref{tab:orf-large-confirmation} reports the primary Budget-L2/L2
+comparison. PAR2 uses verified availability on success and twice the solver cap
+plus preparation on failure. Verification occurs after solving, so this is
+availability after termination and candidate-prefix auditing, not an online
+stopping rule. Complete-process time also includes persistence; reference
+acquisition, calibration and queue time are accounted for separately.
 \input{editorial/confirmation-summary-table}
 Neither primary PAR2 interval establishes an incremental time advantage over
-L2. Gurobi complete-process time is 7.9\% higher for Budget-L2. Every eligible
-final point meets the mapped physical budgets under every policy, so the
-contract supplies no additional physical-budget recoveries in this sample.
-CPLEX's low combined success counts primarily reflect positive residuals of
-exact written bounds; the registered acceptance rule is retained, and this
-is distinct from physical-budget failure. Its numerical control attains 106
-targets versus 99 for Budget-L2; Gurobi L2-NF3 attains 454 versus 432.
-The bound detector has no applicable contrasts for the scaled exports because
-the Base reference is not certified feasible for those rounded representations;
-zero flags there cannot validate solver bounds. Online Resource~1 reports all
-controls, strata, censoring and domain diagnostics. These historically generated
-parents and their prior policy exposure support within-family checking, not
-independent operational validation.
+L2. Gurobi complete-process time is 7.9\% higher for Budget-L2.
+Table~\ref{tab:orf-large-horizons} shows the horizon dependence: the largest
+Gurobi process-time penalty occurs at 360 hours. The marginal intervals are
+descriptive, not simultaneous selection rules or evidence of equivalence.
+Online Resource~1 retains all formulation strata and controls: CPLEX's numerical
+control attains 106 targets versus 99 for Budget-L2; Gurobi L2-NF3 attains 454
+versus 432. Simple's L2 and Budget-L2 exports are identical, so their timing
+differences cannot measure a contractual factor change.
+\input{editorial/confirmation-horizons-table}
+
+\paragraph{Physical precision and sensitivity of exact-domain acceptance}
+Every eligible final point meets the mapped physical budgets under every
+policy. Thus this sample demonstrates no additional recovery of physical
+feasibility from contracts. CPLEX's low combined acceptance instead primarily
+reflects positive written-bound residues: 379/477 final Budget-L2 points and
+378/477 L2 points fail exact bounds. Among their positive residues, the medians
+are $3.41\times10^{-13}$ and $4.51\times10^{-13}$, and maxima
+$2.46\times10^{-6}$ and $3.55\times10^{-6}$, respectively, in the corresponding
+variable units. These magnitudes distinguish small domain deviations from
+failures of the declared physical budgets.
+
+A separately identified post hoc sensitivity changes only the written-bound
+threshold, reusing all saved cost-eligible candidates and keeping every other
+check fixed (Table~\ref{tab:orf-large-sensitivity}). Allowing $10^{-9}$ raises
+CPLEX target counts to 395 for Budget-L2 and 405 for L2; allowing $10^{-5}$ gives
+430 and 431. The sharp increase confirms the influence of exact-domain
+acceptance, without identifying an additional Budget-L2 benefit. These are
+diagnostic algebraic thresholds, not physical standards. The registered zero
+threshold and all primary time comparisons remain unchanged. Per-candidate
+audit timestamps were not saved for alternative thresholds, so no alternative
+PAR2 times are inferred. Online Resource~1 gives both solvers' full sensitivity
+and residue distributions; Online Resource~2 independently reconstructs the
+domain arithmetic from saved vectors and written bounds.
+\input{editorial/confirmation-sensitivity-table}
+
+The scaled bound detector has no applicable contrasts because the Base
+reference is not certified feasible for the rounded scaled representations.
+Zero flags there cannot validate solver bounds; Base has two detected Gurobi
+and thirteen CPLEX contradictions. These applicability limits, the known-parent
+design and finite solver caps delimit the conclusions of this confirmation.

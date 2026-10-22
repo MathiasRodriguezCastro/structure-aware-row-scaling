@@ -21,7 +21,10 @@
 - [x] Six known-parent deletions replayed from native work and external clocks, with all controls retained.
 - [x] Editable LaTeX bundle supplied separately for the source-file upload role, as required by the official instructions checked on 22 October 2026.
 - [x] Larger fixed-policy confirmation: all primary outcomes, controls, strata, domain failures and missing bound applicability retained.
-- [x] Lossless confirmation archive checked against all five original seals; four new tables reproduce the complete comparison and diagnostics.
+- [x] Lossless confirmation archive checked against all five original seals; seven table fragments reproduce the complete comparison, diagnostics and separately identified post hoc sensitivity.
+- [x] Dedicated larger-confirmation subsection: frozen design, actual resampling units, solver/horizon results, acceptance sensitivity and limits.
+- [x] Post hoc bound sensitivity independently reconstructs 13,387 candidate domain checks and all registered success counts; original endpoint and time comparisons unchanged.
+- [x] Prospective Table 14 separated into readable precision/performance panels; practical contribution and lack of extra prospective physical recovery explicit from the introduction.
 - [ ] Confirm exact article type, upload categories and size limits in the ORF portal.
 - [ ] Enter author contributions, competing interests and other required declarations in the interface.
 - [ ] Deposit the exact final version in Zenodo, supply its reserved DOI and update availability.

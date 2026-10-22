@@ -188,7 +188,7 @@ def main():
         assert VERSION in text and TITLE in text
         supplement_text=(sources/'ESM_1.tex').read_text()
         assert ('Online Resource~2 is the complete code/data package for\n'+r'\path{'+VERSION+'}') in supplement_text
-        assert text.index('Accuracy-aware model generation and verification')<text.index('Computational evaluation and mechanism attribution')
+        assert text.index('A verifiable model-generation procedure')<text.index('An auditable computational evaluation')
         assert 'Statements and Declarations' in text and 'Research-tool documentation' in text
         assert 'Supplementary Material' not in text
         pdf=run(['pdftotext','-layout','main_orf.pdf','-'],sources)
@@ -359,12 +359,22 @@ def main():
         assert all((editorial/n).read_bytes()==value for n,value in originals.items())
         result['verified_followup_tables_regenerated_identically']=len(originals)
         (revision/'exploration/orf-confirmatory-extension-20261019').symlink_to(confirmation,target_is_directory=True)
+        sensitivity=revision/'exploration/orf-acceptance-sensitivity-20261022'
+        expected_sensitivity=(sensitivity/'SENSITIVITY.json').read_bytes()
+        expected_sensitivity_validation=(sensitivity/'VALIDATION.json').read_bytes()
+        assert sha(sensitivity/'SENSITIVITY.json')==snapshot['acceptance_sensitivity_sha256']
+        assert sha(sensitivity/'VALIDATION.json')==snapshot['acceptance_sensitivity_validation_sha256']
+        run(['python3','scripts/research/orf_acceptance_sensitivity.py'],revision)
+        assert (sensitivity/'SENSITIVITY.json').read_bytes()==expected_sensitivity
+        run(['python3','scripts/research/check_orf_acceptance_sensitivity.py'],revision)
+        assert (sensitivity/'VALIDATION.json').read_bytes()==expected_sensitivity_validation
+        result['post_hoc_acceptance_sensitivity']=json.loads(expected_sensitivity_validation)
         confirmation_tables=list(editorial.glob('confirmation-*-table.tex'))
-        assert len(confirmation_tables)==4
+        assert len(confirmation_tables)==7
         originals={p.name:p.read_bytes() for p in confirmation_tables}
         run(['python3','scripts/research/orf_confirmation_tables.py'],revision)
         assert all((editorial/n).read_bytes()==value for n,value in originals.items())
-        result['confirmation_tables_regenerated_identically']=4
+        result['confirmation_tables_regenerated_identically']=7
         run(['python3','scripts/research/build_orf.py'],revision)
         assert (revision/'paper/orf/main_orf.tex').read_bytes()==(sources/'main_orf.tex').read_bytes()
         assert (revision/'paper/orf/ESM_1.tex').read_bytes()==(sources/'ESM_1.tex').read_bytes()
