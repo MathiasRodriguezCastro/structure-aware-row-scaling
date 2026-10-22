@@ -3,7 +3,33 @@
 Se preserva `v1.5.0-orf-submission` (`2fbb5f14`) y también v1.4.2. El artículo
 y su ZIP de envío no se modifican. Esta investigación está en una rama separada.
 
-## Campaña confirmatoria enviada
+## Campaña confirmatoria terminada
+
+Las **3.840 ejecuciones terminaron**, con los 480 informes de reproducción
+aprobados y sin fallas de ejecución. El análisis, sellado y control estadístico
+independiente también pasaron: 48 comparaciones y 80 intervalos reproducidos.
+La reproducción abarca 39.265 vectores guardados e incluye 13.387 auditorías
+completas y 477 comprobaciones de referencia. El manifiesto inventaría 37.298 archivos y
+6.801.485.096 bytes.
+
+La comparación primaria **no confirma una aceleración general de Budget-L2
+frente a L2**: PAR2 0,9954 [0,9227; 1,0623] en Gurobi y 0,9999
+[0,9631; 1,0303] en CPLEX. Los objetivos verificados alcanzados fueron 432/423
+y 99/102, respectivamente. En Gurobi, el tiempo completo fue un 7,9 % mayor.
+Todos los candidatos finales evaluables cumplieron los presupuestos físicos;
+las comprobaciones de dominio y calidad son condiciones adicionales.
+
+El [informe de cierre](INFORME_CIERRE_CONFIRMATORIO.md) presenta los resultados,
+la incertidumbre, el diagnóstico de cotas y sus límites editoriales. El informe
+automático completo es `INFORME_CONFIRMACION.md`. El manuscrito conserva su
+versión congelada mientras se valora esta evidencia.
+
+`CONFIRMATION_CLOSURE.json` identifica el cierre y sus fuentes. El diagnóstico
+descriptivo adicional de las cotas está en `CONFIRMATION_FINAL_DIAGNOSTICS.json`;
+conserva los criterios de aceptación registrados. La copia local completa se
+controla por separado mediante `CONFIRMATION_LOCAL_COPY_FOLLOWUP.json`: al terminar
+la transferencia, `finalize_local_copy.py` ejecuta el verificador de todos los
+archivos del manifiesto. Su resultado queda en `CONFIRMATION_LOCAL_RAW_CHECK.json`.
 
 Se enviaron las **3.840 asignaciones** del `CONFIRMATION_PLAN.json`: 480 bloques
 de modelo/semilla, ocho ejecuciones por bloque y una sola resolución simultánea.
