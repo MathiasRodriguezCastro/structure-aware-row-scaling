@@ -10,6 +10,7 @@ import unicodedata
 import zipfile
 from orf_config import ROOT, PAPER, ORF, OUT, VERSION, DATE, TITLE, PARENT, PARENT_DIR, FOLLOWUP, FOLLOWUP_ARCHIVE, VERIFIED, VERIFIED_ARCHIVE, sha
 from orf_config import CONFIRMATION, CONFIRMATION_ARCHIVE, CONFIRMATION_ARCHIVE_PATH, COMPARATIVE_MIP_CALLS
+from orf_config import CONFIRMATION_SUPPORT_ARCHIVE
 
 FILES = ('main_orf.pdf','orf-editable-sources.zip','cover-letter.pdf','title-page.pdf','ESM_1.pdf','ESM_2.zip')
 EXTRAS = ('REPRODUCE.md','UPLOAD_INSTRUCTIONS.md','ONLINE_RESOURCE_CAPTIONS.txt',
@@ -106,6 +107,12 @@ def main():
     confirmation_validation=json.loads((CONFIRMATION/'CONFIRMATION_ARCHIVE_VALIDATION.json').read_text())
     assert confirmation_validation['status']=='passed' and confirmation_validation['full_stream_read_and_checksums']
     assert confirmation_validation['archive_sha256']==sha(CONFIRMATION_ARCHIVE_PATH)
+    # Installation helpers omitted by the old raw-tar metadata filter are
+    # restored separately; no sealed model, vector, log or result is rewritten.
+    support_entries={p.relative_to(ROOT).as_posix():p for p in (CONFIRMATION/'cluster').iterdir()
+        if p.is_file() and p.suffix in ('.py','.json','.slurm','.sh','.md','.txt','.sha256')}
+    support_zip=OUT/CONFIRMATION_SUPPORT_ARCHIVE
+    archive(support_zip,support_entries)
     # Canonical editorial inputs and build tools, distinct from the scientific archive.
     revision={}
     roots=['README.md','CITATION.cff','.zenodo.json','LICENSE','DATA_LICENSE.md','Makefile',
@@ -118,7 +125,9 @@ def main():
            'scripts/research/orf_followup_tables.py','scripts/research/orf_confirmation_tables.py',
            'scripts/research/orf_confirmation_evidence.py',
            'scripts/research/orf_acceptance_sensitivity.py',
-           'scripts/research/check_orf_acceptance_sensitivity.py']
+           'scripts/research/check_orf_acceptance_sensitivity.py',
+           'scripts/research/orf_resource_inventory.py','scripts/research/audit_orf_release.py',
+           'paper/submission/orf/PORTAL_FIELDS.md','paper/submission/orf/SUPPLEMENTARY_CAPTIONS.txt']
     for name in roots:revision[name]=ROOT/name
     sensitivity=ROOT/'exploration/orf-acceptance-sensitivity-20261022'
     sensitivity_validation=json.loads((sensitivity/'VALIDATION.json').read_text())
@@ -142,6 +151,8 @@ def main():
         'verified_followup_prior_validation_sha256':sha(VERIFIED/'PACKAGE_VALIDATION.json'),
         'confirmation_archive_sha256':sha(CONFIRMATION_ARCHIVE_PATH),
         'confirmation_archive_validation_sha256':sha(CONFIRMATION/'CONFIRMATION_ARCHIVE_VALIDATION.json'),
+        'confirmation_support_archive_sha256':sha(support_zip),
+        'confirmation_support_files':len(support_entries),
         'confirmation_analysis_sha256':sha(CONFIRMATION/'CONFIRMATION_ANALYSIS.json'),
         'confirmation_statistical_replay_sha256':sha(CONFIRMATION/'CONFIRMATION_ANALYSIS_REPLAY.json'),
         'acceptance_sensitivity_sha256':sha(sensitivity/'SENSITIVITY.json'),
@@ -168,15 +179,11 @@ def main():
             'larger fixed-policy confirmation: full primary comparison and adverse outcomes; all controls and strata retained',
             'concise conclusions updated to the complete evidence; inherited limitations retained with explicit extension',
             'dedicated larger-confirmation subsection, horizon results and post hoc exact-domain sensitivity; registered endpoint unchanged',
-            'prospective table split into readable precision/performance panels; redundant editorial caveats condensed'],
+            'prospective table split into readable precision/performance panels; redundant editorial caveats condensed',
+            'v1.7.1 packaging repair restores cluster Python helpers and wheel lock without modifying the sealed raw evidence'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
-    captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
-        'exact arithmetic checks, numerical limitations and reproduction instructions.\n\n'
-        'Online Resource 2: Current ORF sources, prospective and verified-candidate evidence, the larger fixed-policy confirmation, and the unchanged audited scientific code/data '
-        'archive, including generators, scaling software, model exports, native logs, saved '
-        'solutions, rational witnesses and independent replay programs. Inheritance and '
-        'file checksums identify the exact versions.\n')
+    captions=(ORF.parent/'submission/orf/SUPPLEMENTARY_CAPTIONS.txt').read_text()
     guide=f'''# {TITLE}
 
 Journal: Operations Research Forum
@@ -207,6 +214,10 @@ separately; they do not enlarge the confirmatory comparison. The lossless
 {CONFIRMATION_ARCHIVE} supplies the final campaign, pilot and reference raw data,
 frozen sources, native logs, vectors, whole-parent analysis and independent replay.
 Its validated stream preserves repeated contents as ordinary tar hard links.
+The small {CONFIRMATION_SUPPORT_ARCHIVE} restores cluster installation helpers
+and the wheel lock omitted by the v1.7.0 metadata filter. Extract it over the same
+scientific root as the raw tar. It includes no solver binaries and changes no
+scientific input or result. The wheel lock matches the recorded installation.
 
 ## Reproduce the evidence
 
@@ -285,8 +296,12 @@ replay nor a paper rebuild reruns commercial optimization or recreates timings.
 Extract {CONFIRMATION_ARCHIVE} over the same scientific repository with GNU tar
 (`tar -xJf path/to/{CONFIRMATION_ARCHIVE}`). Keep hard links when extracting:
 they preserve identical content at its original paths and reduce disk usage.
-CONFIRMATION_ARCHIVE_CONTENTS.json lists every path, size and SHA-256. From
-the repository root, run:
+CONFIRMATION_ARCHIVE_CONTENTS.json lists every path, size and SHA-256. Over
+the same repository root, extract {CONFIRMATION_SUPPORT_ARCHIVE} and check its
+CONTENTS.sha256 too. This overlay supplies the cluster Python helpers and wheel
+lock omitted by the old metadata filter. The wheel filenames and hashes match
+DEPENDENCY_INSTALLATION.json. The full audit checks all 3,840 job bundles and
+every cluster Python helper referenced by the supplied launch scripts. Then run:
 
 ```sh
 python3 exploration/orf-confirmatory-extension-20261019/seal_confirmation.py --check
@@ -323,7 +338,8 @@ extract both follow-up archives over the revision root, copy {VERIFIED_ARCHIVE}
 to exploration/orf-v15-verified-20261019/research-evidence.zip and copy
 VERIFIED_PACKAGE_VALIDATION.json there as PACKAGE_VALIDATION.json. Run
 `python3 scripts/research/orf_followup_tables.py` to regenerate the five selected
-follow-up tables. Also extract {CONFIRMATION_ARCHIVE} over the revision root,
+follow-up tables. Also extract {CONFIRMATION_ARCHIVE} and
+{CONFIRMATION_SUPPORT_ARCHIVE} over the revision root,
 copy the tar/xz file into exploration/orf-confirmatory-extension-20261019/ and
 copy CONFIRMATION_ARCHIVE_VALIDATION.json into that directory. Run
 `python3 scripts/research/orf_acceptance_sensitivity.py` and
@@ -347,6 +363,7 @@ own notices. Manuscript text and PDFs are outside the code/data licenses.
 '''
     esm=OUT/'ESM_2.zip'
     archive(esm,{'README.md':guide,'SNAPSHOT.json':OUT/'SNAPSHOT.json',
+        CONFIRMATION_SUPPORT_ARCHIVE:support_zip,
         FOLLOWUP_ARCHIVE:followup_zip,
         VERIFIED_ARCHIVE:verified_zip,'VERIFIED_PACKAGE_VALIDATION.json':VERIFIED/'PACKAGE_VALIDATION.json',
         CONFIRMATION_ARCHIVE:CONFIRMATION_ARCHIVE_PATH,

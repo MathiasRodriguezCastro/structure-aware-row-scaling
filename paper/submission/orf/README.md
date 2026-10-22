@@ -1,7 +1,36 @@
 # Operations Research Forum delivery
 
-Local version: **v1.7.0-orf-submission**, 22 October 2026.
+Local version: **v1.7.1-orf-submission**, 22 October 2026.
 Proposed type: Original Research Article.
+
+The sealed scientific data from v1.7.0 remain unchanged. The v1.7.1 packaging
+repair adds a small archive of cluster installation helpers and the wheel lock
+omitted by the old tar metadata filter. The latest
+[package audit](VALIDATION.json)
+checks its exact archive hashes, all 3,840 job bundles, dependencies, manifests,
+saved-result verifiers and editable-source builds. Generated delivery files and
+the complete recent raw datasets are supplied in Online Resource 2, not in Git.
+
+For the live submission, [PORTAL_FIELDS.md](PORTAL_FIELDS.md) and
+[UPLOAD_METADATA.json](UPLOAD_METADATA.json) provide the author, contributions,
+competing-interest and funding fields from the frozen manuscript. They are
+prepared values; no live form has been filled or submitted. The known funding
+statement and computing-resource acknowledgement match the frozen manuscript.
+
+[SUPPLEMENTARY_CAPTIONS.txt](SUPPLEMENTARY_CAPTIONS.txt) supplies these concise
+captions for the upload interface:
+
+- Online Resource 1 — Mathematical proofs, experimental protocols and additional results
+- Online Resource 2 — Source code, experimental data and reproducibility package
+
+Upload `orf-editable-sources.zip` in the LaTeX/editable-source role alongside
+`main_orf.pdf` at initial submission. This 70-member bundle includes the main
+and supplementary TeX, bibliography, figures, class/style and build instructions;
+it is supplied separately as well as inside Online Resource 2. The four PDFs
+alone are not the complete upload set. These preparation files follow the
+[official instructions](https://link.springer.com/journal/43069/submission-guidelines)
+checked on 22 October 2026; exact portal categories and size limits remain live
+interface checks.
 
 | File | Role |
 |---|---|
@@ -34,6 +63,13 @@ directory as `reproducibility-artifact.zip`, and copy
 `VERIFIED_PACKAGE_VALIDATION.json` into that directory as `PACKAGE_VALIDATION.json`.
 Then run the commands above. The directory is created locally if absent; no download of an
 unpublished parent release is required.
+For the larger confirmation, also extract `confirmation-evidence-20261022.tar.xz`
+and `confirmation-support-20261022.zip` over the revision root. Copy the tar and
+its supplied `CONFIRMATION_ARCHIVE_VALIDATION.json` into
+`exploration/orf-confirmatory-extension-20261019/` as documented in REPRODUCE.md.
+The support ZIP contains 38 small source/lock/launch files and a checksum list;
+its wheel lock is checked against the recorded installation. It redistributes
+no solver binaries or licenses.
 The canonical code, experiments and current editorial fragments remain in Git.
 The editable LaTeX source bundle can be compiled independently of the code/data
 archive. No original generator or stored experiment is modified by this adaptation.

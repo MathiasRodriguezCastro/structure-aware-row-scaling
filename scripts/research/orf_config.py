@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PAPER = ROOT / 'paper'
 ORF = PAPER / 'orf'
 OUT = PAPER / 'submission/orf'
-VERSION = 'v1.7.0-orf-submission'
+VERSION = 'v1.7.1-orf-submission'
 DATE = '2026-10-22'
 TITLE = ('Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: '
          'A Computational and Software Study')
@@ -20,6 +20,7 @@ VERIFIED_ARCHIVE = 'verified-candidates-orf-20261019.zip'
 CONFIRMATION = ROOT / 'exploration/orf-confirmatory-extension-20261019'
 CONFIRMATION_ARCHIVE = 'confirmation-evidence-20261022.tar.xz'
 CONFIRMATION_ARCHIVE_PATH = CONFIRMATION / CONFIRMATION_ARCHIVE
+CONFIRMATION_SUPPORT_ARCHIVE = 'confirmation-support-20261022.zip'
 COMPARATIVE_MIP_CALLS = 1351 + 3840
 
 

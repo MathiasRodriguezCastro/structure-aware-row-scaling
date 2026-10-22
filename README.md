@@ -5,18 +5,52 @@ Forum (ORF)**. Author: Mathias Rodríguez Castro, Facultad de Ingeniería,
 Universidad de la República, Montevideo, Uruguay; mathiasr@fing.edu.uy;
 ORCID [0009-0002-7235-7677](https://orcid.org/0009-0002-7235-7677).
 
-The manuscript develops an implementation and evaluation workflow for pre-export row scaling:
-residual-budget contracts in original application units, explicit factor-selection decisions,
-finite-precision export and independent verification. The C++ dispatch exporter and Python
-budget selector are separate components. The archived numerical baseline is retained, with
-a controlled row-only Ruiz comparison, final-policy stage ablation, and three application
-precision scenarios on the same 30 operational models added for OMS. The current ORF adaptation is `v1.7.0-orf-submission`, with a separate prospective check on 24 generated dispatch scenarios (360 primary MIP calls plus 360 logging confirmations and 96 exact LP attempts). These use known parent data; they are new parameter scenarios, not an independent application. It reuses the exact audited `v1.3.17-oms-submission` scientific archive. Neither local snapshot has a separate Zenodo version DOI. The v1.5.0 update selectively incorporates export-aware selection and verified-candidate evidence from 630 additional assignments plus one technical repeat on those same scenarios; it establishes no general time advantage over L2.
+**Current submission snapshot: `v1.7.1-orf-submission` (22 October 2026).**
+The v1.7.1 packaging correction adds 38 small cluster support/launch files and
+an installation wheel lock omitted by the earlier raw-tar metadata filter.
+It leaves the sealed scientific tar and all results unchanged; a clean package
+audit checks the restored helpers alongside every confirmatory job bundle.
+The paper presents a verifiable model-generation procedure connecting original-unit
+residual budgets, admissible row-factor selection or explicit abstention,
+finite-precision export and independent returned-point checks. It integrates
+established scaling ideas into explicit, reproducible software decisions.
 
-The v1.5.1 revision emphasizes prospective evidence, distinguishes physical
-budgets from exact domains and reports sensitivity to deleting each known
-parent. The closed [3,840-run campaign](exploration/orf-confirmatory-extension-20261019/INFORME_CIERRE_CONFIRMATORIO.md)
-is now summarized with all primary outcomes in the manuscript and full controls
-and strata in Online Resource 1; its raw evidence accompanies Online Resource 2.
+The larger frozen confirmation contains **3,840 assignments** on 160 models
+from 40 historically generated parents, three dispatch formulations, four
+horizons, three seeds and two solvers. All assignments are retained: 3,816 are
+quality-eligible and 24 are diagnostic because their model is independently
+infeasible. The primary Budget-L2/L2 PAR2 ratios are 0.995 (Gurobi) and 1.000
+(CPLEX), with whole-parent intervals containing one. Gurobi complete-process
+time increases by 7.9%. Every eligible final point meets the mapped physical
+budgets under every policy. These results establish neither general incremental
+acceleration nor additional prospective physical-budget recovery.
+
+The [v1.7.0 sensitivity analysis](exploration/orf-acceptance-sensitivity-20261022/README.md)
+explains much of CPLEX's strict-domain rejection through small written-bound
+residues; its independent vector/bound replay checks 13,387 candidate domains.
+It does not change the registered endpoint or the primary time comparisons.
+The [closed campaign report](exploration/orf-confirmatory-extension-20261019/INFORME_CIERRE_CONFIRMATORIO.md)
+retains the protocol, adverse outcomes and generalization limits. The earlier
+24-scenario prospective study and the audited OMS scientific archive are inherited
+explicitly; these generated inputs are not independent operational observations.
+
+## Public repository and review package
+
+| Material | Availability |
+|---|---|
+| Canonical manuscript fragments, bibliography, generator/scaling code, protocols, analysis programs and aggregate results | Public in this repository |
+| Current `main_orf.pdf`, `ESM_1.pdf` and editable LaTeX ZIP | Supplied in the frozen submission delivery; generated PDFs/ZIPs are not tracked in Git |
+| Complete raw results, candidate vectors, model exports, native logs and clocks for all 3,840 assignments, plus prospective/follow-up evidence | **Online Resource 2 (`ESM_2.zip`)**, supplied for review; the bulk raw files are not hosted in this Git repository |
+| Pinned dependencies, integrity manifests, rational witnesses and license-free replay inputs | Included in Online Resource 2 with canonical sources and byte-identical inherited archives |
+| Historical public baseline | [Zenodo DOI 10.5281/zenodo.23145294](https://doi.org/10.5281/zenodo.23145294); this DOI does not identify the later ORF experiments |
+
+The current complete data package has **no new public Zenodo DOI yet**. A Git
+clone is sufficient to inspect the public sources and reports; full saved-data
+reproduction requires extracting Online Resource 2 according to its README.
+The manuscript's availability statement and the public repository therefore refer
+to different, explicitly identified delivery channels. The [submission guide](paper/submission/orf/README.md)
+provides the upload roles; [audit_orf_release.py](scripts/research/audit_orf_release.py)
+checks the frozen package without modifying it or executing new MIP experiments.
 
 The OMS activation follow-up adds 114 nonpilot solver calls, 20 exact feasible witnesses, and matched numerical controls on six archived scenarios without the documented demand inversion. [Findings and limits](exploration/oms-followup-20261014/RESULTADOS.md) distinguish original-unit precision from MILP-bound validity; `make research-oms-check` verifies the supplied data without optimizing.
 
@@ -87,7 +121,10 @@ and comparison summaries without optimizing. Its 120-second, four-thread Gurobi 
 protocol is separate from the archived 1,800-second operational experiments. The three
 physical budget scenarios are declared study precision objectives, not operator standards.
 
-Run commands from the repository root. The recorded environment is CPython 3.10.12,
+For the complete saved-data replay, first extract Online Resource 2 and its
+nested evidence archives as described in its supplied README. Run the following
+commands from that extracted repository root; a bare Git clone does not contain
+all recent raw data. The recorded environment is CPython 3.10.12,
 NumPy 2.2.6, SciPy 1.15.3, pandas 2.3.3, matplotlib 3.10.9 and pytest 9.0.3.
 The requirements pin analysis dependencies; optimizer packages are optional.
 
@@ -102,9 +139,6 @@ make research-check
 make research-analysis
 make research-claims
 make paper
-make research-online-resources
-python3 scripts/research/package_oms.py
-python3 scripts/research/validate_oms.py
 ```
 
 `research-check-python` tests the row-factor implementation, independently verifies saved
@@ -117,10 +151,22 @@ checks native operational logs and audits the matrix comparisons. Neither import
 `make paper` compiles the canonical manuscript, OMS version and supplement with pdfLaTeX and
 BibTeX. [paper/README.md](paper/README.md) maps the manuscript sources.
 
-`validate_oms.py` extracts the archives, verifies their checksums, recompiles the
-manuscript and supplement, verifies the exact Supplementary Material 1 copy in Material 2,
-checks relative README links and runs the documented audits from the extracted artifact.
-Results are saved in `paper/submission/oms/VALIDATION.json`.
+The frozen ORF package can be checked without replacing its files:
+
+```sh
+TMPDIR=/dev/shm python3 scripts/research/audit_orf_release.py \
+  --release /path/to/v1.7.1-orf-submission \
+  --output /path/to/new-audit-directory
+```
+
+This command requires the complete frozen delivery (including its validation
+record), the analysis dependencies and enough temporary space. It checks all
+3,840 raw job bundles and 480 replay reports, runs the current saved-result
+verifiers, rebuilds the editable LaTeX sources and regenerates the manuscript
+summaries. Only the byte-identical historical parent's already completed
+four-command audit is reused. It performs no new MIP experiments and leaves
+all frozen input files unchanged. The latest [package audit](paper/submission/orf/VALIDATION.json)
+records the exact input hashes and verification scope.
 
 ## Stored experiment data
 

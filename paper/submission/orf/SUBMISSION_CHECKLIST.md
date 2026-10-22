@@ -25,6 +25,8 @@
 - [x] Dedicated larger-confirmation subsection: frozen design, actual resampling units, solver/horizon results, acceptance sensitivity and limits.
 - [x] Post hoc bound sensitivity independently reconstructs 13,387 candidate domain checks and all registered success counts; original endpoint and time comparisons unchanged.
 - [x] Prospective Table 14 separated into readable precision/performance panels; practical contribution and lack of extra prospective physical recovery explicit from the introduction.
+- [x] Read-only frozen-release audit inventories all 3,840 raw job bundles, pinned dependency files, manifests and editable sources, and reruns the current saved-result verifiers.
+- [x] Concise supplement captions and structured author, contribution, competing-interest and funding fields prepared separately for the live interface.
 - [ ] Confirm exact article type, upload categories and size limits in the ORF portal.
 - [ ] Enter author contributions, competing interests and other required declarations in the interface.
 - [ ] Deposit the exact final version in Zenodo, supply its reserved DOI and update availability.

@@ -16,6 +16,8 @@ def main():
     assert validation['confirmation_tables_regenerated_identically']==7
     assert validation['post_hoc_acceptance_sensitivity']['status']=='passed'
     assert validation['post_hoc_acceptance_sensitivity']['registered_successes_reproduced']
+    assert validation['resource_2_coverage']['status']=='passed'
+    assert validation['resource_2_coverage']['assignments']==3840
     assert validation['logging_confirmation']['complete_native_logs']==360
     assert validation['logging_confirmation']['replication']['assignments']==360
     assert validation['delivery']['sha256']==sha(OUT/'orf-delivery.zip')

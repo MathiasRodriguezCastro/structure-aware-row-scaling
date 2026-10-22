@@ -1,6 +1,6 @@
 # Operations Research Forum manuscript
 
-Current editorial version: **v1.7.0-orf-submission**.
+Current editorial version: **v1.7.1-orf-submission**.
 
 **Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: A Computational
 and Software Study** — Mathias Rodríguez Castro.
@@ -80,3 +80,8 @@ is 395/477 for Budget-L2 and 405/477 for L2, compared with 99 and 102 at zero.
 The complete sensitivity and magnitudes remain reproducible, without additional
 optimizer calls. Table 14 now separates precision and performance in two panels.
 The large v1.6.0 scientific archive and earlier releases remain byte-identical.
+
+The v1.7.1 packaging correction restores 38 cluster source/launch/lock files in
+a small support ZIP. It changes no sealed experimental data or conclusions.
+Coverage checks retain all 3,840 job bundles and check every referenced cluster
+Python helper plus the wheel lock against the recorded installation.

@@ -13,6 +13,8 @@ import unicodedata
 import zipfile
 from orf_config import ROOT, PAPER, ORF, OUT, VERSION, PARENT, TITLE, FOLLOWUP_ARCHIVE, VERIFIED_ARCHIVE, sha
 from orf_config import CONFIRMATION_ARCHIVE, COMPARATIVE_MIP_CALLS
+from orf_config import CONFIRMATION_SUPPORT_ARCHIVE
+from orf_resource_inventory import check_coverage
 from package_orf import FILES, EXTRAS, SCIENCE, build_delivery, write_json
 from build_orf import relabel
 
@@ -314,6 +316,15 @@ def main():
         assert archive_validation['status']=='passed' and archive_validation['full_stream_read_and_checksums']
         assert archive_validation['archive_sha256']==sha(esm/CONFIRMATION_ARCHIVE)
         manifest=extract_confirmation(esm/CONFIRMATION_ARCHIVE,science)
+        assert sha(esm/CONFIRMATION_SUPPORT_ARCHIVE)==snapshot['confirmation_support_archive_sha256']
+        with zipfile.ZipFile(esm/CONFIRMATION_SUPPORT_ARCHIVE) as support:
+            support_members=[n for n in support.namelist() if n!='CONTENTS.sha256']
+            # Repeated launch files are exactly the historical files in the tar.
+            for name in support_members:
+                if (science/name).exists():assert (science/name).read_bytes()==support.read(name),name
+        extract(esm/CONFIRMATION_SUPPORT_ARCHIVE,science)
+        assert len(support_members)==snapshot['confirmation_support_files']
+        result['resource_2_coverage']=check_coverage(science,manifest,support_members)
         confirmation=science/'exploration/orf-confirmatory-extension-20261019'
         assert sha(confirmation/'CONFIRMATION_ANALYSIS.json')==snapshot['confirmation_analysis_sha256']
         expected_replay=(confirmation/'CONFIRMATION_ANALYSIS_REPLAY.json').read_bytes()

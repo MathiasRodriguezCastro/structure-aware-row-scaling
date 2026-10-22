@@ -162,3 +162,20 @@ optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.
   prospectivas de las recuperaciones observadas en configuraciones de estrés.
   El archivo científico grande de v1.6.0 se conserva byte a byte; el nuevo análisis
   se entrega como un pequeño conjunto separado en las fuentes canónicas.
+
+## Cobertura del paquete y preparación de carga, v1.7.1
+
+- La auditoría ampliada confirma los 3.840 conjuntos de resultados, archivos de
+  candidatos, logs y relojes, y detecta la omisión de auxiliares `.py` y del
+  manifiesto de ruedas en la carpeta `cluster/`. El filtro del tar solo incluía
+  lanzadores `.slurm` y `.sh` en esa carpeta. El hallazgo queda registrado sin
+  atribuir un fallo a las comprobaciones matemáticas anteriores.
+- Se añaden 38 pequeños archivos existentes en un ZIP de soporte con hashes.
+  Se comprueba la presencia de cada programa Python referido por los lanzadores
+  y que `WHEELS.json` coincida con `DEPENDENCY_INSTALLATION.json`.
+- El tar sellado, los resultados y las conclusiones no cambian; no se ejecutan
+  nuevos MIP. La corrección de empaquetado se valida desde extracción limpia.
+- Las fuentes LaTeX se suministran separadamente desde la carga inicial. Las
+  descripciones de los suplementos se acortan y los campos de autoría, intereses
+  y financiación quedan preparados para la interfaz, sin registrar una carga
+  que no se haya realizado. El README público diferencia Git de Online Resource 2.

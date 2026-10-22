@@ -1,6 +1,6 @@
 \section{Reproduction and artifact layout}
 Online Resource~2 is the complete code/data package for
-\path{v1.7.0-orf-submission}. It contains the unchanged scientific-evidence archive
+\path{v1.7.1-orf-submission}. It contains the unchanged scientific-evidence archive
 \path{v1.3.17-oms-submission}, its validation record, the current ORF editable
 sources and a checksum-based inheritance record. The older editorial files inside
 the scientific archive identify its provenance; the current article and this
@@ -22,8 +22,11 @@ from an independent application. Native solver logs and every saved point are
 retained. The rational certificates are reference points and lower bounds,
 rather than certificates of every returned floating-point candidate.
 
-The larger confirmation is supplied as a lossless archive. After extracting
-its tar/xz file over the same root, run these saved-evidence checks:
+The larger confirmation is supplied as a lossless archive. Extract its tar/xz
+file and the small \path{confirmation-support-20261022.zip} over the same root.
+The latter restores cluster Python installation helpers and the wheel lock
+omitted by the v1.7.0 metadata filter; its hashes match the recorded installation.
+It changes no sealed experimental data. Then run these saved-evidence checks:
 \begin{lstlisting}
 python3 exploration/orf-confirmatory-extension-20261019/seal_confirmation.py --check
 python3 exploration/orf-confirmatory-extension-20261019/seal_pending_validation.py --check
