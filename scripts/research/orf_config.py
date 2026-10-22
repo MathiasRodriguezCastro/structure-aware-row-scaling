@@ -6,8 +6,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PAPER = ROOT / 'paper'
 ORF = PAPER / 'orf'
 OUT = PAPER / 'submission/orf'
-VERSION = 'v1.5.0-orf-submission'
-DATE = '2026-10-19'
+VERSION = 'v1.5.1-orf-submission'
+DATE = '2026-10-22'
 TITLE = ('Accuracy-Aware Row Scaling for Generated Mixed-Integer Programs: '
          'A Computational and Software Study')
 PARENT = 'v1.3.17-oms-submission'

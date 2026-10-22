@@ -217,6 +217,17 @@ def main():
         assert cluster_validation['analysis_sha256']==snapshot['cluster_analysis_sha256']
         assert cluster_validation['confidence_intervals_reconstructed_from_native_work_and_outer_timings']==32
         result['scenario_cluster_uncertainty']=cluster_validation
+        run(['python3',str(followup/'parent_sensitivity.py'),'--check'],science)
+        sensitivity=json.loads((followup/'PARENT_SENSITIVITY.json').read_text())
+        sensitivity_validation=json.loads((followup/'PARENT_SENSITIVITY_VALIDATION.json').read_text())
+        assert sensitivity_validation['status']=='passed'
+        assert sensitivity_validation['analysis_sha256']==snapshot['parent_deletion_analysis_sha256']
+        assert sensitivity_validation['independently_reconstructed_ratios']==56
+        assert sensitivity['domains']['Base']['exact_domains_passed']==69
+        assert sensitivity['domains']['Base-tight']['exact_domains_passed']==66
+        assert all(sensitivity['domains'][p]['exact_domains_passed']==72 for p in ['L2','L2-NF3','Budget-L2'])
+        assert 'Domains' in text and '69/72' in text and '66/72' in text
+        result['known_parent_deletion_sensitivity']=sensitivity_validation
         # Replay the byte-identical frozen follow-up from the complete delivery.
         assert sha(esm/VERIFIED_ARCHIVE)==snapshot['verified_followup_archive_sha256']
         assert sha(esm/'VERIFIED_PACKAGE_VALIDATION.json')==snapshot['verified_followup_prior_validation_sha256']

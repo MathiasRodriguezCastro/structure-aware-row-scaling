@@ -77,3 +77,27 @@ optimalidad. Las 360 repeticiones técnicas no aumentan los 24 grupos.
 - Los 630 MIP más una repetición técnica no agregan escenarios independientes.
   El total ORF desde el padre OMS es 1.351 llamadas, incluidas las 360 confirmaciones
   previas. Se reproducen los seis verificadores sin nuevas optimizaciones comerciales.
+
+
+## Revisión editorial v1.5.1 (22 de octubre de 2026)
+
+- El resumen prioriza los 24 escenarios prospectivos: razones geométricas
+  emparejadas 0,422 en trabajo y 0,797 en tiempo frente a Base. Conserva el
+  resultado dirigido previo (0,317), los límites frente a L2, la contradicción
+  de cota y el deterioro candidato máximo de 1,02%.
+- La tabla principal y la del suplemento separan presupuestos físicos de dominio
+  exacto: Base 69/72 y Base-tight 66/72 en dominios; todas las políticas pasan
+  72/72 presupuestos físicos. Las otras tres pasan ambos criterios en 72/72.
+- Análisis descriptivo posterior: eliminar cada padre y sus cuatro escenarios
+  deja 20 escenarios y 60 pares por control. Frente a Base, trabajo 0,355–0,504
+  y tiempo 0,724–0,841. Frente a L2, trabajo 0,883–1,041: retirar instance001
+  invierte el promedio. Se incluyen los cuatro controles sin filtrar resultados.
+- La reproducción independiente reconstruye 56 cocientes desde métricas nativas
+  y tiempos externos. No se añaden llamadas al optimizador ni nuevos intervalos.
+- Se acorta la discusión y se centra la carta de una página en la especificación
+  de precisión, la selección verificable y el software reproducible.
+- Las instrucciones oficiales de ORF se verificaron nuevamente; las fuentes
+  editables se suministran como archivo separado para su carga. El depósito y
+  DOI permanecen diferidos por el autor. No se afirma haber enviado el trabajo.
+- La campaña posterior de 3.840 ejecuciones conserva su informe independiente;
+  no se incorpora selectivamente ni cambia los totales de esta entrega.

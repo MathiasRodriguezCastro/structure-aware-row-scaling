@@ -23,17 +23,18 @@ completion in 72/72 assignments; native completion is not a certificate.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Prospective scenarios. Budgets include raw and integer-rounded points;
-B/G are detected bound/1\%-completion contradictions against exact feasible
+\caption{Prospective scenarios. Physical budgets include raw and integer-rounded
+points; domains require exact variable bounds and integrality at the returned
+point. B/G are detected bound/1\%-completion contradictions against exact feasible
 witnesses of the actual native export. No missing witness contrasts occur.}
 \label{tab:orf-prospective-accuracy}
-\begin{tabular}{lrrr}\toprule
-Policy & Budgets & B/G & Export hypothesis\\\midrule
-Base & 72/72 & 0/0 & 70/72\\
-Base-tight & 72/72 & 0/0 & 72/72\\
-L2 & 72/72 & 7/6 & 72/72\\
-L2-NF3 & 72/72 & 0/0 & 72/72\\
-Budget-L2 & 72/72 & 1/0 & 72/72\\
+\begin{tabular}{lrrrr}\toprule
+Policy & Physical budgets & Domains & B/G & Export hypothesis\\\midrule
+Base & 72/72 & 69/72 & 0/0 & 70/72\\
+Base-tight & 72/72 & 66/72 & 0/0 & 72/72\\
+L2 & 72/72 & 72/72 & 7/6 & 72/72\\
+L2-NF3 & 72/72 & 72/72 & 0/0 & 72/72\\
+Budget-L2 & 72/72 & 72/72 & 1/0 & 72/72\\
 \bottomrule\end{tabular}\end{table}
 All original-unit checks use exact rational expressions in the supplied
 binary64 data and points. The nominal exported tolerance is distinguished from
@@ -44,6 +45,11 @@ additional primal recoveries here. The contract changes 8,448 factors over the
 Budget/L2 factor ratio per model ranges from 8.242 to 10.694. There are no
 incompatible requirements. These measurements locate the changed representation,
 without identifying a proprietary solver operation as its cause.
+Three Base points violate exact bounds by $9.27\times10^{-10}$ to
+$2.58\times10^{-9}$ in the corresponding variable units; six Base-tight points
+have bound residuals of $2.27\times10^{-13}$ to $4.55\times10^{-13}$.
+All integrality checks pass. These exact-domain failures are distinct from
+the physical row budgets; no acceptance tolerance is changed for this summary.
 
 \begin{table}[htbp]
 \centering\small
@@ -142,6 +148,38 @@ Independent replay reconstructs all 32 intervals from native API work and
 outer process timings using cluster multiplicities rather than the producer's
 indexed averaging. It checks every scenario aggregation and resampling hash,
 without calls to an optimizer.
+
+\paragraph{Post hoc sensitivity to the six known parents}
+Table~\ref{tab:orf-prospective-parent-deletion} removes each original input
+together with its four derived scenarios and their three seeds, leaving 20
+scenarios and 60 paired runs per comparison. Every remaining pair is retained,
+including contradictory bound outcomes. All four controls and both metrics
+are supplied in \texttt{PARENT\_SENSITIVITY.json}; this table displays Base and
+L2. These are descriptive deletion estimates, not confidence intervals or
+evidence about independent MILP families. Their independent replay reconstructs
+the ratios from native work and external process clocks without optimization.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Budget-L2/control after deleting each known parent. Entries are paired
+geometric means over the 60 retained seed pairs; time includes the complete
+process. No pairs are screened out.}
+\label{tab:orf-prospective-parent-deletion}
+\begin{tabular}{lrrrr}\toprule
+Excluded parent & $W/W_{\rm Base}$ & $T/T_{\rm Base}$ & $W/W_{\rm L2}$ & $T/T_{\rm L2}$\\\midrule
+001 & 0.504 & 0.834 & 1.041 & 1.071\\
+005 & 0.375 & 0.750 & 0.913 & 0.975\\
+022 & 0.439 & 0.841 & 0.908 & 0.984\\
+027 & 0.417 & 0.800 & 0.923 & 1.006\\
+031 & 0.355 & 0.724 & 0.923 & 0.989\\
+046 & 0.458 & 0.841 & 0.883 & 0.954\\
+\bottomrule\end{tabular}\end{table}
+The direction of lower work and time against Base survives every single-parent
+deletion. The L2 comparison is less stable: excluding parent 001 gives work
+and time ratios of 1.041 and 1.071, respectively. This reinforces the distinction
+between improvement over the unscaled representation and an incremental
+benefit of the contract over conventional Euclidean scaling. It does not
+resolve uncertainty about new parent structures or applications.
 
 \paragraph{Native logging confirmation}
 The packaging audit detected that the first campaign inherited OutputFlag=0,

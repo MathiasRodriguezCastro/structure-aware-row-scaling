@@ -6,27 +6,32 @@ of inflow and demand from the six known clean inputs. These are new parameter
 scenarios within one family, not independent operational data. Five policies and
 three new seeds give 360 interleaved calls with the previous solver settings.
 Table~\ref{tab:orf-prospective-main} brings the precision and effort outcomes
-together. All five policies meet the budgets in 72/72 assignments, so the
-contract provides no additional primal feasibility recovery in this sample.
+together. All five policies meet the physical budgets in 72/72 assignments, so
+the contract provides no additional physical-budget recovery in this sample.
+Exact variable-domain checks pass in 69/72 Base and 66/72 Base-tight points,
+and in 72/72 for each scaled policy. Budget compliance alone therefore does
+not imply feasibility of all domains.
 Exact witnesses detect seven L2 bound contradictions, one Budget-L2 contradiction
 and none for L2-NF3. Satisfied primal budgets do not certify solver bounds.
 
 \begin{table}[htbp]
-\centering\small\setlength{\tabcolsep}{3pt}
-\caption{Prospective validation on 24 scenarios with three seeds each. Budgets
-count passing runs; B/G count detected bound/1\%-completion contradictions.
+\centering\small\setlength{\tabcolsep}{2pt}
+\caption{Prospective validation on 24 scenarios with three seeds each. Physical
+budgets cover mapped rows before and after integer rounding; domains require
+exact written variable bounds and integrality at the returned point.
+B/G count detected bound/1\%-completion contradictions.
 Work and complete-process time are paired geometric means for Budget-L2 divided
 by the row policy, with marginal 95\% scenario-cluster bootstrap intervals below.
 Wins are scenarios favoring Budget-L2 after aggregating their three seeds,
 for work/time respectively, out of 24. All adverse outcomes are included.}
 \label{tab:orf-prospective-main}
-\begin{tabular}{lccccc}\toprule
-Policy & Budgets & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
-Base & 72/72 & 0/0 & \shortstack{0.422\\{[0.288, 0.604]}} & \shortstack{0.797\\{[0.646, 0.961]}} & 21/16\\[4pt]
-Base-tight & 72/72 & 0/0 & \shortstack{0.170\\{[0.136, 0.213]}} & \shortstack{0.643\\{[0.524, 0.772]}} & 24/21\\[4pt]
-L2 & 72/72 & 7/6 & \shortstack{0.931\\{[0.702, 1.133]}} & \shortstack{0.996\\{[0.832, 1.119]}} & 10/6\\[4pt]
-L2-NF3 & 72/72 & 0/0 & \shortstack{0.476\\{[0.377, 0.582]}} & \shortstack{1.031\\{[0.935, 1.129]}} & 24/8\\[4pt]
-Budget-L2 & 72/72 & 1/0 & --- & --- & ---\\[4pt]
+\begin{tabular}{lcccccc}\toprule
+Policy & \shortstack{Physical\\budgets} & Domains & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
+Base & 72/72 & 69/72 & 0/0 & \shortstack{0.422\\{[0.288, 0.604]}} & \shortstack{0.797\\{[0.646, 0.961]}} & 21/16\\[4pt]
+Base-tight & 72/72 & 66/72 & 0/0 & \shortstack{0.170\\{[0.136, 0.213]}} & \shortstack{0.643\\{[0.524, 0.772]}} & 24/21\\[4pt]
+L2 & 72/72 & 72/72 & 7/6 & \shortstack{0.931\\{[0.702, 1.133]}} & \shortstack{0.996\\{[0.832, 1.119]}} & 10/6\\[4pt]
+L2-NF3 & 72/72 & 72/72 & 0/0 & \shortstack{0.476\\{[0.377, 0.582]}} & \shortstack{1.031\\{[0.935, 1.129]}} & 24/8\\[4pt]
+Budget-L2 & 72/72 & 72/72 & 1/0 & --- & --- & ---\\[4pt]
 \bottomrule\end{tabular}\end{table}
 
 The uncertainty analysis was added after the experimental outcomes were known;
@@ -35,9 +40,15 @@ bootstrap principle of retaining within-group observations~\citep{FieldWelsh2007
 we resample 24 scenarios with replacement 100,000 times, keeping all three seeds
 and paired policies together. We average log ratios within each scenario and
 then across scenarios; the balanced design gives the same point estimate as
-the 72-pair geometric mean. Percentile intervals are conditional on this
-generated sample and its six known parents. They do not assess generalization
-to other applications or account for selecting different parent structures.
+the 72-pair geometric mean. These descriptive percentile intervals are
+conditional on the generated sample and its six known parents. Shared parent
+structure excludes interpreting them as uncertainty about other MILP families.
+A post hoc deletion of each parent and all four derived scenarios retains
+Budget-L2/Base work ratios of 0.355--0.504 and time ratios of 0.724--0.841.
+Against L2, the work ratios range from 0.883 to 1.041; removing parent 001
+reverses the aggregate work comparison. Online Resource~1 supplies all six
+deletions. This checks dependence within the observed family, not external
+generalization.
 
 Against L2, Budget-L2 lowers work in 24/72 seed pairs and 10/24 scenario
 aggregates; it lowers complete-process time in 6/24 scenarios. The work ratio

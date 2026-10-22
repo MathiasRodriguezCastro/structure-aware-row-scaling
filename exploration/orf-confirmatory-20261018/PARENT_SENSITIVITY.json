@@ -1,0 +1,337 @@
+{
+  "analysis": "post_hoc_leave_one_known_parent_out",
+  "parents": [
+    "instance001",
+    "instance005",
+    "instance022",
+    "instance027",
+    "instance031",
+    "instance046"
+  ],
+  "independent_external_families": false,
+  "additional_optimizer_calls": 0,
+  "filtered_pairs": 0,
+  "uncertainty_intervals": false,
+  "scope": "Descriptive sensitivity to each known parent; not external validation.",
+  "input_sha256": {
+    "design.json": "37f77039b76149cbcc494184c15a78b4c1fb0bbc44977a6c1eb2cd98e6713b86",
+    "timing.json": "f75a30761f8003b3815ed10c9eb3632e5cefd15fa5172c2abc33a36fcf916d2f",
+    "verified-pairs.csv": "02034b658812f44ff31dfa9f1df5eaac596328b4fd5c12f96212f4415610f9d0",
+    "verified-runs.csv": "d2619f541ec8c713098a0c5d1f5b4929fcfab7f9e190b19ac383db1e61e15f36",
+    "native_results_digest": "6b78d4a9be838d9eebdf709b540ab38ff7449ca5be582ce08ec8a3f96e52a502"
+  },
+  "domains": {
+    "Base": {
+      "physical_budgets_passed": 72,
+      "exact_domains_passed": 69,
+      "total": 72,
+      "failures": [
+        {
+          "instance": "new-h072-06",
+          "seed": 101,
+          "max_bound_violation": "2.581942014341001e-09",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h072-06",
+          "seed": 137,
+          "max_bound_violation": "2.581942014341001e-09",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h072-06",
+          "seed": 173,
+          "max_bound_violation": "9.27183363172743e-10",
+          "max_integrality": "0.0"
+        }
+      ]
+    },
+    "Base-tight": {
+      "physical_budgets_passed": 72,
+      "exact_domains_passed": 66,
+      "total": 72,
+      "failures": [
+        {
+          "instance": "new-h072-05",
+          "seed": 101,
+          "max_bound_violation": "4.547473508864641e-13",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h072-05",
+          "seed": 137,
+          "max_bound_violation": "4.547473508864641e-13",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h072-05",
+          "seed": 173,
+          "max_bound_violation": "2.2737367544323206e-13",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h168-03",
+          "seed": 101,
+          "max_bound_violation": "2.2737367544323206e-13",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h168-03",
+          "seed": 137,
+          "max_bound_violation": "2.2737367544323206e-13",
+          "max_integrality": "0.0"
+        },
+        {
+          "instance": "new-h168-03",
+          "seed": 173,
+          "max_bound_violation": "2.2737367544323206e-13",
+          "max_integrality": "0.0"
+        }
+      ]
+    },
+    "L2": {
+      "physical_budgets_passed": 72,
+      "exact_domains_passed": 72,
+      "total": 72,
+      "failures": []
+    },
+    "L2-NF3": {
+      "physical_budgets_passed": 72,
+      "exact_domains_passed": 72,
+      "total": 72,
+      "failures": []
+    },
+    "Budget-L2": {
+      "physical_budgets_passed": 72,
+      "exact_domains_passed": 72,
+      "total": 72,
+      "failures": []
+    }
+  },
+  "comparisons": [
+    {
+      "excluded_parent": null,
+      "control": "Base",
+      "retained_scenarios": 24,
+      "retained_seed_pairs": 72,
+      "work_ratio": 0.421717151626235,
+      "time_ratio": 0.796961690781959
+    },
+    {
+      "excluded_parent": null,
+      "control": "Base-tight",
+      "retained_scenarios": 24,
+      "retained_seed_pairs": 72,
+      "work_ratio": 0.17036003674551028,
+      "time_ratio": 0.6434433330688293
+    },
+    {
+      "excluded_parent": null,
+      "control": "L2",
+      "retained_scenarios": 24,
+      "retained_seed_pairs": 72,
+      "work_ratio": 0.930538435811093,
+      "time_ratio": 0.9958872980484599
+    },
+    {
+      "excluded_parent": null,
+      "control": "L2-NF3",
+      "retained_scenarios": 24,
+      "retained_seed_pairs": 72,
+      "work_ratio": 0.47576983089576425,
+      "time_ratio": 1.0306463278630333
+    },
+    {
+      "excluded_parent": "instance001",
+      "control": "Base",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.5042140248838656,
+      "time_ratio": 0.8336927331071589
+    },
+    {
+      "excluded_parent": "instance001",
+      "control": "Base-tight",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.19214096596050054,
+      "time_ratio": 0.687742696782377
+    },
+    {
+      "excluded_parent": "instance001",
+      "control": "L2",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 1.0409783895575098,
+      "time_ratio": 1.0711816729795378
+    },
+    {
+      "excluded_parent": "instance001",
+      "control": "L2-NF3",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.5552820883337449,
+      "time_ratio": 1.0823547642389661
+    },
+    {
+      "excluded_parent": "instance005",
+      "control": "Base",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.375073513505265,
+      "time_ratio": 0.749826429095697
+    },
+    {
+      "excluded_parent": "instance005",
+      "control": "Base-tight",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.17844551864448616,
+      "time_ratio": 0.6418257303721203
+    },
+    {
+      "excluded_parent": "instance005",
+      "control": "L2",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.9127026940174949,
+      "time_ratio": 0.975151790606259
+    },
+    {
+      "excluded_parent": "instance005",
+      "control": "L2-NF3",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.4842127478610284,
+      "time_ratio": 1.0646095757493153
+    },
+    {
+      "excluded_parent": "instance022",
+      "control": "Base",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.43932231456508625,
+      "time_ratio": 0.8411595933942957
+    },
+    {
+      "excluded_parent": "instance022",
+      "control": "Base-tight",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.16143817740042113,
+      "time_ratio": 0.6346911820431957
+    },
+    {
+      "excluded_parent": "instance022",
+      "control": "L2",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.9077341524969077,
+      "time_ratio": 0.9839636346212361
+    },
+    {
+      "excluded_parent": "instance022",
+      "control": "L2-NF3",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.4471763793595514,
+      "time_ratio": 0.9997541996983036
+    },
+    {
+      "excluded_parent": "instance027",
+      "control": "Base",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.41687958147099935,
+      "time_ratio": 0.8003283129113289
+    },
+    {
+      "excluded_parent": "instance027",
+      "control": "Base-tight",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.16439051763401258,
+      "time_ratio": 0.6399334946459901
+    },
+    {
+      "excluded_parent": "instance027",
+      "control": "L2",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.9231406256698153,
+      "time_ratio": 1.0058125600588028
+    },
+    {
+      "excluded_parent": "instance027",
+      "control": "L2-NF3",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.45729568525411535,
+      "time_ratio": 1.0214763557932902
+    },
+    {
+      "excluded_parent": "instance031",
+      "control": "Base",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.35487531376611536,
+      "time_ratio": 0.7236659681057467
+    },
+    {
+      "excluded_parent": "instance031",
+      "control": "Base-tight",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.15676453044359515,
+      "time_ratio": 0.5909236803406712
+    },
+    {
+      "excluded_parent": "instance031",
+      "control": "L2",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.9234284607868818,
+      "time_ratio": 0.9893554323388941
+    },
+    {
+      "excluded_parent": "instance031",
+      "control": "L2-NF3",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.4645732131581316,
+      "time_ratio": 1.0309895695918616
+    },
+    {
+      "excluded_parent": "instance046",
+      "control": "Base",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.457642755878344,
+      "time_ratio": 0.8413431859487138
+    },
+    {
+      "excluded_parent": "instance046",
+      "control": "Base-tight",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.1713759676974704,
+      "time_ratio": 0.6698692166853373
+    },
+    {
+      "excluded_parent": "instance046",
+      "control": "L2",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.8830901824399432,
+      "time_ratio": 0.9538440124768698
+    },
+    {
+      "excluded_parent": "instance046",
+      "control": "L2-NF3",
+      "retained_scenarios": 20,
+      "retained_seed_pairs": 60,
+      "work_ratio": 0.4540476048061156,
+      "time_ratio": 0.9879208081834534
+    }
+  ]
+}

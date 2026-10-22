@@ -31,21 +31,20 @@ The first contribution is accuracy-aware model generation and verification, supp
 by admissibility conditions, incompatibility checks, integer-rounding allowances
 and a selector checking finite-export error reserves. The second is a computational study that separates
 conditioning, subsequent equilibration, optimizer effort and complete-process cost.
-The mathematical results support these implementation decisions; the work does not
-claim a universally superior scaling algorithm.
+The mathematical results support these implementation decisions and make the
+accuracy requirements inspectable before optimization.
 
 Evidence includes 306 generated hydrothermal dispatch models, matched kernel and Ruiz
 controls, enumerated stress tests on three solvers, and independent batch scheduling.
-A directed six-model dispatch comparison finds lower solver work at satisfied primal
-budgets and comparable candidate costs against unscaled numerical controls. Complete
-time improves on the three costlier models and worsens on the three inexpensive ones.
-The paper retains adverse outcomes, configuration sensitivity and the distinction
-between checked primal accuracy and certified mixed-integer optimality.
-A prospective check on 24 new parameter scenarios retains lower work against
-unscaled controls, but shows limited benefit over L2 and one budget-aware bound
-contradiction. Common verified-candidate targets and solver/scaling controls
-likewise establish no general time advantage over L2. These outcomes constrain
-the claims of practical generality.
+A frozen-policy check on 24 new parameter scenarios from six known dispatch
+inputs finds paired geometric-mean work and complete-process time ratios of
+0.422 and 0.797 against the unscaled control. Deleting each known input preserves
+this direction of comparison. Common verified-candidate targets, physical-budget
+sensitivity and solver/internal-scaling controls complement these measurements.
+The contribution is a reproducible accuracy specification and verification
+procedure; computational benefits remain configuration-dependent and do not
+establish general superiority over conventional Euclidean scaling or certified
+mixed-integer optimality.
 
 The combination of mathematical programming, computational evaluation and practical
 guidance for model developers fits the journal's readership across operations research

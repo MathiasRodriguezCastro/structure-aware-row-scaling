@@ -17,6 +17,9 @@
 - [x] Portal text prepared from the current sources, rather than the historical manuscript.
 - [x] Selective v1.5 follow-up: exact-export selector, brief verified-target summary and supplementary robustness/margin controls.
 - [x] Frozen follow-up archive, all six license-free replays and five regenerated tables included in the complete package.
+- [x] Prospective-first abstract and separate physical-budget/domain counts, including Base-tight failures.
+- [x] Six known-parent deletions replayed from native work and external clocks, with all controls retained.
+- [x] Editable LaTeX bundle supplied separately for the source-file upload role, as required by the official instructions checked on 22 October 2026.
 - [ ] Confirm exact article type, upload categories and size limits in the ORF portal.
 - [ ] Enter author contributions, competing interests and other required declarations in the interface.
 - [ ] Deposit the exact final version in Zenodo, supply its reserved DOI and update availability.

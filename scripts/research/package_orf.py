@@ -84,6 +84,9 @@ def main():
     cluster_validation=json.loads((FOLLOWUP/'CLUSTER_VALIDATION.json').read_text())
     assert cluster_validation['status']=='passed'
     assert cluster_validation['analysis_sha256']==sha(FOLLOWUP/'CLUSTER_ANALYSIS.json')
+    parent_sensitivity=json.loads((FOLLOWUP/'PARENT_SENSITIVITY_VALIDATION.json').read_text())
+    assert parent_sensitivity['status']=='passed'
+    assert parent_sensitivity['analysis_sha256']==sha(FOLLOWUP/'PARENT_SENSITIVITY.json')
     followup_entries={p.relative_to(ROOT).as_posix():p for p in FOLLOWUP.rglob('*')
         if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.zip')}
     followup_zip=OUT/FOLLOWUP_ARCHIVE;archive(followup_zip,followup_entries)
@@ -120,6 +123,8 @@ def main():
         'prospective_validation_sha256':sha(FOLLOWUP/'VALIDATION.json'),
         'cluster_analysis_sha256':sha(FOLLOWUP/'CLUSTER_ANALYSIS.json'),
         'cluster_analysis_is_post_hoc':True,'cluster_resamples':100000,'scenario_clusters':24,
+        'parent_deletion_analysis_sha256':sha(FOLLOWUP/'PARENT_SENSITIVITY.json'),
+        'parent_deletion_is_post_hoc':True,'parent_deletions':6,
         'scientific_parent':PARENT,'scientific_archive_sha256':sha(parent_archive),
         'scientific_parent_validation_sha256':sha(PARENT_DIR/'VALIDATION.json'),
         'current_sources_sha256':sha(source_zip),'canonical_revision_sha256':sha(revision_zip),
@@ -130,7 +135,8 @@ def main():
             'prospective 24-scenario validation, 360 primary MIP calls, 360 logging confirmations and rational references',
             'finite-export error bound, concise discussion, workflow figure and uncluttered author line',
             'main-text prospective outcome table, candidate-cost qualification and post hoc scenario-cluster uncertainty',
-            'selective verified-candidate summary and constructive export-aware selector; controls in Online Resource 1'],
+            'selective verified-candidate summary and constructive export-aware selector; controls in Online Resource 1',
+            'prospective-first abstract, explicit exact-domain counts, six-parent deletion sensitivity and concise cover letter'],
         'journal_instructions':'https://link.springer.com/journal/43069/submission-guidelines'}
     write_json(OUT/'SNAPSHOT.json',snapshot)
     captions=('Online Resource 1: Supplementary proofs, full experimental protocols and controls, '
@@ -198,6 +204,7 @@ python3 exploration/orf-confirmatory-20261018/check.py
 python3 exploration/orf-confirmatory-20261018/check.py --logging-confirmation
 python3 exploration/orf-confirmatory-20261018/check_export_bound.py
 python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py
+python3 exploration/orf-confirmatory-20261018/parent_sensitivity.py --check
 ```
 
 These commands check both sets of 360 saved MIP outcomes, complete confirmation
@@ -288,7 +295,7 @@ ESM_1.pdf: Online Resource 1; ESM_2.zip: Online Resource 2, both for review.
 ONLINE_RESOURCE_CAPTIONS.txt gives the supplementary captions.
 FORM_FIELDS.json supplies the current title, abstract, keywords and declarations.
 
-The official journal instructions were consulted on 18 October 2026:
+The official journal instructions were checked again on 22 October 2026:
 https://link.springer.com/journal/43069/submission-guidelines
 Confirm the exact portal categories and limits when uploading. Enter author
 contributions and competing interests in the interface too. The DOI/deposit

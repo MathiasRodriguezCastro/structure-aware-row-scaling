@@ -1,6 +1,6 @@
 # Operations Research Forum delivery
 
-Local version: **v1.5.0-orf-submission**, 19 October 2026.
+Local version: **v1.5.1-orf-submission**, 22 October 2026.
 Proposed type: Original Research Article.
 
 | File | Role |
@@ -73,3 +73,14 @@ successes and PAR2 without claiming a general time advantage over L2. Detailed
 CPLEX, ScaleFlag, margin and selector checks are in Online Resource 1. The exact
 frozen follow-up ZIP and its prior validation are included in Online Resource 2.
 All five new tables regenerate from the independently replayed machine results.
+
+
+The v1.5.1 editorial revision gives the 24-scenario evidence priority in the
+abstract. Physical budgets and exact variable domains are separate columns;
+Base passes domains in 69/72 points and Base-tight in 66/72. A post hoc deletion
+of each known parent leaves 20 scenarios / 60 paired runs: the Base work ratio
+ranges from 0.355 to 0.504, while the L2 ratio ranges from 0.883 to 1.041.
+All four controls and both metrics replay from native work and external clocks:
+`python3 exploration/orf-confirmatory-20261018/parent_sensitivity.py --check`.
+The separate later 3,840-run campaign remains in its research report and is not
+included in this editorial snapshot or its scientific result counts.

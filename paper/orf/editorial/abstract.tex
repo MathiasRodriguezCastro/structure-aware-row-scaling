@@ -6,16 +6,18 @@ accounts for integer rounding, checks binary64 export errors during selection,
 and independently checks returned points.
 Evaluation combines 306 hydrothermal dispatch models, kernel-matched and Ruiz
 controls, enumerated stress tests on three solvers, and independent batch scheduling.
-In a directed comparison on six known dispatch models and three seeds,
-budget-aware Euclidean scaling reduces solver work by 68.3\% relative to no
-external scaling, measured by a paired geometric mean. This uses a
-100\,m\textsuperscript{3} volume budget, automatic presolve and integer feasibility
-tolerance $10^{-9}$ in Gurobi. Primal budgets are satisfied without detected bound
-contradictions, with candidate cost deterioration below 0.1\%; these checks do not
-establish equally certified optimality gaps. Preparation overhead slows the three
-inexpensive models. A prospective check on 24 perturbed scenarios from known
-parents retains lower work against unscaled controls, with one budget-aware
-bound contradiction. Common verified-candidate targets show no clear time
-advantage over conventional Euclidean scaling. Batch scheduling verifies budget
-delivery without an additional primal benefit. Performance benefits remain
-conditional on the instance and numerical configuration.
+With a frozen 100\,m\textsuperscript{3} policy, prospective validation on 24
+perturbed scenarios from six known dispatch inputs and three new seeds gives
+paired geometric-mean work and complete-process time ratios of 0.422 and 0.797
+against no external scaling. Every policy meets the physical budgets; the
+budget-aware policy retains one independently contradicted bound and candidate
+cost deterioration reaches 1.02\%. Against conventional Euclidean scaling, the
+work ratio is 0.931, with a scenario-cluster interval containing one. Excluding
+each known parent preserves lower work against the unscaled control, but can
+reverse the comparison with Euclidean scaling. An earlier directed six-model
+comparison gives a work ratio of 0.317; preparation overhead slows inexpensive
+models. Common verified-candidate targets show no clear time advantage over
+conventional Euclidean scaling. Batch scheduling verifies budget delivery
+without an additional primal benefit. These results support explicit precision
+specification and verification, with configuration-dependent performance, rather
+than general acceleration or certified mixed-integer optimality.

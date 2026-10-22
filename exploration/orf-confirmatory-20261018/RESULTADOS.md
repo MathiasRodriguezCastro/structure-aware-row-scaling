@@ -56,6 +56,32 @@ Budget-L2 en el ciclo completo. El peor costo candidato de Budget-L2 empeora
 afirmación de deterioro inferior a 0,1% del experimento dirigido anterior.
 
 
+## Sensibilidad posterior a los seis padres conocidos
+
+Cada eliminación retira el padre y sus cuatro escenarios, conservando
+los 20 escenarios restantes con sus tres semillas (60 pares por control).
+No se filtran contradicciones ni se añaden optimizaciones o intervalos.
+
+| Padre excluido | Trabajo / Base | Tiempo / Base | Trabajo / L2 | Tiempo / L2 |
+|---|---:|---:|---:|---:|
+| instance001 | 0.504 | 0.834 | 1.041 | 1.071 |
+| instance005 | 0.375 | 0.750 | 0.913 | 0.975 |
+| instance022 | 0.439 | 0.841 | 0.908 | 0.984 |
+| instance027 | 0.417 | 0.800 | 0.923 | 1.006 |
+| instance031 | 0.355 | 0.724 | 0.923 | 0.989 |
+| instance046 | 0.458 | 0.841 | 0.883 | 0.954 |
+
+La dirección favorable frente a Base persiste en las seis eliminaciones.
+Frente a L2, retirar instance001 invierte el promedio de trabajo: 1,041.
+No es validación externa ni elimina la dependencia de las estructuras conocidas.
+PARENT_SENSITIVITY.json contiene los cuatro controles y ambos indicadores;
+el modo --check reconstruye 56 cocientes desde trabajo nativo y relojes externos.
+
+Precisión física y dominio se reportan por separado: Base 72/72 y 69/72;
+Base-tight 72/72 y 66/72; L2, L2-NF3 y Budget-L2 72/72 en ambos.
+Las fallas del dominio son residuos positivos de cotas, sin fallas de integralidad.
+
+
 ## Incertidumbre agrupada por escenario (análisis posterior)
 
 100000 remuestras de los 24 escenarios completos; las tres semillas se
@@ -135,8 +161,8 @@ residuos, contradicciones y preparación adicional de la campaña principal.
 
 La tabla principal reúne precisión, contradicciones, trabajo y tiempo con
 intervalos agrupados por escenario; el suplemento conserva todos los controles.
-El resumen conserva el resultado previo de seis modelos y añade el límite
-prospectivo. No se presenta superioridad general frente a L2 o NF3.
+El resumen prioriza los 24 escenarios prospectivos y conserva la comparación
+dirigida como evidencia inicial. No se presenta superioridad general frente a L2 o NF3.
 La cota elemental de errores de exportación se documenta aparte y se prueba
 en 20000 verificaciones racionales, sin cambiar la política experimental.
 
@@ -150,6 +176,7 @@ python3 exploration/orf-confirmatory-20261018/check.py
 python3 exploration/orf-confirmatory-20261018/check.py --logging-confirmation
 python3 exploration/orf-confirmatory-20261018/check_export_bound.py
 python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py
+python3 exploration/orf-confirmatory-20261018/parent_sensitivity.py --check
 ```
 
 `verified-runs.csv` conserva cada salida; `verified-pairs.csv`, cada comparación;

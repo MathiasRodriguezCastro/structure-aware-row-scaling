@@ -8,25 +8,19 @@ kernel-matched comparison: exact GM local normalization removes the block-scale
 information in the extrema statistic, leaving a Euclidean coupling kernel
 (\cref{prop:audit-collapse}). On the locally whitened triangular model the optimal
 common factor is $(1+\rho^2)^{-1/2}$ (\cref{prop:audit-triangular-optimum}).
-These statements explain spectral behavior without attributing it to metadata
-that no longer affects the selected factors.
-
-The final-policy ablation gives a separate implementation-level result: on its
+The final-policy ablation identifies an implementation consequence: on its
 six-model subset the guards suppress coupling changes, making local-only and
-full exports identical (\cref{subsec:results-ablation}). Thus a coupling kernel
-explains one conditioning comparison, whereas local transformations change the
-dispatch representation. Neither observation identifies a solver's internal
-cause of improved effort.
+full exports identical (\cref{subsec:results-ablation}). Together these results
+separate spectral explanation and implemented transformations from the solver's
+internal causes of improved effort.
 
 \paragraph{Compare contracts with strong numerical alternatives}
-Budgets express application-unit accuracy and coefficient compatibility,
-including when factors stay unchanged. Such an audit establishes precision
-interpretation, not a budget-induced speedup. The activation follow-up supplies
-the complementary case where the contract changes factors
-(\cref{subsec:results-activation}). Its useful precision--effort regime is
-configuration-dependent; earlier settings retain bound contradictions or incur
-substantial solver work. The direct controls in the results include global
-tolerance adjustment, NumericFocus and the unscaled model. In exact arithmetic,
+Budgets express application-unit accuracy and coefficient compatibility even
+when factors stay unchanged; the activation follow-up tests the case where
+they change (\cref{subsec:results-activation}). Direct controls include global
+tolerance adjustment, NumericFocus and the unscaled model. The prospective
+results preserve lower work against Base after each known-parent deletion,
+while the L2 comparison can reverse (\cref{subsec:orf-prospective}). In exact arithmetic,
 fixed factors also admit a sufficient common raw-residual requirement
 $\epsilon\le\min_r\alpha_r\delta_r$; setting a nominal solver tolerance does not
 prove this hypothesis. Contracts make the row-specific requirements explicit
@@ -40,9 +34,8 @@ feasible witnesses of the actual imported exports can refute reported bounds;
 the absence of a detected contradiction cannot certify them. The secondary
 floating-point screen in Online Resource~1, Table~S10 remains exploratory.
 Integer-aware GCD reduction and pattern repair answer different questions from
-equivalent row scaling and are evaluated as such. Developers should measure
-precision, candidate quality and complete-process cost together, as the
-following deployment guidance makes explicit.
+equivalent row scaling. Deployment therefore requires checking precision,
+candidate quality and complete-process cost together.
 The finite-export extension in \cref{sec:contract} uses the residual reserve
 during candidate selection. Finite variable bounds make the reserve uniform;
 otherwise only a pointwise audit is available when products are inexact.

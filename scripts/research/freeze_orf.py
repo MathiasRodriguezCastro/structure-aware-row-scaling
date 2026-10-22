@@ -16,6 +16,7 @@ def main():
     assert validation['delivery']['sha256']==sha(OUT/'orf-delivery.zip')
     assert validation['canonical_editorial_regeneration_identical']
     assert validation['scenario_cluster_uncertainty']['status']=='passed'
+    assert validation['known_parent_deletion_sensitivity']['status']=='passed'
     assert validation['prospective_tables_regenerated_from_audited_data']
     assert validation['verified_followup_replay']['status']=='passed'
     assert validation['verified_followup_tables_regenerated_identically']==5

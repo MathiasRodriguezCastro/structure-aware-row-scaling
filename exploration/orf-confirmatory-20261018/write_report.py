@@ -17,6 +17,10 @@ def main():
     cluster=json.loads((HERE/'CLUSTER_ANALYSIS.json').read_text())
     cluster_check=json.loads((HERE/'CLUSTER_VALIDATION.json').read_text())
     assert cluster_check['status']=='passed'
+    sensitivity=json.loads((HERE/'PARENT_SENSITIVITY.json').read_text())
+    sensitivity_check=json.loads((HERE/'PARENT_SENSITIVITY_VALIDATION.json').read_text())
+    assert sensitivity_check['status']=='passed'
+    domains=sensitivity['domains']
     uncertainty={r['control']:r for r in cluster['comparisons'] if r['horizon'] is None}
     model_rows=[]
     for factors in f:
@@ -107,8 +111,8 @@ def main():
         '## Incorporación al artículo','',
         'La tabla principal reúne precisión, contradicciones, trabajo y tiempo con',
         'intervalos agrupados por escenario; el suplemento conserva todos los controles.',
-        'El resumen conserva el resultado previo de seis modelos y añade el límite',
-        'prospectivo. No se presenta superioridad general frente a L2 o NF3.',
+        'El resumen prioriza los 24 escenarios prospectivos y conserva la comparación',
+        'dirigida como evidencia inicial. No se presenta superioridad general frente a L2 o NF3.',
         'La cota elemental de errores de exportación se documenta aparte y se prueba',
         'en 20000 verificaciones racionales, sin cambiar la política experimental.','',
         '## Reproducción sin licencia comercial','',
@@ -130,22 +134,27 @@ of inflow and demand from the six known clean inputs. These are new parameter
 scenarios within one family, not independent operational data. Five policies and
 three new seeds give 360 interleaved calls with the previous solver settings.
 Table~\ref{tab:orf-prospective-main} brings the precision and effort outcomes
-together. All five policies meet the budgets in 72/72 assignments, so the
-contract provides no additional primal feasibility recovery in this sample.
+together. All five policies meet the physical budgets in 72/72 assignments, so
+the contract provides no additional physical-budget recovery in this sample.
+Exact variable-domain checks pass in 69/72 Base and 66/72 Base-tight points,
+and in 72/72 for each scaled policy. Budget compliance alone therefore does
+not imply feasibility of all domains.
 Exact witnesses detect seven L2 bound contradictions, one Budget-L2 contradiction
 and none for L2-NF3. Satisfied primal budgets do not certify solver bounds.
 
 \begin{table}[htbp]
-\centering\small\setlength{\tabcolsep}{3pt}
-\caption{Prospective validation on 24 scenarios with three seeds each. Budgets
-count passing runs; B/G count detected bound/1\%-completion contradictions.
+\centering\small\setlength{\tabcolsep}{2pt}
+\caption{Prospective validation on 24 scenarios with three seeds each. Physical
+budgets cover mapped rows before and after integer rounding; domains require
+exact written variable bounds and integrality at the returned point.
+B/G count detected bound/1\%-completion contradictions.
 Work and complete-process time are paired geometric means for Budget-L2 divided
 by the row policy, with marginal 95\% scenario-cluster bootstrap intervals below.
 Wins are scenarios favoring Budget-L2 after aggregating their three seeds,
 for work/time respectively, out of 24. All adverse outcomes are included.}
 \label{tab:orf-prospective-main}
-\begin{tabular}{lccccc}\toprule
-Policy & Budgets & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
+\begin{tabular}{lcccccc}\toprule
+Policy & \shortstack{Physical\\budgets} & Domains & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
 '''
     for p in ['Base','Base-tight','L2','L2-NF3','Budget-L2']:
         r=policies[p]
@@ -157,7 +166,7 @@ Policy & Budgets & B/G & Work ratio & Time ratio & Wins $W/T$\\\midrule
             work,time=cell('work'),cell('time')
             wins=f"{c['work']['scenarios_favor_budget']}/{c['time']['scenarios_favor_budget']}"
         else:work=time=wins='---'
-        maintext+=f"{p} & {r['budgets_passed']}/72 & {r['bound_flags']}/{r['completion_flags']} & {work} & {time} & {wins}\\\\[4pt]\n"
+        maintext+=f"{p} & {r['budgets_passed']}/72 & {domains[p]['exact_domains_passed']}/72 & {r['bound_flags']}/{r['completion_flags']} & {work} & {time} & {wins}\\\\[4pt]\n"
     maintext+=r'''\bottomrule\end{tabular}\end{table}
 
 The uncertainty analysis was added after the experimental outcomes were known;
@@ -166,9 +175,15 @@ bootstrap principle of retaining within-group observations~\citep{FieldWelsh2007
 we resample 24 scenarios with replacement 100,000 times, keeping all three seeds
 and paired policies together. We average log ratios within each scenario and
 then across scenarios; the balanced design gives the same point estimate as
-the 72-pair geometric mean. Percentile intervals are conditional on this
-generated sample and its six known parents. They do not assess generalization
-to other applications or account for selecting different parent structures.
+the 72-pair geometric mean. These descriptive percentile intervals are
+conditional on the generated sample and its six known parents. Shared parent
+structure excludes interpreting them as uncertainty about other MILP families.
+A post hoc deletion of each parent and all four derived scenarios retains
+Budget-L2/Base work ratios of 0.355--0.504 and time ratios of 0.724--0.841.
+Against L2, the work ratios range from 0.883 to 1.041; removing parent 001
+reverses the aggregate work comparison. Online Resource~1 supplies all six
+deletions. This checks dependence within the observed family, not external
+generalization.
 
 Against L2, Budget-L2 lowers work in 24/72 seed pairs and 10/24 scenario
 aggregates; it lowers complete-process time in 6/24 scenarios. The work ratio
@@ -223,14 +238,15 @@ completion in 72/72 assignments; native completion is not a certificate.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Prospective scenarios. Budgets include raw and integer-rounded points;
-B/G are detected bound/1\%-completion contradictions against exact feasible
+\caption{Prospective scenarios. Physical budgets include raw and integer-rounded
+points; domains require exact variable bounds and integrality at the returned
+point. B/G are detected bound/1\%-completion contradictions against exact feasible
 witnesses of the actual native export. No missing witness contrasts occur.}
 \label{tab:orf-prospective-accuracy}
-\begin{tabular}{lrrr}\toprule
-Policy & Budgets & B/G & Export hypothesis\\\midrule
+\begin{tabular}{lrrrr}\toprule
+Policy & Physical budgets & Domains & B/G & Export hypothesis\\\midrule
 '''
-    for p,r in policies.items():si+=f"{p} & {r['budgets_passed']}/72 & {r['bound_flags']}/{r['completion_flags']} & {r['exported_hypothesis_passed']}/72\\\\\n"
+    for p,r in policies.items():si+=f"{p} & {r['budgets_passed']}/72 & {domains[p]['exact_domains_passed']}/72 & {r['bound_flags']}/{r['completion_flags']} & {r['exported_hypothesis_passed']}/72\\\\\n"
     si+=r'''\bottomrule\end{tabular}\end{table}
 All original-unit checks use exact rational expressions in the supplied
 binary64 data and points. The nominal exported tolerance is distinguished from
@@ -241,6 +257,11 @@ additional primal recoveries here. The contract changes 8,448 factors over the
 Budget/L2 factor ratio per model ranges from 8.242 to 10.694. There are no
 incompatible requirements. These measurements locate the changed representation,
 without identifying a proprietary solver operation as its cause.
+Three Base points violate exact bounds by $9.27\times10^{-10}$ to
+$2.58\times10^{-9}$ in the corresponding variable units; six Base-tight points
+have bound residuals of $2.27\times10^{-13}$ to $4.55\times10^{-13}$.
+All integrality checks pass. These exact-domain failures are distinct from
+the physical row budgets; no acceptance tolerance is changed for this summary.
 
 \begin{table}[htbp]
 \centering\small
@@ -345,6 +366,57 @@ outer process timings using cluster multiplicities rather than the producer's
 indexed averaging. It checks every scenario aggregation and resampling hash,
 without calls to an optimizer.
 '''
+    si+=r'''
+\paragraph{Post hoc sensitivity to the six known parents}
+Table~\ref{tab:orf-prospective-parent-deletion} removes each original input
+together with its four derived scenarios and their three seeds, leaving 20
+scenarios and 60 paired runs per comparison. Every remaining pair is retained,
+including contradictory bound outcomes. All four controls and both metrics
+are supplied in \texttt{PARENT\_SENSITIVITY.json}; this table displays Base and
+L2. These are descriptive deletion estimates, not confidence intervals or
+evidence about independent MILP families. Their independent replay reconstructs
+the ratios from native work and external process clocks without optimization.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Budget-L2/control after deleting each known parent. Entries are paired
+geometric means over the 60 retained seed pairs; time includes the complete
+process. No pairs are screened out.}
+\label{tab:orf-prospective-parent-deletion}
+\begin{tabular}{lrrrr}\toprule
+Excluded parent & $W/W_{\rm Base}$ & $T/T_{\rm Base}$ & $W/W_{\rm L2}$ & $T/T_{\rm L2}$\\\midrule
+'''
+    for parent in sensitivity['parents']:
+        selected={r['control']:r for r in sensitivity['comparisons'] if r['excluded_parent']==parent}
+        b,l=selected['Base'],selected['L2']
+        si+=f"{parent.removeprefix('instance')} & {b['work_ratio']:.3f} & {b['time_ratio']:.3f} & {l['work_ratio']:.3f} & {l['time_ratio']:.3f}\\\\\n"
+    si+=r'''\bottomrule\end{tabular}\end{table}
+The direction of lower work and time against Base survives every single-parent
+deletion. The L2 comparison is less stable: excluding parent 001 gives work
+and time ratios of 1.041 and 1.071, respectively. This reinforces the distinction
+between improvement over the unscaled representation and an incremental
+benefit of the contract over conventional Euclidean scaling. It does not
+resolve uncertainty about new parent structures or applications.
+'''
+    parent_lines=['','## Sensibilidad posterior a los seis padres conocidos','',
+        'Cada eliminación retira el padre y sus cuatro escenarios, conservando',
+        'los 20 escenarios restantes con sus tres semillas (60 pares por control).',
+        'No se filtran contradicciones ni se añaden optimizaciones o intervalos.','',
+        '| Padre excluido | Trabajo / Base | Tiempo / Base | Trabajo / L2 | Tiempo / L2 |',
+        '|---|---:|---:|---:|---:|']
+    for parent in sensitivity['parents']:
+        selected={r['control']:r for r in sensitivity['comparisons'] if r['excluded_parent']==parent}
+        b,l=selected['Base'],selected['L2']
+        parent_lines.append(f"| {parent} | {b['work_ratio']:.3f} | {b['time_ratio']:.3f} | {l['work_ratio']:.3f} | {l['time_ratio']:.3f} |")
+    parent_lines+=['','La dirección favorable frente a Base persiste en las seis eliminaciones.',
+        'Frente a L2, retirar instance001 invierte el promedio de trabajo: 1,041.',
+        'No es validación externa ni elimina la dependencia de las estructuras conocidas.',
+        'PARENT_SENSITIVITY.json contiene los cuatro controles y ambos indicadores;',
+        'el modo --check reconstruye 56 cocientes desde trabajo nativo y relojes externos.','',
+        'Precisión física y dominio se reportan por separado: Base 72/72 y 69/72;',
+        'Base-tight 72/72 y 66/72; L2, L2-NF3 y Budget-L2 72/72 en ambos.',
+        'Las fallas del dominio son residuos positivos de cotas, sin fallas de integralidad.','']
+    at=lines.index('## Intervención y referencias racionales');lines[at:at]=parent_lines
     summary=['','## Incertidumbre agrupada por escenario (análisis posterior)','',
         '100000 remuestras de los 24 escenarios completos; las tres semillas se',
         'mantienen juntas. No se descartan contradicciones ni se cuentan las',
@@ -413,6 +485,8 @@ bound outcomes remain available for both campaigns. Complete-process time is
 reported separately for this technical replication on the shared host.
 '''
         si+='Budget-L2 time ratios are '+', '.join(f"{r['time_ratio']:.3f} against {p}" for p,r in aa.items())+'.\n'
+    at=lines.index('python3 exploration/orf-confirmatory-20261018/check_cluster_analysis.py')+1
+    lines.insert(at,'python3 exploration/orf-confirmatory-20261018/parent_sensitivity.py --check')
     (HERE/'RESULTADOS.md').write_text('\n'.join(lines)+'\n')
     editorial=ROOT/'paper/orf/editorial';editorial.mkdir(parents=True,exist_ok=True)
     (editorial/'prospective-main.tex').write_text(maintext)
